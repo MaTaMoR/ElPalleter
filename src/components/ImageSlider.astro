@@ -1,0 +1,316 @@
+---
+// ImageSlider.astro - Componente del slider de imágenes
+export interface Props {
+    images: Array<{
+        src: string;
+        alt: string;
+        caption?: string;
+    }>;
+}
+
+const { images } = Astro.props;
+---
+
+<div class="slider-container" data-slider="historia-slider">
+    <div class="slider-wrapper">
+        {images.map((image, index) => (
+            <div 
+                class={`slide ${index === 0 ? 'active' : ''}`}
+                style={`background-image: url('${image.src}')`}
+            >
+                {image.caption && (
+                    <div class="slide-caption">{image.caption}</div>
+                )}
+            </div>
+        ))}
+    </div>
+    
+    <!-- Flechas de navegación -->
+    <button class="slider-arrow prev" aria-label="Imagen anterior">‹</button>
+    <button class="slider-arrow next" aria-label="Siguiente imagen">›</button>
+    
+    <!-- Puntos de navegación -->
+    <div class="slider-nav">
+        {images.map((_, index) => (
+            <button 
+                class={`nav-dot ${index === 0 ? 'active' : ''}`}
+                data-slide={index}
+                aria-label={`Ir a imagen ${index + 1}`}
+            ></button>
+        ))}
+    </div>
+</div>
+
+<style>
+    /* Slider de fotos */
+    .slider-container {
+        position: relative;
+        overflow: hidden;
+        background: #000;
+        height: 100%;
+    }
+    
+    .slider-wrapper {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+    
+    .slide {
+        min-width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    
+    .slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Controles del slider */
+    .slider-nav {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 1rem;
+        z-index: 10;
+    }
+    
+    .nav-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+    
+    .nav-dot.active {
+        background: #f4a261;
+        border-color: #f4a261;
+        transform: scale(1.2);
+    }
+    
+    .nav-dot:hover {
+        background: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* Flechas del slider */
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+    }
+    
+    .slider-arrow:hover {
+        background: rgba(244, 162, 97, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .slider-arrow.prev {
+        left: 2rem;
+    }
+    
+    .slider-arrow.next {
+        right: 2rem;
+    }
+    
+    /* Caption opcional para las fotos */
+    .slide-caption {
+        position: absolute;
+        bottom: 4rem;
+        left: 2rem;
+        right: 2rem;
+        text-align: center;
+        color: white;
+        font-size: 1.1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .slide.active .slide-caption {
+        opacity: 1;
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+        .slider-arrow {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+        
+        .slider-arrow.prev {
+            left: 1rem;
+        }
+        
+        .slider-arrow.next {
+            right: 1rem;
+        }
+        
+        .slide-caption {
+            font-size: 1rem;
+            bottom: 3rem;
+        }
+    }
+</style>
+
+<script>
+    class ImageSlider {
+        constructor(containerId) {
+            this.containerId = containerId || 'sliderContainer';
+            this.container = document.querySelector(`[data-slider="${this.containerId}"]`);
+            
+            if (!this.container) {
+                console.warn(`Slider container with data-slider="${this.containerId}" not found`);
+                return;
+            }
+            
+            this.currentSlide = 0;
+            this.sliderWrapper = this.container.querySelector('.slider-wrapper');
+            this.dots = this.container.querySelectorAll('.nav-dot');
+            this.slides = this.container.querySelectorAll('.slide');
+            this.prevBtn = this.container.querySelector('.slider-arrow.prev');
+            this.nextBtn = this.container.querySelector('.slider-arrow.next');
+            this.totalSlides = this.slides.length;
+            this.autoPlayInterval = null;
+            
+            if (this.totalSlides > 0 && this.sliderWrapper) {
+                this.init();
+                this.updateSlider();
+            }
+        }
+        
+        init() {
+            // Event listeners para las flechas (solo de este slider)
+            if (this.prevBtn) {
+                this.prevBtn.addEventListener('click', () => {
+                    this.clearAutoPlay();
+                    this.prevSlide();
+                    this.startAutoPlay();
+                });
+            }
+            
+            if (this.nextBtn) {
+                this.nextBtn.addEventListener('click', () => {
+                    this.clearAutoPlay();
+                    this.nextSlide();
+                    this.startAutoPlay();
+                });
+            }
+            
+            // Event listeners para los dots (solo de este slider)
+            this.dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    this.clearAutoPlay();
+                    this.goToSlide(index);
+                    this.startAutoPlay();
+                });
+            });
+            
+            // Pausar autoplay en hover (solo de este slider)
+            if (this.sliderWrapper) {
+                this.sliderWrapper.addEventListener('mouseenter', () => this.clearAutoPlay());
+                this.sliderWrapper.addEventListener('mouseleave', () => this.startAutoPlay());
+            }
+            
+            // Iniciar autoplay
+            this.startAutoPlay();
+        }
+        
+        updateSlider() {
+            if (!this.sliderWrapper || this.totalSlides === 0) return;
+            
+            // Mover el slider
+            const translateX = -this.currentSlide * 100;
+            this.sliderWrapper.style.transform = `translateX(${translateX}%)`;
+            
+            // Actualizar dots (solo de este slider)
+            this.dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === this.currentSlide);
+            });
+            
+            // Actualizar slides activos (solo de este slider)
+            this.slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === this.currentSlide);
+            });
+        }
+        
+        nextSlide() {
+            this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+            this.updateSlider();
+        }
+        
+        prevSlide() {
+            this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+            this.updateSlider();
+        }
+        
+        goToSlide(index) {
+            if (index >= 0 && index < this.totalSlides) {
+                this.currentSlide = index;
+                this.updateSlider();
+            }
+        }
+        
+        startAutoPlay() {
+            this.clearAutoPlay();
+            if (this.totalSlides > 1) {
+                this.autoPlayInterval = setInterval(() => this.nextSlide(), 5000);
+            }
+        }
+        
+        clearAutoPlay() {
+            if (this.autoPlayInterval) {
+                clearInterval(this.autoPlayInterval);
+                this.autoPlayInterval = null;
+            }
+        }
+        
+        destroy() {
+            this.clearAutoPlay();
+        }
+    }
+    
+    // Inicializar sliders cuando se carga la página
+    document.addEventListener('DOMContentLoaded', () => {
+        // Buscar todos los contenedores de slider
+        const sliderContainers = document.querySelectorAll('[data-slider]');
+        const sliders = [];
+        
+        sliderContainers.forEach(container => {
+            const sliderId = container.getAttribute('data-slider');
+            const slider = new ImageSlider(sliderId);
+            if (slider.totalSlides > 0) {
+                sliders.push(slider);
+            }
+        });
+        
+        // Limpiar todos los sliders al salir
+        window.addEventListener('beforeunload', () => {
+            sliders.forEach(slider => slider.destroy());
+        });
+    });
+</script>

@@ -1,264 +1,273 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Palleter - Hero Final</title>
-</head>
-<body>
-    <div class="hero">
-        <!-- Sección superior: Solo título y subtítulo -->
-        <div class="hero-header">
-            <div class="logo">
-                <div class="logo-placeholder">EL PALLETER</div>
-            </div>
-            <h2 class="subtitle">Tapas y Parrilla</h2>
-        </div>
+---
+// Hero.astro - Componente del hero principal
+import logoBlanco from '../assets/logo-blanco.svg';
+---
 
-        <!-- Sección inferior: Resto del contenido + flecha integrada -->
-        <div class="hero-content">
-            <!-- Descripción breve -->
-            <p class="description">Auténtica cocina mediterránea en el corazón de Benissa</p>
-            
-            <!-- CTA -->
-            <button class="cta-btn">Conoce Nuestra Historia</button>
-            
-            <!-- Info adicional actualizada -->
-            <div class="extra-info">
-                <span>📍 Benissa, Valencia</span>
-                <span>🕐 Miércoles a Domingo + Lunes mañana</span>
-            </div>
-            
-            <!-- Flecha integrada en el contenido -->
-            <div class="scroll-indicator-integrated">
-                <div class="scroll-text">Explora</div>
-                <div class="scroll-arrow">↓</div>
-            </div>
+<section class="hero" id="hero">
+    <!-- Sección superior: título y subtítulo -->
+    <div class="hero-header">
+        <div class="logo">
+            <div class="logo-text">EL PALLETER</div>
+        </div>
+        <h1 class="subtitle">Tapas y Parrilla</h1>
+    </div>
+
+    <!-- Sección inferior: Resto del contenido + flecha integrada -->
+    <div class="hero-content">
+        <!-- Descripción breve -->
+        <p class="description">Auténtica cocina mediterránea en el corazón de Benissa</p>
+        
+        <!-- CTA -->
+        <button class="cta-btn" data-scroll-to="historia">Conoce Nuestra Historia</button>
+        
+        <!-- Info adicional actualizada -->
+        <div class="extra-info">
+            <span>📍 Benissa, Valencia</span>
+            <span>🕐 Miércoles a Domingo + Lunes mañana</span>
         </div>
         
-        <!-- Scroll indicator como la Opción 2 -->
-        <div class="scroll-indicator">
+        <!-- Flecha integrada en el contenido -->
+        <div class="scroll-indicator-integrated" data-scroll-to="historia">
             <div class="scroll-text">Explora</div>
             <div class="scroll-arrow">↓</div>
         </div>
     </div>
+</section>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+<style>
+    .hero {
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), 
+                    url('../assets/fondo.jpg') center/cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Sección superior: título y subtítulo */
+    .hero-header {
+        text-align: center;
+        color: white;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-top: 100px; /* Espacio para el header fijo */
+    }
+
+    .logo-text {
+        font-size: 7rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .subtitle {
+        font-size: 2.8rem;
+        font-weight: 400;
+        letter-spacing: 3px;
+        margin: 0;
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+        text-transform: uppercase;
+    }
+
+    /* Sección inferior: resto del contenido */
+    .hero-content {
+        text-align: center;
+        color: white;
+        z-index: 2;
+        max-width: 600px;
+        padding-bottom: 3rem;
+    }
+
+    .description {
+        font-size: 1.4rem;
+        font-weight: 300;
+        line-height: 1.5;
+        margin-bottom: 2.5rem;
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+        opacity: 0.95;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+    }
+
+    .cta-btn {
+        background: linear-gradient(45deg, #d4853d, #f4a261);
+        border: none;
+        color: white;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(212, 133, 61, 0.3);
+        margin-bottom: 2rem;
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 133, 61, 0.4);
+        background: linear-gradient(45deg, #c47533, #e8956b);
+    }
+
+    .extra-info {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2.5rem;
+    }
+
+    .extra-info span {
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Flecha integrada dentro del contenido */
+    .scroll-indicator-integrated {
+        margin-top: 2.5rem;
+        text-align: center;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .scroll-indicator-integrated:hover {
+        transform: translateY(-5px);
+    }
+
+    .scroll-indicator-integrated .scroll-text {
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 0 auto 0.5rem auto;
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.2);
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+        width: fit-content;
+    }
+
+    .scroll-indicator-integrated .scroll-arrow {
+        font-size: 2rem;
+        animation: bounce 2s infinite;
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        40% {
+            transform: translateY(-10px);
         }
-
-        .hero {
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), 
-                        url(../assets/fondo.jpg) center/cover;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        /* Sección superior: título y subtítulo */
-        .hero-header {
-            text-align: center;
-            color: white;
-            z-index: 2;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding-top: 100px; /* Espacio para el header fijo */
-        }
-
-        .logo-placeholder {
-            font-size: 7rem;
-            font-weight: 700;
-            letter-spacing: 4px;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-        }
-
-        .subtitle {
-            font-size: 2.8rem;
-            font-weight: 400;
-            letter-spacing: 3px;
-            margin-bottom: 0;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
-            text-transform: uppercase;
-        }
-
-        /* Sección inferior: resto del contenido */
-        .hero-content {
-            text-align: center;
-            color: white;
-            z-index: 2;
-            max-width: 600px;
-            padding-bottom: 3rem; /* Reducido para que la flecha se solape */
-        }
-
-        .description {
-            font-size: 1.4rem;
-            font-weight: 300;
-            line-height: 1.5;
-            margin-bottom: 2.5rem;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
-            opacity: 0.95;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-        }
-
-        .cta-btn {
-            background: linear-gradient(45deg, #d4853d, #f4a261);
-            border: none;
-            color: white;
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(212, 133, 61, 0.3);
-            margin-bottom: 2rem;
-        }
-
-        .cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 133, 61, 0.4);
-            background: linear-gradient(45deg, #c47533, #e8956b);
-        }
-
-        .extra-info {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .extra-info span {
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Flecha integrada dentro del contenido */
-        .scroll-indicator-integrated {
-            margin-top: 2.5rem;
-            text-align: center;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .scroll-indicator-integrated:hover {
+        60% {
             transform: translateY(-5px);
         }
+    }
 
-        .scroll-indicator-integrated .scroll-text {
-            font-size: 1rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 0 auto 0.5rem auto; /* Centrar con auto margins */
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
-            background: rgba(0, 0, 0, 0.2);
-            padding: 0.3rem 0.6rem;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            width: fit-content; /* Se ajusta al contenido */
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-header {
+            padding-top: 80px;
         }
-
-        .scroll-indicator-integrated .scroll-arrow {
+        
+        .hero-content {
+            padding-bottom: 2rem;
+        }
+        
+        .logo-text {
+            font-size: 4rem;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
             font-size: 2rem;
-            animation: bounce 2s infinite;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
         }
+        
+        .description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .cta-btn {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+        }
+        
+        .extra-info {
+            flex-direction: column;
+            gap: 0.8rem;
+            font-size: 1rem;
+            align-items: center;
+        }
+        
+        .extra-info span {
+            padding: 0.3rem 0.6rem;
+            width: fit-content;
+        }
+        
+        .scroll-indicator-integrated {
+            margin-top: 2rem;
+        }
+    }
+</style>
 
-        /* Scroll indicator como la Opción 2 - OCULTO AHORA */
-        .scroll-indicator {
-            display: none;
-        }
+<script>
+    // Smooth scroll mejorado para el hero
+    document.addEventListener('DOMContentLoaded', () => {
+        // Función para smooth scroll
+        const smoothScrollTo = (targetId) => {
+            const target = document.querySelector(`#${targetId}`);
+            if (target) {
+                const headerOffset = 100; // Altura del header fijo
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
+        };
 
-        @media (max-width: 768px) {
-            .hero-header {
-                padding-top: 80px; /* Menor padding en móvil */
-            }
-            
-            .hero-content {
-                padding-bottom: 2rem; /* Menor padding en móvil */
-            }
-            
-            .logo-placeholder {
-                font-size: 4rem;
-                letter-spacing: 2px;
-                margin-bottom: 1rem;
-            }
-            
-            .subtitle {
-                font-size: 2rem;
-                letter-spacing: 2px;
-            }
-            
-            .description {
-                font-size: 1.1rem;
-                margin-bottom: 2rem;
-                padding: 0.4rem 0.8rem;
-            }
-            
-            .cta-btn {
-                padding: 0.8rem 2rem;
-                font-size: 1rem;
-            }
-            
-            .extra-info {
-                flex-direction: column;
-                gap: 0.8rem;
-                font-size: 1rem;
-                align-items: center;
-            }
-            
-            .extra-info span {
-                padding: 0.3rem 0.6rem;
-                width: fit-content;
-            }
-            
-            .scroll-indicator-integrated {
-                margin-top: 2rem;
-            }
-        }
+        // Event listeners para elementos con data-scroll-to
+        const scrollElements = document.querySelectorAll('[data-scroll-to]');
+        scrollElements.forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = element.getAttribute('data-scroll-to');
+                smoothScrollTo(targetId);
+            });
+        });
 
-        @media (max-width: 480px) {
-            .extra-info span {
-                font-size: 0.95rem;
-            }
-        }
-    </style>
-</body>
-</html>
+        // Mantener compatibilidad con cualquier elemento que apunte a #historia
+        const historiaLinks = document.querySelectorAll('a[href="#historia"]');
+        historiaLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                smoothScrollTo('historia');
+            });
+        });
+    });
+</script>

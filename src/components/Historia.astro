@@ -1,0 +1,236 @@
+---
+// HistoriaSection.astro - Componente de la sección de historia
+import ImageSlider from './ImageSlider.astro';
+
+// Importar las imágenes desde assets
+import slider1 from '../assets/slider/slider-1.jpg';
+import slider2 from '../assets/slider/slider-2.jpg';
+import slider3 from '../assets/slider/slider-3.jpg';
+import slider4 from '../assets/slider/slider-4.jpg';
+
+// Imágenes del local con las rutas correctas
+const localImages = [
+    {
+        src: slider1.src,
+        alt: 'Nuestro restaurante El Palleter',
+        caption: 'Nuestro restaurante El Palleter'
+    },
+    {
+        src: slider2.src,
+        alt: 'Nuestra hamburguesa especial',
+        caption: 'Nuestra hamburguesa especial'
+    },
+    {
+        src: slider3.src,
+        alt: 'Ven y prueba nuestra parrilla',
+        caption: 'Ven y prueba nuestra parrilla'
+    },
+    {
+        src: slider4.src,
+        alt: 'En una buena comida no puede faltar un buen postre',
+        caption: 'En una buena comida no puede faltar un buen postre'
+    }
+];
+---
+
+<section class="historia-section fade-in-section" id="historia" data-animate>
+    <!-- Historia a la izquierda -->
+    <div class="history-content">
+        <h2 class="section-title">Nuestra Historia</h2>
+        <p class="section-subtitle">Desde 1985 en el corazón de Benissa</p>
+        
+        <p class="section-text">
+            Lo que comenzó como un pequeño restaurante familiar se ha convertido en 
+            un <span class="highlight">referente de la cocina mediterránea</span> en Benissa. 
+            Tres generaciones han mantenido vivas las recetas tradicionales mientras 
+            incorporan toques modernos que sorprenden a nuestros comensales.
+        </p>
+        
+        <p class="section-text">
+            Cada plato cuenta una historia, cada sabor evoca recuerdos de generaciones 
+            que han encontrado en El Palleter su <span class="highlight">segundo hogar</span>. 
+            Nuestra parrilla, que lleva funcionando desde el primer día, sigue siendo 
+            el corazón de nuestra cocina.
+        </p>
+        
+        <p class="section-text">
+            Hoy, seguimos comprometidos con la <span class="highlight">calidad</span>, 
+            la <span class="highlight">tradición</span> y el <span class="highlight">sabor auténtico</span> 
+            que nos ha caracterizado durante casi cuatro décadas.
+        </p>
+        
+        <div class="cta-container">
+            <a href="#contacto" class="secondary-btn" data-nav="contacto">Conoce más sobre nosotros</a>
+        </div>
+    </div>
+    
+    <!-- Slider de fotos a la derecha -->
+    <div class="slider-section">
+        <ImageSlider images={localImages} />
+    </div>
+</section>
+
+<style>
+    /* Split section principal */
+    .historia-section {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: rgb(20, 20, 20);
+    }
+    
+    /* Animación fade in */
+    .fade-in-section {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fade-in-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Contenido de historia a la izquierda */
+    .history-content {
+        background: rgb(20, 20, 20);
+        color: white;
+        padding: 6rem 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .section-title {
+        font-size: 3rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        color: #f4a261;
+        letter-spacing: 1px;
+    }
+    
+    .section-subtitle {
+        font-size: 1.4rem;
+        font-weight: 400;
+        margin-bottom: 3rem;
+        color: #f4a261;
+        opacity: 0.8;
+    }
+    
+    .section-text {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+    
+    .highlight {
+        color: #f4a261;
+        font-weight: 500;
+    }
+    
+    .cta-container {
+        margin-top: 2rem;
+    }
+    
+    .secondary-btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: transparent;
+        border: 2px solid #f4a261;
+        color: #f4a261;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .secondary-btn:hover {
+        background: #f4a261;
+        color: rgb(20, 20, 20);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(244, 162, 97, 0.3);
+    }
+    
+    /* Sección del slider */
+    .slider-section {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Responsive */
+    @media (max-width: 968px) {
+        .historia-section {
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+        
+        .history-content {
+            padding: 4rem 2rem;
+            order: 1; /* Historia arriba en móvil */
+        }
+        
+        .slider-section {
+            min-height: 60vh;
+            order: 2; /* Slider abajo en móvil */
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+        }
+        
+        .section-text {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .history-content {
+            padding: 3rem 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .section-text {
+            font-size: 1rem;
+        }
+        
+        .secondary-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<script>
+    // Intersection Observer para la animación de fade in
+    document.addEventListener('DOMContentLoaded', () => {
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observar la sección de historia
+        const historiaSection = document.querySelector('[data-animate]');
+        if (historiaSection) {
+            observer.observe(historiaSection);
+        }
+    });
+</script>

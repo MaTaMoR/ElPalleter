@@ -1,5 +1,5 @@
 ---
-// Navigation.astro - Navegación desktop y móvil
+// Navigation.astro - Navegación con smooth scroll
 import logoBlanco from '../assets/logo-blanco.svg';
 ---
 
@@ -13,20 +13,20 @@ import logoBlanco from '../assets/logo-blanco.svg';
     
     <!-- Nav items (desktop) con logo integrado -->
     <ul class="nav-desktop">
-        <li><a href="/">INICIO</a></li>
-        <li><a href="/about">HISTORIA</a></li>
+        <li><a href="#hero" data-nav="inicio">INICIO</a></li>
+        <li><a href="#historia" data-nav="historia">HISTORIA</a></li>
         <li class="logo-item">
-            <a href="/">
+            <a href="#hero" aria-label="Ir a inicio - El Palleter">
                 <img src={logoBlanco.src} alt="El Palleter Logo" />
             </a>
         </li>
-        <li><a href="/carta">CARTA</a></li>
-        <li><a href="/contacto">CONTACTO</a></li>
+        <li><a href="#carta" data-nav="carta">CARTA</a></li>
+        <li><a href="#contacto" data-nav="contacto">CONTACTO</a></li>
     </ul>
     
     <!-- Logo solo para móvil -->
     <div class="logo-mobile">
-        <a href="/">
+        <a href="#hero" aria-label="Ir a inicio - El Palleter">
             <img src={logoBlanco.src} alt="El Palleter Logo" />
         </a>
     </div>
@@ -111,12 +111,19 @@ import logoBlanco from '../assets/logo-blanco.svg';
         display: block;
         text-align: center;
         white-space: nowrap;
+        position: relative;
     }
     
     .nav-desktop li:not(.logo-item) a:hover {
         background: rgba(255, 255, 255, 0.08);
         transform: translateY(-1px);
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    
+    /* Indicador de sección activa */
+    .nav-desktop li:not(.logo-item) a.active {
+        background: rgba(244, 162, 97, 0.2);
+        color: #f4a261;
     }
     
     /* Estilo específico para el item del logo */
@@ -170,3 +177,69 @@ import logoBlanco from '../assets/logo-blanco.svg';
         }
     }
 </style>
+
+<script>
+    // Smooth scroll navigation
+    document.addEventListener('DOMContentLoaded', () => {
+        // Función para smooth scroll
+        const smoothScrollTo = (targetId) => {
+            const target = document.querySelector(targetId);
+            if (target) {
+                const headerOffset = 100; // Altura del header fijo
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        // Event listeners para nav links
+        const navLinks = document.querySelectorAll('a[data-nav]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                smoothScrollTo(targetId);
+            });
+        });
+
+        // Logo links también
+        const logoLinks = document.querySelectorAll('a[href="#hero"]');
+        logoLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                smoothScrollTo('#hero');
+            });
+        });
+
+        // Highlight nav item activo basado en scroll
+        const updateActiveNav = () => {
+            const sections = ['#hero', '#historia', '#carta', '#contacto'];
+            const navItems = document.querySelectorAll('a[data-nav]');
+            
+            let currentSection = '';
+            
+            sections.forEach(sectionId => {
+                const section = document.querySelector(sectionId);
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 150 && rect.bottom >= 150) {
+                        currentSection = sectionId.substring(1); // Remove #
+                    }
+                }
+            });
+
+            navItems.forEach(item => {
+                const navSection = item.getAttribute('data-nav');
+                item.classList.toggle('active', navSection === currentSection);
+            });
+        };
+
+        // Actualizar nav activo en scroll
+        window.addEventListener('scroll', updateActiveNav);
+        updateActiveNav(); // Inicial
+    });
+</script>

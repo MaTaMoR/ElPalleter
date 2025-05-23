@@ -1,5 +1,5 @@
 ---
-// MobileSidebar.astro - Sidebar/overlay menu para móvil
+// MobileSidebar.astro - Sidebar/overlay menu para móvil con smooth scroll
 import logoBlanco from '../assets/logo-blanco.svg';
 ---
 
@@ -15,7 +15,7 @@ import logoBlanco from '../assets/logo-blanco.svg';
         <div class="left-content">
             <!-- Logo en el overlay -->
             <div class="overlay-logo">
-                <a href="/" aria-label="Ir a inicio - El Palleter">
+                <a href="#hero" aria-label="Ir a inicio - El Palleter">
                     <img src={logoBlanco.src} alt="El Palleter Logo" />
                 </a>
             </div>
@@ -23,10 +23,10 @@ import logoBlanco from '../assets/logo-blanco.svg';
             <!-- Navegación del overlay -->
             <nav class="overlay-nav">
                 <ul>
-                    <li><a href="/" aria-label="INICIO" data-delay="0">INICIO</a></li>
-                    <li><a href="/carta" aria-label="CARTA" data-delay="100">CARTA</a></li>
-                    <li><a href="/contacto" aria-label="CONTACTO" data-delay="200">CONTACTO</a></li>
-                    <li><a href="/about" aria-label="HISTORIA" data-delay="300">HISTORIA</a></li>
+                    <li><a href="#hero" data-delay="0" data-nav="inicio">INICIO</a></li>
+                    <li><a href="#historia" data-delay="100" data-nav="historia">HISTORIA</a></li>
+                    <li><a href="#carta" data-delay="200" data-nav="carta">CARTA</a></li>
+                    <li><a href="#contacto" data-delay="300" data-nav="contacto">CONTACTO</a></li>
                 </ul>
             </nav>
         </div>
