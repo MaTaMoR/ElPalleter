@@ -1,0 +1,99 @@
+---
+// Header.astro - Componente principal simplificado
+import Navigation from './Navigation.astro';
+import MobileSidebar from './MobileSidebar.astro';
+---
+
+<header id="header">
+    <!-- Overlay para la opacidad -->
+    <div class="header-overlay"></div>
+    
+    <Navigation />
+</header>
+
+<MobileSidebar />
+
+<!-- Script del header (solo funcionalidad del sidebar) -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const hamburger = document.getElementById('hamburger');
+        const fullscreenMenu = document.getElementById('fullscreenMenu');
+        const closeMenu = document.getElementById('closeMenu');
+        
+        // Abrir fullscreen menu
+        hamburger?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fullscreenMenu?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Cerrar fullscreen menu
+        const closeMenuFunction = () => {
+            fullscreenMenu?.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        
+        closeMenu?.addEventListener('click', closeMenuFunction);
+        
+        // Cerrar menu al hacer click en un link
+        const menuLinks = fullscreenMenu?.querySelectorAll('a');
+        menuLinks?.forEach(link => {
+            link.addEventListener('click', closeMenuFunction);
+        });
+        
+        // Cerrar con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && fullscreenMenu?.classList.contains('active')) {
+                closeMenuFunction();
+            }
+        });
+        
+        // Cerrar al hacer click en el fondo
+        fullscreenMenu?.addEventListener('click', (e) => {
+            if (e.target === fullscreenMenu) {
+                closeMenuFunction();
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Solo estilos del header principal */
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        width: 100%;
+        height: 100px;
+        position: fixed;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        /* Degradado más transparente */
+        background: linear-gradient(135deg, 
+            rgba(10, 10, 10, 0.7) 0%,
+            rgba(21, 21, 21, 0.7) 25%,
+            rgba(26, 18, 18, 0.7) 45%,
+            rgba(31, 31, 31, 0.7) 65%,
+            rgba(20, 20, 20, 0.7) 85%,
+            rgba(0, 0, 0, 0.7) 100%
+        );
+    }
+    
+    .header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(30px) saturate(200%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        z-index: 1;
+    }
+</style>

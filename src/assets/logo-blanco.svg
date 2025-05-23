@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 140" width="450" height="140">
+  
+  <!-- Título principal -->
+  <text x="225" y="60" text-anchor="middle" font-family="serif" font-size="60" font-weight="bold" fill="white">
+    EL PALLETER
+  </text>
+  
+  <!-- Línea decorativa -->
+  <line x1="65" y1="80" x2="385" y2="80" stroke="#FF4500" stroke-width="3"/>
+  
+  <!-- Subtítulo -->
+  <text x="225" y="115" text-anchor="middle" font-family="serif" font-size="30" fill="white">
+    Tapas &amp; Parrilla
+  </text>
+  
+</svg>

@@ -1,0 +1,261 @@
+---
+// MobileSidebar.astro - Sidebar/overlay menu para móvil
+import logoBlanco from '../assets/logo-blanco.svg';
+---
+
+<!-- Fullscreen Overlay Menu -->
+<div class="fullscreen-menu" id="fullscreenMenu">
+    <div class="fullscreen-content">
+        <!-- Botón de cerrar en la esquina superior derecha -->
+        <button class="close-btn" id="closeMenu" aria-label="Cerrar menú">
+            <span>✕</span>
+        </button>
+        
+        <!-- Container izquierdo para logo y nav -->
+        <div class="left-content">
+            <!-- Logo en el overlay -->
+            <div class="overlay-logo">
+                <a href="/" aria-label="Ir a inicio - El Palleter">
+                    <img src={logoBlanco.src} alt="El Palleter Logo" />
+                </a>
+            </div>
+            
+            <!-- Navegación del overlay -->
+            <nav class="overlay-nav">
+                <ul>
+                    <li><a href="/" aria-label="INICIO" data-delay="0">INICIO</a></li>
+                    <li><a href="/carta" aria-label="CARTA" data-delay="100">CARTA</a></li>
+                    <li><a href="/contacto" aria-label="CONTACTO" data-delay="200">CONTACTO</a></li>
+                    <li><a href="/about" aria-label="HISTORIA" data-delay="300">HISTORIA</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Fullscreen Menu Overlay */
+    .fullscreen-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(15px);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fullscreen-menu.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .fullscreen-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    /* Botón de cerrar en esquina superior derecha */
+    .close-btn {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    
+    .fullscreen-menu.active .close-btn {
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 0.4s ease 0.3s;
+    }
+    
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(90deg);
+    }
+    
+    /* Container izquierdo */
+    .left-content {
+        position: absolute;
+        top: 1.25rem; /* 20px - para alinear con el header de 100px */
+        left: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    /* Logo en el overlay */
+    .overlay-logo {
+        margin-bottom: 3rem;
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: all 0.6s ease;
+        /* Ajustar para que coincida con la altura del logo del nav */
+        margin-top: 0.5rem; /* Pequeño ajuste fino */
+    }
+    
+    .fullscreen-menu.active .overlay-logo {
+        opacity: 1;
+        transform: translateX(0);
+        transition-delay: 0.2s;
+    }
+    
+    .overlay-logo a {
+        display: block;
+        transition: all 0.3s ease;
+    }
+    
+    .overlay-logo img {
+        height: 100px;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+        transition: all 0.3s ease;
+    }
+    
+    .overlay-logo a:hover img {
+        transform: scale(1.05);
+    }
+    
+    /* Navegación del overlay */
+    .overlay-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+    
+    .overlay-nav li {
+        margin: 1.5rem 0;
+    }
+    
+    .overlay-nav a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        font-size: 1.8rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        /* Transiciones específicas solo para propiedades de hover */
+        transition: background-color 0.15s ease, 
+                    color 0.15s ease, 
+                    text-shadow 0.15s ease,
+                    border-left-color 0.15s ease;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        text-transform: uppercase;
+        border-left: 3px solid transparent;
+        
+        /* Animación inicial - desde la derecha */
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    
+    /* Animación cuando se abre el menu */
+    .fullscreen-menu.active .overlay-nav a {
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Delays escalonados para cada elemento */
+    .fullscreen-menu.active .overlay-nav a[data-delay="0"] {
+        transition-delay: 0.4s;
+    }
+    
+    .fullscreen-menu.active .overlay-nav a[data-delay="100"] {
+        transition-delay: 0.5s;
+    }
+    
+    .fullscreen-menu.active .overlay-nav a[data-delay="200"] {
+        transition-delay: 0.6s;
+    }
+    
+    .fullscreen-menu.active .overlay-nav a[data-delay="300"] {
+        transition-delay: 0.7s;
+    }
+    
+    /* Hover con transición específica para transform */
+    .overlay-nav a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        color: white;
+        border-left-color: transparent;
+        /* Transición específica solo para el transform del hover */
+        transition: background-color 0.15s ease, 
+                    color 0.15s ease, 
+                    text-shadow 0.15s ease,
+                    border-left-color 0.15s ease,
+                    transform 0.15s ease;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .left-content {
+            top: 1rem; /* Ajuste para móvil */
+            left: 2rem;
+        }
+        
+        .overlay-logo {
+            margin-top: 0.25rem; /* Ajuste fino para móvil */
+        }
+        
+        .overlay-logo img {
+            height: 80px;
+        }
+        
+        .overlay-nav a {
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .close-btn {
+            font-size: 3rem;
+            width: 40px;
+            height: 40px;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .overlay-nav a {
+            font-size: 1.2rem;
+            padding: 0.6rem 1rem;
+        }
+        
+        .overlay-logo {
+            margin-bottom: 2rem;
+            margin-top: 0.25rem; /* Mantener ajuste fino */
+        }
+        
+        .overlay-logo img {
+            height: 80px;
+        }
+        
+        .left-content {
+            top: 0.75rem; /* Ajuste adicional para pantallas muy pequeñas */
+            left: 1.5rem;
+        }
+    }
+</style>

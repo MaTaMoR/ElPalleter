@@ -1,0 +1,172 @@
+---
+// Navigation.astro - Navegación desktop y móvil
+import logoBlanco from '../assets/logo-blanco.svg';
+---
+
+<nav>
+    <!-- Hamburger button (solo visible en móvil) -->
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Nav items (desktop) con logo integrado -->
+    <ul class="nav-desktop">
+        <li><a href="/">INICIO</a></li>
+        <li><a href="/about">HISTORIA</a></li>
+        <li class="logo-item">
+            <a href="/">
+                <img src={logoBlanco.src} alt="El Palleter Logo" />
+            </a>
+        </li>
+        <li><a href="/carta">CARTA</a></li>
+        <li><a href="/contacto">CONTACTO</a></li>
+    </ul>
+    
+    <!-- Logo solo para móvil -->
+    <div class="logo-mobile">
+        <a href="/">
+            <img src={logoBlanco.src} alt="El Palleter Logo" />
+        </a>
+    </div>
+</nav>
+
+<style>
+    nav {
+        max-width: 1200px;
+        width: 100%;
+        padding: 0 2rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        position: relative;
+        display: flex;
+        align-items: center;
+        z-index: 2;
+    }
+    
+    /* Hamburger (oculto en desktop) */
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 10px;
+        position: absolute;
+        left: 1rem;
+        z-index: 103;
+    }
+    
+    .hamburger span {
+        width: 25px;
+        height: 3px;
+        background: white;
+        margin: 3px 0;
+        border-radius: 2px;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+    }
+    
+    /* Logo móvil (oculto en desktop) */
+    .logo-mobile {
+        display: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 102;
+    }
+    
+    .logo-mobile img {
+        height: 80px;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) 
+                drop-shadow(0 0 16px rgba(0, 0, 0, 0.3));
+        transition: all 0.3s ease;
+    }
+    
+    .logo-mobile img:hover {
+        transform: scale(1.03);
+    }
+    
+    /* Nav Desktop */
+    .nav-desktop {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    
+    /* Estilo para items de navegación normales */
+    .nav-desktop li:not(.logo-item) a {
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 12px 16px;
+        color: white;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        display: block;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .nav-desktop li:not(.logo-item) a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    
+    /* Estilo específico para el item del logo */
+    .logo-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 1rem;
+    }
+    
+    .logo-item a {
+        display: block;
+        padding: 0;
+        border-radius: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .logo-item img {
+        height: 80px;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) 
+                drop-shadow(0 0 16px rgba(0, 0, 0, 0.3));
+        transition: all 0.3s ease;
+    }
+    
+    .logo-item a:hover img {
+        transform: scale(1.03);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hamburger {
+            display: flex;
+        }
+        
+        .nav-desktop {
+            display: none;
+        }
+        
+        .logo-mobile {
+            display: block;
+        }
+        
+        nav {
+            padding: 0 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .logo-mobile img {
+            height: 80px;
+        }
+    }
+</style>
