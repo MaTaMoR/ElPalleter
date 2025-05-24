@@ -179,28 +179,20 @@ import epLogo from '../assets/mini-logo.svg';
 </style>
 
 <script>
-    // Smooth scroll mejorado para el hero
+    // Smooth scroll sin offset - navegación exacta al inicio de cada sección
     document.addEventListener('DOMContentLoaded', () => {
-        // Función para smooth scroll - SIN OFFSET para mostrar contenido completo
+        // Función para smooth scroll SIN OFFSET
         const smoothScrollTo = (targetId) => {
             const target = document.querySelector(`#${targetId}`);
             if (target) {
-                // Opción 1: Scroll exacto al inicio de la sección (RECOMENDADA)
+                // Scroll exacto al inicio de la sección (sin offset)
                 const elementPosition = target.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset;
 
                 window.scrollTo({
-                    top: offsetPosition - 100,
+                    top: offsetPosition,
                     behavior: 'smooth'
                 });
-
-                // Opción 2: Alternativa si quieres un pequeño margen (descomenta si prefieres)
-                // const smallOffset = 20; // Solo 20px de margen
-                // const offsetPosition = elementPosition + window.pageYOffset - smallOffset;
-                // window.scrollTo({
-                //     top: offsetPosition,
-                //     behavior: 'smooth'
-                // });
             }
         };
 
