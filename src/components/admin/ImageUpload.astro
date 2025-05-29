@@ -1,0 +1,221 @@
+---
+export interface Props {
+  id: string;
+  label: string;
+  currentImage?: string;
+  accept?: string;
+  onUpload?: string; // Nombre de la función JS que se ejecutará
+  section?: string;
+  type?: string;
+}
+
+const { 
+  id, 
+  label, 
+  currentImage, 
+  accept = "image/*", 
+  onUpload, 
+  section = "general",
+  type = "image" 
+} = Astro.props;
+---
+
+<div class="image-upload-component" data-upload-id={id}>
+    <label class="upload-label">{label}</label>
+    
+    <div class="image-preview-container">
+        <div class="image-preview" id={`preview-${id}`}>
+            {currentImage ? (
+                <img src={currentImage} alt={label} />
+            ) : (
+                <div class="image-placeholder">
+                    <div class="placeholder-icon">📷</div>
+                    <div class="placeholder-text">Haga clic para subir imagen</div>
+                </div>
+            )}
+        </div>
+        
+        <div class="upload-overlay">
+            <input 
+                type="file" 
+                id={id}
+                class="file-input" 
+                accept={accept}
+                data-section={section}
+                data-type={type}
+                data-callback={onUpload}
+            />
+            <label for={id} class="upload-button">
+                📷 Cambiar Imagen
+            </label>
+        </div>
+    </div>
+    
+    {currentImage && (
+        <div class="current-url">
+            <small>{currentImage}</small>
+        </div>
+    )}
+</div>
+
+<style>
+    .image-upload-component {
+        margin-bottom: 2rem;
+    }
+
+    .upload-label {
+        display: block;
+        margin-bottom: 1rem;
+        color: #f4a261;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .image-preview-container {
+        position: relative;
+        border: 2px dashed rgba(244, 162, 97, 0.3);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .image-preview-container:hover {
+        border-color: rgba(244, 162, 97, 0.6);
+    }
+
+    .image-preview {
+        width: 100%;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        text-align: center;
+        color: #ccc;
+        opacity: 0.7;
+    }
+
+    .placeholder-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .placeholder-text {
+        font-size: 0.9rem;
+    }
+
+    .upload-overlay {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .upload-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+        background: rgba(244, 162, 97, 0.9);
+        color: #141414;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .upload-button:hover {
+        background: #f4a261;
+        transform: translateY(-1px);
+    }
+
+    .current-url {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(244, 162, 97, 0.05);
+        border-radius: 4px;
+    }
+
+    .current-url small {
+        color: #ccc;
+        opacity: 0.8;
+        word-break: break-all;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Setup para todos los inputs de imagen
+        document.querySelectorAll('.file-input').forEach(input => {
+            input.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const section = input.dataset.section;
+                const type = input.dataset.type;
+                const callback = input.dataset.callback;
+                const previewId = `preview-${input.id}`;
+
+                try {
+                    // Mostrar preview inmediato
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = document.getElementById(previewId);
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Preview" />`;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Subir archivo
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('section', section);
+                    formData.append('type', type);
+
+                    window.showStatus('Subiendo imagen...', 'info');
+
+                    const response = await fetch('/api/admin/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Error subiendo imagen');
+                    }
+
+                    const result = await response.json();
+
+                    // Ejecutar callback si existe
+                    if (callback && window[callback]) {
+                        window[callback](result);
+                    }
+
+                    window.showStatus('Imagen subida correctamente', 'success');
+
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    window.showStatus('Error subiendo la imagen', 'error');
+                    
+                    // Restaurar preview original si hay error
+                    // (Podrías implementar esto si es necesario)
+                }
+            });
+        });
+    });
+</script>

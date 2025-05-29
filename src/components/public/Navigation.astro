@@ -1,6 +1,5 @@
 ---
-// Navigation.astro - Navegación con smooth scroll
-import epLogo from '../assets/mini-logo.svg';
+import epLogo from '../../assets/mini-logo.svg';
 ---
 
 <nav>
@@ -13,7 +12,7 @@ import epLogo from '../assets/mini-logo.svg';
     
     <!-- Nav items (desktop) con logo integrado -->
     <ul class="nav-desktop">
-        <li><a href="#hero" data-nav="inicio">INICIO</a></li>
+        <li><a href="#inicio" data-nav="inicio">INICIO</a></li>
         <li><a href="#historia" data-nav="historia">HISTORIA</a></li>
         <li class="logo-item">
             <a href="#hero" aria-label="Ir a inicio - El Palleter">
@@ -177,55 +176,3 @@ import epLogo from '../assets/mini-logo.svg';
         }
     }
 </style>
-
-<script>
-    // Smooth scroll sin offset - navegación exacta al inicio de cada sección
-    document.addEventListener('DOMContentLoaded', () => {
-        // Función para smooth scroll SIN OFFSET
-        const smoothScrollTo = (targetId) => {
-            const target = document.querySelector(`#${targetId}`);
-            if (target) {
-                // Scroll exacto al inicio de la sección (sin offset)
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        };
-
-        // Event listeners para elementos con data-scroll-to
-        const scrollElements = document.querySelectorAll('[data-scroll-to]');
-        scrollElements.forEach(element => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = element.getAttribute('data-scroll-to');
-                smoothScrollTo(targetId);
-            });
-        });
-
-        // Mantener compatibilidad con cualquier elemento que apunte a #historia
-        const historiaLinks = document.querySelectorAll('a[href="#historia"]');
-        historiaLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                smoothScrollTo('historia');
-            });
-        });
-
-        // Función adicional para manejar todos los enlaces internos de navegación
-        const navLinks = document.querySelectorAll('a[href^="#"]');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const href = link.getAttribute('href');
-                const targetId = href.substring(1); // Quitar el #
-                if (targetId) {
-                    smoothScrollTo(targetId);
-                }
-            });
-        });
-    });
-</script>

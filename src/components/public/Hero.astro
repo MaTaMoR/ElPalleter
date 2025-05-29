@@ -1,9 +1,8 @@
 ---
-// Hero.astro - Componente del hero principal minimalista
-import logoBlanco from '../assets/logo-blanco.svg';
+import logoBlanco from '../../assets/logo-blanco.svg';
 ---
 
-<section class="hero" id="hero">
+<section class="hero" id="inicio">
     <!-- Sección central: título y subtítulo -->
     <div class="hero-header">
         <img src={logoBlanco.src} alt="El Palleter Logo" class="hero-logo" />
@@ -229,54 +228,3 @@ import logoBlanco from '../assets/logo-blanco.svg';
         }
     }
 </style>
-
-<script>
-    // Smooth scroll mejorado - SIN OFFSET para mostrar contenido completo
-    document.addEventListener('DOMContentLoaded', () => {
-        const smoothScrollTo = (targetId) => {
-            const target = document.querySelector(`#${targetId}`);
-            if (target) {
-                // Scroll exacto al inicio de la sección
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        };
-
-        // Event listeners para elementos con data-scroll-to
-        const scrollElements = document.querySelectorAll('[data-scroll-to]');
-        scrollElements.forEach(element => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = element.getAttribute('data-scroll-to');
-                smoothScrollTo(targetId);
-            });
-        });
-
-        // Mantener compatibilidad con cualquier elemento que apunte a #historia
-        const historiaLinks = document.querySelectorAll('a[href="#historia"]');
-        historiaLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                smoothScrollTo('historia');
-            });
-        });
-
-        // Función para manejar todos los enlaces internos de navegación
-        const navLinks = document.querySelectorAll('a[href^="#"]');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const href = link.getAttribute('href');
-                const targetId = href.substring(1); // Quitar el #
-                if (targetId) {
-                    smoothScrollTo(targetId);
-                }
-            });
-        });
-    });
-</script>

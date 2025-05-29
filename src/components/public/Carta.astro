@@ -1,5 +1,4 @@
 ---
-// Carta.astro - Componente de la carta/menú de El Palleter
 ---
 
 <section class="carta-section" id="carta">
@@ -416,12 +415,49 @@
         min-height: 100vh;
         padding: 120px 0 80px 0;
         background: rgb(20, 20, 20);
+        position: relative;
+    }
+
+    /* Efecto de partículas animadas en el fondo */
+    .carta-section:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
+                        radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+                        radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
+                        radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
+                        radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
+        background-size: 120px 120px, 150px 150px, 100px 100px, 180px 180px, 90px 90px;
+        opacity: 0.15;
+        animation: float 25s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    @keyframes float {
+        0%, 100% { 
+            transform: translateY(0px) translateX(0px); 
+        }
+        25% { 
+            transform: translateY(-15px) translateX(5px); 
+        }
+        50% { 
+            transform: translateY(-25px) translateX(-10px); 
+        }
+        75% { 
+            transform: translateY(-10px) translateX(8px); 
+        }
     }
 
     .carta-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
+        z-index: 2;
+        position: relative;
     }
 
     .carta-header {

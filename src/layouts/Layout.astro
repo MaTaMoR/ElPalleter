@@ -33,9 +33,117 @@ const {
         
         <title>{title}</title>
     </head>
+    
     <body>
         <slot />
     </body>
+
+    <script is:inline>
+        // Script centralizado para smooth scroll 
+        document.addEventListener('DOMContentLoaded', () => {
+            // Función para obtener la altura del header dinámicamente
+            const getHeaderHeight = () => {
+                const header = document.querySelector('#header');
+                return header ? header.getBoundingClientRect().height : 80; // Fallback a 80px
+            };
+
+            // Función principal de smooth scroll CON offset del header
+            const smoothScrollTo = (targetId) => {
+                const target = document.querySelector(`#${targetId}`);
+                if (target) {
+                    // Obtener la altura actual del header
+                    const headerHeight = getHeaderHeight();
+                    
+                    // Calcular posición con offset del header
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Usar un pequeño delay para que el scroll termine antes de limpiar la URL
+                    setTimeout(() => {
+                        // Limpiar la URL sin afectar el historial
+                        history.replaceState(null, null, window.location.pathname + window.location.search);
+                    }, 100);
+                }
+            };
+
+            // Función para manejar todos los elementos con data-scroll-to
+            const handleScrollElements = () => {
+                const scrollElements = document.querySelectorAll('[data-scroll-to]');
+                scrollElements.forEach(element => {
+                    // Remover listeners existentes para evitar duplicados
+                    element.removeEventListener('click', handleScrollClick);
+                    element.addEventListener('click', handleScrollClick);
+                });
+            };
+
+            // Handler para clicks de scroll
+            const handleScrollClick = (e) => {
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('data-scroll-to');
+                if (targetId) {
+                    smoothScrollTo(targetId);
+                }
+            };
+
+            // Función para manejar enlaces con href="#section"
+            const handleNavLinks = () => {
+                const navLinks = document.querySelectorAll('a[href^="#"]');
+                navLinks.forEach(link => {
+                    // Remover listeners existentes para evitar duplicados
+                    link.removeEventListener('click', handleNavClick);
+                    link.addEventListener('click', handleNavClick);
+                });
+            };
+
+            // Handler para clicks de navegación
+            const handleNavClick = (e) => {
+                e.preventDefault();
+                const href = e.currentTarget.getAttribute('href');
+                const targetId = href.substring(1); // Quitar el #
+                if (targetId) {
+                    smoothScrollTo(targetId);
+                }
+            };
+
+            // Función para manejar hash en la URL al cargar la página
+            const handleInitialHash = () => {
+                const hash = window.location.hash;
+                if (hash) {
+                    const targetId = hash.substring(1);
+                    // Pequeño delay para asegurar que la página esté completamente cargada
+                    setTimeout(() => smoothScrollTo(targetId), 100);
+                }
+            };
+
+            // Función para manejar cambios en el hash de la URL
+            const handleHashChange = () => {
+                const hash = window.location.hash;
+                if (hash) {
+                    const targetId = hash.substring(1);
+                    smoothScrollTo(targetId);
+                }
+            };
+
+
+            // Función para reinicializar todos los event listeners
+            const initializeScrollBehavior = () => {
+                handleScrollElements();
+                handleNavLinks();
+            };
+
+            // Inicializar al cargar la página
+            initializeScrollBehavior();
+            handleInitialHash();
+
+            // Escuchar cambios en el hash de la URL
+            window.addEventListener('hashchange', handleHashChange);
+        });
+    </script>
 </html>
 
 <style is:global>
