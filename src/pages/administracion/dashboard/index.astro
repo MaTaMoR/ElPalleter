@@ -1,11 +1,8 @@
 ---
-export interface Props {
-  title: string;
-  description?: string;
-  activeSection?: string;
-}
+// src/pages/administracion/dashboard/index.astro
+export const prerender = false;
 
-const { title, description, activeSection } = Astro.props;
+const title = "Dashboard - Administración";
 ---
 
 <!DOCTYPE html>
@@ -28,13 +25,19 @@ const { title, description, activeSection } = Astro.props;
             min-height: 100vh;
         }
 
-e
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
         /* Sidebar */
         .sidebar {
             background: linear-gradient(180deg, rgba(244, 162, 97, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(244, 162, 97, 0.2);
             padding: 2rem;
+            width: 280px;
             height: 100vh;
             overflow-y: auto;
         }
@@ -139,33 +142,115 @@ e
         .main-content {
             margin-left: 280px;
             padding: 2rem;
-            min-height: 100vh;
         }
 
         .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(244, 162, 97, 0.2);
         }
 
-        .header-left h1 {
+        .main-title {
             font-size: 2.5rem;
             font-weight: 300;
             color: white;
             margin-bottom: 0.5rem;
         }
 
-        .header-left p {
+        .main-subtitle {
             color: #ccc;
             opacity: 0.8;
         }
 
-        .header-actions {
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(244, 162, 97, 0.4);
+            box-shadow: 0 20px 40px rgba(244, 162, 97, 0.1);
+        }
+
+        .card-header {
             display: flex;
+            align-items: center;
             gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #f4a261, #e76f51);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .card-description {
+            color: #ccc;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .card-action {
+            color: #f4a261;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card-action:hover {
+            transform: translateX(5px);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(244, 162, 97, 0.1);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #f4a261;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
         }
 
         /* Responsive */
@@ -191,86 +276,15 @@ e
                 position: static;
                 margin-top: 2rem;
             }
-            
-            .main-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-        }
-
-        /* Shared Admin Styles */
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #f4a261, #e76f51);
-            color: #141414;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(244, 162, 97, 0.3);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #f4a261;
-            border: 1px solid rgba(244, 162, 97, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(244, 162, 97, 0.1);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .status-message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .status-success {
-            background: rgba(46, 204, 113, 0.1);
-            color: #2ecc71;
-            border: 1px solid rgba(46, 204, 113, 0.3);
-        }
-
-        .status-error {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
-        }
-
-        .status-info {
-            background: rgba(52, 152, 219, 0.1);
-            color: #3498db;
-            border: 1px solid rgba(52, 152, 219, 0.3);
         }
 
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 3rem;
+            height: 200px;
             color: #f4a261;
+            font-size: 1.1rem;
         }
 
         .spinner {
@@ -301,31 +315,31 @@ e
             <nav>
                 <ul class="sidebar-nav">
                     <li class="nav-item">
-                        <a href="/administracion/dashboard" class={`nav-link ${activeSection === 'dashboard' ? 'active' : ''}`}>
+                        <a href="/administracion/dashboard" class="nav-link active">
                             <span class="nav-icon">📊</span>
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/administracion/dashboard/carta" class={`nav-link ${activeSection === 'carta' ? 'active' : ''}`}>
+                        <a href="/administracion/dashboard/carta" class="nav-link">
                             <span class="nav-icon">🍽️</span>
                             Carta
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/administracion/dashboard/historia" class={`nav-link ${activeSection === 'historia' ? 'active' : ''}`}>
+                        <a href="/administracion/dashboard/historia" class="nav-link">
                             <span class="nav-icon">📖</span>
                             Historia
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/administracion/dashboard/contacto" class={`nav-link ${activeSection === 'contacto' ? 'active' : ''}`}>
+                        <a href="/administracion/dashboard/contacto" class="nav-link">
                             <span class="nav-icon">📞</span>
                             Contacto
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/administracion/dashboard/configuracion" class={`nav-link ${activeSection === 'configuracion' ? 'active' : ''}`}>
+                        <a href="/administracion/dashboard/configuracion" class="nav-link">
                             <span class="nav-icon">⚙️</span>
                             Configuración
                         </a>
@@ -347,25 +361,87 @@ e
         <!-- Main Content -->
         <main class="main-content">
             <div class="main-header">
-                <div class="header-left">
-                    <h1>{title}</h1>
-                    {description && <p>{description}</p>}
+                <h1 class="main-title">Dashboard</h1>
+                <p class="main-subtitle">Gestiona todo el contenido de tu restaurante</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="cartaItemsCount">-</div>
+                    <div class="stat-label">Platos en Carta</div>
                 </div>
-                <div class="header-actions">
-                    <slot name="header-actions" />
+                <div class="stat-card">
+                    <div class="stat-number" id="lastUpdateDate">-</div>
+                    <div class="stat-label">Días desde última actualización</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="sectionsCount">-</div>
+                    <div class="stat-label">Secciones Configuradas</div>
                 </div>
             </div>
 
-            <div id="statusMessage" style="display: none;"></div>
+            <!-- Management Cards -->
+            <div class="cards-grid">
+                <div class="dashboard-card" onclick="window.location.href='/administracion/dashboard/carta'">
+                    <div class="card-header">
+                        <div class="card-icon">🍽️</div>
+                        <div class="card-title">Gestionar Carta</div>
+                    </div>
+                    <div class="card-description">
+                        Actualiza platos, precios, descripciones y organiza las categorías de tu menú.
+                    </div>
+                    <div class="card-action">
+                        Editar Carta →
+                    </div>
+                </div>
 
-            <slot />
+                <div class="dashboard-card" onclick="window.location.href='/administracion/dashboard/historia'">
+                    <div class="card-header">
+                        <div class="card-icon">📖</div>
+                        <div class="card-title">Historia del Restaurante</div>
+                    </div>
+                    <div class="card-description">
+                        Modifica la historia, misión y valores que aparecen en tu página web.
+                    </div>
+                    <div class="card-action">
+                        Editar Historia →
+                    </div>
+                </div>
+
+                <div class="dashboard-card" onclick="window.location.href='/administracion/dashboard/contacto'">
+                    <div class="card-header">
+                        <div class="card-icon">📞</div>
+                        <div class="card-title">Información de Contacto</div>
+                    </div>
+                    <div class="card-description">
+                        Actualiza horarios, teléfono, dirección y redes sociales.
+                    </div>
+                    <div class="card-action">
+                        Editar Contacto →
+                    </div>
+                </div>
+
+                <div class="dashboard-card" onclick="window.location.href='/administracion/dashboard/configuracion'">
+                    <div class="card-header">
+                        <div class="card-icon">⚙️</div>
+                        <div class="card-title">Configuración General</div>
+                    </div>
+                    <div class="card-description">
+                        Configura aspectos generales del sitio web y opciones avanzadas.
+                    </div>
+                    <div class="card-action">
+                        Configurar →
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // Scripts compartidos para el admin
         document.addEventListener('DOMContentLoaded', async () => {
             await loadUserInfo();
+            await loadStats();
             setupLogout();
         });
 
@@ -390,6 +466,21 @@ e
             }
         }
 
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    document.getElementById('cartaItemsCount').textContent = stats.cartaItems || 0;
+                    document.getElementById('lastUpdateDate').textContent = stats.daysSinceUpdate || 0;
+                    document.getElementById('sectionsCount').textContent = stats.sectionsCount || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
         function setupLogout() {
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 try {
@@ -401,40 +492,6 @@ e
                 }
             });
         }
-
-        // Función global para mostrar mensajes de estado
-        window.showStatus = function(message, type) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.className = `status-message status-${type}`;
-            statusEl.textContent = message;
-            statusEl.style.display = 'block';
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 5000);
-            }
-        };
-
-        // Función global para hacer requests autenticados
-        window.adminFetch = async function(url, options = {}) {
-            const defaultOptions = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
-                ...options
-            };
-
-            const response = await fetch(url, defaultOptions);
-            
-            if (response.status === 401) {
-                window.location.href = '/administracion';
-                return null;
-            }
-
-            return response;
-        };
     </script>
 </body>
 </html>
