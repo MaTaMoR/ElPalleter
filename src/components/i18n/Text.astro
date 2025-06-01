@@ -1,0 +1,36 @@
+---
+// src/components/i18n/Text.astro
+export interface Props {
+  key: string;
+  fallback?: string;
+  params?: Record<string, string>;
+  maxLength?: number;
+}
+
+const { key, fallback, params, maxLength } = Astro.props;
+
+// Obtener el idioma de la URL o contexto
+const language = Astro.url.pathname.startsWith('/en/') ? 'en' : 
+                Astro.url.pathname.startsWith('/ca/') ? 'ca' : 'es';
+
+import { I18nConfig } from '../../i18n/config';
+
+const i18n = I18nConfig.getInstance();
+await i18n.loadTranslations();
+
+let text = i18n.getTranslation(key, language) || fallback || key;
+
+// Reemplazar parámetros si existen
+if (params) {
+  Object.entries(params).forEach(([param, value]) => {
+    text = text.replace(new RegExp(`{{${param}}}`, 'g'), value);
+  });
+}
+
+// Aplicar límite de caracteres si existe
+if (maxLength && text.length > maxLength) {
+  text = text.substring(0, maxLength - 3) + '...';
+}
+---
+
+<span class="translated-text" data-key={key}>{text}</span>
