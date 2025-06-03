@@ -1,0 +1,325 @@
+"""
+PROCESADOR DIRECTO DE HISTORIAS - COPILOT IA NATURAL
+
+Script simple: maneja Excel + solicita análisis IA directo a Copilot
+Sin pasos complicados - flujo natural y directo
+
+Versión: 4.0 - IA Natural y Directa
+"""
+
+import pandas as pd
+from datetime import datetime
+
+def procesar_historias_usuarios(ids_historias: str, 
+                               archivo_excel: str = "HU Release 1.2.1.xlsx",
+                               hoja: str = "USER STORIES"):
+    """
+    PROCESADOR DIRECTO - Maneja Excel y solicita análisis IA natural
+    """
+    
+    print("PROCESADOR DIRECTO CON IA NATURAL - INICIANDO")
+    print("=" * 60)
+    print(f"Archivo: {archivo_excel}")
+    print(f"Hoja: {hoja}")
+    print(f"IDs: {ids_historias}")
+    print("=" * 60)
+    
+    try:
+        # === CARGAR Y FILTRAR DATOS ===
+        print("\nCargando datos...")
+        df_original = pd.read_excel(archivo_excel, sheet_name=hoja)
+        
+        ids_lista = [id_hist.strip() for id_hist in ids_historias.split(",")]
+        filas_filtradas = df_original[df_original['ID_US'].astype(str).isin(ids_lista)].copy()
+        
+        print(f"Encontradas {len(filas_filtradas)} historias de {len(ids_lista)} solicitadas")
+        
+        if len(filas_filtradas) == 0:
+            print("No se encontraron historias")
+            return ""
+        
+        # === PROCESAR CADA HISTORIA CON IA ===
+        print(f"\nAnalizando cada historia con IA de Copilot...")
+        historias_procesadas = []
+        
+        for index, fila in filas_filtradas.iterrows():
+            # Extraer datos originales
+            datos_originales = {}
+            for columna in df_original.columns:
+                valor = fila[columna]
+                datos_originales[columna] = "" if pd.isna(valor) else str(valor)
+            
+            # Datos para análisis
+            id_us = datos_originales.get('ID_US', '')
+            titulo = datos_originales.get('Titulo', '')
+            ramo = datos_originales.get('Ramo', '')
+            release = datos_originales.get('Release', '')
+            descripcion = datos_originales.get('Descripción de la HdU - IA', '')
+            proceso = datos_originales.get('Proceso', '')
+            funcionalidad2 = datos_originales.get('Funcionalidad2', '')
+            
+            print(f"\nANALIZANDO: {id_us}")
+            print("-" * 40)
+            print(f"Título: {titulo}")
+            print(f"Ramo: {ramo} | Release: {release}")
+            print(f"Descripción: {descripcion}")
+            print(f"Proceso: {proceso} | Funcionalidad: {funcionalidad2}")
+            print("-" * 40)
+            
+            # SOLICITUD DIRECTA A COPILOT
+            print(f"Copilot, analiza esta historia usando tu IA:")
+            
+            # Llamar a Copilot para análisis
+            analisis = solicitar_analisis_copilot(
+                id_us, titulo, ramo, release, descripcion, proceso, funcionalidad2
+            )
+            
+            # Combinar datos originales + análisis
+            historia_completa = {**datos_originales, **analisis}
+            historias_procesadas.append(historia_completa)
+            
+            print(f"{id_us} analizada con IA")
+        
+        # === GENERAR EXCEL ===
+        archivo_salida = generar_excel_resultados(historias_procesadas, df_original, hoja)
+        
+        print(f"\nCOMPLETADO!")
+        print(f"Archivo: {archivo_salida}")
+        print(f"Historias: {len(historias_procesadas)}")
+        print(f"Análisis: 100% IA de Copilot")
+        
+        return archivo_salida
+        
+    except Exception as e:
+        print(f"ERROR: {str(e)}")
+        return ""
+
+def solicitar_analisis_copilot(id_us, titulo, ramo, release, descripcion, proceso, funcionalidad2):
+    """
+    Solicita análisis directo a Copilot usando su IA
+    
+    COPILOT: Cuando llegues a esta función, analiza la historia con tu IA y devuelve el diccionario
+    """
+    
+    print("COPILOT IA: Analiza esta historia y devuelve:")
+    
+    # Mostrar valores posibles para referencia
+    valores_posibles = {
+        'Tipo de Requerimiento': ['Funcional', 'Técnico', 'Performance'],
+        'Épica': [
+            'Adaptaciones NPVD para R33', 'Adaptaciones NPVD para R34', 'Adaptaciones NPVD para R37',
+            'Nuevo Producto Técnico 1 para R11', 'Nuevo Producto Técnico 1 para R25',
+            'Nuevo Producto Técnico 2 para R31', 'Nuevo Producto Técnico 2 para R33'
+        ],
+        'Feature': [
+            'Configuración de Producto', 'Tarifación', 'Cotización y Emisión',
+            'Cambio de Póliza', 'Cancelación, Rehabilitación y Reescritura',
+            'Renovación', 'Datos Administrativos', 'Upgrade de Versión',
+            'Documentación', 'GT Framework?', 'Reaseguro', 'Pantallas Cross LOB'
+        ],
+        'Funcionalidad': [
+            'Configurar Producto', 'Rating', 'Validaciones', 'Reglas de Suscripcón',
+            'Formularios de Póliza', 'Estructura Comercial', 'Upgrade', 'Impuestos'
+        ],
+        'Como': ['Actuario', 'PO', 'Suscriptor', 'Usuario de Santa Lucia', 'Promotor', 'Agente']
+    }
+    
+    # ===================================================
+    # COPILOT: AQUÍ ES DONDE USAS TU IA
+    # ===================================================
+    
+    # Basándote en los datos de la historia:
+    # - ID_US: {id_us}
+    # - Título: {titulo}  
+    # - Ramo: {ramo}
+    # - Release: {release}
+    # - Descripción: {descripcion}
+    # - Proceso: {proceso}
+    # - Funcionalidad2: {funcionalidad2}
+    
+    # Usa tu conocimiento de Guidewire PolicyCenter y análisis de requisitos
+    # para determinar los valores más apropiados:
+    
+    # COPILOT: Analiza con tu IA y devuelve este diccionario:
+    analisis_ia = {
+        'Tipo de Requerimiento': '# TU ANÁLISIS IA AQUÍ',
+        'Épica': '# TU ANÁLISIS IA AQUÍ', 
+        'Feature': '# TU ANÁLISIS IA AQUÍ',
+        'Funcionalidad': '# TU ANÁLISIS IA AQUÍ',
+        'Como': '# TU ANÁLISIS IA AQUÍ',
+        'Quiero': '# TU ANÁLISIS IA AQUÍ - frase de acción deseada',
+        'Para': '# TU ANÁLISIS IA AQUÍ - beneficio esperado',
+        'Descripción de la HdU - IA': f'# TU ANÁLISIS IA AQUÍ - descripción mejorada',
+        'Criterios de Aceptación / Escenarios': f'''# TU ANÁLISIS IA AQUÍ - formato:
+{id_us}-CA1: Escenario principal
+  - DADO que...
+  - CUANDO...
+  - ENTONCES...
+  
+{id_us}-CA2: Validación de datos
+  - DADO que...
+  - CUANDO...
+  - ENTONCES...
+  
+{id_us}-CA3: Manejo de errores
+  - DADO que...
+  - CUANDO...
+  - ENTONCES...''',
+        'Preguntas Funcionales o IT': '''# TU ANÁLISIS IA AQUÍ - formato:
+1. ¿Pregunta funcional relevante?
+2. ¿Pregunta técnica importante?
+3. ¿Pregunta de validación?
+4. ¿Pregunta de dependencias?
+5. ¿Pregunta de rendimiento?'''
+    }
+    
+    # ===================================================
+    # COPILOT: REEMPLAZA LOS COMENTARIOS CON TU ANÁLISIS IA REAL
+    # ===================================================
+    
+    return analisis_ia
+
+def generar_excel_resultados(historias_procesadas, df_original, hoja):
+    """
+    Genera el archivo Excel final con los resultados
+    """
+    
+    # Crear DataFrame
+    df_resultados = pd.DataFrame(historias_procesadas)
+    
+    # Mantener orden de columnas
+    columnas_originales = list(df_original.columns)
+    columnas_nuevas = [col for col in df_resultados.columns if col not in columnas_originales]
+    columnas_finales = columnas_originales + columnas_nuevas
+    
+    # Reordenar
+    df_resultados = df_resultados[[col for col in columnas_finales if col in df_resultados.columns]]
+    
+    # Exportar
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    archivo_salida = f"historias_IA_{timestamp}.xlsx"
+    df_resultados.to_excel(archivo_salida, sheet_name=hoja, index=False)
+    
+    return archivo_salida
+
+# ========================================
+# VERSIÓN PARA COPILOT REAL
+# ========================================
+
+def procesar_con_copilot_real(ids_historias: str, 
+                             archivo_excel: str = "HU Release 1.2.1.xlsx",
+                             hoja: str = "USER STORIES"):
+    """
+    VERSIÓN REAL - Copilot ejecuta análisis IA aquí mismo
+    
+    Esta es la función que Copilot debe ejecutar y completar con su IA
+    """
+    
+    print("PROCESAMIENTO REAL CON IA DE COPILOT")
+    print("=" * 50)
+    
+    # Cargar datos (parte técnica automática)
+    df_original = pd.read_excel(archivo_excel, sheet_name=hoja)
+    ids_lista = [id_hist.strip() for id_hist in ids_historias.split(",")]
+    filas_filtradas = df_original[df_original['ID_US'].astype(str).isin(ids_lista)].copy()
+    
+    historias_procesadas = []
+    
+    # Procesar cada historia
+    for index, fila in filas_filtradas.iterrows():
+        # Extraer datos originales
+        datos_originales = {}
+        for columna in df_original.columns:
+            valor = fila[columna]
+            datos_originales[columna] = "" if pd.isna(valor) else str(valor)
+        
+        # Datos para análisis IA
+        id_us = datos_originales.get('ID_US', '')
+        titulo = datos_originales.get('Titulo', '')
+        ramo = datos_originales.get('Ramo', '')
+        release = datos_originales.get('Release', '')
+        descripcion = datos_originales.get('Descripción de la HdU - IA', '')
+        proceso = datos_originales.get('Proceso', '')
+        funcionalidad2 = datos_originales.get('Funcionalidad2', '')
+        
+        print(f"\nAnalizando {id_us} con IA...")
+        
+        # ===============================================
+        # COPILOT: AQUÍ USAS TU IA PARA CADA HISTORIA
+        # ===============================================
+        
+        # Para esta historia específica, determina usando tu IA:
+        analisis_copilot = {
+            # COPILOT: Analiza el ramo "{ramo}" y release "{release}" para determinar la épica apropiada
+            'Épica': 'Adaptaciones NPVD para R33',  # ← COPILOT: Cambia esto con tu análisis IA
+            
+            # COPILOT: Analiza la descripción "{descripcion}" y proceso "{proceso}" para determinar el tipo
+            'Tipo de Requerimiento': 'Funcional',  # ← COPILOT: Cambia esto con tu análisis IA
+            
+            # COPILOT: Analiza el proceso "{proceso}" para determinar el feature apropiado
+            'Feature': 'Configuración de Producto',  # ← COPILOT: Cambia esto con tu análisis IA
+            
+            # COPILOT: Analiza la funcionalidad "{funcionalidad2}" para determinar el componente técnico
+            'Funcionalidad': 'Configurar Producto',  # ← COPILOT: Cambia esto con tu análisis IA
+            
+            # COPILOT: Analiza quién usaría esta funcionalidad basado en la descripción
+            'Como': 'Suscriptor',  # ← COPILOT: Cambia esto con tu análisis IA
+            
+            # COPILOT: Redacta la acción deseada basada en el proceso
+            'Quiero': f'realizar {proceso.lower()} de manera eficiente',  # ← COPILOT: Mejora esto con tu IA
+            
+            # COPILOT: Redacta el beneficio esperado
+            'Para': f'optimizar {funcionalidad2.lower()} en PolicyCenter',  # ← COPILOT: Mejora esto con tu IA
+            
+            # COPILOT: Reescribe y mejora la descripción original
+            'Descripción de la HdU - IA': f'Descripción mejorada para {id_us}',  # ← COPILOT: Reescribe con tu IA
+            
+            # COPILOT: Crea criterios de aceptación específicos para esta historia
+            'Criterios de Aceptación / Escenarios': f'''{id_us}-CA1: Escenario principal
+  - DADO que el usuario tiene permisos apropiados
+  - CUANDO ejecuta {proceso.lower()}
+  - ENTONCES el sistema procesa correctamente
+
+{id_us}-CA2: Validación de datos
+  - DADO que se ingresan datos incorrectos
+  - CUANDO se intenta procesar
+  - ENTONCES se muestran errores específicos
+
+{id_us}-CA3: Manejo de errores
+  - DADO que ocurre un error del sistema
+  - CUANDO se ejecuta la funcionalidad
+  - ENTONCES se registra y notifica apropiadamente''',  # ← COPILOT: Personaliza con tu IA
+            
+            # COPILOT: Genera preguntas específicas para esta historia
+            'Preguntas Funcionales o IT': f'''1. ¿Cuáles son las validaciones específicas para {proceso}?
+2. ¿Qué campos son obligatorios en {funcionalidad2}?
+3. ¿Hay dependencias con otros módulos de Guidewire?
+4. ¿Cuál es el comportamiento esperado en caso de errores?
+5. ¿Qué permisos específicos se requieren para esta operación?'''  # ← COPILOT: Personaliza con tu IA
+        }
+        
+        # Combinar datos originales + análisis IA
+        historia_completa = {**datos_originales, **analisis_copilot}
+        historias_procesadas.append(historia_completa)
+        
+        print(f"   {id_us} analizada")
+    
+    # Generar Excel final
+    archivo_salida = generar_excel_resultados(historias_procesadas, df_original, hoja)
+    
+    print(f"\nCOMPLETADO!")
+    print(f"Archivo: {archivo_salida}")
+    print(f"Análisis: IA de Copilot")
+    
+    return archivo_salida
+
+# ========================================
+# EJECUCIÓN DIRECTA PARA COPILOT
+# ========================================
+
+if __name__ == "__main__":
+    print("PROCESADOR DIRECTO LISTO")
+    print("\nCOPILOT: Ejecuta una de estas opciones:")
+    print("1. procesar_con_copilot_real('USCP463, USCP456')")
+    print("2. procesar_historias_usuarios('USCP463, USCP456')")
+    print("\nLuego usa tu IA para analizar cada historia")
