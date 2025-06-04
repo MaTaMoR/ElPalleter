@@ -36,18 +36,32 @@ Sub ImportarAnalisisDesdeArchivo()
         Exit Sub
     End If
     
-    ' Leer archivo completo
+    ' Leer archivo completo con codificación correcta
     Dim objFSO As Object
-    Dim objFile As Object
+    Dim objStream As Object
     Set objFSO = CreateObject("Scripting.FileSystemObject")
-    Set objFile = objFSO.OpenTextFile(archivo, 1, False, -1) ' -1 = Unicode/UTF-8
-    contenido = objFile.ReadAll
-    objFile.Close
+    
+    ' Usar ADODB.Stream para manejar UTF-8 correctamente
+    Set objStream = CreateObject("ADODB.Stream")
+    objStream.Type = 2 ' adTypeText
+    objStream.Charset = "UTF-8"
+    objStream.Open
+    objStream.LoadFromFile archivo
+    contenido = objStream.ReadText
+    objStream.Close
     
     ' Dividir en líneas
     contenido = Replace(contenido, vbCrLf, vbLf)
     contenido = Replace(contenido, vbCr, vbLf)
     lineas = Split(contenido, vbLf)
+    
+    ' Debug: mostrar primeras líneas para verificar codificación
+    Debug.Print "=== VERIFICACIÓN DE CODIFICACIÓN ==="
+    Debug.Print "Total de líneas: " & UBound(lineas) + 1
+    For i = 0 To WorksheetFunction.Min(5, UBound(lineas))
+        Debug.Print "Línea " & i & ": " & lineas(i)
+    Next i
+    Debug.Print "=== FIN VERIFICACIÓN ==="
     
     ' Procesar cada línea
     For i = 0 To UBound(lineas)
