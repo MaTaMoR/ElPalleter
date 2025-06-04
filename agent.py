@@ -1,312 +1,152 @@
-Sub ExportarHistoriasConPromptDesdeExcel()
-'
-' Macro para exportar historias con prompt leído desde Excel
-' 1. El prompt debe estar en la hoja "PROMPT" en la celda A1
-' 2. Seleccionar las filas que contienen las historias antes de ejecutar
-'
-    Dim ws As Worksheet
-    Dim wsPrompt As Worksheet
-    Dim rango As Range
-    Dim archivo As String
-    Dim contenido As String
-    Dim promptCompleto As String
-    Dim datosHistorias As String
-    Dim fila As Range
-    Dim ultimaColumna As Integer
-    Dim i As Integer
-    Dim nombreColumna As String
-    Dim valorCelda As String
-    Dim contadorHistoria As Integer
-    Dim columna As Integer ' Nueva variable para el índice de columna
-    
-    Set ws = ActiveSheet
-    Set rango = Selection
-    
-    ' Verificar que hay una selección
-    If rango Is Nothing Then
-        MsgBox "Por favor, selecciona las filas que deseas exportar"
-        Exit Sub
-    End If
-    
-    ' Si la selección es solo una columna, expandir a toda la fila
-    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
-    
-    If rango.Columns.Count = 1 Then
-        ' Expandir la selección desde la columna A hasta la última columna con datos
-        Set rango = ws.Range(ws.Cells(rango.Row, 1), ws.Cells(rango.Row + rango.Rows.Count - 1, ultimaColumna))
-        Debug.Print "Selección expandida automáticamente desde columna " & rango.Address & " a filas completas"
-    End If
-    
-    ' Verificar que existe la hoja PROMPT
-    On Error GoTo ErrorHojaPrompt
-    Set wsPrompt = ThisWorkbook.Worksheets("PROMPT")
-    On Error GoTo 0
-    
-    ' Leer el prompt desde la celda A1 de la hoja PROMPT
-    promptCompleto = wsPrompt.Range("A1").Value
-    
-    ' Verificar que el prompt no esté vacío
-    If Trim(promptCompleto) = "" Then
-        MsgBox "La celda A1 de la hoja 'PROMPT' está vacía. Por favor, pega ahí el prompt completo."
-        Exit Sub
-    End If
-    
-    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
-    contadorHistoria = 1
-    
-    ' Leer las columnas a exportar desde la hoja CONFIG (o usar default)
-    Dim columnasExportar As Variant
-    columnasExportar = LeerColumnasDesdeConfig(ws)
-    
-    ' Agregar sección de datos al prompt
-    promptCompleto = promptCompleto & vbCrLf & vbCrLf & "## DATOS DE ENTRADA" & vbCrLf & vbCrLf
-    promptCompleto = promptCompleto & "[PROCESA TODAS LAS HISTORIAS INCLUIDAS AQUÍ ABAJO]" & vbCrLf & vbCrLf
-    
-    ' Procesar cada historia seleccionada
-    For Each fila In rango.Rows
-        If fila.Row > 1 Then ' Saltar la fila de headers
-            datosHistorias = datosHistorias & "------------------------------ Historia " & contadorHistoria & " ------------------------------" & vbCrLf & vbCrLf
-            
-            ' Exportar solo las columnas especificadas en el array
-            For i = 0 To UBound(columnasExportar)
-                nombreColumna = columnasExportar(i)
-                columna = BuscarColumna(ws, nombreColumna)
-                
-                If columna > 0 Then
-                    valorCelda = ws.Cells(fila.Row, columna).Value
-                    If valorCelda <> "" Then
-                        datosHistorias = datosHistorias & nombreColumna & ":::" & " " & valorCelda & vbCrLf
-                    End If
-                Else
-                    Debug.Print "Advertencia: No se encontró la columna '" & nombreColumna & "'"
-                End If
-            Next i
-            
-            datosHistorias = datosHistorias & vbCrLf
-            contadorHistoria = contadorHistoria + 1
-        End If
-    Next fila
-    
-    ' Combinar prompt + datos
-    contenido = promptCompleto & datosHistorias
-    contenido = contenido & vbCrLf & "---" & vbCrLf & vbCrLf
-    contenido = contenido & "**RECUERDA**: Debes procesar TODAS las historias incluidas arriba y generar análisis específicos y detallados para cada una. NO uses placeholders genéricos."
-    
-    ' Seleccionar archivo de destino
-    archivo = Application.GetSaveAsFilename(FileFilter:="Archivos de texto (*.txt), *.txt", _
-                                          Title:="Guardar prompt completo como", _
-                                          InitialFileName:="AnalisisHistorias_" & Format(Now, "yyyymmdd_hhmmss") & ".txt")
-    
-    If archivo = "False" Then
-        MsgBox "Operación cancelada"
-        Exit Sub
-    End If
-    
-    ' Guardar el archivo
-    Open archivo For Output As #1
-    Print #1, contenido
-    Close #1
-    
-    MsgBox "Exportación completada: " & archivo & vbCrLf & vbCrLf & _
-           "Historias exportadas: " & (contadorHistoria - 1) & vbCrLf & _
-           "Columnas exportadas: " & (UBound(columnasExportar) + 1) & vbCrLf & vbCrLf & _
-           "Ahora copia todo el contenido del archivo y pégalo en Copilot." & vbCrLf & vbCrLf & _
-           "TIP: Usa 'ConfigurarColumnasExportar' para cambiar qué columnas exportar."
-    
-    Exit Sub
-    
-ErrorHojaPrompt:
-    MsgBox "No se encontró la hoja 'PROMPT'. Por favor:" & vbCrLf & vbCrLf & _
-           "1. Crea una nueva hoja llamada 'PROMPT'" & vbCrLf & _
-           "2. Pega el prompt completo en la celda A1" & vbCrLf & _
-           "3. Vuelve a ejecutar este macro"
-    Exit Sub
-    
-End Sub
+# ANÁLISIS AUTOMÁTICO DE HISTORIAS DE USUARIO - GUIDEWIRE POLICYCENTER
 
-Sub CrearHojaPrompt()
-'
-' Macro auxiliar para crear la hoja PROMPT con el texto base
-'
-    Dim wsPrompt As Worksheet
-    Dim promptBase As String
-    
-    ' Verificar si ya existe la hoja
-    On Error GoTo CrearHoja
-    Set wsPrompt = ThisWorkbook.Worksheets("PROMPT")
-    
-    ' Si ya existe, preguntar si sobrescribir
-    If MsgBox("La hoja 'PROMPT' ya existe. ¿Deseas sobrescribir el contenido?", vbYesNo + vbQuestion) = vbNo Then
-        Exit Sub
-    End If
-    GoTo ConfigurarHoja
-    
-CrearHoja:
-    On Error GoTo 0
-    ' Crear nueva hoja
-    Set wsPrompt = ThisWorkbook.Worksheets.Add
-    wsPrompt.Name = "PROMPT"
-    
-ConfigurarHoja:
-    ' Configurar la celda A1
-    With wsPrompt.Range("A1")
-        .Font.Name = "Consolas"
-        .Font.Size = 10
-        .WrapText = True
-        .VerticalAlignment = xlTop
-        .HorizontalAlignment = xlLeft
-    End With
-    
-    ' Ajustar el ancho de la columna A para que sea cómoda de leer
-    wsPrompt.Columns("A:A").ColumnWidth = 120
-    
-    ' Prompt base para empezar
-    promptBase = "# ANÁLISIS DE HISTORIAS DE USUARIO - GUIDEWIRE POLICYCENTER" & vbCrLf & vbCrLf & _
-                "**IMPORTANTE**: Lee completamente este prompt antes de generar cualquier respuesta. Debes analizar TODAS las historias incluidas en la sección ""DATOS DE ENTRADA"" y generar análisis específicos y detallados para cada una." & vbCrLf & vbCrLf & _
-                "## INSTRUCCIONES PARA EL ANÁLISIS" & vbCrLf & vbCrLf & _
-                "Eres un analista experto en Guidewire PolicyCenter. Tu tarea es procesar las historias de usuario incluidas al final de este prompt y generar análisis enriquecidos siguiendo EXACTAMENTE este formato." & vbCrLf & vbCrLf & _
-                "[CONTINÚA EDITANDO AQUÍ EL PROMPT COMPLETO...]"
-    
-    wsPrompt.Range("A1").Value = promptBase
-    
-    ' Seleccionar la celda A1 para que el usuario pueda empezar a editar
-    wsPrompt.Range("A1").Select
-    
-    MsgBox "Hoja 'PROMPT' creada exitosamente." & vbCrLf & vbCrLf & _
-           "Ahora puedes:" & vbCrLf & _
-           "1. Editar el prompt completo en la celda A1" & vbCrLf & _
-           "2. Usar el macro 'ExportarHistoriasConPromptDesdeExcel' para generar archivos"
-    
-End Sub
+Eres un analista experto en Guidewire PolicyCenter. Analiza TODAS las historias incluidas en la sección "DATOS DE ENTRADA" y genera automáticamente el análisis enriquecido en el formato especificado.
 
-Sub AbrirHojaPrompt()
-'
-' Macro para abrir rápidamente la hoja PROMPT para editar
-'
-    On Error GoTo ErrorHoja
-    ThisWorkbook.Worksheets("PROMPT").Activate
-    ThisWorkbook.Worksheets("PROMPT").Range("A1").Select
-    Exit Sub
-    
-ErrorHoja:
-    MsgBox "No se encontró la hoja 'PROMPT'. Ejecuta primero el macro 'CrearHojaPrompt'."
-End Sub
+**NO HAGAS PREGUNTAS. GENERA DIRECTAMENTE EL ANÁLISIS COMPLETO.**
 
-Sub ConfigurarColumnasExportar()
-'
-' Macro para configurar fácilmente qué columnas exportar
-' Crea una hoja "CONFIG" con la lista de columnas a exportar
-'
-    Dim wsConfig As Worksheet
-    Dim columnasDefault As Variant
-    Dim i As Integer
-    
-    ' Columnas por defecto
-    columnasDefault = Array("ID_US", "Ramo", "Release", "Funcionalidad", "Titulo", "Descripción de la HdU - IA")
-    
-    ' Verificar si ya existe la hoja CONFIG
-    On Error GoTo CrearHojaConfig
-    Set wsConfig = ThisWorkbook.Worksheets("CONFIG")
-    
-    ' Si ya existe, preguntar si sobrescribir
-    If MsgBox("La hoja 'CONFIG' ya existe. ¿Deseas sobrescribir la configuración?", vbYesNo + vbQuestion) = vbNo Then
-        Exit Sub
-    End If
-    GoTo ConfigurarHojaConfig
-    
-CrearHojaConfig:
-    On Error GoTo 0
-    ' Crear nueva hoja
-    Set wsConfig = ThisWorkbook.Worksheets.Add
-    wsConfig.Name = "CONFIG"
-    
-ConfigurarHojaConfig:
-    ' Limpiar la hoja
-    wsConfig.Cells.Clear
-    
-    ' Configurar headers
-    wsConfig.Range("A1").Value = "Columnas a Exportar"
-    wsConfig.Range("A1").Font.Bold = True
-    wsConfig.Range("A1").Font.Size = 12
-    
-    wsConfig.Range("A2").Value = "Edita esta lista para cambiar qué columnas se exportan:"
-    wsConfig.Range("A2").Font.Italic = True
-    
-    ' Agregar las columnas por defecto
-    For i = 0 To UBound(columnasDefault)
-        wsConfig.Cells(i + 4, 1).Value = columnasDefault(i)
-    Next i
-    
-    ' Formatear
-    wsConfig.Columns("A:A").AutoFit
-    wsConfig.Range("A4:A" & (4 + UBound(columnasDefault))).Borders.LineStyle = xlContinuous
-    
-    ' Seleccionar la primera celda de datos
-    wsConfig.Range("A4").Select
-    
-    MsgBox "Hoja 'CONFIG' creada exitosamente." & vbCrLf & vbCrLf & _
-           "Puedes:" & vbCrLf & _
-           "1. Editar la lista de columnas en la columna A (a partir de la fila 4)" & vbCrLf & _
-           "2. Agregar o quitar columnas según necesites" & vbCrLf & _
-           "3. El macro de exportación usará esta lista automáticamente"
-    
-    Exit Sub
-    
-End Sub
+## CAMPOS OBLIGATORIOS A GENERAR
 
-Function LeerColumnasDesdeConfig(ws As Worksheet) As Variant
-'
-' Lee la lista de columnas desde la hoja CONFIG
-' Si no existe, usa la lista por defecto
-'
-    Dim wsConfig As Worksheet
-    Dim ultimaFilaConfig As Long
-    Dim columnasArray() As String
-    Dim i As Long
-    Dim valorColumna As String
-    Dim contador As Integer
-    
-    ' Intentar acceder a la hoja CONFIG
-    On Error GoTo UsarDefault
-    Set wsConfig = ThisWorkbook.Worksheets("CONFIG")
-    
-    ' Encontrar la última fila con datos en la columna A
-    ultimaFilaConfig = wsConfig.Cells(wsConfig.Rows.Count, 1).End(xlUp).Row
-    
-    ' Verificar que hay datos después de la fila 3 (headers)
-    If ultimaFilaConfig <= 3 Then GoTo UsarDefault
-    
-    ' Contar las columnas válidas
-    contador = 0
-    For i = 4 To ultimaFilaConfig
-        valorColumna = Trim(wsConfig.Cells(i, 1).Value)
-        If valorColumna <> "" Then
-            contador = contador + 1
-        End If
-    Next i
-    
-    ' Si no hay columnas válidas, usar default
-    If contador = 0 Then GoTo UsarDefault
-    
-    ' Redimensionar el array
-    ReDim columnasArray(0 To contador - 1)
-    
-    ' Llenar el array
-    contador = 0
-    For i = 4 To ultimaFilaConfig
-        valorColumna = Trim(wsConfig.Cells(i, 1).Value)
-        If valorColumna <> "" Then
-            columnasArray(contador) = valorColumna
-            contador = contador + 1
-        End If
-    Next i
-    
-    LeerColumnasDesdeConfig = columnasArray
-    Exit Function
-    
-UsarDefault:
-    On Error GoTo 0
-    ' Usar la lista por defecto
-    LeerColumnasDesdeConfig = Array("ID_US", "Ramo", "Release", "Funcionalidad", "Titulo", "Descripción de la HdU - IA")
-End Function
-End Sub
+Para CADA historia, selecciona UNO de los valores predefinidos:
+
+**Tipo de Requerimiento:** Funcional | Técnico | Performance
+
+**Épica:** 
+- Adaptaciones NPVD para R33
+- Adaptaciones NPVD para R34  
+- Adaptaciones NPVD para R37
+- Nuevo Producto Técnico 1 para R11
+- Nuevo Producto Técnico 1 para R25
+- Nuevo Producto Técnico 2 para R31
+- Nuevo Producto Técnico 2 para R33
+
+**Feature:**
+- Configuración de Producto
+- Tarifación
+- Cotización y Emisión
+- Cambio de Póliza
+- Cancelación, Rehabilitación y Reescritura
+- Renovación
+- Datos Administrativos
+- Upgrade de Versión
+- Documentación
+- GT Framework
+- Reaseguro
+- Pantallas Cross LOB
+
+**Funcionalidad Analizada:**
+- Configurar Producto
+- Rating
+- Validaciones
+- Reglas de Suscripción
+- Formularios de Póliza
+- Estructura Comercial
+- Upgrade
+- Impuestos
+
+**Como:** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente
+
+## CAMPOS DE TEXTO A COMPLETAR
+
+**Quiero:** [Frase específica de la acción deseada]
+**Para:** [Beneficio específico que se obtendrá]
+**Descripción Mejorada:** [Reescritura clara y profesional de la descripción original]
+
+## CRITERIOS DE ACEPTACIÓN
+
+Genera todos los criterios necesarios para probar completamente la historia de usuario (MÍNIMO 3, tantos como sean necesarios):
+
+- **Casos normales:** Flujos principales de éxito
+- **Casos límite:** Valores en los extremos, datos mínimos/máximos
+- **Casos de error:** Validaciones, excepciones, datos inválidos
+- **Casos de integración:** Interacciones con otros sistemas/módulos
+- **Casos de permisos:** Diferentes roles de usuario
+- **Casos de estado:** Diferentes estados del sistema/objeto
+
+Formato Gherkin obligatorio:
+```
+[ID_US]-CA1::: [Título específico] - DADO que [condición específica] CUANDO [acción específica] ENTONCES [resultado específico]
+[ID_US]-CA2::: [Título específico] - DADO que [condición específica] CUANDO [acción específica] ENTONCES [resultado específico]
+[ID_US]-CA3::: [Título específico] - DADO que [condición específica] CUANDO [acción específica] ENTONCES [resultado específico]
+[continúa con todos los casos necesarios...]
+```
+
+## PREGUNTAS FUNCIONALES
+
+Genera entre 5-10 preguntas técnicas específicas según la complejidad de la historia:
+
+**Categorías obligatorias a cubrir:**
+- **Validaciones y reglas de negocio:** ¿Qué validaciones específicas se requieren?
+- **Integración y dependencias:** ¿Con qué sistemas debe integrarse?
+- **Casos límite y excepciones:** ¿Cómo manejar situaciones especiales?
+- **Performance y volumetría:** ¿Qué volúmenes de datos debe soportar?
+- **Configuración y parametrización:** ¿Qué aspectos deben ser configurables?
+- **Seguridad y permisos:** ¿Qué controles de acceso son necesarios?
+- **Impacto en procesos existentes:** ¿Qué otros procesos se ven afectados?
+
+Formato:
+```
+1. [Pregunta específica sobre validaciones o reglas de negocio]
+2. [Pregunta específica sobre integración o dependencias]
+3. [Pregunta específica sobre casos límite o excepciones]
+4. [Pregunta específica sobre performance o volumetría]
+5. [Pregunta específica sobre configuración o parametrización]
+[continúa con todas las preguntas necesarias...]
+```
+
+## FORMATO DE SALIDA OBLIGATORIO
+
+COPIA EXACTAMENTE este formato para cada historia:
+
+```
+------------------------------ Historia [N] ------------------------------
+
+[COPIA TODOS LOS CAMPOS ORIGINALES EXACTAMENTE COMO ESTÁN]
+
+--- ANÁLISIS GENERADO ---
+
+Tipo de Requerimiento::: [valor seleccionado]
+Épica::: [valor seleccionado]
+Feature::: [valor seleccionado]
+Funcionalidad Analizada::: [valor seleccionado]
+Como::: [valor seleccionado]
+Quiero::: [frase específica]
+Para::: [beneficio específico]
+Descripción Mejorada::: [descripción mejorada]
+Criterios de Aceptación::: 
+[ID_US]-CA1::: [criterio específico con DADO-CUANDO-ENTONCES]
+[ID_US]-CA2::: [criterio específico con DADO-CUANDO-ENTONCES]
+[ID_US]-CA3::: [criterio específico con DADO-CUANDO-ENTONCES]
+[ID_US]-CA4::: [criterio adicional si es necesario]
+[ID_US]-CA5::: [criterio adicional si es necesario]
+[continúa con todos los criterios necesarios]
+Preguntas Funcionales:::
+1. [pregunta específica y técnica]
+2. [pregunta específica y técnica]
+3. [pregunta específica y técnica]
+4. [pregunta específica y técnica]
+5. [pregunta específica y técnica]
+6. [pregunta adicional si es necesaria]
+7. [pregunta adicional si es necesaria]
+[continúa con todas las preguntas necesarias]
+```
+
+## REGLAS CRÍTICAS PARA IMPORTACIÓN
+
+- ✅ USA el separador `:::` en TODOS los campos generados
+- ✅ CONSERVA todos los campos originales exactamente como están
+- ✅ AÑADE la sección "--- ANÁLISIS GENERADO ---" después de los campos originales
+- ✅ GENERA contenido específico, NO placeholders genéricos
+- ✅ MANTÉN el formato exacto para facilitar la importación automática a Excel
+- ✅ PROCESA todas las historias sin excepciones
+
+## INSTRUCCIONES DE PROCESAMIENTO
+
+1. **Lee todas las historias** en la sección "DATOS DE ENTRADA"
+2. **Analiza cada historia** basándote en su contexto específico
+3. **Selecciona valores** apropiados de las listas predefinidas
+4. **Genera criterios suficientes** para cubrir completamente todos los casos de prueba
+5. **Genera preguntas suficientes** para aclarar todos los aspectos críticos (5-10 según complejidad)
+6. **Formatea la salida** usando exactamente el formato especificado
+7. **Asegúrate** de que cada campo tenga el separador `:::`
+
+**IMPORTANTE:** El resultado debe ser un archivo de texto listo para importar automáticamente a Excel usando macros de Visual Basic. El formato es crítico para el funcionamiento de la importación.
