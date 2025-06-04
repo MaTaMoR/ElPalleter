@@ -14,14 +14,20 @@ Selecciona UNO de estos valores para cada historia:
 
 **Tipo de Requerimiento:** Funcional | Técnico | Performance
 
-**Épica:** 
-- Adaptaciones NPVD para R33
-- Adaptaciones NPVD para R34  
-- Adaptaciones NPVD para R37
-- Nuevo Producto Técnico 1 para R11
-- Nuevo Producto Técnico 1 para R25
-- Nuevo Producto Técnico 2 para R31
-- Nuevo Producto Técnico 2 para R33
+**Épica - REGLAS DE MAPEO OBLIGATORIAS:**
+Usa EXACTAMENTE estas reglas basándote SOLO en el campo "Ramo" de los datos de entrada:
+
+- Si "Ramo" contiene "33" → "Adaptaciones NPVD para R33"
+- Si "Ramo" contiene "34" → "Adaptaciones NPVD para R34"  
+- Si "Ramo" contiene "37" → "Adaptaciones NPVD para R37"
+- Si "Ramo" contiene "11" → "Nuevo Producto Técnico 1 para R11"
+- Si "Ramo" contiene "25" → "Nuevo Producto Técnico 1 para R25"
+- Si "Ramo" contiene "31" → "Nuevo Producto Técnico 2 para R31"
+
+**IMPORTANTE:** 
+- USA SOLO el valor del campo "Ramo" para determinar la épica
+- IGNORA el campo "Release" para esta selección
+- NO inventes códigos que no estén en los datos de entrada
 
 **Feature:**
 - Configuración de Producto
