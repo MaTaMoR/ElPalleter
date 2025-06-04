@@ -78,101 +78,66 @@ def generar_prompt_para_copilot(ids_historias: str,
 
 def crear_contenido_prompt(historias_df, df_original):
     """
-    Crea el contenido completo del prompt con contexto y datos
+    Crea el contenido completo del prompt con contexto y datos - VERSIÓN CONCISA
     """
     
-    prompt_content = f"""# ANÁLISIS DE HISTORIAS DE USUARIO - PROMPT PARA COPILOT
+    prompt_content = f"""# ANÁLISIS DE HISTORIAS DE USUARIO - SEGUROS
 
-## CONTEXTO Y OBJETIVO
+## CONTEXTO RÁPIDO
+Eres analista de requerimientos de seguros. Analiza estas {len(historias_df)} historias y completa la información faltante.
 
-Eres un analista de requerimientos especializado en seguros. Tu tarea es analizar historias de usuario incompletas y enriquecerlas con información estructurada según metodologías ágiles.
+## VALORES OBLIGATORIOS A USAR
 
-### PROPÓSITO:
-- Completar historias de usuario siguiendo el formato estándar: "Como [rol] quiero [acción] para [beneficio]"
-- Clasificar las historias según épicas, features y funcionalidades predefinidas
-- Generar criterios de aceptación en formato Gherkin (Dado-Cuando-Entonces)
-- Crear preguntas funcionales para clarificar requerimientos
+**Tipo de Requerimiento:** Funcional | Técnico | Performance
 
-### DOMINIO DE NEGOCIO:
-- **Sector**: Seguros (Vida, Accidentes, Salud, etc.)
-- **Sistema**: Plataforma de gestión de pólizas y productos de seguros
-- **Usuarios**: Actuarios, POs, Suscriptores, Promotores, Agentes
+**Épica:** 
+• Adaptaciones NPVD para R33/R34/R37
+• Nuevo Producto Técnico 1 para R11/R25  
+• Nuevo Producto Técnico 2 para R31/R33
 
-## PARÁMETROS Y VALORES DISPONIBLES
+**Feature:**
+• Configuración de Producto, Tarifación, Cotización y Emisión
+• Cambio de Póliza, Cancelación Rehabilitación y Reescritura
+• Renovación, Datos Administrativos, Upgrade de Versión
+• Documentación, GT Framework?, Reaseguro, Pantallas Cross LOB
 
-### TIPO DE REQUERIMIENTO (obligatorio - elige UNO):
-- Funcional
-- Técnico  
-- Performance
+**Funcionalidad:**
+• Configurar Producto, Rating, Validaciones, Reglas de Suscripción
+• Formularios de Póliza, Estructura Comercial, Upgrade, Impuestos
 
-### ÉPICA (obligatorio - elige UNA basada en Ramo y Release):
-- Adaptaciones NPVD para R33
-- Adaptaciones NPVD para R34
-- Adaptaciones NPVD para R37
-- Nuevo Producto Técnico 1 para R11
-- Nuevo Producto Técnico 1 para R25
-- Nuevo Producto Técnico 2 para R31
-- Nuevo Producto Técnico 2 para R33
+**Como (Rol):** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente
 
-### FEATURE (obligatorio - elige UNO):
-- Configuración de Producto, Tarifación, Cotización y Emisión
-- Cambio de Póliza, Cancelación Rehabilitación y Reescritura
-- Renovación, Datos Administrativos, Upgrade de Versión
-- Documentación, GT Framework?, Reaseguro, Pantallas Cross LOB
+## FORMATO DE RESPUESTA OBLIGATORIO
 
-### FUNCIONALIDAD (obligatorio - elige UNA):
-- Configurar Producto, Rating, Validaciones, Reglas de Suscripción
-- Formularios de Póliza, Estructura Comercial, Upgrade, Impuestos
+Para CADA historia, responde con este formato exacto:
 
-### COMO - ROLES DISPONIBLES (obligatorio - elige UNO):
-- Actuario
-- PO (Product Owner)
-- Suscriptor
-- Usuario de Santa Lucia
-- Promotor
-- Agente
-
-## FORMATO DE RESPUESTA REQUERIDO
-
-Para cada historia, debes responder EXACTAMENTE en este formato:
-
-```
-HISTORIA [ID_US]:
-- Tipo de Requerimiento: [valor de la lista]
-- Épica: [valor de la lista]
-- Feature: [valor de la lista]
-- Funcionalidad: [valor de la lista]
-- Como: [rol del usuario]
-- Quiero: [acción específica que desea realizar]
-- Para: [beneficio o valor que obtiene]
-- Descripción mejorada: [reescritura clara de la descripción original]
-- Criterios de Aceptación: 
-  * DADO [contexto inicial] CUANDO [acción del usuario] ENTONCES [resultado esperado]
-  * DADO [contexto inicial] CUANDO [acción del usuario] ENTONCES [resultado esperado]
-  * DADO [contexto inicial] CUANDO [acción del usuario] ENTONCES [resultado esperado]
+HISTORIA [ID]:
+- Tipo de Requerimiento: [elegir de la lista]
+- Épica: [elegir de la lista]
+- Feature: [elegir de la lista]  
+- Funcionalidad: [elegir de la lista]
+- Como: [elegir rol]
+- Quiero: [acción específica]
+- Para: [beneficio/valor]
+- Descripción mejorada: [versión clara y técnica]
+- Criterios de Aceptación:
+  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]
+  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]
+  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]
 - Preguntas Funcionales:
-  * [Pregunta relevante sobre el requerimiento]
-  * [Pregunta sobre casos edge o excepciones]
-  * [Pregunta sobre integración con otros sistemas]
-  * [Pregunta sobre validaciones o reglas de negocio]
-  * [Pregunta sobre experiencia de usuario]
-```
+  * [Pregunta sobre requerimiento]
+  * [Pregunta sobre casos especiales]
+  * [Pregunta sobre integraciones]
+  * [Pregunta sobre validaciones]
+  * [Pregunta sobre UX]
 
-## INSTRUCCIONES ESPECÍFICAS
+═══════════════════════════════════════════════════════════════════
 
-1. **OBLIGATORIO**: Usa SOLO los valores de las listas predefinidas para Tipo, Épica, Feature y Funcionalidad
-2. **Criterios de Aceptación**: Mínimo 3 escenarios en formato Gherkin estricto
-3. **Preguntas Funcionales**: Mínimo 5 preguntas relevantes y específicas
-4. **Descripción mejorada**: Debe ser más clara y técnica que la original
-5. **Como/Quiero/Para**: Sigue la estructura estándar de historias de usuario
-
-## HISTORIAS A ANALIZAR
-
-A continuación se presentan {len(historias_df)} historias que requieren análisis completo:
+## HISTORIAS A ANALIZAR ({len(historias_df)} total)
 
 """
 
-    # Agregar cada historia encontrada
+    # Agregar cada historia con separación visual clara
     for i, (index, fila) in enumerate(historias_df.iterrows(), 1):
         # Extraer y limpiar datos
         datos = {}
@@ -181,37 +146,33 @@ A continuación se presentan {len(historias_df)} historias que requieren anális
             datos[columna] = "" if pd.isna(valor) else str(valor)
         
         prompt_content += f"""
-### HISTORIA {i}: {datos.get('ID_US', 'N/A')}
+██████████████████████████████████████████████████████████████████
+                              HISTORIA {i}
+██████████████████████████████████████████████████████████████████
 
-**Datos disponibles:**
-- ID_US: {datos.get('ID_US', 'N/A')}
-- Título: {datos.get('Titulo', 'N/A')}
-- Ramo: {datos.get('Ramo', 'N/A')}
-- Release: {datos.get('Release', 'N/A')}
-- Descripción de la HdU - IA: {datos.get('Descripción de la HdU - IA', 'N/A')}
-- Proceso: {datos.get('Proceso', 'N/A')}
-- Funcionalidad2: {datos.get('Funcionalidad2', 'N/A')}
+🔹 ID_US: {datos.get('ID_US', 'N/A')}
+🔹 Título: {datos.get('Titulo', 'N/A')}
+🔹 Ramo: {datos.get('Ramo', 'N/A')}
+🔹 Release: {datos.get('Release', 'N/A')}
+🔹 Descripción: {datos.get('Descripción de la HdU - IA', 'N/A')}
+🔹 Proceso: {datos.get('Proceso', 'N/A')}
+🔹 Funcionalidad2: {datos.get('Funcionalidad2', 'N/A')}
 
----
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
 """
 
     prompt_content += f"""
+═══════════════════════════════════════════════════════════════════
 
-## INSTRUCCIONES FINALES
+## ⚠️  INSTRUCCIONES CRÍTICAS
 
-### CALIDAD ESPERADA:
-- Análisis coherente con el dominio de seguros
-- Criterios de aceptación testeable y específicos
-- Preguntas que ayuden a clarificar el scope funcional
-- Historias bien formadas siguiendo estándares ágiles
+1. **USA SOLO** los valores de las listas arriba
+2. **MANTÉN** el formato exacto de respuesta
+3. **INCLUYE** mínimo 3 criterios y 5 preguntas por historia
+4. **PROCESA** las {len(historias_df)} historias mostradas
 
-### IMPORTANTE:
-- Procesa TODAS las {len(historias_df)} historias mostradas arriba
-- Mantén el formato exacto especificado
-- Usa únicamente los valores predefinidos en las listas
-- Sé específico y técnico en las descripciones
-
-¡Comienza el análisis completo!
+¡ANALIZA TODAS LAS HISTORIAS AHORA!
 """
 
     return prompt_content
