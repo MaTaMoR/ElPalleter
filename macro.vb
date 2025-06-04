@@ -1,138 +1,127 @@
-Sub ExportarHistoriasConPromptDesdeExcel()
+Sub ImportarAnalisisDesdeArchivo()
 '
-' Macro para exportar historias con prompt leído desde Excel
-' 1. El prompt debe estar en la hoja "PROMPT" en la celda A1
-' 2. Seleccionar las filas que contienen las historias antes de ejecutar
-' 3. Exporta en formato UTF-8
+' Macro para importar el análisis generado desde archivo de texto
+' Busca y actualiza los datos en la hoja activa
 '
     Dim ws As Worksheet
-    Dim wsPrompt As Worksheet
-    Dim rango As Range
     Dim archivo As String
     Dim contenido As String
-    Dim promptCompleto As String
-    Dim datosHistorias As String
-    Dim fila As Range
-    Dim ultimaColumna As Integer
-    Dim i As Integer
-    Dim nombreColumna As String
-    Dim valorCelda As String
-    Dim contadorHistoria As Integer
+    Dim lineas As Variant
+    Dim i As Long
+    Dim fila As Long
+    Dim idUsuario As String
+    Dim campo As String
+    Dim valor As String
+    Dim posicionSeparador As Integer
     Dim columna As Integer
-    
-    ' Definir las columnas que se quieren exportar (MODIFICAR AQUÍ SEGÚN NECESITES)
-    Dim columnasExportar As Variant
-    columnasExportar = Array("ID_US", "Ramo", "Funcionalidad", "Titulo", "Descripción de la HdU - IA")
+    Dim filasActualizadas As Integer
+    Dim contadorHistorias As Integer
     
     Set ws = ActiveSheet
-    Set rango = Selection
+    filasActualizadas = 0
+    contadorHistorias = 0
     
-    ' Verificar que hay una selección
-    If rango Is Nothing Then
-        MsgBox "Por favor, selecciona las filas que deseas exportar"
-        Exit Sub
-    End If
-    
-    ' Si la selección es solo una columna, expandir a toda la fila
-    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
-    
-    If rango.Columns.Count = 1 Then
-        ' Expandir la selección desde la columna A hasta la última columna con datos
-        Set rango = ws.Range(ws.Cells(rango.Row, 1), ws.Cells(rango.Row + rango.Rows.Count - 1, ultimaColumna))
-        Debug.Print "Selección expandida automáticamente desde columna " & rango.Address & " a filas completas"
-    End If
-    
-    ' Verificar que existe la hoja PROMPT
-    On Error GoTo ErrorHojaPrompt
-    Set wsPrompt = ThisWorkbook.Worksheets("PROMPT")
-    On Error GoTo 0
-    
-    ' Leer el prompt desde la celda A1 de la hoja PROMPT
-    promptCompleto = wsPrompt.Range("A1").Value
-    
-    ' Verificar que el prompt no esté vacío
-    If Trim(promptCompleto) = "" Then
-        MsgBox "La celda A1 de la hoja 'PROMPT' está vacía. Por favor, pega ahí el prompt completo."
-        Exit Sub
-    End If
-    
-    contadorHistoria = 1
-    
-    ' Agregar sección de datos al prompt
-    promptCompleto = promptCompleto & vbCrLf & vbCrLf & "## DATOS DE ENTRADA" & vbCrLf & vbCrLf
-    promptCompleto = promptCompleto & "[PROCESA TODAS LAS HISTORIAS INCLUIDAS AQUÍ ABAJO]" & vbCrLf & vbCrLf
-    
-    ' Procesar cada historia seleccionada
-    For Each fila In rango.Rows
-        If fila.Row > 1 Then ' Saltar la fila de headers
-            datosHistorias = datosHistorias & "------------------------------ Historia " & contadorHistoria & " ------------------------------" & vbCrLf & vbCrLf
-            
-            ' Exportar solo las columnas especificadas en el array
-            For i = 0 To UBound(columnasExportar)
-                nombreColumna = columnasExportar(i)
-                columna = BuscarColumna(ws, nombreColumna)
-                
-                If columna > 0 Then
-                    valorCelda = ws.Cells(fila.Row, columna).Value
-                    If valorCelda <> "" Then
-                        datosHistorias = datosHistorias & nombreColumna & ":::" & " " & valorCelda & vbCrLf
-                    End If
-                Else
-                    Debug.Print "Advertencia: No se encontró la columna '" & nombreColumna & "'"
-                End If
-            Next i
-            
-            datosHistorias = datosHistorias & vbCrLf
-            contadorHistoria = contadorHistoria + 1
-        End If
-    Next fila
-    
-    ' Combinar prompt + datos
-    contenido = promptCompleto & datosHistorias
-    contenido = contenido & vbCrLf & "---" & vbCrLf & vbCrLf
-    contenido = contenido & "**RECUERDA**: Debes procesar TODAS las historias incluidas arriba y generar análisis específicos y detallados para cada una. NO uses placeholders genéricos."
-    
-    ' Seleccionar archivo de destino
-    archivo = Application.GetSaveAsFilename(FileFilter:="Archivos de texto (*.txt), *.txt", _
-                                          Title:="Guardar prompt completo como", _
-                                          InitialFileName:="AnalisisHistorias_" & Format(Now, "yyyymmdd_hhmmss") & ".txt")
+    ' Seleccionar archivo
+    archivo = Application.GetOpenFilename(FileFilter:="Archivos de texto (*.txt), *.txt", _
+                                        Title:="Seleccionar archivo con análisis generado")
     
     If archivo = "False" Then
         MsgBox "Operación cancelada"
         Exit Sub
     End If
     
-    ' Guardar el archivo en UTF-8
-    Dim objStream As Object
-    Set objStream = CreateObject("ADODB.Stream")
+    ' Leer archivo completo
+    Dim objFSO As Object
+    Dim objFile As Object
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objFile = objFSO.OpenTextFile(archivo, 1, False, -1) ' -1 = Unicode/UTF-8
+    contenido = objFile.ReadAll
+    objFile.Close
     
-    With objStream
-        .Type = 2 ' adTypeText
-        .Charset = "UTF-8"
-        .Open
-        .WriteText contenido
-        .SaveToFile archivo, 2 ' adSaveCreateOverWrite
-        .Close
-    End With
+    ' Dividir en líneas
+    contenido = Replace(contenido, vbCrLf, vbLf)
+    contenido = Replace(contenido, vbCr, vbLf)
+    lineas = Split(contenido, vbLf)
     
-    Set objStream = Nothing
+    ' Procesar cada línea
+    For i = 0 To UBound(lineas)
+        Dim lineaActual As String
+        lineaActual = Trim(lineas(i))
+        
+        ' Verificar si es una línea con separador :::
+        If InStr(lineaActual, ":::") > 0 Then
+            posicionSeparador = InStr(lineaActual, ":::")
+            campo = Trim(Left(lineaActual, posicionSeparador - 1))
+            valor = Trim(Mid(lineaActual, posicionSeparador + 3))
+            
+            ' Si encontramos un ID_US, establecer la fila actual
+            If campo = "ID_US" Then
+                idUsuario = valor
+                fila = BuscarFilaPorID(ws, idUsuario)
+                If fila > 0 Then
+                    contadorHistorias = contadorHistorias + 1
+                    Debug.Print "Procesando historia: " & idUsuario & " en fila " & fila
+                End If
+            ElseIf fila > 0 Then
+                ' Procesar otros campos
+                columna = BuscarColumna(ws, campo)
+                If columna > 0 Then
+                    ' Verificar si es un campo de criterios múltiples
+                    If Left(campo, Len(idUsuario) + 3) = idUsuario & "-CA" Or _
+                       IsNumeric(Left(campo, 1)) Then
+                        ' Es un criterio de aceptación o pregunta funcional
+                        ActualizarCampoMultiple ws, fila, campo, valor, idUsuario
+                    Else
+                        ' Campo normal
+                        ws.Cells(fila, columna).Value = valor
+                        filasActualizadas = filasActualizadas + 1
+                        Debug.Print "Actualizado: " & campo & " = " & Left(valor, 50) & "..."
+                    End If
+                Else
+                    ' Si no existe la columna, crearla
+                    columna = CrearNuevaColumna(ws, campo)
+                    If columna > 0 Then
+                        ws.Cells(fila, columna).Value = valor
+                        filasActualizadas = filasActualizadas + 1
+                        Debug.Print "Nueva columna creada: " & campo
+                    End If
+                End If
+            End If
+        End If
+    Next i
     
-    MsgBox "Exportación completada: " & archivo & vbCrLf & vbCrLf & _
-           "Historias exportadas: " & (contadorHistoria - 1) & vbCrLf & _
-           "Columnas exportadas: " & (UBound(columnasExportar) + 1) & vbCrLf & _
-           "Codificación: UTF-8" & vbCrLf & vbCrLf & _
-           "Ahora copia todo el contenido del archivo y pégalo en Copilot."
-    
-    Exit Sub
-    
-ErrorHojaPrompt:
-    MsgBox "No se encontró la hoja 'PROMPT'. Por favor:" & vbCrLf & vbCrLf & _
-           "1. Crea una nueva hoja llamada 'PROMPT'" & vbCrLf & _
-           "2. Pega el prompt completo en la celda A1" & vbCrLf & _
-           "3. Vuelve a ejecutar este macro"
-    Exit Sub
+    MsgBox "Importación completada:" & vbCrLf & vbCrLf & _
+           "Historias procesadas: " & contadorHistorias & vbCrLf & _
+           "Campos actualizados: " & filasActualizadas & vbCrLf & vbCrLf & _
+           "Archivo importado: " & archivo
     
 End Sub
+
+Function BuscarFilaPorID(ws As Worksheet, idBuscado As String) As Long
+'
+' Busca la fila que contiene el ID especificado
+'
+    Dim ultimaFila As Long
+    Dim columnaID As Integer
+    Dim i As Long
+    
+    ultimaFila = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    columnaID = BuscarColumna(ws, "ID_US")
+    
+    If columnaID = 0 Then
+        BuscarFilaPorID = 0
+        Exit Function
+    End If
+    
+    For i = 2 To ultimaFila ' Empezar desde fila 2 (saltar headers)
+        If Trim(ws.Cells(i, columnaID).Value) = idBuscado Then
+            BuscarFilaPorID = i
+            Exit Function
+        End If
+    Next i
+    
+    BuscarFilaPorID = 0 ' No encontrado
+End Function
 
 Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
 '
@@ -143,7 +132,7 @@ Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
     
     ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
     
-    ' Buscar en la primera fila (headers)
+    ' Buscar en la primera fila (headers) - usar nombre exacto
     For i = 1 To ultimaColumna
         If Trim(ws.Cells(1, i).Value) = nombreColumna Then
             BuscarColumna = i
@@ -153,3 +142,51 @@ Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
     
     BuscarColumna = 0 ' No encontrado
 End Function
+
+Function CrearNuevaColumna(ws As Worksheet, nombreColumna As String) As Integer
+'
+' Crea una nueva columna al final de la tabla
+'
+    Dim ultimaColumna As Integer
+    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column + 1
+    
+    ' Usar el nombre exacto sin mapeo
+    ws.Cells(1, ultimaColumna).Value = nombreColumna
+    ws.Cells(1, ultimaColumna).Font.Bold = True
+    
+    CrearNuevaColumna = ultimaColumna
+End Function
+
+Sub ActualizarCampoMultiple(ws As Worksheet, fila As Long, campo As String, valor As String, idUsuario As String)
+'
+' Maneja campos que pueden tener múltiples valores (criterios y preguntas)
+'
+    Dim columnaBase As Integer
+    Dim valorExistente As String
+    
+    ' Determinar la columna base usando nombres exactos
+    If InStr(campo, "-CA") > 0 Then
+        ' Es un criterio de aceptación
+        columnaBase = BuscarColumna(ws, "Criterios de aceptación/Escenarios")
+        If columnaBase = 0 Then
+            columnaBase = CrearNuevaColumna(ws, "Criterios de aceptación/Escenarios")
+        End If
+    ElseIf IsNumeric(Left(campo, 1)) Then
+        ' Es una pregunta funcional
+        columnaBase = BuscarColumna(ws, "Preguntas Funcionales o IT")
+        If columnaBase = 0 Then
+            columnaBase = CrearNuevaColumna(ws, "Preguntas Funcionales o IT")
+        End If
+    Else
+        Exit Sub
+    End If
+    
+    ' Agregar el valor al contenido existente
+    valorExistente = ws.Cells(fila, columnaBase).Value
+    If valorExistente = "" Then
+        ws.Cells(fila, columnaBase).Value = campo & ": " & valor
+    Else
+        ws.Cells(fila, columnaBase).Value = valorExistente & vbCrLf & campo & ": " & valor
+    End If
+    
+End Sub
