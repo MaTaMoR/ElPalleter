@@ -109,19 +109,23 @@ Como::: [valor de la lista]
 Quiero::: [TEXTO ESPECÍFICO REAL - NO PLACEHOLDER]
 Para::: [TEXTO ESPECÍFICO REAL - NO PLACEHOLDER]
 Descripción Mejorada::: [TEXTO ESPECÍFICO REAL - NO PLACEHOLDER]
-Criterios de Aceptación::: 
-[ID_US]-CA1::: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
-[ID_US]-CA2::: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
-[ID_US]-CA3::: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
+Criterios de aceptación/Escenarios::: [ID_US]-CA1: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
+[ID_US]-CA2: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
+[ID_US]-CA3: [CRITERIO ESPECÍFICO REAL con DADO-CUANDO-ENTONCES]
 [más criterios si son necesarios]
-Preguntas Funcionales:::
-1. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
+Preguntas Funcionales o IT::: 1. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 2. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 3. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 4. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 5. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 [más preguntas si son necesarias]
 ```
+
+**IMPORTANTE PARA CRITERIOS Y PREGUNTAS:**
+- NO uses ::: en criterios individuales (USCP001-CA1, USCP001-CA2, etc.)
+- NO uses ::: en preguntas individuales (1., 2., 3., etc.)
+- Todos los criterios van después de "Criterios de aceptación/Escenarios:::" en líneas separadas
+- Todas las preguntas van después de "Preguntas Funcionales o IT:::" en líneas separadas
 
 ## EJEMPLOS DE RESPUESTAS INCORRECTAS
 
@@ -130,7 +134,7 @@ Preguntas Funcionales:::
 INCORRECTO: Quiero::: [Frase específica de la acción deseada]
 INCORRECTO: Para::: [Beneficio específico que se obtendrá]
 INCORRECTO: USCP001-CA1::: [Título específico] - DADO que [condición]
-INCORRECTO: 1. [Pregunta específica sobre validaciones]
+INCORRECTO: 1::: [Pregunta específica sobre validaciones]
 
 ## EJEMPLOS DE RESPUESTAS CORRECTAS
 
@@ -140,7 +144,7 @@ CORRECTO: Quiero::: configurar nuevas reglas de suscripción automática para pr
 
 CORRECTO: Para::: acelerar el proceso de suscripción reduciendo el tiempo de evaluación manual de 2 horas a 5 minutos por cotización y mejorar la consistencia en las decisiones de suscripción
 
-CORRECTO: USCP001-CA1::: Validar datos del conductor - DADO que recibo una solicitud de cotización de seguros de auto CUANDO los datos del conductor están incompletos o inválidos ENTONCES el sistema debe mostrar errores específicos por cada campo faltante antes de continuar con el proceso
+CORRECTO: USCP001-CA1: Validar datos del conductor - DADO que recibo una solicitud de cotización de seguros de auto CUANDO los datos del conductor están incompletos o inválidos ENTONCES el sistema debe mostrar errores específicos por cada campo faltante antes de continuar con el proceso
 
 CORRECTO: 1. ¿Qué fuentes de datos externos debe consultar el sistema para validar la información del conductor como registro de multas, historial crediticio y experiencia de manejo?
 

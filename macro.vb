@@ -16,10 +16,16 @@ Sub ImportarAnalisisDesdeArchivo()
     Dim columna As Integer
     Dim filasActualizadas As Integer
     Dim contadorHistorias As Integer
+    Dim bloqueMultiple As String
+    Dim enBloqueMultiple As Boolean
+    Dim tipoBloque As String
     
     Set ws = ActiveSheet
     filasActualizadas = 0
     contadorHistorias = 0
+    bloqueMultiple = ""
+    enBloqueMultiple = False
+    tipoBloque = ""
     
     ' Seleccionar archivo
     archivo = Application.GetOpenFilename(FileFilter:="Archivos de texto (*.txt), *.txt", _
@@ -50,54 +56,114 @@ Sub ImportarAnalisisDesdeArchivo()
         
         ' Detectar cabecera de nueva historia
         If InStr(lineaActual, "------------------------------") > 0 And InStr(lineaActual, "Historia") > 0 Then
+            ' Guardar bloque múltiple anterior si existe
+            If enBloqueMultiple And bloqueMultiple <> "" And fila > 0 Then
+                GuardarBloqueMultiple ws, fila, tipoBloque, bloqueMultiple
+            End If
+            
             ' Reset para nueva historia
             idUsuario = ""
             fila = 0
+            bloqueMultiple = ""
+            enBloqueMultiple = False
+            tipoBloque = ""
             Debug.Print "Nueva historia detectada: " & lineaActual
+            
         ElseIf InStr(lineaActual, ":::") > 0 Then
             ' Verificar si es una línea con separador :::
             posicionSeparador = InStr(lineaActual, ":::")
             campo = Trim(Left(lineaActual, posicionSeparador - 1))
             valor = Trim(Mid(lineaActual, posicionSeparador + 3))
             
-            ' Si encontramos un ID_US, establecer la fila actual
-            If campo = "ID_US" Then
-                idUsuario = valor
-                fila = BuscarFilaPorID(ws, idUsuario)
-                If fila > 0 Then
-                    contadorHistorias = contadorHistorias + 1
-                    Debug.Print "Procesando historia: " & idUsuario & " en fila " & fila
-                Else
-                    Debug.Print "ADVERTENCIA: No se encontró el ID " & idUsuario & " en la hoja"
-                End If
-            ElseIf fila > 0 And idUsuario <> "" Then
-                ' Procesar otros campos solo si tenemos una historia válida
-                columna = BuscarColumna(ws, campo)
-                If columna > 0 Then
-                    ' Verificar si es un campo de criterios múltiples
-                    If Left(campo, Len(idUsuario) + 3) = idUsuario & "-CA" Or _
-                       IsNumeric(Left(campo, 1)) Then
-                        ' Es un criterio de aceptación o pregunta funcional
-                        ActualizarCampoMultiple ws, fila, campo, valor, idUsuario
-                        Debug.Print "Campo múltiple actualizado: " & campo
+            ' Guardar bloque múltiple anterior si cambiamos de campo
+            If enBloqueMultiple And bloqueMultiple <> "" And fila > 0 Then
+                GuardarBloqueMultiple ws, fila, tipoBloque, bloqueMultiple
+                bloqueMultiple = ""
+                enBloqueMultiple = False
+            End If
+            
+            ' Verificar si es el inicio de un bloque múltiple
+            If campo = "Criterios de aceptación/Escenarios" Then
+                enBloqueMultiple = True
+                tipoBloque = "criterios"
+                bloqueMultiple = valor
+                Debug.Print "Iniciando bloque de criterios"
+            ElseIf campo = "Preguntas Funcionales o IT" Then
+                enBloqueMultiple = True
+                tipoBloque = "preguntas"
+                bloqueMultiple = valor
+                Debug.Print "Iniciando bloque de preguntas"
+            Else
+                ' Campo normal
+                If campo = "ID_US" Then
+                    idUsuario = valor
+                    fila = BuscarFilaPorID(ws, idUsuario)
+                    If fila > 0 Then
+                        contadorHistorias = contadorHistorias + 1
+                        Debug.Print "Procesando historia: " & idUsuario & " en fila " & fila
                     Else
-                        ' Campo normal
+                        Debug.Print "ADVERTENCIA: No se encontró el ID " & idUsuario & " en la hoja"
+                    End If
+                ElseIf fila > 0 And idUsuario <> "" Then
+                    ' Procesar campo normal
+                    columna = BuscarColumna(ws, campo)
+                    If columna > 0 Then
                         ws.Cells(fila, columna).Value = valor
                         filasActualizadas = filasActualizadas + 1
                         Debug.Print "Actualizado: " & campo & " = " & Left(valor, 30) & "..."
+                    Else
+                        Debug.Print "Columna no encontrada, saltando: " & campo
                     End If
+                End If
+            End If
+            
+        Else
+            ' Línea sin separador ::: - puede ser parte de un bloque múltiple
+            If enBloqueMultiple And lineaActual <> "" Then
+                If bloqueMultiple = "" Then
+                    bloqueMultiple = lineaActual
                 Else
-                    ' Si no existe la columna, saltar el valor
-                    Debug.Print "Columna no encontrada, saltando: " & campo
+                    bloqueMultiple = bloqueMultiple & vbCrLf & lineaActual
                 End If
             End If
         End If
     Next i
     
+    ' Guardar el último bloque múltiple si existe
+    If enBloqueMultiple And bloqueMultiple <> "" And fila > 0 Then
+        GuardarBloqueMultiple ws, fila, tipoBloque, bloqueMultiple
+    End If
+    
     MsgBox "Importación completada:" & vbCrLf & vbCrLf & _
            "Historias procesadas: " & contadorHistorias & vbCrLf & _
            "Campos actualizados: " & filasActualizadas & vbCrLf & vbCrLf & _
            "Archivo importado: " & archivo
+    
+End Sub
+
+Sub GuardarBloqueMultiple(ws As Worksheet, fila As Long, tipoBloque As String, contenido As String)
+'
+' Guarda un bloque múltiple (criterios o preguntas) en la columna correspondiente
+'
+    Dim columna As Integer
+    
+    If tipoBloque = "criterios" Then
+        columna = BuscarColumna(ws, "Criterios de aceptación/Escenarios")
+        If columna > 0 Then
+            ws.Cells(fila, columna).Value = contenido
+            Debug.Print "Criterios guardados: " & Left(contenido, 50) & "..."
+        Else
+            Debug.Print "Columna 'Criterios de aceptación/Escenarios' no encontrada"
+        End If
+    ElseIf tipoBloque = "preguntas" Then
+        columna = BuscarColumna(ws, "Preguntas Funcionales o IT")
+        If columna > 0 Then
+            ws.Cells(fila, columna).Value = contenido
+            Debug.Print "Preguntas guardadas: " & Left(contenido, 50) & "..."
+        Else
+            Debug.Print "Columna 'Preguntas Funcionales o IT' no encontrada"
+        End If
+    End If
     
 End Sub
 
@@ -146,40 +212,3 @@ Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
     
     BuscarColumna = 0 ' No encontrado
 End Function
-
-Sub ActualizarCampoMultiple(ws As Worksheet, fila As Long, campo As String, valor As String, idUsuario As String)
-'
-' Maneja campos que pueden tener múltiples valores (criterios y preguntas)
-' Los consolida en una sola celda separados por newlines
-'
-    Dim columnaBase As Integer
-    Dim valorExistente As String
-    
-    ' Determinar la columna base usando nombres exactos
-    If InStr(campo, "-CA") > 0 Then
-        ' Es un criterio de aceptación
-        columnaBase = BuscarColumna(ws, "Criterios de aceptación/Escenarios")
-        If columnaBase = 0 Then
-            Debug.Print "Columna 'Criterios de aceptación/Escenarios' no encontrada, saltando: " & campo
-            Exit Sub
-        End If
-    ElseIf IsNumeric(Left(campo, 1)) Then
-        ' Es una pregunta funcional
-        columnaBase = BuscarColumna(ws, "Preguntas Funcionales o IT")
-        If columnaBase = 0 Then
-            Debug.Print "Columna 'Preguntas Funcionales o IT' no encontrada, saltando: " & campo
-            Exit Sub
-        End If
-    Else
-        Exit Sub
-    End If
-    
-    ' Agregar el valor al contenido existente en una sola celda
-    valorExistente = ws.Cells(fila, columnaBase).Value
-    If valorExistente = "" Then
-        ws.Cells(fila, columnaBase).Value = valor
-    Else
-        ws.Cells(fila, columnaBase).Value = valorExistente & vbCrLf & valor
-    End If
-    
-End Sub
