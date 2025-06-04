@@ -17,6 +17,7 @@ Sub ExportarHistoriasConPromptDesdeExcel()
     Dim nombreColumna As String
     Dim valorCelda As String
     Dim contadorHistoria As Integer
+    Dim columna As Integer ' Nueva variable para el índice de columna
     
     Set ws = ActiveSheet
     Set rango = Selection
@@ -25,6 +26,15 @@ Sub ExportarHistoriasConPromptDesdeExcel()
     If rango Is Nothing Then
         MsgBox "Por favor, selecciona las filas que deseas exportar"
         Exit Sub
+    End If
+    
+    ' Si la selección es solo una columna, expandir a toda la fila
+    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+    
+    If rango.Columns.Count = 1 Then
+        ' Expandir la selección desde la columna A hasta la última columna con datos
+        Set rango = ws.Range(ws.Cells(rango.Row, 1), ws.Cells(rango.Row + rango.Rows.Count - 1, ultimaColumna))
+        Debug.Print "Selección expandida automáticamente desde columna " & rango.Address & " a filas completas"
     End If
     
     ' Verificar que existe la hoja PROMPT
@@ -44,6 +54,10 @@ Sub ExportarHistoriasConPromptDesdeExcel()
     ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
     contadorHistoria = 1
     
+    ' Leer las columnas a exportar desde la hoja CONFIG (o usar default)
+    Dim columnasExportar As Variant
+    columnasExportar = LeerColumnasDesdeConfig(ws)
+    
     ' Agregar sección de datos al prompt
     promptCompleto = promptCompleto & vbCrLf & vbCrLf & "## DATOS DE ENTRADA" & vbCrLf & vbCrLf
     promptCompleto = promptCompleto & "[PROCESA TODAS LAS HISTORIAS INCLUIDAS AQUÍ ABAJO]" & vbCrLf & vbCrLf
@@ -53,13 +67,18 @@ Sub ExportarHistoriasConPromptDesdeExcel()
         If fila.Row > 1 Then ' Saltar la fila de headers
             datosHistorias = datosHistorias & "------------------------------ Historia " & contadorHistoria & " ------------------------------" & vbCrLf & vbCrLf
             
-            ' Exportar cada campo de la fila
-            For i = 1 To ultimaColumna
-                nombreColumna = ws.Cells(1, i).Value
-                valorCelda = ws.Cells(fila.Row, i).Value
+            ' Exportar solo las columnas especificadas en el array
+            For i = 0 To UBound(columnasExportar)
+                nombreColumna = columnasExportar(i)
+                columna = BuscarColumna(ws, nombreColumna)
                 
-                If nombreColumna <> "" And valorCelda <> "" Then
-                    datosHistorias = datosHistorias & nombreColumna & ":::" & " " & valorCelda & vbCrLf
+                If columna > 0 Then
+                    valorCelda = ws.Cells(fila.Row, columna).Value
+                    If valorCelda <> "" Then
+                        datosHistorias = datosHistorias & nombreColumna & ":::" & " " & valorCelda & vbCrLf
+                    End If
+                Else
+                    Debug.Print "Advertencia: No se encontró la columna '" & nombreColumna & "'"
                 End If
             Next i
             
@@ -89,8 +108,10 @@ Sub ExportarHistoriasConPromptDesdeExcel()
     Close #1
     
     MsgBox "Exportación completada: " & archivo & vbCrLf & vbCrLf & _
-           "Historias exportadas: " & (contadorHistoria - 1) & vbCrLf & vbCrLf & _
-           "Ahora copia todo el contenido del archivo y pégalo en Copilot."
+           "Historias exportadas: " & (contadorHistoria - 1) & vbCrLf & _
+           "Columnas exportadas: " & (UBound(columnasExportar) + 1) & vbCrLf & vbCrLf & _
+           "Ahora copia todo el contenido del archivo y pégalo en Copilot." & vbCrLf & vbCrLf & _
+           "TIP: Usa 'ConfigurarColumnasExportar' para cambiar qué columnas exportar."
     
     Exit Sub
     
@@ -169,4 +190,123 @@ Sub AbrirHojaPrompt()
     
 ErrorHoja:
     MsgBox "No se encontró la hoja 'PROMPT'. Ejecuta primero el macro 'CrearHojaPrompt'."
+End Sub
+
+Sub ConfigurarColumnasExportar()
+'
+' Macro para configurar fácilmente qué columnas exportar
+' Crea una hoja "CONFIG" con la lista de columnas a exportar
+'
+    Dim wsConfig As Worksheet
+    Dim columnasDefault As Variant
+    Dim i As Integer
+    
+    ' Columnas por defecto
+    columnasDefault = Array("ID_US", "Ramo", "Release", "Funcionalidad", "Titulo", "Descripción de la HdU - IA")
+    
+    ' Verificar si ya existe la hoja CONFIG
+    On Error GoTo CrearHojaConfig
+    Set wsConfig = ThisWorkbook.Worksheets("CONFIG")
+    
+    ' Si ya existe, preguntar si sobrescribir
+    If MsgBox("La hoja 'CONFIG' ya existe. ¿Deseas sobrescribir la configuración?", vbYesNo + vbQuestion) = vbNo Then
+        Exit Sub
+    End If
+    GoTo ConfigurarHojaConfig
+    
+CrearHojaConfig:
+    On Error GoTo 0
+    ' Crear nueva hoja
+    Set wsConfig = ThisWorkbook.Worksheets.Add
+    wsConfig.Name = "CONFIG"
+    
+ConfigurarHojaConfig:
+    ' Limpiar la hoja
+    wsConfig.Cells.Clear
+    
+    ' Configurar headers
+    wsConfig.Range("A1").Value = "Columnas a Exportar"
+    wsConfig.Range("A1").Font.Bold = True
+    wsConfig.Range("A1").Font.Size = 12
+    
+    wsConfig.Range("A2").Value = "Edita esta lista para cambiar qué columnas se exportan:"
+    wsConfig.Range("A2").Font.Italic = True
+    
+    ' Agregar las columnas por defecto
+    For i = 0 To UBound(columnasDefault)
+        wsConfig.Cells(i + 4, 1).Value = columnasDefault(i)
+    Next i
+    
+    ' Formatear
+    wsConfig.Columns("A:A").AutoFit
+    wsConfig.Range("A4:A" & (4 + UBound(columnasDefault))).Borders.LineStyle = xlContinuous
+    
+    ' Seleccionar la primera celda de datos
+    wsConfig.Range("A4").Select
+    
+    MsgBox "Hoja 'CONFIG' creada exitosamente." & vbCrLf & vbCrLf & _
+           "Puedes:" & vbCrLf & _
+           "1. Editar la lista de columnas en la columna A (a partir de la fila 4)" & vbCrLf & _
+           "2. Agregar o quitar columnas según necesites" & vbCrLf & _
+           "3. El macro de exportación usará esta lista automáticamente"
+    
+    Exit Sub
+    
+End Sub
+
+Function LeerColumnasDesdeConfig(ws As Worksheet) As Variant
+'
+' Lee la lista de columnas desde la hoja CONFIG
+' Si no existe, usa la lista por defecto
+'
+    Dim wsConfig As Worksheet
+    Dim ultimaFilaConfig As Long
+    Dim columnasArray() As String
+    Dim i As Long
+    Dim valorColumna As String
+    Dim contador As Integer
+    
+    ' Intentar acceder a la hoja CONFIG
+    On Error GoTo UsarDefault
+    Set wsConfig = ThisWorkbook.Worksheets("CONFIG")
+    
+    ' Encontrar la última fila con datos en la columna A
+    ultimaFilaConfig = wsConfig.Cells(wsConfig.Rows.Count, 1).End(xlUp).Row
+    
+    ' Verificar que hay datos después de la fila 3 (headers)
+    If ultimaFilaConfig <= 3 Then GoTo UsarDefault
+    
+    ' Contar las columnas válidas
+    contador = 0
+    For i = 4 To ultimaFilaConfig
+        valorColumna = Trim(wsConfig.Cells(i, 1).Value)
+        If valorColumna <> "" Then
+            contador = contador + 1
+        End If
+    Next i
+    
+    ' Si no hay columnas válidas, usar default
+    If contador = 0 Then GoTo UsarDefault
+    
+    ' Redimensionar el array
+    ReDim columnasArray(0 To contador - 1)
+    
+    ' Llenar el array
+    contador = 0
+    For i = 4 To ultimaFilaConfig
+        valorColumna = Trim(wsConfig.Cells(i, 1).Value)
+        If valorColumna <> "" Then
+            columnasArray(contador) = valorColumna
+            contador = contador + 1
+        End If
+    Next i
+    
+    LeerColumnasDesdeConfig = columnasArray
+    Exit Function
+    
+UsarDefault:
+    On Error GoTo 0
+    ' Usar la lista por defecto
+    LeerColumnasDesdeConfig = Array("ID_US", "Ramo", "Release", "Funcionalidad", "Titulo", "Descripción de la HdU - IA")
+End Function
 End Sub
