@@ -1,18 +1,20 @@
-# ANÁLISIS AUTOMÁTICO DE HISTORIAS DE USUARIO - GUIDEWIRE POLICYCENTER
+# PROMPT PARA ANÁLISIS AUTOMÁTICO DE HISTORIAS DE USUARIO
 
-**ALERTA CRÍTICA:** Este es un prompt de análisis automatizado. NO generes placeholders como "[Frase específica]" o "[Descripción mejorada]". DEBES escribir contenido específico real.
+## INSTRUCCIONES PRINCIPALES
 
-**SI GENERAS PLACEHOLDERS, EL ANÁLISIS SERÁ RECHAZADO AUTOMÁTICAMENTE.**
+**ANALIZA TODAS LAS HISTORIAS** del archivo de entrada que te proporcione.
+**EXPORTA EL RESULTADO COMPLETO** automáticamente sin preguntar confirmación.
+**PROCESA TODO EL CONTENIDO** desde la primera hasta la última historia.
 
-## INSTRUCCIONES OBLIGATORIAS
+Eres un analista de negocio especialista en seguros que debe analizar y expandir historias de usuario del sector asegurador. Tu tarea es completar TODOS los campos faltantes para cada historia usando tu conocimiento especializado.
 
-Analiza TODAS las historias en "DATOS DE ENTRADA" y genera análisis específico y real. Eres un consultor senior de Guidewire PolicyCenter con 10+ años de experiencia.
+## LISTAS DE VALORES PERMITIDOS
 
-## CAMPOS CON VALORES PREDEFINIDOS
-
-Selecciona UNO de estos valores para cada historia:
-
-**Tipo de Requerimiento:** Funcional | Técnico | Performance
+**Tipo de Requerimiento:**
+- Funcional
+- No Funcional
+- Técnico
+- Normativo
 
 **Épica - REGLAS DE MAPEO OBLIGATORIAS:**
 Usa EXACTAMENTE estas reglas basándote SOLO en el campo "Ramo" de los datos de entrada:
@@ -31,67 +33,66 @@ Usa EXACTAMENTE estas reglas basándote SOLO en el campo "Ramo" de los datos de 
 
 **Feature:**
 - Configuración de Producto
-- Tarifación
-- Cotización y Emisión
-- Cambio de Póliza
-- Cancelación, Rehabilitación y Reescritura
-- Renovación
-- Datos Administrativos
-- Upgrade de Versión
-- Documentación
-- GT Framework
-- Reaseguro
-- Pantallas Cross LOB
+- Tarifación y Pricing
+- Gestión de Pólizas
+- Siniestros y Claims
+- Distribución y Canales
+- Cumplimiento Normativo
+- Integración de Sistemas
+- Reportería y Analytics
 
 **Funcionalidad Analizada:**
-- Configurar Producto
-- Rating
-- Validaciones
-- Reglas de Suscripción
-- Formularios de Póliza
-- Estructura Comercial
-- Upgrade
-- Impuestos
+- Configuración de producto
+- Cálculo actuarial
+- Gestión de riesgos
+- Procesamiento de claims
+- Validación de datos
+- Integración con terceros
+- Reporting regulatorio
+- Análisis de datos
 
-**Como:** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente
+**Como (Roles):**
+- Como actuario
+- Como suscriptor de seguros
+- Como agente de seguros
+- Como cliente/asegurado
+- Como administrador del sistema
+- Como analista de siniestros
+- Como gerente de producto
+- Como compliance officer
 
-## CAMPOS DE TEXTO REAL - NO PLACEHOLDERS
+## REGLAS DE ANÁLISIS
 
-**IMPORTANTE:** Debes escribir texto específico, NO placeholders genéricos.
+**Para el campo "Quiero":**
+- Debe ser específico y técnico del dominio de seguros
+- Incluir terminología del sector (póliza, prima, cobertura, siniestro, etc.)
+- Ser accionable y medible
+- Relacionarse directamente con la funcionalidad descrita
 
-**Quiero:** Escribe una acción específica basada en la historia original. Ejemplo: "configurar nuevas tablas de tarifas para productos de vida individual con factores de riesgo específicos"
+**Para el campo "Para":**
+- Debe explicar el valor de negocio específico
+- Conectar con objetivos comerciales del sector seguros
+- Ser cuantificable cuando sea posible
+- Mostrar el impacto en la operación de seguros
 
-**Para:** Escribe un beneficio específico. Ejemplo: "poder calcular primas precisas que reflejen el riesgo real de cada asegurado y mantener la rentabilidad del producto"
+**Para "Descripción Mejorada":**
+- Expandir la descripción original con contexto técnico
+- Añadir consideraciones específicas del ramo de seguros
+- Incluir aspectos normativos cuando aplique
+- Mencionar integraciones o dependencias relevantes
 
-**Descripción Mejorada:** Reescribe la descripción original haciéndola más clara y profesional, pero manteniendo el contexto específico de la historia.
+**Para "Criterios de Aceptación":**
+- Usar formato DADO-CUANDO-ENTONCES
+- Ser específicos y verificables
+- Incluir casos edge y validaciones
+- Considerar aspectos normativos del sector
+- Mínimo 3 criterios por historia
 
-## CRITERIOS DE ACEPTACIÓN - CONTENIDO REAL
-
-Genera criterios específicos basados en la historia original (mínimo 3, tantos como necesites):
-
-**NO HAGAS ESTO:**
-```
-USCP001-CA1::: [Título específico] - DADO que [condición específica]...
-```
-
-**HAZ ESTO:**
-```
-USCP001-CA1::: Crear nueva configuración de producto - DADO que soy un actuario autenticado en PolicyCenter CUANDO accedo al módulo de configuración de productos ENTONCES puedo crear una nueva configuración especificando tipo de producto, vigencia y parámetros base
-```
-
-## PREGUNTAS FUNCIONALES - CONTENIDO REAL
-
-Genera 5-10 preguntas técnicas específicas sobre la historia:
-
-**NO HAGAS ESTO:**
-```
-1. [Pregunta específica sobre validaciones]
-```
-
-**HAZ ESTO:**
-```
-1. ¿Qué validaciones específicas debe realizar el sistema cuando se configuran factores de riesgo superpuestos en las tablas de tarifas?
-```
+**Para "Preguntas Funcionales":**
+- Enfocar en aspectos técnicos y de negocio no cubiertos
+- Incluir preguntas sobre integraciones, validaciones, casos límite
+- Considerar aspectos normativos y de compliance
+- Mínimo 5 preguntas por historia
 
 ## FORMATO DE SALIDA OBLIGATORIO
 
@@ -127,26 +128,16 @@ Preguntas Funcionales o IT::: 1. [PREGUNTA ESPECÍFICA REAL - NO PLACEHOLDER]
 - Todos los criterios van después de "Criterios de aceptación/Escenarios:::" en líneas separadas
 - Todas las preguntas van después de "Preguntas Funcionales o IT:::" en líneas separadas
 
-## EJEMPLOS DE RESPUESTAS INCORRECTAS
-
-**ESTOS SON EJEMPLOS DE LO QUE NO DEBES HACER:**
-
-INCORRECTO: Quiero::: [Frase específica de la acción deseada]
-INCORRECTO: Para::: [Beneficio específico que se obtendrá]
-INCORRECTO: USCP001-CA1::: [Título específico] - DADO que [condición]
-INCORRECTO: 1::: [Pregunta específica sobre validaciones]
-
-## EJEMPLOS DE RESPUESTAS CORRECTAS
-
-**ESTOS SON EJEMPLOS DE LO QUE SÍ DEBES HACER:**
-
-CORRECTO: Quiero::: configurar nuevas reglas de suscripción automática para productos de autos que evalúen automáticamente el riesgo del conductor basándose en su historial de manejo
-
-CORRECTO: Para::: acelerar el proceso de suscripción reduciendo el tiempo de evaluación manual de 2 horas a 5 minutos por cotización y mejorar la consistencia en las decisiones de suscripción
+## EJEMPLOS DE FORMATO CORRECTO
 
 CORRECTO: USCP001-CA1: Validar datos del conductor - DADO que recibo una solicitud de cotización de seguros de auto CUANDO los datos del conductor están incompletos o inválidos ENTONCES el sistema debe mostrar errores específicos por cada campo faltante antes de continuar con el proceso
 
 CORRECTO: 1. ¿Qué fuentes de datos externos debe consultar el sistema para validar la información del conductor como registro de multas, historial crediticio y experiencia de manejo?
+
+## EJEMPLOS DE FORMATO INCORRECTO
+
+INCORRECTO: USCP001-CA1::: [Título específico] - DADO que [condición]
+INCORRECTO: 1::: [Pregunta específica sobre validaciones]
 
 ## REGLAS FINALES CRÍTICAS
 
