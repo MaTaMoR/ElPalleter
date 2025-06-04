@@ -95,15 +95,12 @@ Genera 5-10 preguntas técnicas específicas sobre la historia:
 
 ## FORMATO DE SALIDA OBLIGATORIO
 
-Para CADA historia, usa EXACTAMENTE este formato:
+Para CADA historia, usa EXACTAMENTE este formato (TODO JUNTO, SIN SEPARACIONES):
 
 ```
 ------------------------------ Historia [N] ------------------------------
 
 [COPIA TODOS LOS CAMPOS ORIGINALES EXACTAMENTE]
-
---- ANÁLISIS GENERADO ---
-
 Tipo de Requerimiento::: [valor de la lista]
 Épica::: [valor de la lista]
 Feature::: [valor de la lista]
@@ -155,5 +152,12 @@ CORRECTO: 1. ¿Qué fuentes de datos externos debe consultar el sistema para val
 - USA EL SEPARADOR ::: en todos los campos generados
 - MANTÉN EL FORMATO exacto para importación automática a Excel
 - CONSERVA todos los campos originales de entrada
+- GENERA TODOS LOS CAMPOS NUEVOS: Tipo de Requerimiento, Épica, Feature, Funcionalidad Analizada, Como, Quiero, Para, Descripción Mejorada, Criterios de Aceptación, Preguntas Funcionales
+- EXPORTA EL RESULTADO COMPLETO: Cada historia debe incluir tanto los campos originales como todos los campos de análisis generados
+
+**IMPORTANTE:** El resultado final debe contener para cada historia:
+1. Todos los campos originales (ID_US, Ramo, Funcionalidad, Titulo, Descripción de la HdU - IA)
+2. Todos los campos de análisis generados (Tipo de Requerimiento, Épica, Feature, etc.)
+3. Todo en formato continuo sin separaciones artificiales
 
 **RECORDATORIO FINAL:** Si generas placeholders genéricos, tendremos que repetir todo el proceso. Escribe contenido específico, técnico y útil basado en el contexto real de cada historia de usuario.
