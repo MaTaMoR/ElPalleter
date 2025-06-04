@@ -78,31 +78,31 @@ def generar_prompt_para_copilot(ids_historias: str,
 
 def crear_contenido_prompt(historias_df, df_original):
     """
-    Crea el contenido completo del prompt con contexto y datos - VERSIÓN CONCISA
+    Crea el contenido completo del prompt con contexto y datos - VERSIÓN SIMPLIFICADA
     """
     
     num_historias = len(historias_df)
     
     # Parte 1: Cabecera y contexto
-    prompt_content = f"# ANÁLISIS DE HISTORIAS DE USUARIO - SEGUROS\n\n"
-    prompt_content += "## CONTEXTO RÁPIDO\n"
-    prompt_content += f"Eres analista de requerimientos de seguros. Analiza estas {num_historias} historias y completa la información faltante.\n\n"
+    prompt_content = "# ANALISIS DE HISTORIAS DE USUARIO - SEGUROS\n\n"
+    prompt_content += "## CONTEXTO RAPIDO\n"
+    prompt_content += f"Eres analista de requerimientos de seguros. Analiza estas {num_historias} historias y completa la informacion faltante.\n\n"
     
     # Parte 2: Valores obligatorios
     prompt_content += "## VALORES OBLIGATORIOS A USAR\n\n"
-    prompt_content += "**Tipo de Requerimiento:** Funcional | Técnico | Performance\n\n"
-    prompt_content += "**Épica:**\n"
-    prompt_content += "• Adaptaciones NPVD para R33/R34/R37\n"
-    prompt_content += "• Nuevo Producto Técnico 1 para R11/R25\n"
-    prompt_content += "• Nuevo Producto Técnico 2 para R31/R33\n\n"
+    prompt_content += "**Tipo de Requerimiento:** Funcional | Tecnico | Performance\n\n"
+    prompt_content += "**Epica:**\n"
+    prompt_content += "- Adaptaciones NPVD para R33/R34/R37\n"
+    prompt_content += "- Nuevo Producto Tecnico 1 para R11/R25\n"
+    prompt_content += "- Nuevo Producto Tecnico 2 para R31/R33\n\n"
     prompt_content += "**Feature:**\n"
-    prompt_content += "• Configuración de Producto, Tarifación, Cotización y Emisión\n"
-    prompt_content += "• Cambio de Póliza, Cancelación Rehabilitación y Reescritura\n"
-    prompt_content += "• Renovación, Datos Administrativos, Upgrade de Versión\n"
-    prompt_content += "• Documentación, GT Framework?, Reaseguro, Pantallas Cross LOB\n\n"
+    prompt_content += "- Configuracion de Producto, Tarifacion, Cotizacion y Emision\n"
+    prompt_content += "- Cambio de Poliza, Cancelacion Rehabilitacion y Reescritura\n"
+    prompt_content += "- Renovacion, Datos Administrativos, Upgrade de Version\n"
+    prompt_content += "- Documentacion, GT Framework?, Reaseguro, Pantallas Cross LOB\n\n"
     prompt_content += "**Funcionalidad:**\n"
-    prompt_content += "• Configurar Producto, Rating, Validaciones, Reglas de Suscripción\n"
-    prompt_content += "• Formularios de Póliza, Estructura Comercial, Upgrade, Impuestos\n\n"
+    prompt_content += "- Configurar Producto, Rating, Validaciones, Reglas de Suscripcion\n"
+    prompt_content += "- Formularios de Poliza, Estructura Comercial, Upgrade, Impuestos\n\n"
     prompt_content += "**Como (Rol):** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente\n\n"
     
     # Parte 3: Formato de respuesta
@@ -110,17 +110,17 @@ def crear_contenido_prompt(historias_df, df_original):
     prompt_content += "Para CADA historia, responde con este formato exacto:\n\n"
     prompt_content += "HISTORIA [ID]:\n"
     prompt_content += "- Tipo de Requerimiento: [elegir de la lista]\n"
-    prompt_content += "- Épica: [elegir de la lista]\n"
+    prompt_content += "- Epica: [elegir de la lista]\n"
     prompt_content += "- Feature: [elegir de la lista]\n"
     prompt_content += "- Funcionalidad: [elegir de la lista]\n"
     prompt_content += "- Como: [elegir rol]\n"
-    prompt_content += "- Quiero: [acción específica]\n"
+    prompt_content += "- Quiero: [accion especifica]\n"
     prompt_content += "- Para: [beneficio/valor]\n"
-    prompt_content += "- Descripción mejorada: [versión clara y técnica]\n"
-    prompt_content += "- Criterios de Aceptación:\n"
-    prompt_content += "  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]\n"
-    prompt_content += "  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]\n"
-    prompt_content += "  * DADO [contexto] CUANDO [acción] ENTONCES [resultado]\n"
+    prompt_content += "- Descripcion mejorada: [version clara y tecnica]\n"
+    prompt_content += "- Criterios de Aceptacion:\n"
+    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
+    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
+    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
     prompt_content += "- Preguntas Funcionales:\n"
     prompt_content += "  * [Pregunta sobre requerimiento]\n"
     prompt_content += "  * [Pregunta sobre casos especiales]\n"
@@ -129,7 +129,7 @@ def crear_contenido_prompt(historias_df, df_original):
     prompt_content += "  * [Pregunta sobre UX]\n\n"
     
     # Separador
-    prompt_content += "═══════════════════════════════════════════════════════════════════\n\n"
+    prompt_content += "-------------------------------------------------------------------\n\n"
     prompt_content += f"## HISTORIAS A ANALIZAR ({num_historias} total)\n\n"
 
     # Agregar cada historia con separación visual clara
@@ -140,37 +140,37 @@ def crear_contenido_prompt(historias_df, df_original):
             valor = fila[columna]
             datos[columna] = "" if pd.isna(valor) else str(valor)
         
-        # Agregar historia con separadores
-        prompt_content += "██████████████████████████████████████████████████████████████████\n"
+        # Agregar historia con separadores básicos
+        prompt_content += "-------------------------------------------------------------------\n"
         prompt_content += f"                              HISTORIA {i}\n"
-        prompt_content += "██████████████████████████████████████████████████████████████████\n\n"
+        prompt_content += "-------------------------------------------------------------------\n\n"
         
         id_us = datos.get('ID_US', 'N/A')
         titulo = datos.get('Titulo', 'N/A')
         ramo = datos.get('Ramo', 'N/A')
         release = datos.get('Release', 'N/A')
-        descripcion = datos.get('Descripción de la HdU - IA', 'N/A')
+        descripcion = datos.get('Descripcion de la HdU - IA', 'N/A')
         proceso = datos.get('Proceso', 'N/A')
         funcionalidad2 = datos.get('Funcionalidad2', 'N/A')
         
-        prompt_content += f"🔹 ID_US: {id_us}\n"
-        prompt_content += f"🔹 Título: {titulo}\n"
-        prompt_content += f"🔹 Ramo: {ramo}\n"
-        prompt_content += f"🔹 Release: {release}\n"
-        prompt_content += f"🔹 Descripción: {descripcion}\n"
-        prompt_content += f"🔹 Proceso: {proceso}\n"
-        prompt_content += f"🔹 Funcionalidad2: {funcionalidad2}\n\n"
+        prompt_content += f"- ID_US: {id_us}\n"
+        prompt_content += f"- Titulo: {titulo}\n"
+        prompt_content += f"- Ramo: {ramo}\n"
+        prompt_content += f"- Release: {release}\n"
+        prompt_content += f"- Descripcion: {descripcion}\n"
+        prompt_content += f"- Proceso: {proceso}\n"
+        prompt_content += f"- Funcionalidad2: {funcionalidad2}\n\n"
         
-        prompt_content += "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n\n"
+        prompt_content += "---\n\n"
 
     # Parte final: Instrucciones críticas
-    prompt_content += "═══════════════════════════════════════════════════════════════════\n\n"
-    prompt_content += "## ⚠️  INSTRUCCIONES CRÍTICAS\n\n"
+    prompt_content += "-------------------------------------------------------------------\n\n"
+    prompt_content += "## INSTRUCCIONES CRITICAS\n\n"
     prompt_content += "1. **USA SOLO** los valores de las listas arriba\n"
-    prompt_content += "2. **MANTÉN** el formato exacto de respuesta\n"
-    prompt_content += "3. **INCLUYE** mínimo 3 criterios y 5 preguntas por historia\n"
+    prompt_content += "2. **MANTEN** el formato exacto de respuesta\n"
+    prompt_content += "3. **INCLUYE** minimo 3 criterios y 5 preguntas por historia\n"
     prompt_content += f"4. **PROCESA** las {num_historias} historias mostradas\n\n"
-    prompt_content += "¡ANALIZA TODAS LAS HISTORIAS AHORA!\n"
+    prompt_content += "ANALIZA TODAS LAS HISTORIAS AHORA!\n"
 
     return prompt_content
 
