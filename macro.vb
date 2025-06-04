@@ -48,8 +48,14 @@ Sub ImportarAnalisisDesdeArchivo()
         Dim lineaActual As String
         lineaActual = Trim(lineas(i))
         
-        ' Verificar si es una línea con separador :::
-        If InStr(lineaActual, ":::") > 0 Then
+        ' Detectar cabecera de nueva historia
+        If InStr(lineaActual, "------------------------------") > 0 And InStr(lineaActual, "Historia") > 0 Then
+            ' Reset para nueva historia
+            idUsuario = ""
+            fila = 0
+            Debug.Print "Nueva historia detectada: " & lineaActual
+        ElseIf InStr(lineaActual, ":::") > 0 Then
+            ' Verificar si es una línea con separador :::
             posicionSeparador = InStr(lineaActual, ":::")
             campo = Trim(Left(lineaActual, posicionSeparador - 1))
             valor = Trim(Mid(lineaActual, posicionSeparador + 3))
@@ -61,9 +67,11 @@ Sub ImportarAnalisisDesdeArchivo()
                 If fila > 0 Then
                     contadorHistorias = contadorHistorias + 1
                     Debug.Print "Procesando historia: " & idUsuario & " en fila " & fila
+                Else
+                    Debug.Print "ADVERTENCIA: No se encontró el ID " & idUsuario & " en la hoja"
                 End If
-            ElseIf fila > 0 Then
-                ' Procesar otros campos
+            ElseIf fila > 0 And idUsuario <> "" Then
+                ' Procesar otros campos solo si tenemos una historia válida
                 columna = BuscarColumna(ws, campo)
                 If columna > 0 Then
                     ' Verificar si es un campo de criterios múltiples
@@ -71,20 +79,16 @@ Sub ImportarAnalisisDesdeArchivo()
                        IsNumeric(Left(campo, 1)) Then
                         ' Es un criterio de aceptación o pregunta funcional
                         ActualizarCampoMultiple ws, fila, campo, valor, idUsuario
+                        Debug.Print "Campo múltiple actualizado: " & campo
                     Else
                         ' Campo normal
                         ws.Cells(fila, columna).Value = valor
                         filasActualizadas = filasActualizadas + 1
-                        Debug.Print "Actualizado: " & campo & " = " & Left(valor, 50) & "..."
+                        Debug.Print "Actualizado: " & campo & " = " & Left(valor, 30) & "..."
                     End If
                 Else
-                    ' Si no existe la columna, crearla
-                    columna = CrearNuevaColumna(ws, campo)
-                    If columna > 0 Then
-                        ws.Cells(fila, columna).Value = valor
-                        filasActualizadas = filasActualizadas + 1
-                        Debug.Print "Nueva columna creada: " & campo
-                    End If
+                    ' Si no existe la columna, saltar el valor
+                    Debug.Print "Columna no encontrada, saltando: " & campo
                 End If
             End If
         End If
@@ -143,23 +147,10 @@ Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
     BuscarColumna = 0 ' No encontrado
 End Function
 
-Function CrearNuevaColumna(ws As Worksheet, nombreColumna As String) As Integer
-'
-' Crea una nueva columna al final de la tabla
-'
-    Dim ultimaColumna As Integer
-    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column + 1
-    
-    ' Usar el nombre exacto sin mapeo
-    ws.Cells(1, ultimaColumna).Value = nombreColumna
-    ws.Cells(1, ultimaColumna).Font.Bold = True
-    
-    CrearNuevaColumna = ultimaColumna
-End Function
-
 Sub ActualizarCampoMultiple(ws As Worksheet, fila As Long, campo As String, valor As String, idUsuario As String)
 '
 ' Maneja campos que pueden tener múltiples valores (criterios y preguntas)
+' Los consolida en una sola celda separados por newlines
 '
     Dim columnaBase As Integer
     Dim valorExistente As String
@@ -169,24 +160,26 @@ Sub ActualizarCampoMultiple(ws As Worksheet, fila As Long, campo As String, valo
         ' Es un criterio de aceptación
         columnaBase = BuscarColumna(ws, "Criterios de aceptación/Escenarios")
         If columnaBase = 0 Then
-            columnaBase = CrearNuevaColumna(ws, "Criterios de aceptación/Escenarios")
+            Debug.Print "Columna 'Criterios de aceptación/Escenarios' no encontrada, saltando: " & campo
+            Exit Sub
         End If
     ElseIf IsNumeric(Left(campo, 1)) Then
         ' Es una pregunta funcional
         columnaBase = BuscarColumna(ws, "Preguntas Funcionales o IT")
         If columnaBase = 0 Then
-            columnaBase = CrearNuevaColumna(ws, "Preguntas Funcionales o IT")
+            Debug.Print "Columna 'Preguntas Funcionales o IT' no encontrada, saltando: " & campo
+            Exit Sub
         End If
     Else
         Exit Sub
     End If
     
-    ' Agregar el valor al contenido existente
+    ' Agregar el valor al contenido existente en una sola celda
     valorExistente = ws.Cells(fila, columnaBase).Value
     If valorExistente = "" Then
-        ws.Cells(fila, columnaBase).Value = campo & ": " & valor
+        ws.Cells(fila, columnaBase).Value = valor
     Else
-        ws.Cells(fila, columnaBase).Value = valorExistente & vbCrLf & campo & ": " & valor
+        ws.Cells(fila, columnaBase).Value = valorExistente & vbCrLf & valor
     End If
     
 End Sub
