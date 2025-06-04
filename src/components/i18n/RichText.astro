@@ -1,0 +1,439 @@
+---
+import { getI18nInfo } from '../../utils/astro-i18n-utils.js';
+import richContent from '../../data/rich-content.json';
+
+export interface Props {
+  key: string;
+  fallback?: string;
+  className?: string;
+  sanitize?: boolean;
+  maxLength?: number;
+  tag?: keyof HTMLElementTagNameMap;
+  theme?: 'light' | 'dark' | 'gold' | 'custom';
+  [key: string]: any;
+}
+
+const { 
+  key, 
+  fallback, 
+  className, 
+  sanitize = false,
+  maxLength,
+  tag = 'div',
+  theme = 'light',
+  ...restProps 
+} = Astro.props;
+
+const { locale } = getI18nInfo(Astro);
+
+function getRichContent(contentKey: string, lang: string): string {
+  const content = richContent[contentKey as keyof typeof richContent];
+  if (content && typeof content === 'object') {
+    return content[lang as keyof typeof content] || content['es'] || fallback || '';
+  }
+  return fallback || contentKey;
+}
+
+function sanitizeHtml(html: string): string {
+  if (!sanitize) return html;
+  
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '')
+    .replace(/javascript:/gi, '');
+}
+
+let htmlContent = getRichContent(key, locale);
+
+if (sanitize) {
+  htmlContent = sanitizeHtml(htmlContent);
+}
+
+if (maxLength && htmlContent.length > maxLength) {
+  const tempDiv = { textContent: htmlContent.replace(/<[^>]*>/g, '') };
+  if (tempDiv.textContent && tempDiv.textContent.length > maxLength) {
+    htmlContent = htmlContent.substring(0, maxLength - 3) + '...';
+  }
+}
+
+const elementProps = {
+  class: `richtext-editor ${theme}-theme ${className || ''}`.trim(),
+  'data-rich-text-key': key,
+  'data-locale': locale,
+  'data-theme': theme,
+  ...restProps
+};
+
+const Element = tag;
+---
+
+<Element {...elementProps} set:html={htmlContent} />
+
+<style>
+  /* === SISTEMA DE TEMAS CON CSS CUSTOM PROPERTIES === */
+  
+  /* Tema Light */
+  .richtext-editor.light-theme {
+    --rt-primary-color: #2c3e50;
+    --rt-secondary-color: #7f8c8d;
+    --rt-accent-color: #3498db;
+    --rt-highlight-color: #e74c3c;
+    --rt-background-color: #ffffff;
+    --rt-border-color: #ecf0f1;
+    
+    --rt-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --rt-heading-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --rt-mono-font: 'Monaco', 'Menlo', monospace;
+  }
+  
+  /* Tema Dark */
+  .richtext-editor.dark-theme {
+    --rt-primary-color: #ffffff;
+    --rt-secondary-color: #bdc3c7;
+    --rt-accent-color: #74b9ff;
+    --rt-highlight-color: #fd79a8;
+    --rt-background-color: #2d3436;
+    --rt-border-color: #636e72;
+    
+    --rt-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --rt-heading-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --rt-mono-font: 'Monaco', 'Menlo', monospace;
+  }
+  
+  /* Tema Gold (para restaurantes/elegante) */
+  .richtext-editor.gold-theme {
+    --rt-primary-color: #ffffff;
+    --rt-secondary-color: #f4a261;
+    --rt-accent-color: #f39c12;
+    --rt-highlight-color: #f4a261;
+    --rt-background-color: transparent;
+    --rt-border-color: #f4a261;
+    
+    --rt-font-family: 'Georgia', serif;
+    --rt-heading-font: 'Playfair Display', Georgia, serif;
+    --rt-mono-font: 'Monaco', 'Menlo', monospace;
+  }
+  
+  /* Tema Custom - permite override completo */
+  .richtext-editor.custom-theme {
+    /* Se definen vía CSS custom properties externamente */
+  }
+  
+  /* === BASE CONTAINER === */
+  .richtext-editor {
+    width: 100%;
+    font-family: var(--rt-font-family);
+    color: var(--rt-primary-color);
+    background-color: var(--rt-background-color);
+    line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Reset básico para evitar herencia */
+  .richtext-editor * {
+    box-sizing: border-box;
+  }
+  
+  /* === SISTEMA DE TIPOGRAFÍA INDEPENDIENTE === */
+  
+  /* Títulos Principales */
+  .richtext-editor :global(.rt-h1) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--rt-primary-color);
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.02em;
+  }
+  
+  .richtext-editor :global(.rt-h2) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--rt-primary-color);
+    margin: 0 0 1.25rem 0;
+    letter-spacing: -0.01em;
+  }
+  
+  .richtext-editor :global(.rt-h3) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--rt-primary-color);
+    margin: 0 0 1rem 0;
+  }
+  
+  .richtext-editor :global(.rt-h4) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(1.5rem, 2vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--rt-primary-color);
+    margin: 0 0 0.875rem 0;
+  }
+  
+  .richtext-editor :global(.rt-h5) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(1.25rem, 1.75vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--rt-primary-color);
+    margin: 0 0 0.75rem 0;
+  }
+  
+  .richtext-editor :global(.rt-h6) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--rt-secondary-color);
+    margin: 0 0 0.75rem 0;
+  }
+  
+  /* Textos de Cuerpo */
+  .richtext-editor :global(.rt-body-large) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--rt-primary-color);
+    margin: 0 0 1.25rem 0;
+  }
+  
+  .richtext-editor :global(.rt-body) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(1rem, 1.25vw, 1.125rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--rt-primary-color);
+    margin: 0 0 1rem 0;
+  }
+  
+  .richtext-editor :global(.rt-body-small) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(0.875rem, 1.1vw, 1rem);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--rt-secondary-color);
+    margin: 0 0 0.875rem 0;
+  }
+  
+  /* Subtítulos y elementos especiales */
+  .richtext-editor :global(.rt-subtitle) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(1.25rem, 1.75vw, 1.5rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--rt-secondary-color);
+    margin: 0 0 1.5rem 0;
+  }
+  
+  .richtext-editor :global(.rt-lead) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(1.25rem, 1.75vw, 1.375rem);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--rt-primary-color);
+    margin: 0 0 1.5rem 0;
+  }
+  
+  /* === ELEMENTOS INLINE === */
+  
+  /* Destacados y énfasis */
+  .richtext-editor :global(.rt-highlight) {
+    color: var(--rt-highlight-color);
+    font-weight: 600;
+    background: none;
+  }
+  
+  .richtext-editor :global(.rt-accent) {
+    color: var(--rt-accent-color);
+    font-weight: 500;
+  }
+  
+  .richtext-editor :global(.rt-strong) {
+    font-weight: 700;
+    color: var(--rt-primary-color);
+  }
+  
+  .richtext-editor :global(.rt-emphasis) {
+    font-style: italic;
+    color: var(--rt-primary-color);
+  }
+  
+  .richtext-editor :global(.rt-underline) {
+    text-decoration: underline;
+    text-decoration-color: var(--rt-accent-color);
+    text-underline-offset: 2px;
+  }
+  
+  .richtext-editor :global(.rt-code) {
+    font-family: var(--rt-mono-font);
+    font-size: 0.9em;
+    background-color: var(--rt-border-color);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    color: var(--rt-primary-color);
+  }
+  
+  /* === ELEMENTOS DE BLOQUE === */
+  
+  /* Quotes */
+  .richtext-editor :global(.rt-quote) {
+    font-family: var(--rt-heading-font);
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--rt-secondary-color);
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
+    border-left: 4px solid var(--rt-accent-color);
+    background-color: var(--rt-border-color);
+    position: relative;
+  }
+  
+  .richtext-editor :global(.rt-quote::before) {
+    content: '"';
+    font-family: var(--rt-heading-font);
+    font-size: 4rem;
+    color: var(--rt-accent-color);
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    line-height: 1;
+    opacity: 0.3;
+  }
+  
+  /* Listas */
+  .richtext-editor :global(.rt-list) {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .richtext-editor :global(.rt-list-item) {
+    font-family: var(--rt-font-family);
+    font-size: clamp(1rem, 1.25vw, 1.125rem);
+    line-height: 1.6;
+    color: var(--rt-primary-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Enlaces */
+  .richtext-editor :global(.rt-link) {
+    color: var(--rt-accent-color);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .richtext-editor :global(.rt-link:hover) {
+    border-bottom-color: var(--rt-accent-color);
+  }
+  
+  /* === ESPACIADO === */
+  .richtext-editor :global(.rt-spacer-xs) { height: 0.5rem; }
+  .richtext-editor :global(.rt-spacer-sm) { height: 1rem; }
+  .richtext-editor :global(.rt-spacer-md) { height: 1.5rem; }
+  .richtext-editor :global(.rt-spacer-lg) { height: 2rem; }
+  .richtext-editor :global(.rt-spacer-xl) { height: 3rem; }
+  
+  /* === CONTENEDORES === */
+  .richtext-editor :global(.rt-content) {
+    width: 100%;
+  }
+  
+  .richtext-editor :global(.rt-section) {
+    margin: 2rem 0;
+  }
+  
+  .richtext-editor :global(.rt-block) {
+    margin: 1rem 0;
+  }
+  
+  /* === COLORES PERSONALIZADOS (para editor futuro) === */
+  .richtext-editor :global(.rt-color-primary) { color: var(--rt-primary-color) !important; }
+  .richtext-editor :global(.rt-color-secondary) { color: var(--rt-secondary-color) !important; }
+  .richtext-editor :global(.rt-color-accent) { color: var(--rt-accent-color) !important; }
+  .richtext-editor :global(.rt-color-highlight) { color: var(--rt-highlight-color) !important; }
+  
+  /* === TAMAÑOS PERSONALIZADOS (para editor futuro) === */
+  .richtext-editor :global(.rt-size-xs) { font-size: 0.75rem !important; }
+  .richtext-editor :global(.rt-size-sm) { font-size: 0.875rem !important; }
+  .richtext-editor :global(.rt-size-md) { font-size: 1rem !important; }
+  .richtext-editor :global(.rt-size-lg) { font-size: 1.25rem !important; }
+  .richtext-editor :global(.rt-size-xl) { font-size: 1.5rem !important; }
+  .richtext-editor :global(.rt-size-2xl) { font-size: 2rem !important; }
+  
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .richtext-editor :global(.rt-quote) {
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .richtext-editor :global(.rt-quote::before) {
+      font-size: 3rem;
+      left: 0.25rem;
+    }
+  }
+  
+  /* === INDICADOR DE DESARROLLO === */
+  .richtext-editor[data-rich-text-missing="true"] {
+    background-color: rgba(255, 165, 0, 0.1);
+    border: 1px dashed orange;
+    padding: 1rem;
+    border-radius: 4px;
+  }
+  
+  .richtext-editor[data-rich-text-missing="true"]::before {
+    content: "⚠️ Missing rich content for key: " attr(data-rich-text-key);
+    display: block;
+    font-size: 0.8rem;
+    color: orange;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  if (import.meta.env.DEV) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const richTextElements = document.querySelectorAll('[data-rich-text-key]');
+      
+      richTextElements.forEach(element => {
+        const key = element.getAttribute('data-rich-text-key');
+        const content = element.innerHTML.trim();
+        
+        if (content === key || content.length < 10) {
+          element.setAttribute('data-rich-text-missing', 'true');
+          console.warn(`[RichText] Missing or invalid rich content for key: ${key}`);
+        }
+        
+        if (content.includes('<script')) {
+          console.error(`[RichText] Security warning: Script tags found in rich content for key: ${key}`);
+        }
+      });
+    });
+  }
+  
+  // Función para ayudar con futuros editores
+  window.RichTextEditor = {
+    themes: ['light', 'dark', 'gold', 'custom'],
+    elements: [
+      'rt-h1', 'rt-h2', 'rt-h3', 'rt-h4', 'rt-h5', 'rt-h6',
+      'rt-body-large', 'rt-body', 'rt-body-small',
+      'rt-subtitle', 'rt-lead', 'rt-quote',
+      'rt-highlight', 'rt-accent', 'rt-strong', 'rt-emphasis'
+    ],
+    colors: ['primary', 'secondary', 'accent', 'highlight'],
+    sizes: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'],
+    spacers: ['xs', 'sm', 'md', 'lg', 'xl']
+  };
+</script>

@@ -1,36 +1,94 @@
 ---
-// src/components/i18n/Text.astro
+import { getI18nInfo, safeTranslation } from '../../utils/astro-i18n-utils.js';
+import { I18nConfig } from '../../i18n/config.js';
+
 export interface Props {
   key: string;
   fallback?: string;
-  params?: Record<string, string>;
+  params?: Record<string, string | number>;
   maxLength?: number;
+  tag?: keyof HTMLElementTagNameMap;
+  class?: string;
+  style?: string;
+  [key: string]: any; // Para otros atributos HTML
 }
 
-const { key, fallback, params, maxLength } = Astro.props;
+const { 
+  key, 
+  fallback, 
+  params, 
+  maxLength, 
+  tag = 'span',
+  class: className,
+  style,
+  ...restProps 
+} = Astro.props;
 
-// Obtener el idioma de la URL o contexto
-const language = Astro.url.pathname.startsWith('/en/') ? 'en' : 
-                Astro.url.pathname.startsWith('/ca/') ? 'ca' : 'es';
+// Obtener información de i18n usando el helper
+const { locale, i18n } = getI18nInfo(Astro);
 
-import { I18nConfig } from '../../i18n/config';
-
-const i18n = I18nConfig.getInstance();
+// Asegurar que las traducciones estén cargadas
 await i18n.loadTranslations();
 
-let text = i18n.getTranslation(key, language) || fallback || key;
-
-// Reemplazar parámetros si existen
-if (params) {
-  Object.entries(params).forEach(([param, value]) => {
-    text = text.replace(new RegExp(`{{${param}}}`, 'g'), value);
-  });
-}
+// Obtener la traducción
+let text = i18n.getTranslation(key, locale, params) || fallback || key;
 
 // Aplicar límite de caracteres si existe
 if (maxLength && text.length > maxLength) {
   text = text.substring(0, maxLength - 3) + '...';
 }
+
+// Preparar atributos del elemento
+const elementProps = {
+  class: className ? `translated-text ${className}` : 'translated-text',
+  'data-i18n-key': key,
+  'data-locale': locale,
+  style,
+  ...restProps
+};
+
+// Limpiar props undefined
+Object.keys(elementProps).forEach(prop => {
+  if (elementProps[prop] === undefined) {
+    delete elementProps[prop];
+  }
+});
+
+const Element = tag;
 ---
 
-<span class="translated-text" data-key={key}>{text}</span>
+<Element {...elementProps} set:html={text} />
+
+<style>
+  .translated-text {
+    /* Estilos base para texto traducido */
+  }
+  
+  /* Indicador visual en modo desarrollo */
+  .translated-text[data-i18n-missing="true"] {
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px dashed red;
+    padding: 2px 4px;
+  }
+</style>
+
+<script>
+  // Solo en desarrollo: resaltar traducciones faltantes
+  if (import.meta.env.DEV) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const textElements = document.querySelectorAll('[data-i18n-key]');
+      
+      textElements.forEach(element => {
+        const key = element.getAttribute('data-i18n-key');
+        const content = element.textContent || element.innerHTML;
+        
+        // Si el contenido es igual a la clave, probablemente falta la traducción
+        if (content.trim() === key) {
+          element.setAttribute('data-i18n-missing', 'true');
+          element.title = `Missing translation for key: ${key}`;
+          console.warn(`[i18n] Missing translation: ${key}`);
+        }
+      });
+    });
+  }
+</script>

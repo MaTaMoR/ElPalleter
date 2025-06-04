@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "Inici",
+    "menu": "Carta",
+    "story": "Història",
+    "contact": "Contacte",
+    "admin": "Administració"
+  },
+  "hero": {
+    "title": "El Palleter",
+    "subtitle": "Autèntica cuina mediterrània",
+    "description": "Descobreix els sabors tradicionals de la Costa Blanca al cor de Benissa"
+  },
+}

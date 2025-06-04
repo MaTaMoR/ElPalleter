@@ -1,0 +1,72 @@
+{
+  "sections": [
+    {
+      "id": "starters",
+      "nameKey": "menu.sections.starters",
+      "order": 1,
+      "items": [
+        {
+          "id": "pan_tomate",
+          "nameKey": "menu.items.pan_tomate.name",
+          "descriptionKey": "menu.items.pan_tomate.description",
+          "price": 4.50,
+          "available": true,
+          "allergens": ["gluten"],
+          "category": "vegetarian"
+        },
+        {
+          "id": "croquetas_jamon",
+          "nameKey": "menu.items.croquetas_jamon.name",
+          "descriptionKey": "menu.items.croquetas_jamon.description",
+          "price": 8.00,
+          "available": true,
+          "allergens": ["gluten", "lactose"],
+          "category": "meat"
+        }
+      ]
+    },
+    {
+      "id": "rice_dishes",
+      "nameKey": "menu.sections.rice_dishes",
+      "order": 2,
+      "items": [
+        {
+          "id": "paella_valenciana",
+          "nameKey": "menu.items.paella_valenciana.name",
+          "descriptionKey": "menu.items.paella_valenciana.description",
+          "price": 15.00,
+          "available": true,
+          "allergens": [],
+          "category": "rice",
+          "servings": "2-3 personas"
+        },
+        {
+          "id": "arroz_negro",
+          "nameKey": "menu.items.arroz_negro.name",
+          "descriptionKey": "menu.items.arroz_negro.description",
+          "price": 16.50,
+          "available": true,
+          "allergens": ["seafood"],
+          "category": "rice",
+          "servings": "2-3 personas"
+        }
+      ]
+    },
+    {
+      "id": "desserts",
+      "nameKey": "menu.sections.desserts",
+      "order": 3,
+      "items": [
+        {
+          "id": "flan_casero",
+          "nameKey": "menu.items.flan_casero.name",
+          "descriptionKey": "menu.items.flan_casero.description",
+          "price": 5.50,
+          "available": true,
+          "allergens": ["lactose", "eggs"],
+          "category": "dessert"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 ---
 import ImageSlider from './ImageSlider.astro';
+import RichText from '../i18n/RichText.astro';
 
 // Importar las imágenes desde assets
 import slider1 from '../../assets/slider/slider-1.jpg';
@@ -33,31 +34,15 @@ const localImages = [
 ---
 
 <section class="historia-section" id="historia">
-    <div class="historia-container">
+    <div class="historia-container container">
         <!-- Historia a la izquierda -->
         <div class="history-content">
-            <h2 class="section-title">Nuestra Historia</h2>
-            <p class="section-subtitle">Desde 1985 en el corazón de Benissa</p>
-            
-            <p class="section-text">
-                Lo que comenzó como un pequeño restaurante familiar se ha convertido en 
-                un <span class="highlight">referente de la cocina mediterránea</span> en Benissa. 
-                Tres generaciones han mantenido vivas las recetas tradicionales mientras 
-                incorporan toques modernos que sorprenden a nuestros comensales.
-            </p>
-            
-            <p class="section-text">
-                Cada plato cuenta una historia, cada sabor evoca recuerdos de generaciones 
-                que han encontrado en El Palleter su <span class="highlight">segundo hogar</span>. 
-                Nuestra parrilla, que lleva funcionando desde el primer día, sigue siendo 
-                el corazón de nuestra cocina.
-            </p>
-            
-            <p class="section-text">
-                Hoy, seguimos comprometidos con la <span class="highlight">calidad</span>, 
-                la <span class="highlight">tradición</span> y el <span class="highlight">sabor auténtico</span> 
-                que nos ha caracterizado durante casi cuatro décadas.
-            </p>
+            <RichText 
+                key="historia_content" 
+                fallback="Historia no disponible"
+                className="historia-rich-content"
+                theme="gold"
+            />
         </div>
     
         <!-- Slider de fotos a la derecha -->
@@ -68,612 +53,319 @@ const localImages = [
 </section>
 
 <style>
-    /* Sección principal con partículas animadas */
-/* Sección principal con partículas animadas */
-/* Sección principal con partículas animadas */
-/* Sección principal con partículas animadas */
-.historia-section {
-    width: 100%;
-    min-height: 900px; /* Cambio: altura más compacta similar a los 1000px originales */
-    max-height: 1000px; /* Límite máximo para desktop */
-    background: rgb(20, 20, 20);
-    padding: 120px 0;
-    display: flex;
-    align-items: stretch; /* Cambio: permite que los elementos ocupen toda la altura */
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box; /* Asegurar que el padding se incluya en el cálculo */
-}
+    /* IMPORTAR EL SISTEMA GLOBAL (en tu layout principal) */
+    /* @import '../styles/breakpoints.css'; */
 
-/* Efecto de partículas animadas en el fondo */
-.historia-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
-                      radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-                      radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
-                      radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
-                      radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
-    background-size: 120px 120px, 150px 150px, 100px 100px, 180px 180px, 90px 90px;
-    opacity: 0.15;
-    animation: float 25s ease-in-out infinite;
-    z-index: 1;
-}
-
-@keyframes float {
-    0%, 100% { 
-        transform: translateY(0px) translateX(0px); 
-    }
-    25% { 
-        transform: translateY(-15px) translateX(5px); 
-    }
-    50% { 
-        transform: translateY(-25px) translateX(-10px); 
-    }
-    75% { 
-        transform: translateY(-10px) translateX(8px); 
-    }
-}
-
-/* Contenedor centrado con max-width */
-.historia-container {
-    width: 100%;
-    max-width: 1400px;
-    height: 660px; /* Altura fija para asegurar que ambos elementos sean iguales */
-    margin: 0 auto;
-    display: flex;
-    flex-direction: row;
-    gap: 3rem;
-    position: relative;
-    z-index: 2;
-    padding: 0 2rem;
-}
-
-/* Reemplaza las animaciones fade-in existentes con estas nuevas animaciones slide-in */
-
-/* Quitar las clases fade-in y reemplazar con slide-in */
-.historia-section {
-    width: 100%;
-    min-height: 900px;
-    max-height: 1000px;
-    background: rgb(20, 20, 20);
-    padding: 120px 0;
-    display: flex;
-    align-items: stretch;
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-/* Animaciones slide-in para los containers */
-.history-content {
-    flex: 1.2;
-    color: white;
-    padding: clamp(2.5rem, 4vw, 3.5rem) clamp(2rem, 3vw, 3rem);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 20px;
-    border: 1px solid rgba(244, 162, 97, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    height: 100%;
-    
-    /* Animación desde la izquierda */
-    opacity: 0;
-    transform: translateX(-100px);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.slider-section {
-    flex: 1.3;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 20px;
-    border: 1px solid rgba(244, 162, 97, 0.15);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    
-    /* Animación desde la derecha */
-    opacity: 0;
-    transform: translateX(100px);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Estados activos - cuando los elementos son visibles */
-.history-content.slide-in-active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.slider-section.slide-in-active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Delay para que el slider aparezca ligeramente después que la historia */
-.slider-section.slide-in-active {
-    transition-delay: 0.2s;
-}
-
-/* Responsive - Mantener las animaciones en tablet */
-@media (max-width: 1024px) {
-    .history-content {
-        transform: translateX(-80px);
-    }
-    
-    .slider-section {
-        transform: translateX(80px);
-    }
-}
-
-@media (max-width: 999px) and (min-width: 821px) {
-    .history-content {
-        transform: translateX(-60px);
-    }
-    
-    .slider-section {
-        transform: translateX(60px);
-    }
-}
-
-@media (max-width: 820px) and (min-width: 769px) {
-    .history-content {
-        transform: translateX(-50px);
-    }
-    
-    .slider-section {
-        transform: translateX(50px);
-    }
-}
-
-/* En móvil - cambiar a animación vertical ya que están apilados */
-@media (max-width: 768px) {
+    /* === BASE SECTION === */
     .historia-section {
-        min-height: auto;
-        max-height: none;
-        padding: 120px 0 40px 0;
-        display: block;
-        align-items: unset;
-    }
-    
-    .history-content {
-        padding: 3rem 2rem;
-        order: 1;
-        height: auto;
-        
-        /* En móvil: animación desde arriba */
-        opacity: 0;
-        transform: translateY(-50px);
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .slider-section {
-        min-height: 60vh;
-        height: 60vh;
-        order: 2;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 15px;
-        border: 1px solid rgba(244, 162, 97, 0.2);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        min-height: 900px;
+        max-height: 1000px;
+        background: rgb(20, 20, 20);
+        padding: 120px 0;
+        display: flex;
+        align-items: stretch;
+        position: relative;
         overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    /* Efecto de partículas animadas en el fondo */
+    .historia-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
+        background-size: 120px 120px, 150px 150px, 100px 100px, 180px 180px, 90px 90px;
+        opacity: 0.15;
+        animation: float 25s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    @keyframes float {
+        0%, 100% { 
+            transform: translateY(0px) translateX(0px); 
+        }
+        25% { 
+            transform: translateY(-15px) translateX(5px); 
+        }
+        50% { 
+            transform: translateY(-25px) translateX(-10px); 
+        }
+        75% { 
+            transform: translateY(-10px) translateX(8px); 
+        }
+    }
+
+    /* === CONTAINER USANDO SISTEMA GLOBAL === */
+    .historia-container {
+        /* Usa las variables globales del sistema */
+        height: 660px;
+        display: flex;
+        flex-direction: row;
+        gap: var(--gap-mobile); /* Gap responsivo automático */
+        position: relative;
+        z-index: 2;
+    }
+
+    /* === CONTENT SECTIONS BASE === */
+    .history-content {
+        flex: 1.2;
+        padding: var(--padding-mobile);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1px solid rgba(244, 162, 97, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        height: 100%;
+        
+        /* SISTEMA DE ANIMACIÓN UNIFICADO */
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slider-section {
+        flex: 1.3;
+        height: 100%;
         display: grid;
         place-items: center;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 20px;
+        border: 1px solid rgba(244, 162, 97, 0.15);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
         
-        /* En móvil: animación desde abajo */
+        /* SISTEMA DE ANIMACIÓN UNIFICADO */
         opacity: 0;
-        transform: translateY(50px);
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
+    /* === ANIMACIONES ACTIVAS BASE === */
     .history-content.slide-in-active {
         opacity: 1;
-        transform: translateY(0);
     }
-    
+
     .slider-section.slide-in-active {
         opacity: 1;
-        transform: translateY(0);
-        transition-delay: 0.3s; /* Delay más largo en móvil */
+        transition-delay: 0.2s;
     }
-}
 
-@media (max-width: 480px) {
-    .historia-section {
-        padding: 100px 0 30px 0;
-        display: block;
-        max-height: none;
-    }
+    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
     
-    .history-content {
-        padding: 2.5rem 1.8rem;
-        border-radius: 15px;
-        height: auto;
-        transform: translateY(-40px);
-    }
-    
-    .slider-section {
-        min-height: 50vh;
-        height: 50vh;
-        transform: translateY(40px);
-    }
-}
+    /* TABLET Y SUPERIOR (768px+) - Animación horizontal */
+    @media (min-width: 768px) {
+        .historia-container {
+            gap: var(--gap-tablet);
+        }
+        
+        .history-content {
+            padding: var(--padding-tablet);
+        }
+        
+        .history-content:not(.slide-in-active) {
+            transform: translateX(-60px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slider-section:not(.slide-in-active) {
+            transform: translateX(60px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .history-content.slide-in-active {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
-/* Contenido de historia con efecto glassmorphism */
-.history-content {
-    flex: 1.2;
-    color: white;
-    padding: clamp(2.5rem, 4vw, 3.5rem) clamp(2rem, 3vw, 3rem);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 20px;
-    border: 1px solid rgba(244, 162, 97, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    height: 100%; /* Altura completa del contenedor padre */
-}
+        .slider-section.slide-in-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition-delay: 0.2s;
+        }
+    }
 
-/* Tipografía */
-.section-title {
-    font-size: clamp(2.2rem, 2.8vw, 2.8rem);
-    font-weight: 300;
-    margin-bottom: 1.2rem;
-    color: #f4a261;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 10px rgba(244, 162, 97, 0.3);
-}
+    /* DESKTOP (1024px+) */
+    @media (min-width: 1024px) {
+        .historia-container {
+            gap: var(--gap-desktop);
+        }
+        
+        .history-content {
+            padding: var(--padding-desktop);
+        }
+    }
 
-.section-subtitle {
-    font-size: clamp(1.2rem, 1.8vw, 1.3rem);
-    font-weight: 400;
-    margin-bottom: 2rem;
-    color: #f4a261;
-    opacity: 0.9;
-    text-shadow: 0 1px 5px rgba(244, 162, 97, 0.2);
-}
+    /* DESKTOP LARGE (1400px+) */
+    @media (min-width: 1400px) {
+        .historia-container {
+            gap: var(--gap-desktop-lg);
+        }
+    }
 
-.section-text {
-    font-size: clamp(1.05rem, 1.4vw, 1.1rem);
-    line-height: 1.6;
-    opacity: 0.95;
-    margin-bottom: 1.3rem;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
+    /* TABLET ESPECÍFICO (768px-1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .historia-section {
+            min-height: 800px;
+            max-height: 900px;
+            padding: 100px 0;
+        }
+        
+        .historia-container {
+            height: 600px;
+        }
+    }
 
-.highlight {
-    color: #f4a261;
-    font-weight: 500;
-    text-shadow: 0 1px 5px rgba(244, 162, 97, 0.3);
-}
+    /* MOBILE (0-767px) - Animación vertical */
+    @media (max-width: 767px) {
+        .historia-section {
+            min-height: auto;
+            max-height: none;
+            padding: 120px 0 40px 0;
+            display: block;
+            align-items: unset;
+        }
+        
+        .historia-container {
+            flex-direction: column;
+            height: auto;
+            gap: var(--gap-mobile);
+        }
+        
+        .history-content {
+            order: 2;
+            padding: var(--padding-mobile);
+            height: auto;
+        }
+        
+        .slider-section {
+            order: 1;
+            min-height: 60vh;
+            height: 60vh;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animaciones móvil */
+        .slider-section:not(.slide-in-active) {
+            transform: translateY(-30px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .history-content:not(.slide-in-active) {
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slider-section.slide-in-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.1s;
+        }
+        
+        .history-content.slide-in-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.3s;
+        }
+        
+        /* Partículas más sutiles en móvil */
+        .historia-section::before {
+            opacity: 0.08;
+            animation-duration: 30s;
+        }
+    }
 
-/* CTA */
-.cta-container {
-    margin-top: 1.5rem;
-}
-
-.secondary-btn {
-    display: inline-block;
-    padding: 1rem 2rem;
-    background: rgba(244, 162, 97, 0.1);
-    border: 2px solid #f4a261;
-    color: #f4a261;
-    text-decoration: none;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(244, 162, 97, 0.2);
-}
-
-.secondary-btn:hover {
-    background: #f4a261;
-    color: rgb(20, 20, 20);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(244, 162, 97, 0.4);
-}
-
-/* Sección del slider con glassmorphism */
-.slider-section {
-    flex: 1.3;
-    height: 100%; /* Altura completa del contenedor padre */
-    display: grid;
-    place-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 20px;
-    border: 1px solid rgba(244, 162, 97, 0.15);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .historia-section {
-        min-height: 800px; /* Altura reducida para tablets */
-        max-height: 900px; /* Límite para tablets */
-        padding: 100px 0;
+    /* MOBILE PEQUEÑO (0-480px) */
+    @media (max-width: 480px) {
+        .historia-section {
+            padding: 100px 0 30px 0;
+        }
+        
+        .historia-container {
+            gap: calc(var(--gap-mobile) * 0.75);
+        }
+        
+        .slider-section {
+            min-height: 50vh;
+            height: 50vh;
+        }
+        
+        .history-content {
+            border-radius: 15px;
+        }
     }
-    
-    .historia-container {
-        max-width: 1200px;
-        padding: 0 1.5rem;
-        gap: 2rem;
-        height: 600px; /* Altura fija para tablets */
-    }
-    
-    .history-content {
-        padding: clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem);
-        height: 100%; /* Altura completa */
-    }
-    
-    .slider-section {
-        height: 100%; /* Altura completa */
-    }
-}
-
-/* Breakpoint adicional para pantallas 1000px-1024px */
-@media (max-width: 1024px) and (min-width: 1000px) {
-    .history-content {
-        padding: 2.5rem 2rem; /* Padding específico para este rango */
-        justify-content: center; /* Centrar contenido */
-    }
-    
-    .section-title {
-        font-size: 2.2rem;
-        margin-bottom: 1rem;
-    }
-    
-    .section-subtitle {
-        font-size: 1.2rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .section-text {
-        font-size: 1.05rem;
-        margin-bottom: 1.2rem;
-        line-height: 1.5;
-    }
-}
-
-/* Breakpoint para pantallas 999px-821px mejorado */
-
-/* Breakpoint específico para pantallas 768px-999px */
-@media (max-width: 999px) and (min-width: 821px) {
-    .historia-section {
-        min-height: 750px; /* Altura fija más compacta */
-        max-height: 850px;
-        padding: 80px 0;
-    }
-    
-    .historia-container {
-        gap: 1.5rem;
-        padding: 0 1rem;
-        height: 590px; /* Altura fija */
-    }
-    
-    .history-content {
-        flex: 1.1;
-        padding: 2rem 1.5rem; /* Reducir padding para más espacio al texto */
-        justify-content: space-between; /* Cambio: distribuir mejor el espacio */
-        height: 100%; /* Altura completa */
-    }
-    
-    .slider-section {
-        flex: 1.4;
-        height: 100%; /* Altura completa */
-    }
-    
-    .section-title {
-        font-size: clamp(1.6rem, 2vw, 1.9rem); /* Reducir tamaño */
-        margin-bottom: 0.8rem; /* Reducir margen */
-    }
-    
-    .section-subtitle {
-        font-size: clamp(1rem, 1.3vw, 1.1rem); /* Reducir tamaño */
-        margin-bottom: 1rem; /* Reducir margen */
-    }
-    
-    .section-text {
-        font-size: clamp(0.9rem, 1.1vw, 1rem); /* Reducir tamaño */
-        margin-bottom: 0.8rem; /* Reducir margen */
-        line-height: 1.4; /* Reducir line-height */
-    }
-    
-    .cta-container {
-        margin-top: 0.8rem; /* Reducir margen */
-    }
-    
-    .secondary-btn {
-        padding: 0.7rem 1.3rem; /* Reducir padding */
-        font-size: 0.85rem; /* Reducir tamaño */
-    }
-}
-
-/* Breakpoint específico para pantallas 769px-820px */
-@media (max-width: 820px) and (min-width: 769px) {
-    .historia-section {
-        min-height: 700px; /* Altura fija más compacta */
-        max-height: 800px;
-        padding: 70px 0;
-    }
-    
-    .historia-container {
-        gap: 1rem;
-        padding: 0 0.8rem;
-        height: 560px; /* Altura fija */
-    }
-    
-    .history-content {
-        flex: 1;
-        padding: 1.5rem 1.2rem; /* Reducir aún más el padding */
-        justify-content: space-between;
-        height: 100%; /* Altura completa */
-    }
-    
-    .slider-section {
-        flex: 1.5;
-        height: 100%; /* Altura completa */
-    }
-    
-    .section-title {
-        font-size: clamp(1.5rem, 1.8vw, 1.7rem); /* Reducir más */
-        margin-bottom: 0.6rem; /* Reducir margen */
-    }
-    
-    .section-subtitle {
-        font-size: clamp(0.95rem, 1.2vw, 1.05rem); /* Reducir más */
-        margin-bottom: 0.8rem; /* Reducir margen */
-    }
-    
-    .section-text {
-        font-size: clamp(0.85rem, 1vw, 0.95rem); /* Reducir más */
-        margin-bottom: 0.6rem; /* Reducir margen */
-        line-height: 1.3; /* Reducir line-height */
-    }
-    
-    .cta-container {
-        margin-top: 0.6rem; /* Reducir margen */
-    }
-    
-    .secondary-btn {
-        padding: 0.6rem 1.1rem; /* Reducir padding */
-        font-size: 0.8rem; /* Reducir tamaño */
-    }
-}
-
-@media (max-width: 768px) {
-    .historia-section {
-        min-height: auto; /* En móvil permitir altura automática */
-        max-height: none; /* Quitar límite máximo en móvil */
-        padding: 120px 0 40px 0;
-        display: block;
-        align-items: unset; /* Resetear align-items en móvil */
-    }
-    
-    .historia-container {
-        flex-direction: column-reverse;
-        height: auto; /* Cambio: altura automática en móvil */
-        gap: 2rem;
-        padding: 0 1rem;
-    }
-    
-    .history-content {
-        padding: 3rem 2rem;
-        order: 1;
-        height: auto; /* Cambio: altura automática en móvil */
-    }
-    
-    .slider-section {
-        min-height: 60vh; /* Más altura en móvil para el slider */
-        height: 60vh; /* Altura fija en móvil */
-        order: 2;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 15px;
-        border: 1px solid rgba(244, 162, 97, 0.2);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        display: grid;
-        place-items: center;
-    }
-    
-    /* Partículas más sutiles en móvil */
-    .historia-section::before {
-        opacity: 0.08;
-        animation-duration: 30s;
-    }
-}
-
-@media (max-width: 480px) {
-    .historia-section {
-        padding: 100px 0 30px 0;
-        display: block;
-        max-height: none; /* Quitar límite máximo */
-    }
-    
-    .historia-container {
-        padding: 0 0.5rem;
-        gap: 2rem;
-        height: auto; /* Altura automática en móviles pequeños */
-    }
-    
-    .history-content {
-        padding: 2.5rem 1.8rem;
-        border-radius: 15px;
-        height: auto; /* Altura automática en móviles pequeños */
-    }
-    
-    .slider-section {
-        min-height: 50vh; /* Altura ajustada para móviles pequeños */
-        height: 50vh;
-    }
-    
-    .secondary-btn {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-        border-radius: 10px;
-    }
-}
 </style>
 
 <script>
+    // Importar las utilidades de breakpoints
+    // import { onBreakpointChange, getCurrentBreakpoint } from '../utils/breakpoints.js';
+    
     document.addEventListener('DOMContentLoaded', () => {
-        // Configuración del Intersection Observer
+        // Usar las utilidades globales de breakpoints
+        let currentBreakpoint = window.innerWidth <= 767 ? 'mobile' : 'desktop';
+        let resizeTimer;
+        
         const observerOptions = {
-            threshold: 0.15, // Se activa cuando el 15% del elemento es visible
-            rootMargin: '0px 0px -50px 0px' // Activar un poco antes de que el elemento sea completamente visible
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
         };
 
-        // Crear el observer
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Añadir la clase para activar la animación
                     entry.target.classList.add('slide-in-active');
-                    
-                    // Opcional: dejar de observar el elemento una vez que se ha animado
-                    // observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        // Observar tanto el contenido de historia como el slider
         const historyContent = document.querySelector('.history-content');
         const sliderSection = document.querySelector('.slider-section');
         
-        if (historyContent) {
-            observer.observe(historyContent);
-        }
-        
-        if (sliderSection) {
-            observer.observe(sliderSection);
-        }
+        if (historyContent) observer.observe(historyContent);
+        if (sliderSection) observer.observe(sliderSection);
 
-        // OPCIONAL: Si quieres que la animación se repita cada vez que el usuario hace scroll
-        // puedes comentar la línea observer.unobserve(entry.target) de arriba
-        
-        // OPCIONAL: Animación manual al hacer clic (para testing)
-        const triggerAnimation = () => {
-            if (historyContent) historyContent.classList.add('slide-in-active');
-            if (sliderSection) sliderSection.classList.add('slide-in-active');
-        };
-        
-        // Exponer función para testing manual (opcional)
-        window.triggerHistoriaAnimation = triggerAnimation;
+        // Usar el sistema global para detectar cambios de breakpoint
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            
+            resizeTimer = setTimeout(() => {
+                const newBreakpoint = window.innerWidth <= 767 ? 'mobile' : 'desktop';
+                
+                if (newBreakpoint !== currentBreakpoint) {
+                    currentBreakpoint = newBreakpoint;
+                    
+                    // Temporalmente deshabilitar transiciones durante el cambio
+                    if (historyContent && sliderSection) {
+                        historyContent.style.transition = 'none';
+                        sliderSection.style.transition = 'none';
+                        
+                        requestAnimationFrame(() => {
+                            setTimeout(() => {
+                                historyContent.style.transition = '';
+                                sliderSection.style.transition = '';
+                            }, 100);
+                        });
+                    }
+                }
+            }, 150);
+        });
     });
 </script>

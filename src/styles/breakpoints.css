@@ -1,0 +1,118 @@
+:root {
+  /* Valores de breakpoints */
+  --bp-mobile-sm: 480px;
+  --bp-mobile: 767px;
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+  --bp-desktop-lg: 1400px;
+  
+  /* Containers max-width por breakpoint */
+  --container-mobile: 100%;
+  --container-tablet: 768px;
+  --container-desktop: 1024px;
+  --container-desktop-lg: 1400px;
+  
+  /* Gaps estándar */
+  --gap-mobile: 1rem;
+  --gap-tablet: 2rem;
+  --gap-desktop: 3rem;
+  --gap-desktop-lg: 4rem;
+  
+  /* Padding estándar */
+  --padding-mobile: 1rem;
+  --padding-tablet: 2rem;
+  --padding-desktop: 3rem;
+}
+
+/* === CLASES UTILITARIAS DE BREAKPOINTS === */
+
+/* Container responsive estándar */
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: var(--container-tablet);
+    padding: 0 var(--padding-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: var(--container-desktop);
+    padding: 0 var(--padding-desktop);
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: var(--container-desktop-lg);
+  }
+}
+
+/* === MIXINS CSS (usando @apply si usas Tailwind, sino usar clases) === */
+
+/* Clases para mostrar/ocultar por breakpoint */
+.mobile-only {
+  display: block;
+}
+
+.tablet-up {
+  display: none;
+}
+
+.desktop-up {
+  display: none;
+}
+
+.desktop-lg-up {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .tablet-up {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-up {
+    display: block;
+  }
+}
+
+@media (min-width: 1400px) {
+  .desktop-lg-up {
+    display: block;
+  }
+}
+
+/* Gaps responsivos */
+.gap-responsive {
+  gap: var(--gap-mobile);
+}
+
+@media (min-width: 768px) {
+  .gap-responsive {
+    gap: var(--gap-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .gap-responsive {
+    gap: var(--gap-desktop);
+  }
+}
+
+@media (min-width: 1400px) {
+  .gap-responsive {
+    gap: var(--gap-desktop-lg);
+  }
+}

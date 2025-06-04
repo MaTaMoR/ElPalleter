@@ -78,7 +78,7 @@ def generar_prompt_para_copilot(ids_historias: str,
 
 def crear_contenido_prompt(historias_df, df_original):
     """
-    Crea el contenido completo del prompt con contexto y datos - VERSIÓN SIMPLIFICADA
+    Crea el contenido completo del prompt con contexto y datos - VERSIÓN COMPLETA
     """
     
     num_historias = len(historias_df)
@@ -105,7 +105,27 @@ def crear_contenido_prompt(historias_df, df_original):
     prompt_content += "- Formularios de Poliza, Estructura Comercial, Upgrade, Impuestos\n\n"
     prompt_content += "**Como (Rol):** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente\n\n"
     
-    # Parte 3: Formato de respuesta
+    # Parte 3: Instrucciones detalladas para criterios y preguntas
+    prompt_content += "## INSTRUCCIONES ESPECIFICAS\n\n"
+    prompt_content += "### CRITERIOS DE ACEPTACION (minimo 3 por historia):\n"
+    prompt_content += "Usa formato Gherkin estricto: DADO-CUANDO-ENTONCES\n"
+    prompt_content += "Ejemplos para seguros:\n"
+    prompt_content += "- DADO que soy un actuario CUANDO configuro una tabla de tarifas ENTONCES el sistema valida los rangos\n"
+    prompt_content += "- DADO que ingreso datos de poliza CUANDO supero el limite de cobertura ENTONCES se muestra alerta\n"
+    prompt_content += "- DADO que soy agente CUANDO consulto una poliza cancelada ENTONCES veo el historial completo\n\n"
+    prompt_content += "### PREGUNTAS FUNCIONALES (minimo 5 por historia):\n"
+    prompt_content += "Enfocate en clarificar:\n"
+    prompt_content += "- Validaciones y reglas de negocio especificas\n"
+    prompt_content += "- Integraciones con otros sistemas (core, CRM, etc)\n"
+    prompt_content += "- Casos de excepcion y manejo de errores\n"
+    prompt_content += "- Permisos y roles de usuario\n"
+    prompt_content += "- Impacto en productos existentes\n"
+    prompt_content += "Ejemplos:\n"
+    prompt_content += "- Que validaciones aplicar cuando el tomador es menor de edad?\n"
+    prompt_content += "- Como integrar con el sistema de facturacion existente?\n"
+    prompt_content += "- Que ocurre si falla la conexion con reaseguros?\n\n"
+    
+    # Parte 4: Formato de respuesta
     prompt_content += "## FORMATO DE RESPUESTA OBLIGATORIO\n\n"
     prompt_content += "Para CADA historia, responde con este formato exacto:\n\n"
     prompt_content += "HISTORIA [ID]:\n"
@@ -122,11 +142,11 @@ def crear_contenido_prompt(historias_df, df_original):
     prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
     prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
     prompt_content += "- Preguntas Funcionales:\n"
-    prompt_content += "  * [Pregunta sobre requerimiento]\n"
-    prompt_content += "  * [Pregunta sobre casos especiales]\n"
+    prompt_content += "  * [Pregunta sobre validaciones/reglas]\n"
     prompt_content += "  * [Pregunta sobre integraciones]\n"
-    prompt_content += "  * [Pregunta sobre validaciones]\n"
-    prompt_content += "  * [Pregunta sobre UX]\n\n"
+    prompt_content += "  * [Pregunta sobre casos de excepcion]\n"
+    prompt_content += "  * [Pregunta sobre permisos/roles]\n"
+    prompt_content += "  * [Pregunta sobre impacto en otros productos]\n\n"
     
     # Separador
     prompt_content += "-------------------------------------------------------------------\n\n"
@@ -166,10 +186,14 @@ def crear_contenido_prompt(historias_df, df_original):
     # Parte final: Instrucciones críticas
     prompt_content += "-------------------------------------------------------------------\n\n"
     prompt_content += "## INSTRUCCIONES CRITICAS\n\n"
-    prompt_content += "1. **USA SOLO** los valores de las listas arriba\n"
-    prompt_content += "2. **MANTEN** el formato exacto de respuesta\n"
-    prompt_content += "3. **INCLUYE** minimo 3 criterios y 5 preguntas por historia\n"
-    prompt_content += f"4. **PROCESA** las {num_historias} historias mostradas\n\n"
+    prompt_content += "1. **USA SOLO** los valores de las listas de VALORES OBLIGATORIOS\n"
+    prompt_content += "2. **MANTEN** el formato exacto de respuesta mostrado arriba\n"
+    prompt_content += "3. **CREA** minimo 3 criterios de aceptacion en formato DADO-CUANDO-ENTONCES\n"
+    prompt_content += "4. **GENERA** minimo 5 preguntas funcionales especificas del dominio seguros\n"
+    prompt_content += f"5. **PROCESA** las {num_historias} historias mostradas\n"
+    prompt_content += "6. **ENFOCATE** en validaciones, integraciones y casos de excepcion\n\n"
+    prompt_content += "IMPORTANTE: Cada criterio debe ser especifico y testeable.\n"
+    prompt_content += "Cada pregunta debe ayudar a clarificar requerimientos faltantes.\n\n"
     prompt_content += "ANALIZA TODAS LAS HISTORIAS AHORA!\n"
 
     return prompt_content

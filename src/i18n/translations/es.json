@@ -1,0 +1,11 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "story": "Historia",
+    "menu": "Carta",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "menu": "Ver Carta"
+  }
+}

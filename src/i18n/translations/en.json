@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "story": "Story",
+    "contact": "Contact",
+    "admin": "Administration"
+  },
+  "hero": {
+    "title": "El Palleter",
+    "subtitle": "Authentic Mediterranean cuisine",
+    "description": "Discover the traditional flavors of Costa Blanca in the heart of Benissa"
+  },
+  "story": {
+    "title": "Our Story",
+    "content": "historia_enriquecida"
+  },
+  "contact": {
+    "title": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Hours",
+    "find_us": "Find Us"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "legal": "Legal Notice",
+    "privacy": "Privacy Policy"
+  },
+  "menu": {
+    "sections": {
+      "starters": "Starters",
+      "rice_dishes": "Rice Dishes",
+      "desserts": "Desserts"
+    },
+    "items": {
+      "pan_tomate": {
+        "name": "Tomato Bread",
+        "description": "Artisan toasted bread with natural tomato, garlic and extra virgin olive oil"
+      },
+      "croquetas_jamon": {
+        "name": "Iberian Ham Croquettes",
+        "description": "Creamy acorn-fed Iberian ham croquettes, handmade"
+      },
+      "paella_valenciana": {
+        "name": "Valencian Paella",
+        "description": "Authentic Valencian paella with chicken, rabbit, lima beans, green beans and saffron"
+      },
+      "arroz_negro": {
+        "name": "Black Rice",
+        "description": "Creamy rice with cuttlefish in its ink, prawns and Mediterranean mussels"
+      },
+      "flan_casero": {
+        "name": "Homemade Flan",
+        "description": "Traditional flan made with fresh eggs and liquid caramel"
+      }
+    }
+  },
+  "gallery": {
+    "images": {
+      "paella_valenciana_alt": "Delicious traditional Valencian paella",
+      "paella_valenciana_title": "Valencian Paella - House specialty",
+      "restaurant_interior_alt": "Cozy interior of El Palleter restaurant",
+      "restaurant_interior_title": "Family and traditional atmosphere",
+      "arroz_negro_alt": "Black rice with Mediterranean seafood",
+      "arroz_negro_title": "Black Rice - Flavors of the sea",
+      "terrace_view_alt": "Terrace with panoramic views of Benissa",
+      "terrace_view_title": "Terrace with spectacular views",
+      "chef_cooking_alt": "Chef preparing paella in traditional kitchen",
+      "chef_cooking_title": "Live artisanal preparation"
+    }
+  }
+}

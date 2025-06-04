@@ -1,5 +1,18 @@
 ---
 import epLogo from '../../assets/mini-logo.svg';
+
+import Text from '../i18n/Text.astro';
+import { getI18nInfo, localizeUrl, getAlternateUrls } from '../../utils/astro-i18n-utils.js';
+
+// Obtener información de i18n usando el nuevo sistema
+const { locale } = getI18nInfo(Astro);
+
+const localizedUrls = {
+    home: localizeUrl('#home', locale, Astro),
+    story: localizeUrl('#historia', locale, Astro),
+    menu: localizeUrl('#carta', locale, Astro),
+    contact: localizeUrl('#contacto', locale, Astro)
+}
 ---
 
 <nav>
@@ -12,15 +25,15 @@ import epLogo from '../../assets/mini-logo.svg';
     
     <!-- Nav items (desktop) con logo integrado -->
     <ul class="nav-desktop">
-        <li><a href="#inicio" data-nav="inicio">INICIO</a></li>
-        <li><a href="#historia" data-nav="historia">HISTORIA</a></li>
+        <li><a data-scroll-to="inicio"><Text key="nav.home"/></a></li>
+        <li><a data-scroll-to="historia"><Text key="nav.story"></a></li>
         <li class="logo-item">
             <a href="#hero" aria-label="Ir a inicio - El Palleter">
                 <img src={epLogo.src} alt="El Palleter Logo" />
             </a>
         </li>
-        <li><a href="#carta" data-nav="carta">CARTA</a></li>
-        <li><a href="#contacto" data-nav="contacto">CONTACTO</a></li>
+        <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
+        <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
     </ul>
     
     <!-- Logo solo para móvil -->
@@ -111,6 +124,7 @@ import epLogo from '../../assets/mini-logo.svg';
         text-align: center;
         white-space: nowrap;
         position: relative;
+        cursor: pointer;
     }
     
     .nav-desktop li:not(.logo-item) a:hover {

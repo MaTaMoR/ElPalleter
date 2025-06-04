@@ -1,274 +1,228 @@
-const DEFAULT_LANGUAGE = 'es';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configuración
+const LOCALES = ['es', 'en', 'ca'];
+const DEFAULT_LOCALE = 'es';
+const TRANSLATIONS_DIR = path.join(__dirname, '../i18n/translations');
 
 /**
- * Gestor principal de traducciones
+ * Clase para gestionar las traducciones con cache optimizado
  */
-export class TranslationManager {
+class TranslationManager {
   constructor() {
     this.translations = new Map();
-    this.languages = [];
-    this.textKeys = [];
+    this.loaded = false;
+    this.loading = false; // Para evitar carga múltiple
+    this.loadPromise = null; // Para reutilizar la promesa de carga
   }
-  
+
   /**
-   * Obtener instancia singleton
-   * @returns {TranslationManager}
+   * Carga todas las traducciones (con protección contra carga múltiple)
    */
-  static getInstance() {
-    if (!TranslationManager.instance) {
-      TranslationManager.instance = new TranslationManager();
+  async loadAllTranslations() {
+    // Si ya está cargado, retornar inmediatamente
+    if (this.loaded) return;
+    
+    // Si ya se está cargando, esperar a que termine
+    if (this.loading && this.loadPromise) {
+      return await this.loadPromise;
     }
-    return TranslationManager.instance;
-  }
-  
-  /**
-   * Cargar todas las traducciones desde la base de datos
-   */
-  async loadTranslations() {
+
+    // Marcar como cargando y crear promesa
+    this.loading = true;
+    this.loadPromise = this._performLoad();
+    
     try {
-      const response = await fetch('/api/translations/all');
-      const data = await response.json();
-      
-      this.translations.clear();
-      
-      data.translations.forEach(translation => {
-        if (!this.translations.has(translation.languageId)) {
-          this.translations.set(translation.languageId, new Map());
-        }
-        this.translations.get(translation.languageId).set(translation.key, translation);
-      });
-      
-      this.languages = data.languages;
-      this.textKeys = data.textKeys;
-    } catch (error) {
-      console.error('Error loading translations:', error);
+      await this.loadPromise;
+    } finally {
+      this.loading = false;
+      this.loadPromise = null;
     }
   }
-  
-  /**
-   * Obtener traducción por clave e idioma
-   * @param {string} key - Clave de traducción
-   * @param {string} languageId - ID del idioma
-   * @returns {string} Traducción encontrada o clave por defecto
-   */
-  getTranslation(key, languageId = DEFAULT_LANGUAGE) {
-    const langTranslations = this.translations.get(languageId);
-    
-    if (langTranslations && langTranslations.has(key)) {
-      return langTranslations.get(key).translation;
-    }
-    
-    // Fallback al español si no existe en el idioma solicitado
-    if (languageId !== 'es') {
-      const defaultTranslations = this.translations.get('es');
-      if (defaultTranslations && defaultTranslations.has(key)) {
-        return defaultTranslations.get(key).translation;
-      }
-    }
-    
-    return `[${key}]`;
-  }
-  
-  /**
-   * Verificar si una traducción existe
-   * @param {string} key - Clave de traducción
-   * @param {string} languageId - ID del idioma
-   * @returns {boolean}
-   */
-  hasTranslation(key, languageId) {
-    const langTranslations = this.translations.get(languageId);
-    return langTranslations ? langTranslations.has(key) : false;
-  }
-  
-  /**
-   * Obtener porcentaje de completitud de un idioma
-   * @param {string} languageId - ID del idioma
-   * @returns {number} Porcentaje de completitud
-   */
-  getLanguageCompleteness(languageId) {
-    const totalKeys = this.textKeys.length;
-    if (totalKeys === 0) return 100;
-    
-    const langTranslations = this.translations.get(languageId);
-    if (!langTranslations) return 0;
-    
-    const translatedKeys = langTranslations.size;
-    return Math.round((translatedKeys / totalKeys) * 100);
-  }
-  
-  /**
-   * Obtener claves faltantes para un idioma
-   * @param {string} languageId - ID del idioma
-   * @returns {string[]} Array de claves faltantes
-   */
-  getMissingKeys(languageId) {
-    const langTranslations = this.translations.get(languageId);
-    const missingKeys = [];
-    
-    this.textKeys.forEach(textKey => {
-      if (!langTranslations || !langTranslations.has(textKey.key)) {
-        missingKeys.push(textKey.key);
-      }
-    });
-    
-    return missingKeys;
-  }
-  
-  /**
-   * Actualizar traducción
-   * @param {string} key - Clave de texto
-   * @param {string} languageId - ID del idioma
-   * @param {string} translation - Traducción
-   * @param {boolean} isReviewed - Si está revisada
-   * @param {string} translatorNotes - Notas del traductor
-   * @returns {Promise<boolean>} Éxito de la operación
-   */
-  async updateTranslation(key, languageId, translation, isReviewed = false, translatorNotes = '') {
+
+  async _performLoad() {
     try {
-      const response = await fetch(`/api/translations/${key}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          languageId,
-          translation,
-          isReviewed,
-          translatorNotes
-        })
-      });
-      
-      if (response.ok) {
-        // Actualizar cache local
-        if (!this.translations.has(languageId)) {
-          this.translations.set(languageId, new Map());
+      const loadPromises = LOCALES.map(async (locale) => {
+        const translationPath = path.join(TRANSLATIONS_DIR, `${locale}.json`);
+        
+        try {
+          const content = await fs.readFile(translationPath, 'utf-8');
+          const translations = JSON.parse(content);
+          const flattened = this.flattenObject(translations);
+          this.translations.set(locale, flattened);
+          
+          if (import.meta.env.DEV) {
+            console.log(`[i18n] Loaded ${Object.keys(flattened).length} translations for ${locale}`);
+          }
+        } catch (error) {
+          console.warn(`[i18n] Warning: Could not load translations for ${locale}:`, error.message);
+          this.translations.set(locale, {});
         }
-        
-        const langTranslations = this.translations.get(languageId);
-        const existingTranslation = langTranslations.get(key);
-        
-        langTranslations.set(key, {
-          ...existingTranslation,
-          key,
-          languageId,
-          translation,
-          isReviewed,
-          translatorNotes,
-          updatedAt: new Date().toISOString()
-        });
-      }
+      });
+
+      await Promise.all(loadPromises);
+      this.loaded = true;
       
-      return response.ok;
     } catch (error) {
-      console.error('Error updating translation:', error);
-      return false;
+      console.error('[i18n] Error loading translations:', error);
+      throw error;
     }
+  }
+
+  /**
+   * Aplana un objeto anidado para facilitar el acceso
+   */
+  flattenObject(obj, prefix = '') {
+    const flattened = {};
+    
+    for (const [key, value] of Object.entries(obj)) {
+      const newKey = prefix ? `${prefix}.${key}` : key;
+      
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        Object.assign(flattened, this.flattenObject(value, newKey));
+      } else {
+        flattened[newKey] = value;
+      }
+    }
+    
+    return flattened;
+  }
+
+  /**
+   * Obtiene una traducción
+   */
+  getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
+    if (!this.loaded) {
+      if (import.meta.env.DEV) {
+        console.warn('[i18n] Translations not loaded yet for key:', key);
+      }
+      return key;
+    }
+
+    const localeTranslations = this.translations.get(locale);
+    if (!localeTranslations) {
+      if (import.meta.env.DEV) {
+        console.warn(`[i18n] No translations found for locale: ${locale}`);
+      }
+      return key;
+    }
+
+    let translation = localeTranslations[key];
+    
+    // Fallback al idioma por defecto
+    if (!translation && locale !== DEFAULT_LOCALE) {
+      const defaultTranslations = this.translations.get(DEFAULT_LOCALE);
+      translation = defaultTranslations?.[key];
+    }
+    
+    // Si aún no hay traducción, usar la clave
+    if (!translation) {
+      if (import.meta.env.DEV) {
+        console.warn(`[i18n] Missing translation for key: ${key} (locale: ${locale})`);
+      }
+      return key;
+    }
+
+    // Reemplazar parámetros
+    if (params && Object.keys(params).length > 0) {
+      translation = this.replaceParams(translation, params);
+    }
+
+    return translation;
+  }
+
+  /**
+   * Reemplaza parámetros en una traducción
+   */
+  replaceParams(text, params) {
+    let result = text;
+    
+    for (const [key, value] of Object.entries(params)) {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      result = result.replace(regex, String(value));
+    }
+    
+    return result;
+  }
+
+  /**
+   * Obtiene todas las traducciones para un idioma
+   */
+  getAllTranslations(locale) {
+    return this.translations.get(locale) || {};
+  }
+
+  /**
+   * Verifica si existe una traducción
+   */
+  hasTranslation(key, locale) {
+    const translations = this.translations.get(locale);
+    return translations && key in translations;
+  }
+
+  /**
+   * Obtiene estadísticas de traducciones
+   */
+  getStats() {
+    const stats = {};
+    
+    for (const locale of LOCALES) {
+      const translations = this.translations.get(locale) || {};
+      stats[locale] = {
+        total: Object.keys(translations).length,
+        missing: []
+      };
+    }
+
+    // Encontrar claves faltantes comparando con el idioma por defecto
+    const defaultKeys = Object.keys(this.translations.get(DEFAULT_LOCALE) || {});
+    
+    for (const locale of LOCALES) {
+      if (locale === DEFAULT_LOCALE) continue;
+      
+      const localeKeys = Object.keys(this.translations.get(locale) || {});
+      const missing = defaultKeys.filter(key => !localeKeys.includes(key));
+      stats[locale].missing = missing;
+    }
+
+    return stats;
   }
 }
 
 /**
- * Constructor de traducciones estáticas
+ * Instancia singleton del gestor de traducciones
  */
-export class StaticTranslationBuilder {
-  /**
-   * Generar archivos de traducciones estáticas
-   */
-  static async generateStaticTranslations() {
-    const manager = TranslationManager.getInstance();
-    await manager.loadTranslations();
-    
-    const translations = manager.exportTranslationsForBuild();
-    
-    // Generar archivo JSON para cada idioma
-    const fs = await import('fs/promises');
-    const path = await import('path');
-    
-    const translationsDir = path.join(process.cwd(), 'src/i18n/generated');
-    
-    try {
-      await fs.mkdir(translationsDir, { recursive: true });
-    } catch (error) {
-      // Directorio ya existe
-    }
-    
-    for (const [languageId, langTranslations] of Object.entries(translations)) {
-      const filePath = path.join(translationsDir, `${languageId}.json`);
-      await fs.writeFile(filePath, JSON.stringify(langTranslations, null, 2));
-    }
-    
-    console.log('Static translations generated successfully');
+const translationManager = new TranslationManager();
+
+/**
+ * Función helper para obtener traducciones (para uso en componentes)
+ */
+export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
+  if (!translationManager.loaded) {
+    await translationManager.loadAllTranslations();
   }
+  
+  return translationManager.getTranslation(key, locale, params);
 }
 
 /**
- * Exportar traducciones para build
- * @returns {Object} Objeto con traducciones por idioma
+ * Hook para precargar traducciones en el servidor
  */
-TranslationManager.prototype.exportTranslationsForBuild = function() {
-  const exportData = {};
-  
-  this.translations.forEach((langTranslations, languageId) => {
-    exportData[languageId] = {};
-    langTranslations.forEach((translation, key) => {
-      exportData[languageId][key] = translation.translation;
-    });
-  });
-  
-  return exportData;
+export async function preloadTranslations() {
+  if (!translationManager.loaded) {
+    await translationManager.loadAllTranslations();
+  }
+  return translationManager;
+}
+
+// Exportar instancia y constantes
+export { 
+  translationManager,
+  LOCALES, 
+  DEFAULT_LOCALE
 };
-
-/**
- * Utilidad para cargar traducciones estáticas en producción
- * @param {string} key - Clave de traducción
- * @param {string} languageId - ID del idioma
- * @returns {Promise<string|null>} Traducción o null
- */
-export async function getStaticTranslation(key, languageId) {
-  try {
-    const translations = await import(`../i18n/generated/${languageId}.json`, {
-      assert: { type: 'json' }
-    });
-    return translations.default[key] || null;
-  } catch (error) {
-    // Fallback al español si el archivo del idioma no existe
-    if (languageId !== 'es') {
-      try {
-        const defaultTranslations = await import('../i18n/generated/es.json', {
-          assert: { type: 'json' }
-        });
-        return defaultTranslations.default[key] || null;
-      } catch (fallbackError) {
-        return null;
-      }
-    }
-    return null;
-  }
-}
-
-/**
- * Hook para usar en componentes
- * @param {string} languageId - ID del idioma
- * @returns {Object} Objeto con funciones de traducción
- */
-export function useTranslation(languageId = 'es') {
-  const manager = TranslationManager.getInstance();
-  
-  return {
-    t: (key, params = {}) => {
-      let translation = manager.getTranslation(key, languageId);
-      
-      if (params && Object.keys(params).length > 0) {
-        Object.entries(params).forEach(([param, value]) => {
-          translation = translation.replace(
-            new RegExp(`{{\\s*${param}\\s*}}`, 'g'), 
-            String(value)
-          );
-        });
-      }
-      
-      return translation;
-    },
-    hasTranslation: (key) => manager.hasTranslation(key, languageId),
-    getLanguageCompleteness: () => manager.getLanguageCompleteness(languageId)
-  };
-}

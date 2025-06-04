@@ -1,5 +1,6 @@
 ---
 import logoBlanco from '../../assets/logo-blanco.svg';
+import Text from '../i18n/Text.astro';
 ---
 
 <section class="hero" id="inicio">
@@ -9,7 +10,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
     </div>
     <!-- Sección inferior: descripción + flecha -->
     <div class="hero-footer">
-        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta">Ver Carta</a>
+        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta"><Text key="hero.menu" /></a>
         <div class="scroll-indicator" data-scroll-to="historia">
             <div class="scroll-arrow">↓</div>
         </div>
@@ -17,6 +18,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
 </section>
 
 <style>
+    /* === HERO BASE === */
     .hero {
         width: 100%;
         height: 100vh;
@@ -29,13 +31,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         color: white;
     }
 
-    .hero img {
-        max-width: 800px;
-        height: auto;
-        filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
-    }
-
-    /* Sección central: título y subtítulo */
+    /* === SECCIÓN CENTRAL - USANDO SISTEMA GLOBAL === */
     .hero-header {
         width: 100%;
         text-align: center;
@@ -45,33 +41,39 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding-top: 100px; /* Espacio para el header fijo */
+        /* Mobile base - usando variables globales */
+        padding-top: calc(var(--padding-mobile) * 5); /* Equivalente a 80px con padding base */
+        padding-left: var(--padding-mobile);
+        padding-right: var(--padding-mobile);
     }
 
     .hero-logo {
-        max-width: 500px;
-        width: 100%;
+        /* Mobile base */
+        max-width: 400px;
+        width: 90%;
         height: auto;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Botón Ver Carta - Bordered con efecto glow dorado */
+    /* === BOTONES - USANDO SISTEMA GLOBAL === */
     .cta-btn-carta {
         background: transparent;
         border: 2px solid white;
         color: white;
-        padding: 1rem 2.5rem;
-        font-size: 1rem;
+        /* Mobile base */
+        padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.5);
+        font-size: 0.85rem;
         font-weight: 600;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         text-transform: uppercase;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-decoration: none;
         display: inline-block;
-        margin-top: 1.5rem;
-        border-radius: 8px;
+        margin-top: 1rem;
+        border-radius: 6px;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     }
 
@@ -89,13 +91,13 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         background: none;
         border: none;
         color: white;
-        padding: 0.8rem 0;
-        font-size: 1rem;
+        padding: 0.6rem 0;
+        font-size: 0.85rem;
         font-weight: 400;
-        letter-spacing: 1.5px;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-decoration: none;
         display: inline-block;
         position: relative;
@@ -110,7 +112,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         width: 0;
         height: 2px;
         background: #f4a261;
-        transition: width 0.3s ease;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .cta-btn:hover::after {
@@ -122,7 +124,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         transform: translateY(-1px);
     }
 
-    /* Sección inferior: descripción + flecha */
+    /* === SECCIÓN INFERIOR - USANDO SISTEMA GLOBAL === */
     .hero-footer {
         position: absolute;
         bottom: 0;
@@ -131,23 +133,28 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1rem;
+        gap: var(--gap-mobile); /* Gap responsivo automático */
+        /* Mobile base */
+        padding-bottom: calc(var(--padding-mobile) * 1.5);
+        width: 100%;
     }
 
     .description {
-        font-size: clamp(1rem, 2vw, 1.3rem);
+        font-size: clamp(0.9rem, 2vw, 1.3rem);
         font-weight: 300;
-        max-width: 700px;
+        max-width: 90%;
         margin: 0;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
         opacity: 0.9;
         line-height: 1.4;
+        /* Mobile base */
+        padding: 0 var(--padding-mobile);
     }
 
     .scroll-indicator {
         cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: var(--padding-mobile);
     }
 
     .scroll-indicator:hover {
@@ -155,7 +162,8 @@ import logoBlanco from '../../assets/logo-blanco.svg';
     }
 
     .scroll-arrow {
-        font-size: 2.5rem;
+        /* Mobile base */
+        font-size: 2rem;
         animation: bounce 2s infinite;
         text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
     }
@@ -172,58 +180,138 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         }
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
+    
+    /* TABLET Y SUPERIOR (768px+) */
+    @media (min-width: 768px) {
         .hero-header {
-            padding-top: 80px;
+            padding-top: calc(var(--padding-tablet) * 4); /* Equivalente a 100px */
+            padding-left: var(--padding-tablet);
+            padding-right: var(--padding-tablet);
         }
-        
-        .hero-footer {
-            gap: 0.8rem;
+
+        .hero-logo {
+            max-width: 500px;
+            width: 80%;
+            margin-bottom: 2.5rem;
         }
-        
-        .description {
-            font-size: 1rem;
-            max-width: 90%;
-            padding: 0 1rem;
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-tablet) * 0.6) calc(var(--padding-tablet) * 1.2);
+            font-size: 0.95rem;
+            letter-spacing: 1.2px;
+            margin-top: 1.2rem;
         }
-        
-        .scroll-arrow {
-            font-size: 2rem;
-        }
-        
+
         .cta-btn {
             padding: 0.7rem 0;
             font-size: 0.9rem;
             letter-spacing: 1px;
         }
 
-        .cta-btn-carta {
-            padding: 0.9rem 2rem;
-            font-size: 0.9rem;
-            letter-spacing: 1.5px;
+        .hero-footer {
+            gap: var(--gap-tablet);
+            padding-bottom: calc(var(--padding-tablet) * 1.5);
+        }
+
+        .description {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            max-width: 700px;
+            padding: 0 var(--padding-tablet);
+        }
+
+        .scroll-arrow {
+            font-size: 2.5rem;
         }
     }
 
+    /* DESKTOP (1024px+) */
+    @media (min-width: 1024px) {
+        .hero-header {
+            padding-top: calc(var(--padding-desktop) * 3.5); /* Equivalente a 100px con sistema */
+            padding-left: var(--padding-desktop);
+            padding-right: var(--padding-desktop);
+        }
+
+        .hero-logo {
+            max-width: 600px;
+        }
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-desktop) * 0.5) calc(var(--padding-desktop) * 1);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+            border-radius: 6px;
+        }
+
+        .cta-btn {
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+        }
+
+        .hero-footer {
+            gap: var(--gap-desktop);
+            padding-bottom: var(--padding-desktop);
+        }
+
+        .description {
+            padding: 0 var(--padding-desktop);
+        }
+    }
+
+    /* DESKTOP LARGE (1400px+) */
+    @media (min-width: 1400px) {
+        .hero-logo {
+            max-width: 550px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-footer {
+            gap: var(--gap-desktop);
+            padding-bottom: var(--padding-desktop);
+        }
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-desktop) * 0.45) calc(var(--padding-desktop) * 0.9);
+            font-size: 0.85rem;
+            letter-spacing: 0.8px;
+            margin-top: 0.8rem;
+            max-width: 200px;
+        }
+    }
+
+    /* MOBILE PEQUEÑO (0-480px) */
     @media (max-width: 480px) {
         .hero-header {
-            padding-top: 60px;
+            padding-top: calc(var(--padding-mobile) * 3); /* Equivalente a 60px */
         }
-        
-        .description {
-            font-size: 0.9rem;
+
+        .hero-logo {
+            max-width: 350px;
+            width: 95%;
+            margin-bottom: 1.5rem;
         }
-        
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.2);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
         .cta-btn {
             padding: 0.6rem 0;
             font-size: 0.85rem;
             letter-spacing: 0.8px;
         }
 
-        .cta-btn-carta {
-            padding: 0.8rem 1.5rem;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+        .description {
+            font-size: 0.9rem;
+        }
+
+        .scroll-arrow {
+            font-size: 1.8rem;
         }
     }
 </style>

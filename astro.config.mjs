@@ -29,12 +29,12 @@ export default defineConfig({
       hooks: {
         'astro:config:setup': ({ addMiddleware }) => {
           addMiddleware({
-            entrypoint: './src/middleware/i18n.js',
+            entrypoint: '/src/middleware/i18n.js',
             order: 'pre'
           });
         },
         'astro:build:start': async () => {
-          const { StaticTranslationBuilder } = await import('./src/utils/translation-utils.js');
+          const { StaticTranslationBuilder } = await import('/src/utils/translation-utils.js');
           await StaticTranslationBuilder.generateStaticTranslations();
         }
       }

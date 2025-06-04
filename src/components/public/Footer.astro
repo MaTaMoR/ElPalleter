@@ -3,7 +3,7 @@ import epLogo from '../../assets/mini-logo.svg';
 ---
 
 <footer class="footer">
-    <div class="footer-container">
+    <div class="footer-container container">
         <!-- Logo y descripción -->
         <div class="footer-brand">
             <img src={epLogo.src} alt="El Palleter Logo" class="footer-logo" />
@@ -36,7 +36,7 @@ import epLogo from '../../assets/mini-logo.svg';
 
     <!-- Copyright -->
     <div class="footer-bottom">
-        <div class="footer-container">
+        <div class="footer-container container">
             <p>&copy; 2025 El Palleter. Todos los derechos reservados.</p>
             <div class="footer-social">
                 <a href="#" aria-label="Facebook">📘</a>
@@ -48,28 +48,28 @@ import epLogo from '../../assets/mini-logo.svg';
 </footer>
 
 <style>
-    /* Footer principal */
+    /* FOOTER BASE */
     .footer {
         background: rgb(15, 15, 15);
         color: white;
-        padding-top: 4rem;
+        padding-top: calc(var(--padding-mobile) * 4);
         border-top: 1px solid rgba(244, 162, 97, 0.2);
     }
 
+    /* CONTAINER PRINCIPAL usando sistema global */
     .footer-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        gap: 3rem;
+        grid-template-columns: 1fr;
+        gap: var(--gap-mobile);
     }
 
-    /* Sección de marca */
+    /* SECCIÓN DE MARCA */
     .footer-brand {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: var(--gap-mobile);
+        text-align: center;
+        align-items: center;
     }
 
     .footer-logo {
@@ -83,9 +83,10 @@ import epLogo from '../../assets/mini-logo.svg';
         line-height: 1.6;
         opacity: 0.8;
         color: #ccc;
+        max-width: 400px;
     }
 
-    /* Títulos de sección */
+    /* TÍTULOS DE SECCIÓN */
     .footer-title {
         font-size: 1.2rem;
         font-weight: 600;
@@ -94,32 +95,12 @@ import epLogo from '../../assets/mini-logo.svg';
         letter-spacing: 0.5px;
     }
 
-    /* Enlaces */
-    .footer-links ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    /* INFORMACIÓN DE CONTACTO Y HORARIOS */
+    .footer-contact,
+    .footer-hours {
+        text-align: center;
     }
 
-    .footer-links li {
-        margin-bottom: 0.8rem;
-    }
-
-    .footer-links a {
-        color: #ccc;
-        text-decoration: none;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        display: block;
-        padding: 0.2rem 0;
-    }
-
-    .footer-links a:hover {
-        color: #f4a261;
-        transform: translateX(5px);
-    }
-
-    /* Información de contacto */
     .contact-info p,
     .hours-info p {
         margin-bottom: 0.8rem;
@@ -133,20 +114,22 @@ import epLogo from '../../assets/mini-logo.svg';
         font-weight: 600;
     }
 
-    /* Footer inferior */
+    /* FOOTER INFERIOR */
     .footer-bottom {
         background: rgba(0, 0, 0, 0.3);
-        margin-top: 3rem;
-        padding: 1.5rem 0;
+        margin-top: calc(var(--gap-mobile) * 3);
+        padding: calc(var(--padding-mobile) * 1.5) 0;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .footer-bottom .footer-container {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
+        gap: var(--gap-mobile);
         grid-template-columns: none;
-        gap: 1rem;
+        text-align: center;
     }
 
     .footer-bottom p {
@@ -155,10 +138,11 @@ import epLogo from '../../assets/mini-logo.svg';
         color: #999;
     }
 
-    /* Redes sociales */
+    /* REDES SOCIALES */
     .footer-social {
         display: flex;
-        gap: 1rem;
+        gap: var(--gap-mobile);
+        justify-content: center;
     }
 
     .footer-social a {
@@ -175,11 +159,17 @@ import epLogo from '../../assets/mini-logo.svg';
         transform: translateY(-2px);
     }
 
-    /* Responsive */
-    @media (max-width: 1024px) {
+    /* === BREAKPOINTS ESTÁNDAR === */
+    
+    /* TABLET (768px+) */
+    @media (min-width: 768px) {
+        .footer {
+            padding-top: calc(var(--padding-tablet) * 2);
+        }
+        
         .footer-container {
             grid-template-columns: 1fr 1fr;
-            gap: 2.5rem;
+            gap: var(--gap-tablet);
         }
         
         .footer-brand {
@@ -187,50 +177,69 @@ import epLogo from '../../assets/mini-logo.svg';
             text-align: center;
             align-items: center;
         }
-    }
-
-    @media (max-width: 768px) {
-        .footer {
-            padding-top: 3rem;
-        }
         
-        .footer-container {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            padding: 0 1.5rem;
-        }
-        
-        .footer-brand {
-            grid-column: 1;
-            text-align: center;
-            align-items: center;
-        }
-        
-        .footer-links,
         .footer-contact,
         .footer-hours {
             text-align: center;
         }
         
-        .footer-bottom .footer-container {
-            flex-direction: column;
-            text-align: center;
-            gap: 1rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .footer-container {
-            padding: 0 1rem;
+        .footer-bottom {
+            margin-top: calc(var(--gap-tablet) * 2);
+            padding: var(--padding-tablet) 0;
         }
         
-        .footer-title {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
+        .footer-bottom .footer-container {
+            flex-direction: row;
+            justify-content: space-between;
+            text-align: left;
         }
         
         .footer-social {
-            justify-content: center;
+            gap: var(--gap-tablet);
+        }
+    }
+
+    /* DESKTOP (1024px+) */
+    @media (min-width: 1024px) {
+        .footer {
+            padding-top: calc(var(--padding-desktop) * 2);
+        }
+        
+        .footer-container {
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: var(--gap-desktop);
+        }
+        
+        .footer-brand {
+            grid-column: 1;
+            text-align: left;
+            align-items: flex-start;
+        }
+        
+        .footer-contact,
+        .footer-hours {
+            text-align: left;
+        }
+        
+        .footer-bottom {
+            margin-top: var(--gap-desktop);
+            padding: var(--padding-desktop) 0;
+        }
+        
+        .footer-social {
+            gap: var(--gap-desktop);
+        }
+    }
+
+    /* DESKTOP GRANDE (1400px+) */
+    @media (min-width: 1400px) {
+        .footer-container {
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--gap-desktop-lg);
+        }
+        
+        .footer-social {
+            gap: var(--gap-desktop-lg);
         }
     }
 </style>
