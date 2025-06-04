@@ -1,265 +1,470 @@
-"""
-GENERADOR DE PROMPT PARA COPILOT - VERSIÓN SIMPLIFICADA
+# Agente Microsoft 365 Copilot para Análisis y Expansión de Requisitos en Guidewire PolicyCenter - V2.0
 
-Este script busca historias en Excel y genera un archivo .txt con el prompt para Copilot.
-Versión: 7.0 - Solo Generación de Prompt
-"""
+Este agente está diseñado para procesar historias de usuario exportadas de Guidewire PolicyCenter en formato de texto plano y generar análisis enriquecidos que posteriormente pueden ser importados de vuelta al Excel original.
 
-import pandas as pd
-from datetime import datetime
+---
 
-def generar_prompt_para_copilot(ids_historias: str, 
-                               archivo_excel: str = "HU Release 1.2.1.xlsx",
-                               hoja: str = "USER STORIES"):
-    """
-    Busca historias en Excel y genera archivo .txt con prompt para Copilot
-    
-    Args:
-        ids_historias: IDs de historias separados por coma
-        archivo_excel: Nombre del archivo Excel
-        hoja: Nombre de la hoja
-    
-    Returns:
-        str: Nombre del archivo .txt generado (o None si error)
-    """
-    
-    print("🔍 BUSCANDO HISTORIAS Y GENERANDO PROMPT")
-    print("=" * 50)
-    
-    try:
-        # Cargar datos del Excel
-        print(f"📂 Cargando: {archivo_excel} - Hoja: {hoja}")
-        df_original = pd.read_excel(archivo_excel, sheet_name=hoja)
-        
-        # Procesar IDs solicitados
-        ids_lista = [id_hist.strip() for id_hist in ids_historias.split(",")]
-        print(f"🎯 IDs solicitados: {ids_lista}")
-        
-        # Filtrar historias
-        filas_filtradas = df_original[df_original['ID_US'].astype(str).isin(ids_lista)].copy()
-        
-        print(f"✅ Historias encontradas: {len(filas_filtradas)} de {len(ids_lista)} solicitadas")
-        
-        if len(filas_filtradas) == 0:
-            print("❌ ERROR: No se encontraron historias con esos IDs")
-            return None
-        
-        # Mostrar IDs no encontrados
-        ids_encontrados = filas_filtradas['ID_US'].astype(str).tolist()
-        ids_faltantes = [id_h for id_h in ids_lista if id_h not in ids_encontrados]
-        if ids_faltantes:
-            print(f"⚠️  IDs no encontrados: {', '.join(ids_faltantes)}")
-        
-        # Generar archivo de prompt
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        archivo_prompt = f"prompt_copilot_{timestamp}.txt"
-        
-        print(f"📝 Generando prompt: {archivo_prompt}")
-        
-        # Crear contenido del prompt
-        contenido_prompt = crear_contenido_prompt(filas_filtradas, df_original)
-        
-        # Escribir archivo
-        with open(archivo_prompt, 'w', encoding='utf-8') as f:
-            f.write(contenido_prompt)
-        
-        print(f"🎉 PROMPT GENERADO EXITOSAMENTE")
-        print(f"📁 Archivo: {archivo_prompt}")
-        print(f"📊 Historias incluidas: {len(filas_filtradas)}")
-        
-        return archivo_prompt
-        
-    except FileNotFoundError:
-        print(f"❌ ERROR: No se encontró el archivo {archivo_excel}")
-        return None
-    except Exception as e:
-        print(f"❌ ERROR: {str(e)}")
-        return None
+## Flujo de Trabajo
 
-def crear_contenido_prompt(historias_df, df_original):
-    """
-    Crea el contenido completo del prompt con contexto y datos - VERSIÓN COMPLETA
-    """
-    
-    num_historias = len(historias_df)
-    
-    # Parte 1: Cabecera y contexto
-    prompt_content = "# ANALISIS DE HISTORIAS DE USUARIO - SEGUROS\n\n"
-    prompt_content += "## CONTEXTO RAPIDO\n"
-    prompt_content += f"Eres analista de requerimientos de seguros. Analiza estas {num_historias} historias y completa la informacion faltante.\n\n"
-    
-    # Parte 2: Valores obligatorios
-    prompt_content += "## VALORES OBLIGATORIOS A USAR\n\n"
-    prompt_content += "**Tipo de Requerimiento:** Funcional | Tecnico | Performance\n\n"
-    prompt_content += "**Epica:**\n"
-    prompt_content += "- Adaptaciones NPVD para R33/R34/R37\n"
-    prompt_content += "- Nuevo Producto Tecnico 1 para R11/R25\n"
-    prompt_content += "- Nuevo Producto Tecnico 2 para R31/R33\n\n"
-    prompt_content += "**Feature:**\n"
-    prompt_content += "- Configuracion de Producto, Tarifacion, Cotizacion y Emision\n"
-    prompt_content += "- Cambio de Poliza, Cancelacion Rehabilitacion y Reescritura\n"
-    prompt_content += "- Renovacion, Datos Administrativos, Upgrade de Version\n"
-    prompt_content += "- Documentacion, GT Framework?, Reaseguro, Pantallas Cross LOB\n\n"
-    prompt_content += "**Funcionalidad:**\n"
-    prompt_content += "- Configurar Producto, Rating, Validaciones, Reglas de Suscripcion\n"
-    prompt_content += "- Formularios de Poliza, Estructura Comercial, Upgrade, Impuestos\n\n"
-    prompt_content += "**Como (Rol):** Actuario | PO | Suscriptor | Usuario de Santa Lucia | Promotor | Agente\n\n"
-    
-    # Parte 3: Instrucciones detalladas para criterios y preguntas
-    prompt_content += "## INSTRUCCIONES ESPECIFICAS\n\n"
-    prompt_content += "### CRITERIOS DE ACEPTACION (minimo 3 por historia):\n"
-    prompt_content += "Usa formato Gherkin estricto: DADO-CUANDO-ENTONCES\n"
-    prompt_content += "Ejemplos para seguros:\n"
-    prompt_content += "- DADO que soy un actuario CUANDO configuro una tabla de tarifas ENTONCES el sistema valida los rangos\n"
-    prompt_content += "- DADO que ingreso datos de poliza CUANDO supero el limite de cobertura ENTONCES se muestra alerta\n"
-    prompt_content += "- DADO que soy agente CUANDO consulto una poliza cancelada ENTONCES veo el historial completo\n\n"
-    prompt_content += "### PREGUNTAS FUNCIONALES (minimo 5 por historia):\n"
-    prompt_content += "Enfocate en clarificar:\n"
-    prompt_content += "- Validaciones y reglas de negocio especificas\n"
-    prompt_content += "- Integraciones con otros sistemas (core, CRM, etc)\n"
-    prompt_content += "- Casos de excepcion y manejo de errores\n"
-    prompt_content += "- Permisos y roles de usuario\n"
-    prompt_content += "- Impacto en productos existentes\n"
-    prompt_content += "Ejemplos:\n"
-    prompt_content += "- Que validaciones aplicar cuando el tomador es menor de edad?\n"
-    prompt_content += "- Como integrar con el sistema de facturacion existente?\n"
-    prompt_content += "- Que ocurre si falla la conexion con reaseguros?\n\n"
-    
-    # Parte 4: Formato de respuesta
-    prompt_content += "## FORMATO DE RESPUESTA OBLIGATORIO\n\n"
-    prompt_content += "Para CADA historia, responde con este formato exacto:\n\n"
-    prompt_content += "HISTORIA [ID]:\n"
-    prompt_content += "- Tipo de Requerimiento: [elegir de la lista]\n"
-    prompt_content += "- Epica: [elegir de la lista]\n"
-    prompt_content += "- Feature: [elegir de la lista]\n"
-    prompt_content += "- Funcionalidad: [elegir de la lista]\n"
-    prompt_content += "- Como: [elegir rol]\n"
-    prompt_content += "- Quiero: [accion especifica]\n"
-    prompt_content += "- Para: [beneficio/valor]\n"
-    prompt_content += "- Descripcion mejorada: [version clara y tecnica]\n"
-    prompt_content += "- Criterios de Aceptacion:\n"
-    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
-    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
-    prompt_content += "  * DADO [contexto] CUANDO [accion] ENTONCES [resultado]\n"
-    prompt_content += "- Preguntas Funcionales:\n"
-    prompt_content += "  * [Pregunta sobre validaciones/reglas]\n"
-    prompt_content += "  * [Pregunta sobre integraciones]\n"
-    prompt_content += "  * [Pregunta sobre casos de excepcion]\n"
-    prompt_content += "  * [Pregunta sobre permisos/roles]\n"
-    prompt_content += "  * [Pregunta sobre impacto en otros productos]\n\n"
-    
-    # Separador
-    prompt_content += "-------------------------------------------------------------------\n\n"
-    prompt_content += f"## HISTORIAS A ANALIZAR ({num_historias} total)\n\n"
+1. **Exportación**: Usar macro de Visual Basic para exportar historias seleccionadas del Excel a archivo de texto
+2. **Análisis**: Este agente procesa el archivo de texto y genera análisis enriquecido
+3. **Importación**: Usar macro de Visual Basic para importar los resultados de vuelta al Excel
 
-    # Agregar cada historia con separación visual clara
-    for i, (index, fila) in enumerate(historias_df.iterrows(), 1):
-        # Extraer y limpiar datos
-        datos = {}
-        for columna in df_original.columns:
-            valor = fila[columna]
-            datos[columna] = "" if pd.isna(valor) else str(valor)
-        
-        # Agregar historia con separadores básicos
-        prompt_content += "-------------------------------------------------------------------\n"
-        prompt_content += f"                              HISTORIA {i}\n"
-        prompt_content += "-------------------------------------------------------------------\n\n"
-        
-        id_us = datos.get('ID_US', 'N/A')
-        titulo = datos.get('Titulo', 'N/A')
-        ramo = datos.get('Ramo', 'N/A')
-        release = datos.get('Release', 'N/A')
-        descripcion = datos.get('Descripcion de la HdU - IA', 'N/A')
-        proceso = datos.get('Proceso', 'N/A')
-        funcionalidad2 = datos.get('Funcionalidad2', 'N/A')
-        
-        prompt_content += f"- ID_US: {id_us}\n"
-        prompt_content += f"- Titulo: {titulo}\n"
-        prompt_content += f"- Ramo: {ramo}\n"
-        prompt_content += f"- Release: {release}\n"
-        prompt_content += f"- Descripcion: {descripcion}\n"
-        prompt_content += f"- Proceso: {proceso}\n"
-        prompt_content += f"- Funcionalidad2: {funcionalidad2}\n\n"
-        
-        prompt_content += "---\n\n"
+---
 
-    # Parte final: Instrucciones críticas
-    prompt_content += "-------------------------------------------------------------------\n\n"
-    prompt_content += "## INSTRUCCIONES CRITICAS\n\n"
-    prompt_content += "1. **USA SOLO** los valores de las listas de VALORES OBLIGATORIOS\n"
-    prompt_content += "2. **MANTEN** el formato exacto de respuesta mostrado arriba\n"
-    prompt_content += "3. **CREA** minimo 3 criterios de aceptacion en formato DADO-CUANDO-ENTONCES\n"
-    prompt_content += "4. **GENERA** minimo 5 preguntas funcionales especificas del dominio seguros\n"
-    prompt_content += f"5. **PROCESA** las {num_historias} historias mostradas\n"
-    prompt_content += "6. **ENFOCATE** en validaciones, integraciones y casos de excepcion\n\n"
-    prompt_content += "IMPORTANTE: Cada criterio debe ser especifico y testeable.\n"
-    prompt_content += "Cada pregunta debe ayudar a clarificar requerimientos faltantes.\n\n"
-    prompt_content += "ANALIZA TODAS LAS HISTORIAS AHORA!\n"
+## 1. Análisis de Historia de Usuario
 
-    return prompt_content
+### Propósito
 
-def listar_historias_disponibles(archivo_excel: str = "HU Release 1.2.1.xlsx",
-                                hoja: str = "USER STORIES"):
-    """
-    Muestra todas las historias disponibles en el Excel para referencia
-    """
+Generar análisis enriquecido de historias de usuario a partir de datos exportados en formato de texto plano.
+
+### Formato de Entrada Esperado
+
+El agente espera recibir un archivo de texto con el siguiente formato:
+
+```
+------------------------------ Historia 1 ------------------------------
+
+ID_US::: USCP463
+Ramo::: Vida Individual
+Release::: R1.2.1
+Funcionalidad::: Tarifación
+Titulo::: Implementar nueva tabla de tarifas
+Descripción de la HdU - IA::: Como actuario quiero poder configurar nuevas tablas de tarifas para productos de vida individual
+
+------------------------------ Historia 2 ------------------------------
+
+ID_US::: USCP464
+Ramo::: Autos
+Release::: R1.2.1
+Funcionalidad::: Validaciones
+Titulo::: Validar datos del vehículo
+Descripción de la HdU - IA::: Como suscriptor necesito validar automáticamente los datos del vehículo antes de la emisión
+```
+
+### Campos de Entrada Requeridos
+
+Para cada historia, el agente espera los siguientes campos mínimos:
+- **ID_US**: Identificador único de la historia
+- **Ramo**: Línea de negocio
+- **Release**: Versión del release
+- **Funcionalidad**: Funcionalidad técnica involucrada
+- **Titulo**: Título de la historia
+- **Descripción de la HdU - IA**: Descripción detallada de la historia
+
+*Nota: Cualquier campo adicional presente en el archivo será preservado en el output.*
+
+### Comportamiento del Agente
+
+1. **Procesamiento de Entrada**
+   - El agente parseará el archivo de texto identificando cada historia por los separadores
+   - Extraerá todos los campos usando el separador `:::`
+   - Validará que los campos obligatorios estén presentes
+
+2. **Validación**
+   - Si faltan campos obligatorios, el agente indicará qué campos faltan para cada historia
+   - Ejemplo: "Historia USCP463: Faltan los campos 'Ramo' y 'Release'. ¿Puedes proporcionarlos para continuar?"
+
+3. **Generación del Análisis**
+   
+   Para cada historia, el agente generará:
+
+   #### Campos de Análisis Generados
+
+   - **Tipo de Requerimiento**  
+     Clasificación del tipo de historia basada en su propósito y naturaleza.
+     Valores posibles: **Funcional**, **Técnico**, **Performance**
+
+   - **Épica**  
+     Agrupación superior basada principalmente en el Ramo.
+     Valores posibles:
+      - **Adaptaciones NPVD para R33**
+      - **Adaptaciones NPVD para R34**
+      - **Adaptaciones NPVD para R37**
+      - **Nuevo Producto Técnico 1 para R11**
+      - **Nuevo Producto Técnico 1 para R25**
+      - **Nuevo Producto Técnico 2 para R31**
+      - **Nuevo Producto Técnico 2 para R33**
+
+   - **Feature**  
+     Elemento funcional central.
+     Valores posibles:
+      - **Configuración de Producto**
+      - **Tarifación**
+      - **Cotización y Emisión**
+      - **Cambio de Póliza**
+      - **Cancelación, Rehabilitación y Reescritura**
+      - **Renovación**
+      - **Datos Administrativos**
+      - **Upgrade de Versión**
+      - **Documentación**
+      - **GT Framework**
+      - **Reaseguro**
+      - **Pantallas Cross LOB**
+
+   - **Funcionalidad Analizada**  
+     Componente técnico específico involucrado.
+     Valores posibles:
+      - **Configurar Producto**
+      - **Rating**
+      - **Validaciones**
+      - **Reglas de Suscripción**
+      - **Formularios de Póliza**
+      - **Estructura Comercial**
+      - **Upgrade**
+      - **Impuestos**
+
+   - **Como**  
+     Rol del usuario que realiza la acción.
+     Valores posibles: **Actuario**, **PO**, **Suscriptor**, **Usuario de Santa Lucia**, **Promotor**, **Agente**
+
+   - **Quiero**  
+     Acción deseada, redactada como frase breve que exprese la intención.
+
+   - **Para**  
+     Beneficio esperado por el usuario o sistema.
+
+   - **Descripción Mejorada**  
+     Descripción reescrita de forma clara y mejorada, manteniendo el propósito original.
+
+   - **Criterios de Aceptación**  
+     Escenarios en formato Gherkin que cubran completamente los casos de la historia.
+     Formato: `[ID_US]-CA[Índice]::: [Nombre] - DADO... CUANDO... ENTONCES...`
+     Mínimo 3 escenarios por historia.
+
+   - **Preguntas Funcionales**  
+     Entre 5-10 preguntas para aclarar puntos críticos y asegurar implementación correcta.
+
+### Formato de Salida
+
+El agente generará un archivo con la misma estructura de entrada, preservando todos los campos originales y añadiendo los campos de análisis:
+
+```
+------------------------------ Historia 1 ------------------------------
+
+ID_US::: USCP463
+Ramo::: Vida Individual
+Release::: R1.2.1
+Funcionalidad::: Tarifación
+Titulo::: Implementar nueva tabla de tarifas
+Descripción de la HdU - IA::: Como actuario quiero poder configurar nuevas tablas de tarifas para productos de vida individual
+
+--- ANÁLISIS GENERADO ---
+
+Tipo de Requerimiento::: Funcional
+Épica::: Nuevo Producto Técnico 1 para R25
+Feature::: Tarifación
+Funcionalidad Analizada::: Rating
+Como::: Actuario
+Quiero::: Configurar nuevas tablas de tarifas específicas para productos de vida individual
+Para::: Poder calcular primas precisas y competitivas según los perfiles de riesgo de cada cliente
+Descripción Mejorada::: Como actuario del área de vida individual, necesito la capacidad de configurar y mantener tablas de tarifas dinámicas que me permitan establecer precios precisos basados en factores de riesgo específicos del producto, con el fin de asegurar la rentabilidad y competitividad de nuestras pólizas de vida individual.
+Criterios de Aceptación::: 
+USCP463-CA1::: Crear nueva tabla de tarifas - DADO que soy un actuario autenticado CUANDO accedo al módulo de configuración de tarifas ENTONCES puedo crear una nueva tabla especificando nombre, vigencia y parámetros base
+USCP463-CA2::: Configurar factores de riesgo - DADO que tengo una tabla de tarifas activa CUANDO defino factores de riesgo ENTONCES el sistema valida que los rangos sean coherentes y no se superpongan
+USCP463-CA3::: Aplicar tarifas en cotización - DADO que existe una tabla de tarifas configurada CUANDO se genera una cotización ENTONCES el sistema aplica automáticamente las tarifas correspondientes según el perfil del asegurado
+Preguntas Funcionales:::
+1. ¿Qué tipos de factores de riesgo específicos deben considerarse para productos de vida individual?
+2. ¿Cómo se debe manejar la transición entre tablas de tarifas cuando hay cambios de versión?
+3. ¿Existe algún límite en el número de factores que pueden configurarse por tabla?
+4. ¿Cómo se debe validar la coherencia matemática de las tarifas configuradas?
+5. ¿Qué nivel de granularidad temporal requieren las tarifas (diaria, mensual, anual)?
+
+------------------------------ Historia 2 ------------------------------
+
+[Contenido de la segunda historia...]
+```
+
+### Consideraciones para Importación
+
+El formato de salida está diseñado para facilitar la posterior importación mediante macro de Visual Basic:
+
+- **Separadores claros**: Cada historia está delimitada por líneas específicas
+- **Formato clave:::valor**: Facilita el mapeo directo a columnas de Excel usando `Split(":::")`
+- **Campos multilínea**: Los campos con múltiples valores usan saltos de línea internos
+- **Preservación de datos**: Todos los campos originales se mantienen intactos
+
+### Instrucciones de Uso
+
+1. **Exportar**: Usar el macro de VB para exportar historias seleccionadas del Excel
+2. **Copiar**: Pegar el contenido del archivo de texto en el chat de Copilot
+3. **Procesar**: El agente analizará automáticamente todas las historias detectadas
+4. **Guardar**: Copiar el resultado en un archivo de texto
+5. **Importar**: Usar el macro de importación para actualizar el Excel con los análisis generados
+
+---
+
+## Notas Técnicas
+
+- El agente detecta automáticamente el número de historias en el archivo
+- Preserva cualquier campo adicional que no esté en la lista estándar
+- Genera IDs únicos para criterios de aceptación basados en el ID_US original
+- Valida la coherencia de los valores seleccionados contra las listas predefinidas
+- Usa el separador `:::` para evitar conflictos con contenido que contenga dos puntos simples
+
+---
+
+## Campos de Mapeo para Macro de Importación
+
+Los siguientes campos generados por el análisis deben mapearse a las columnas correspondientes en Excel:
+
+**Campos de Entrada (preservados):**
+- ID_US
+- Ramo
+- Release
+- Funcionalidad
+- Titulo
+- Descripción de la HdU - IA
+
+**Campos Generados (nuevos):**
+- Tipo de Requerimiento
+- Épica
+- Feature
+- Funcionalidad Analizada
+- Como
+- Quiero
+- Para
+- Descripción Mejorada
+- Criterios de Aceptación
+- Preguntas Funcionales
+
+Sub ImportarAnalisisHistorias()
+'
+' Macro para importar análisis de historias de usuario desde archivo de texto
+' Formato esperado: Campo:::Valor
+' Separador de historias: ------------------------------ Historia X ------------------------------
+'
+
+    Dim archivoTexto As String
+    Dim contenido As String
+    Dim historias() As String
+    Dim i As Integer
+    Dim j As Integer
+    Dim lineas() As String
+    Dim linea As String
+    Dim campo As String
+    Dim valor As String
+    Dim posicion As Integer
+    Dim idUS As String
+    Dim filaEncontrada As Long
+    Dim ws As Worksheet
+    Dim ultimaFila As Long
+    Dim columna As Integer
     
-    try:
-        print("📋 LISTANDO HISTORIAS DISPONIBLES")
-        print("=" * 50)
+    ' Configuración de la hoja de trabajo
+    Set ws = ActiveSheet ' O especifica la hoja: Worksheets("USER STORIES")
+    
+    ' Seleccionar archivo de texto
+    archivoTexto = Application.GetOpenFilename("Archivos de texto (*.txt), *.txt", , "Seleccionar archivo con análisis")
+    
+    If archivoTexto = "False" Then
+        MsgBox "Operación cancelada"
+        Exit Sub
+    End If
+    
+    ' Leer el contenido del archivo
+    Open archivoTexto For Input As #1
+    contenido = Input$(LOF(1), 1)
+    Close #1
+    
+    ' Dividir el contenido en historias individuales
+    historias = Split(contenido, "------------------------------")
+    
+    ' Procesar cada historia
+    For i = 1 To UBound(historias)
         
-        df = pd.read_excel(archivo_excel, sheet_name=hoja)
-        
-        for index, fila in df.iterrows():
-            id_us = fila.get('ID_US', 'N/A')
-            titulo = fila.get('Titulo', 'N/A')
-            ramo = fila.get('Ramo', 'N/A')
-            release = fila.get('Release', 'N/A')
+        If InStr(historias(i), "Historia") > 0 Then
             
-            titulo_corto = titulo[:60] + "..." if len(str(titulo)) > 60 else titulo
-            print(f"🔹 {id_us} | {ramo} | R{release} | {titulo_corto}")
-        
-        print(f"\n📊 Total de historias: {len(df)}")
-        return df['ID_US'].tolist()
-        
-    except Exception as e:
-        print(f"❌ ERROR listando historias: {str(e)}")
-        return []
+            ' Dividir la historia en líneas
+            lineas = Split(historias(i), vbCrLf)
+            idUS = ""
+            
+            ' Buscar el ID_US para identificar la fila
+            For j = 0 To UBound(lineas)
+                linea = Trim(lineas(j))
+                If InStr(linea, "ID_US:::") = 1 Then
+                    idUS = Trim(Split(linea, ":::")(1))
+                    Exit For
+                End If
+            Next j
+            
+            ' Si encontramos ID_US, buscar la fila en Excel
+            If idUS <> "" Then
+                filaEncontrada = BuscarFilaPorIDUS(ws, idUS)
+                
+                If filaEncontrada > 0 Then
+                    ' Procesar todos los campos de la historia
+                    For j = 0 To UBound(lineas)
+                        linea = Trim(lineas(j))
+                        
+                        ' Verificar si la línea contiene el separador :::
+                        If InStr(linea, ":::") > 0 And linea <> "" Then
+                            posicion = InStr(linea, ":::")
+                            campo = Trim(Left(linea, posicion - 1))
+                            valor = Trim(Mid(linea, posicion + 3))
+                            
+                            ' Buscar la columna correspondiente y actualizar
+                            columna = BuscarColumna(ws, campo)
+                            If columna > 0 Then
+                                ws.Cells(filaEncontrada, columna).Value = valor
+                            End If
+                        End If
+                    Next j
+                    
+                    Debug.Print "Historia " & idUS & " actualizada en fila " & filaEncontrada
+                Else
+                    MsgBox "No se encontró la fila para ID_US: " & idUS
+                End If
+            End If
+        End If
+    Next i
+    
+    MsgBox "Importación completada"
+    
+End Sub
 
-def main():
-    """
-    Función principal simplificada
-    """
+Function BuscarFilaPorIDUS(ws As Worksheet, idUS As String) As Long
+'
+' Busca la fila que contiene el ID_US especificado
+'
+    Dim ultimaFila As Long
+    Dim i As Long
+    Dim columnaIDUS As Integer
     
-    print("🚀 GENERADOR DE PROMPT PARA COPILOT")
-    print("=" * 50)
+    ' Buscar la columna ID_US (asumiendo que está en la primera fila)
+    columnaIDUS = BuscarColumna(ws, "ID_US")
     
-    # Configuración (modificar según necesidad)
-    ids_ejemplo = "HU001, HU002, HU003"  # ⚠️ CAMBIAR POR IDs REALES
-    archivo_excel = "HU Release 1.2.1.xlsx"
-    hoja = "USER STORIES"
+    If columnaIDUS = 0 Then
+        BuscarFilaPorIDUS = 0
+        Exit Function
+    End If
     
-    # Paso 1: Mostrar historias disponibles (opcional)
-    print("📋 PASO 1: Historias disponibles")
-    listar_historias_disponibles(archivo_excel, hoja)
+    ultimaFila = ws.Cells(ws.Rows.Count, columnaIDUS).End(xlUp).Row
     
-    print(f"\n🎯 PASO 2: Generando prompt para IDs: {ids_ejemplo}")
+    ' Buscar el ID_US en la columna correspondiente
+    For i = 2 To ultimaFila ' Empezar desde la fila 2 (asumiendo que la 1 tiene headers)
+        If ws.Cells(i, columnaIDUS).Value = idUS Then
+            BuscarFilaPorIDUS = i
+            Exit Function
+        End If
+    Next i
     
-    # Paso 2: Generar prompt
-    archivo_generado = generar_prompt_para_copilot(ids_ejemplo, archivo_excel, hoja)
-    
-    if archivo_generado:
-        print(f"\n✅ ÉXITO! Archivo generado: {archivo_generado}")
-        print("\n" + "="*60)
-        print("🤖 SIGUIENTE PASO:")
-        print("="*60)
-        print(f"1. Abre el archivo: {archivo_generado}")
-        print("2. Copia todo el contenido")
-        print("3. Pégalo en Microsoft 365 Copilot")
-        print("4. ¡Espera el análisis completo!")
-        print("="*60)
-    else:
-        print("\n❌ Error: No se pudo generar el prompt")
+    BuscarFilaPorIDUS = 0 ' No encontrado
+End Function
 
-if __name__ == "__main__":
-    main()
+Function BuscarColumna(ws As Worksheet, nombreColumna As String) As Integer
+'
+' Busca el número de columna basado en el nombre del header
+'
+    Dim ultimaColumna As Integer
+    Dim i As Integer
+    
+    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+    
+    ' Buscar en la primera fila (headers)
+    For i = 1 To ultimaColumna
+        If Trim(ws.Cells(1, i).Value) = nombreColumna Then
+            BuscarColumna = i
+            Exit Function
+        End If
+    Next i
+    
+    BuscarColumna = 0 ' No encontrado
+End Function
+
+Sub CrearColumnasAnalisis()
+'
+' Macro auxiliar para crear las columnas de análisis si no existen
+'
+    Dim ws As Worksheet
+    Dim ultimaColumna As Integer
+    Dim columnasAnalisis As Variant
+    Dim i As Integer
+    Dim columnaExistente As Integer
+    
+    Set ws = ActiveSheet
+    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+    
+    ' Definir las columnas de análisis que deben existir
+    columnasAnalisis = Array("Tipo de Requerimiento", "Épica", "Feature", _
+                           "Funcionalidad Analizada", "Como", "Quiero", "Para", _
+                           "Descripción Mejorada", "Criterios de Aceptación", _
+                           "Preguntas Funcionales")
+    
+    ' Verificar y crear columnas faltantes
+    For i = 0 To UBound(columnasAnalisis)
+        columnaExistente = BuscarColumna(ws, columnasAnalisis(i))
+        If columnaExistente = 0 Then
+            ultimaColumna = ultimaColumna + 1
+            ws.Cells(1, ultimaColumna).Value = columnasAnalisis(i)
+            ws.Cells(1, ultimaColumna).Font.Bold = True
+        End If
+    Next i
+    
+    MsgBox "Columnas de análisis verificadas/creadas"
+End Sub
+
+Sub ExportarHistoriasSeleccionadas()
+'
+' Macro para exportar historias seleccionadas a formato de texto
+' Seleccionar las filas que contienen las historias antes de ejecutar
+'
+    Dim ws As Worksheet
+    Dim rango As Range
+    Dim archivo As String
+    Dim contenido As String
+    Dim fila As Range
+    Dim ultimaColumna As Integer
+    Dim i As Integer
+    Dim nombreColumna As String
+    Dim valorCelda As String
+    Dim contadorHistoria As Integer
+    
+    Set ws = ActiveSheet
+    Set rango = Selection
+    
+    ' Verificar que hay una selección
+    If rango Is Nothing Then
+        MsgBox "Por favor, selecciona las filas que deseas exportar"
+        Exit Sub
+    End If
+    
+    ultimaColumna = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+    contadorHistoria = 1
+    
+    ' Seleccionar archivo de destino
+    archivo = Application.GetSaveAsFilename(FileFilter:="Archivos de texto (*.txt), *.txt", _
+                                          Title:="Guardar exportación como")
+    
+    If archivo = "False" Then
+        MsgBox "Operación cancelada"
+        Exit Sub
+    End If
+    
+    ' Procesar cada fila seleccionada
+    For Each fila In rango.Rows
+        If fila.Row > 1 Then ' Saltar la fila de headers
+            contenido = contenido & "------------------------------ Historia " & contadorHistoria & " ------------------------------" & vbCrLf & vbCrLf
+            
+            ' Exportar cada campo de la fila
+            For i = 1 To ultimaColumna
+                nombreColumna = ws.Cells(1, i).Value
+                valorCelda = ws.Cells(fila.Row, i).Value
+                
+                If nombreColumna <> "" And valorCelda <> "" Then
+                    contenido = contenido & nombreColumna & ":::" & " " & valorCelda & vbCrLf
+                End If
+            Next i
+            
+            contenido = contenido & vbCrLf
+            contadorHistoria = contadorHistoria + 1
+        End If
+    Next fila
+    
+    ' Guardar el archivo
+    Open archivo For Output As #1
+    Print #1, contenido
+    Close #1
+    
+    MsgBox "Exportación completada: " & archivo
+End Sub
