@@ -7,5 +7,199 @@
   },
   "hero": {
     "menu": "Ver Carta"
+  },
+  "carta": {
+    "title": "Nuestra Carta",
+    "subtitle": "Auténtica cocina mediterránea desde 1985",
+    "categories": {
+      "entrantes": "Entrantes",
+      "raciones": "Raciones Calientes",
+      "hamburguesas": "Hamburguesas",
+      "parrilla": "Carnes a la Parrilla",
+      "bebidas": "Bebidas",
+      "cocteles": "Cócteles"
+    },
+    "subcategories": {
+      "entrantes-frios": "Entrantes Fríos",
+      "entrantes-calientes": "Entrantes Calientes",
+      "pescados-mariscos": "Pescados y Mariscos",
+      "guisos-tradicionales": "Guisos Tradicionales",
+      "hamburguesas-gourmet": "Hamburguesas Gourmet",
+      "carnes-parrilla": "Carnes a la Parrilla",
+      "menu-ninos": "Menú de Niños",
+      "cervezas": "Cervezas",
+      "refrescos": "Refrescos",
+      "cafe": "Café",
+      "cocteles-clasicos": "Cócteles Clásicos",
+      "cocteles-casa": "Cócteles de la Casa"
+    },
+    "items": {
+      "ensalada-palleter": {
+        "name": "Ensalada Palleter",
+        "description": "Pan, alioli y tomate, patatas fritas"
+      },
+      "tabla-jamon-iberico": {
+        "name": "Tabla de Jamón Ibérico"
+      },
+      "boquerones-vinagre": {
+        "name": "Boquerones en Vinagre"
+      },
+      "aspencat-mojama": {
+        "name": "Aspencat con Mojama"
+      },
+      "ensaladilla-rusa": {
+        "name": "Ensaladilla Rusa"
+      },
+      "patatas-bravas": {
+        "name": "Patatas Bravas"
+      },
+      "pimientos-padron": {
+        "name": "Pimientos del Padrón"
+      },
+      "boniato-frito": {
+        "name": "Boniato Frito"
+      },
+      "tabla-quesos-embutidos": {
+        "name": "Tabla de Quesos con Embutidos"
+      },
+      "sepia-parrilla": {
+        "name": "Sepia a la Parrilla"
+      },
+      "pulpo-parrilla": {
+        "name": "Pulpo a la Parrilla"
+      },
+      "gambas-ajillo": {
+        "name": "Gambas al Ajillo"
+      },
+      "fritura-pescado": {
+        "name": "Fritura de Pescado"
+      },
+      "langostinos-panko": {
+        "name": "Langostinos al Panko"
+      },
+      "callos": {
+        "name": "Callos"
+      },
+      "rabo-toro": {
+        "name": "Rabo de Toro"
+      },
+      "albondigas-salsa": {
+        "name": "Albóndigas en Salsa"
+      },
+      "magro-tomate": {
+        "name": "Magro con Tomate"
+      },
+      "hamburguesa-palleter": {
+        "name": "Hamburguesa Palleter",
+        "description": "Ternera, lechuga, tomate, cebolla, queso, bacon, huevo frito y mayonesa"
+      },
+      "hamburguesa-siempre": {
+        "name": "Hamburguesa de Siempre",
+        "description": "Ternera, lechuga, tomate, cebolla, queso y mahonesa"
+      },
+      "hamburguesa-pollo": {
+        "name": "Hamburguesa de Pollo",
+        "description": "Muslo de pollo deshuesado a la parrilla, lechuga, cebolla, tomate, queso y mahonesa"
+      },
+      "hamburguesa-sepia": {
+        "name": "Hamburguesa de Sepia"
+      },
+      "hamburguesa-vegana": {
+        "name": "Hamburguesa Vegana",
+        "description": "Filete vegetal, lechuga, tomate, cebolla, aguacate y mayonesa vegana"
+      },
+      "secreto-cerdo": {
+        "name": "Secreto de Cerdo"
+      },
+      "pinchos-morunos": {
+        "name": "Pinchos Morunos Caseros"
+      },
+      "entrecot-ternera": {
+        "name": "Entrecot de Ternera (Lomo Bajo)"
+      },
+      "chuleton-ternera": {
+        "name": "Chuletón de Ternera"
+      },
+      "chuleton-angus": {
+        "name": "Chuletón de Ternera Angus"
+      },
+      "escalope-pollo": {
+        "name": "Escalope Pollo con Patatas"
+      },
+      "calamares-patatas": {
+        "name": "Calamares con Patatas"
+      },
+      "tortilla-longanizas": {
+        "name": "Tortilla Francesa y 2 Longanizas"
+      },
+      "merluza-rebozada": {
+        "name": "Merluza Rebozada con Patatas"
+      },
+      "cana-mahou": {
+        "name": "Caña Mahou Clásica"
+      },
+      "doble-mahou": {
+        "name": "Doble Mahou Clásica"
+      },
+      "jarra-mahou": {
+        "name": "Jarra Mahou Clásica 1L"
+      },
+      "mahou-5-estrellas": {
+        "name": "Mahou 5 Estrellas 1/3"
+      },
+      "coca-cola": {
+        "name": "Coca Cola"
+      },
+      "coca-cola-zero": {
+        "name": "Coca Cola Zero"
+      },
+      "aquarius": {
+        "name": "Aquarius"
+      },
+      "agua-aquabona": {
+        "name": "Agua Aquabona 1,5L"
+      },
+      "cafe-solo": {
+        "name": "Café Solo"
+      },
+      "cafe-leche": {
+        "name": "Café con Leche"
+      },
+      "cappuccino": {
+        "name": "Cappuccino"
+      },
+      "mojito": {
+        "name": "Mojito",
+        "description": "Havana 5, azúcar moreno, lima, gaseosa y hierba buena"
+      },
+      "pina-colada": {
+        "name": "Piña Colada",
+        "description": "Havana 3, zumo de piña, azúcar y coco"
+      },
+      "caipirinha": {
+        "name": "Caipiriña",
+        "description": "Cachaça, gaseosa, lima y azúcar"
+      },
+      "margarita": {
+        "name": "Margarita",
+        "description": "Tequila, triple seco, zumo de lima y azúcar"
+      },
+      "coctel-palleter": {
+        "name": "Palleter",
+        "description": "Sandía, Havana 3, Pasoa, gaseosa, zumo de lima, azúcar y hierba buena"
+      },
+      "moscow-mule": {
+        "name": "Moscow Mule",
+        "description": "Vodka, lima, ginger beer y hierba buena"
+      },
+      "sex-on-beach": {
+        "name": "Sex on the Beach",
+        "description": "Vodka, licor de melocotón, zumo de naranja natural y granadina"
+      },
+      "mimosa": {
+        "name": "Mimosa",
+        "description": "Cava y zumo de naranja natural"
+      }
+    }
   }
 }

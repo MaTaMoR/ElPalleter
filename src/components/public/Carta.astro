@@ -1,411 +1,73 @@
 ---
+import Text from '../../components/i18n/Text.astro';
+import cartaData from '../../data/carta-data.json';
+
+// Helper para formatear precios
+function formatPrice(price) {
+  if (typeof price === 'string') {
+    return price; // Para casos como "3,50€/und"
+  }
+  return `${price.toFixed(2).replace('.', ',')}€`;
+}
 ---
 
 <section class="carta-section" id="carta">
     <div class="carta-container container">
         <div class="carta-header">
-            <h2 class="carta-title">Nuestra Carta</h2>
-            <p class="carta-subtitle">Auténtica cocina mediterránea desde 1985</p>
+            <h2 class="carta-title">
+                <Text key="carta.title" fallback="Nuestra Carta" />
+            </h2>
+            <p class="carta-subtitle">
+                <Text key="carta.subtitle" fallback="Auténtica cocina mediterránea desde 1985" />
+            </p>
         </div>
 
         <!-- Navegación de categorías -->
         <div class="menu-nav">
-            <button class="menu-nav-btn active" data-category="entrantes">Entrantes</button>
-            <button class="menu-nav-btn" data-category="raciones">Raciones Calientes</button>
-            <button class="menu-nav-btn" data-category="hamburguesas">Hamburguesas</button>
-            <button class="menu-nav-btn" data-category="parrilla">Carnes a la Parrilla</button>
-            <button class="menu-nav-btn" data-category="bebidas">Bebidas</button>
-            <button class="menu-nav-btn" data-category="cocteles">Cócteles</button>
+            {cartaData.categories.map((category, index) => (
+                <button 
+                    class={`menu-nav-btn ${index === 0 ? 'active' : ''}`} 
+                    data-category={category.id}
+                >
+                    <Text key={category.nameKey} fallback={category.id} />
+                </button>
+            ))}
         </div>
 
         <!-- Contenido del menú -->
         <div class="menu-content">
-            
-            <!-- ENTRANTES -->
-            <div class="menu-section active" id="entrantes">
-                <div class="menu-category">
-                    <h3 class="category-title">🥗 Entrantes Fríos</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Ensalada Palleter</div>
-                            <div class="item-description">Pan, alioli y tomate, patatas fritas</div>
+            {cartaData.categories.map((category, categoryIndex) => (
+                <div 
+                    class={`menu-section ${categoryIndex === 0 ? 'active' : ''}`} 
+                    id={category.id}
+                >
+                    {category.subcategories.map((subcategory) => (
+                        <div class="menu-category">
+                            <h3 class="category-title">
+                                <Text key={subcategory.nameKey} fallback={subcategory.id} />
+                            </h3>
+                            
+                            {subcategory.items.map((item) => (
+                                <div class="menu-item">
+                                    <div class="item-info">
+                                        <div class="item-name">
+                                            <Text key={item.nameKey} fallback={item.id} />
+                                        </div>
+                                        {item.descriptionKey && (
+                                            <div class="item-description">
+                                                <Text key={item.descriptionKey} fallback="" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="item-price">
+                                        {formatPrice(item.price)}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div class="item-price">11,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Tabla de Jamón Ibérico</div>
-                        </div>
-                        <div class="item-price">12,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Boquerones en Vinagre</div>
-                        </div>
-                        <div class="item-price">7,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Aspencat con Mojama</div>
-                        </div>
-                        <div class="item-price">8,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Ensaladilla Rusa</div>
-                        </div>
-                        <div class="item-price">6,00€</div>
-                    </div>
+                    ))}
                 </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">🔥 Entrantes Calientes</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Patatas Bravas</div>
-                        </div>
-                        <div class="item-price">7,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Pimientos del Padrón</div>
-                        </div>
-                        <div class="item-price">4,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Boniato Frito</div>
-                        </div>
-                        <div class="item-price">4,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Tabla de Quesos con Embutidos</div>
-                        </div>
-                        <div class="item-price">8,50€</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RACIONES CALIENTES -->
-            <div class="menu-section" id="raciones">
-                <div class="menu-category">
-                    <h3 class="category-title">🍤 Pescados y Mariscos</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Sepia a la Parrilla</div>
-                        </div>
-                        <div class="item-price">11,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Pulpo a la Parrilla</div>
-                        </div>
-                        <div class="item-price">17,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Gambas al Ajillo</div>
-                        </div>
-                        <div class="item-price">12,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Fritura de Pescado</div>
-                        </div>
-                        <div class="item-price">14,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Langostinos al Panko</div>
-                        </div>
-                        <div class="item-price">12,00€</div>
-                    </div>
-                </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">🍖 Guisos Tradicionales</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Callos</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Rabo de Toro</div>
-                        </div>
-                        <div class="item-price">10,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Albóndigas en Salsa</div>
-                        </div>
-                        <div class="item-price">8,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Magro con Tomate</div>
-                        </div>
-                        <div class="item-price">8,00€</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HAMBURGUESAS -->
-            <div class="menu-section" id="hamburguesas">
-                <div class="menu-category">
-                    <h3 class="category-title">🍔 Hamburguesas Gourmet</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Hamburguesa Palleter</div>
-                            <div class="item-description">Ternera, lechuga, tomate, cebolla, queso, bacon, huevo frito y mayonesa</div>
-                        </div>
-                        <div class="item-price">12,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Hamburguesa de Siempre</div>
-                            <div class="item-description">Ternera, lechuga, tomate, cebolla, queso y mahonesa</div>
-                        </div>
-                        <div class="item-price">10,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Hamburguesa de Pollo</div>
-                            <div class="item-description">Muslo de pollo deshuesado a la parrilla, lechuga, cebolla, tomate, queso y mahonesa</div>
-                        </div>
-                        <div class="item-price">10,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Hamburguesa de Sepia</div>
-                        </div>
-                        <div class="item-price">12,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Hamburguesa Vegana</div>
-                            <div class="item-description">Filete vegetal, lechuga, tomate, cebolla, aguacate y mayonesa vegana</div>
-                        </div>
-                        <div class="item-price">10,50€</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CARNES A LA PARRILLA -->
-            <div class="menu-section" id="parrilla">
-                <div class="menu-category">
-                    <h3 class="category-title">🥩 Carnes a la Parrilla</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Secreto de Cerdo</div>
-                        </div>
-                        <div class="item-price">16,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Pinchos Morunos Caseros</div>
-                        </div>
-                        <div class="item-price">3,50€/und</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Entrecot de Ternera (Lomo Bajo)</div>
-                        </div>
-                        <div class="item-price">24,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Chuletón de Ternera</div>
-                        </div>
-                        <div class="item-price">38,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Chuletón de Ternera Angus</div>
-                        </div>
-                        <div class="item-price">70,00€</div>
-                    </div>
-                </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">🍽️ Menú de Niños</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Escalope Pollo con Patatas</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Calamares con Patatas</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Tortilla Francesa y 2 Longanizas</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Merluza Rebozada con Patatas</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BEBIDAS -->
-            <div class="menu-section" id="bebidas">
-                <div class="menu-category">
-                    <h3 class="category-title">🍺 Cervezas</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Caña Mahou Clásica</div>
-                        </div>
-                        <div class="item-price">1,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Doble Mahou Clásica</div>
-                        </div>
-                        <div class="item-price">2,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Jarra Mahou Clásica 1L</div>
-                        </div>
-                        <div class="item-price">6,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Mahou 5 Estrellas 1/3</div>
-                        </div>
-                        <div class="item-price">2,00€</div>
-                    </div>
-                </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">🥤 Refrescos</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Coca Cola</div>
-                        </div>
-                        <div class="item-price">1,80€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Coca Cola Zero</div>
-                        </div>
-                        <div class="item-price">1,80€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Aquarius</div>
-                        </div>
-                        <div class="item-price">1,80€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Agua Aquabona 1,5L</div>
-                        </div>
-                        <div class="item-price">2,50€</div>
-                    </div>
-                </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">☕ Café</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Café Solo</div>
-                        </div>
-                        <div class="item-price">1,10€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Café con Leche</div>
-                        </div>
-                        <div class="item-price">1,30€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Cappuccino</div>
-                        </div>
-                        <div class="item-price">1,80€</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CÓCTELES -->
-            <div class="menu-section" id="cocteles">
-                <div class="menu-category">
-                    <h3 class="category-title">🍹 Cócteles Clásicos</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Mojito</div>
-                            <div class="item-description">Havana 5, azúcar moreno, lima, gaseosa y hierba buena</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Piña Colada</div>
-                            <div class="item-description">Havana 3, zumo de piña, azúcar y coco</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Caipiriña</div>
-                            <div class="item-description">Cachaça, gaseosa, lima y azúcar</div>
-                        </div>
-                        <div class="item-price">7,00€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Margarita</div>
-                            <div class="item-description">Tequila, triple seco, zumo de lima y azúcar</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                </div>
-
-                <div class="menu-category">
-                    <h3 class="category-title">🏠 Cócteles de la Casa</h3>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Palleter</div>
-                            <div class="item-description">Sandía, Havana 3, Pasoa, gaseosa, zumo de lima, azúcar y hierba buena</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Moscow Mule</div>
-                            <div class="item-description">Vodka, lima, ginger beer y hierba buena</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Sex on the Beach</div>
-                            <div class="item-description">Vodka, licor de melocotón, zumo de naranja natural y granadina</div>
-                        </div>
-                        <div class="item-price">7,50€</div>
-                    </div>
-                    <div class="menu-item">
-                        <div class="item-info">
-                            <div class="item-name">Mimosa</div>
-                            <div class="item-description">Cava y zumo de naranja natural</div>
-                        </div>
-                        <div class="item-price">6,50€</div>
-                    </div>
-                </div>
-            </div>
-
+            ))}
         </div>
     </div>
 </section>
@@ -416,8 +78,7 @@
         min-height: 100vh;
         background: rgb(20, 20, 20);
         position: relative;
-        /* Mobile base */
-        padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2.5) 0; /* 100px top, 50px bottom */
+        padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2.5) 0;
     }
 
     /* Efecto de partículas animadas en el fondo */
@@ -455,7 +116,6 @@
     }
 
     .carta-container {
-        /* Usando container global del sistema */
         z-index: 2;
         position: relative;
     }
@@ -463,8 +123,7 @@
     /* === HEADER === */
     .carta-header {
         text-align: center;
-        /* Mobile base */
-        margin-bottom: calc(var(--gap-mobile) * 3); /* Equivalente a 3rem */
+        margin-bottom: calc(var(--gap-mobile) * 3);
     }
 
     .carta-title {
@@ -486,7 +145,6 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        /* Mobile base */
         gap: calc(var(--gap-mobile) * 0.5);
         margin-bottom: calc(var(--gap-mobile) * 2.5);
     }
@@ -495,7 +153,6 @@
         background: transparent;
         border: 2px solid rgba(244, 162, 97, 0.3);
         color: white;
-        /* Mobile base */
         padding: calc(var(--padding-mobile) * 0.6) var(--padding-mobile);
         border-radius: 25px;
         cursor: pointer;
@@ -517,7 +174,6 @@
     /* === CONTENEDOR DE MENÚ === */
     .menu-content {
         display: grid;
-        /* Mobile base */
         grid-template-columns: 1fr;
         gap: var(--gap-mobile);
         margin-bottom: var(--gap-mobile);
@@ -529,7 +185,6 @@
         border-radius: 15px;
         border: 1px solid rgba(244, 162, 97, 0.2);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        /* Mobile base */
         padding: calc(var(--padding-mobile) * 1.5);
         margin-bottom: calc(var(--gap-mobile) * 1.5);
         animation: fadeInUp 0.6s ease-out;
@@ -545,7 +200,6 @@
         font-weight: 600;
         text-align: center;
         border-bottom: 2px solid rgba(244, 162, 97, 0.3);
-        /* Mobile base */
         margin-bottom: calc(var(--gap-mobile) * 0.75);
         padding-bottom: calc(var(--padding-mobile) * 0.25);
     }
@@ -556,7 +210,6 @@
         justify-content: space-between;
         align-items: flex-start;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        /* Mobile base */
         margin-bottom: calc(var(--gap-mobile) * 0.6);
         padding-bottom: calc(var(--padding-mobile) * 0.4);
     }
@@ -614,11 +267,11 @@
     }
 
     /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
-
+    
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .carta-section {
-            padding: calc(var(--padding-tablet) * 6) 0 calc(var(--padding-tablet) * 2.5) 0; /* 120px top, 50px bottom */
+            padding: calc(var(--padding-tablet) * 6) 0 calc(var(--padding-tablet) * 2.5) 0;
         }
 
         .carta-header {
@@ -687,7 +340,7 @@
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .carta-section {
-            padding: calc(var(--padding-desktop) * 4) 0 calc(var(--padding-desktop) * 2.67) 0; /* 120px top, 80px bottom */
+            padding: calc(var(--padding-desktop) * 4) 0 calc(var(--padding-desktop) * 2.67) 0;
         }
 
         .carta-header {
@@ -760,7 +413,7 @@
     /* MOBILE PEQUEÑO (0-480px) */
     @media (max-width: 480px) {
         .carta-section {
-            padding: calc(var(--padding-mobile) * 4) 0 calc(var(--padding-mobile) * 1.5) 0; /* 80px top, 30px bottom */
+            padding: calc(var(--padding-mobile) * 4) 0 calc(var(--padding-mobile) * 1.5) 0;
         }
 
         .carta-header {
@@ -820,17 +473,37 @@
 </style>
 
 <script>
-    // Funcionalidad para cambiar entre categorías usando sistema global
+    // ✅ VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
+    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoint-manager.js';
+    
     document.addEventListener('DOMContentLoaded', () => {
-        // Importar utilidades de breakpoints si están disponibles
-        // import { getCurrentBreakpoint, onBreakpointChange } from '../utils/breakpoints.js';
-        
         const navButtons = document.querySelectorAll('.menu-nav-btn');
         const menuSections = document.querySelectorAll('.menu-section');
+        const cartaSection = document.querySelector('.carta-section');
+        const menuCategories = document.querySelectorAll('.menu-category');
         
-        let currentBreakpoint = window.innerWidth <= 767 ? 'mobile' : 
-                               window.innerWidth <= 1023 ? 'tablet' : 'desktop';
+        // 🔧 Usar el sistema centralizado de breakpoints
+        const breakpoints = useBreakpoints('carta-component', {
+            element: cartaSection
+        });
+        
+        // Suscribirse a cambios de breakpoint
+        breakpoints.subscribe({
+            onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
+                console.log(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
+                
+                // Deshabilitar transiciones durante el cambio para evitar glitches
+                const elementsToAdjust = [cartaSection, ...menuCategories];
+                disableTransitionsDuringResize(elementsToAdjust);
+            },
+            
+            onResize: (currentBreakpoint) => {
+                // Lógica adicional de resize si es necesaria
+                // console.log(`🔄 Carta: Resize en breakpoint ${currentBreakpoint}`);
+            }
+        });
 
+        // Funcionalidad original de navegación de categorías
         navButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 // Quitar active de todos los botones
@@ -848,42 +521,10 @@
                 }
             });
         });
-
-        // Detectar cambios de breakpoint para optimizar animaciones
-        let resizeTimer;
-
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            
-            resizeTimer = setTimeout(() => {
-                const newBreakpoint = window.innerWidth <= 767 ? 'mobile' : 
-                                     window.innerWidth <= 1023 ? 'tablet' : 'desktop';
-                
-                if (newBreakpoint !== currentBreakpoint) {
-                    currentBreakpoint = newBreakpoint;
-                    
-                    // Optimizar transiciones durante cambio de breakpoint
-                    const cartaSection = document.querySelector('.carta-section');
-                    const menuCategories = document.querySelectorAll('.menu-category');
-                    
-                    if (cartaSection) {
-                        cartaSection.style.transition = 'none';
-                        
-                        menuCategories.forEach(category => {
-                            category.style.transition = 'none';
-                        });
-                        
-                        requestAnimationFrame(() => {
-                            setTimeout(() => {
-                                cartaSection.style.transition = '';
-                                menuCategories.forEach(category => {
-                                    category.style.transition = '';
-                                });
-                            }, 100);
-                        });
-                    }
-                }
-            }, 150);
+        
+        // Cleanup al descargar la página
+        window.addEventListener('beforeunload', () => {
+            breakpoints.unsubscribe();
         });
     });
 </script>

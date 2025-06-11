@@ -53,9 +53,6 @@ const localImages = [
 </section>
 
 <style>
-    /* IMPORTAR EL SISTEMA GLOBAL (en tu layout principal) */
-    /* @import '../styles/breakpoints.css'; */
-
     /* === BASE SECTION === */
     .historia-section {
         width: 100%;
@@ -106,11 +103,10 @@ const localImages = [
 
     /* === CONTAINER USANDO SISTEMA GLOBAL === */
     .historia-container {
-        /* Usa las variables globales del sistema */
         height: 660px;
         display: flex;
         flex-direction: row;
-        gap: var(--gap-mobile); /* Gap responsivo automático */
+        gap: var(--gap-mobile);
         position: relative;
         z-index: 2;
     }
@@ -315,14 +311,19 @@ const localImages = [
 </style>
 
 <script>
-    // Importar las utilidades de breakpoints
-    // import { onBreakpointChange, getCurrentBreakpoint } from '../utils/breakpoints.js';
+    // ✅ VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
+    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoint-manager.js';
     
     document.addEventListener('DOMContentLoaded', () => {
-        // Usar las utilidades globales de breakpoints
-        let currentBreakpoint = window.innerWidth <= 767 ? 'mobile' : 'desktop';
-        let resizeTimer;
+        const historyContent = document.querySelector('.history-content');
+        const sliderSection = document.querySelector('.slider-section');
         
+        // 🔧 Usar el sistema centralizado de breakpoints
+        const breakpoints = useBreakpoints('historia-component', {
+            element: document.querySelector('.historia-section')
+        });
+        
+        // Observer para animaciones de entrada
         const observerOptions = {
             threshold: 0.15,
             rootMargin: '0px 0px -50px 0px'
@@ -336,36 +337,29 @@ const localImages = [
             });
         }, observerOptions);
 
-        const historyContent = document.querySelector('.history-content');
-        const sliderSection = document.querySelector('.slider-section');
-        
         if (historyContent) observer.observe(historyContent);
         if (sliderSection) observer.observe(sliderSection);
-
-        // Usar el sistema global para detectar cambios de breakpoint
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            
-            resizeTimer = setTimeout(() => {
-                const newBreakpoint = window.innerWidth <= 767 ? 'mobile' : 'desktop';
+        
+        // Suscribirse a cambios de breakpoint
+        breakpoints.subscribe({
+            onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
+                console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
-                if (newBreakpoint !== currentBreakpoint) {
-                    currentBreakpoint = newBreakpoint;
-                    
-                    // Temporalmente deshabilitar transiciones durante el cambio
-                    if (historyContent && sliderSection) {
-                        historyContent.style.transition = 'none';
-                        sliderSection.style.transition = 'none';
-                        
-                        requestAnimationFrame(() => {
-                            setTimeout(() => {
-                                historyContent.style.transition = '';
-                                sliderSection.style.transition = '';
-                            }, 100);
-                        });
-                    }
-                }
-            }, 150);
+                // Deshabilitar transiciones temporalmente durante el cambio
+                const elementsToAdjust = [historyContent, sliderSection].filter(Boolean);
+                disableTransitionsDuringResize(elementsToAdjust);
+            },
+            
+            onResize: (currentBreakpoint) => {
+                // Lógica adicional específica para historia si es necesaria
+                // console.log(`🔄 Historia: Resize en breakpoint ${currentBreakpoint}`);
+            }
+        });
+        
+        // Cleanup al descargar la página
+        window.addEventListener('beforeunload', () => {
+            breakpoints.unsubscribe();
+            observer.disconnect();
         });
     });
 </script>

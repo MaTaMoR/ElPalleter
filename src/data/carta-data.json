@@ -1,0 +1,380 @@
+{
+  "categories": [
+    {
+      "id": "entrantes",
+      "nameKey": "carta.categories.entrantes",
+      "subcategories": [
+        {
+          "id": "entrantes-frios",
+          "nameKey": "carta.subcategories.entrantes-frios",
+          "items": [
+            {
+              "id": "ensalada-palleter",
+              "nameKey": "carta.items.ensalada-palleter.name",
+              "descriptionKey": "carta.items.ensalada-palleter.description",
+              "price": 11.50
+            },
+            {
+              "id": "tabla-jamon-iberico",
+              "nameKey": "carta.items.tabla-jamon-iberico.name",
+              "price": 12.00
+            },
+            {
+              "id": "boquerones-vinagre",
+              "nameKey": "carta.items.boquerones-vinagre.name",
+              "price": 7.00
+            },
+            {
+              "id": "aspencat-mojama",
+              "nameKey": "carta.items.aspencat-mojama.name",
+              "price": 8.00
+            },
+            {
+              "id": "ensaladilla-rusa",
+              "nameKey": "carta.items.ensaladilla-rusa.name",
+              "price": 6.00
+            }
+          ]
+        },
+        {
+          "id": "entrantes-calientes",
+          "nameKey": "carta.subcategories.entrantes-calientes",
+          "items": [
+            {
+              "id": "patatas-bravas",
+              "nameKey": "carta.items.patatas-bravas.name",
+              "price": 7.00
+            },
+            {
+              "id": "pimientos-padron",
+              "nameKey": "carta.items.pimientos-padron.name",
+              "price": 4.50
+            },
+            {
+              "id": "boniato-frito",
+              "nameKey": "carta.items.boniato-frito.name",
+              "price": 4.50
+            },
+            {
+              "id": "tabla-quesos-embutidos",
+              "nameKey": "carta.items.tabla-quesos-embutidos.name",
+              "price": 8.50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "raciones",
+      "nameKey": "carta.categories.raciones",
+      "subcategories": [
+        {
+          "id": "pescados-mariscos",
+          "nameKey": "carta.subcategories.pescados-mariscos",
+          "items": [
+            {
+              "id": "sepia-parrilla",
+              "nameKey": "carta.items.sepia-parrilla.name",
+              "price": 11.50
+            },
+            {
+              "id": "pulpo-parrilla",
+              "nameKey": "carta.items.pulpo-parrilla.name",
+              "price": 17.50
+            },
+            {
+              "id": "gambas-ajillo",
+              "nameKey": "carta.items.gambas-ajillo.name",
+              "price": 12.00
+            },
+            {
+              "id": "fritura-pescado",
+              "nameKey": "carta.items.fritura-pescado.name",
+              "price": 14.50
+            },
+            {
+              "id": "langostinos-panko",
+              "nameKey": "carta.items.langostinos-panko.name",
+              "price": 12.00
+            }
+          ]
+        },
+        {
+          "id": "guisos-tradicionales",
+          "nameKey": "carta.subcategories.guisos-tradicionales",
+          "items": [
+            {
+              "id": "callos",
+              "nameKey": "carta.items.callos.name",
+              "price": 7.50
+            },
+            {
+              "id": "rabo-toro",
+              "nameKey": "carta.items.rabo-toro.name",
+              "price": 10.00
+            },
+            {
+              "id": "albondigas-salsa",
+              "nameKey": "carta.items.albondigas-salsa.name",
+              "price": 8.00
+            },
+            {
+              "id": "magro-tomate",
+              "nameKey": "carta.items.magro-tomate.name",
+              "price": 8.00
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hamburguesas",
+      "nameKey": "carta.categories.hamburguesas",
+      "subcategories": [
+        {
+          "id": "hamburguesas-gourmet",
+          "nameKey": "carta.subcategories.hamburguesas-gourmet",
+          "items": [
+            {
+              "id": "hamburguesa-palleter",
+              "nameKey": "carta.items.hamburguesa-palleter.name",
+              "descriptionKey": "carta.items.hamburguesa-palleter.description",
+              "price": 12.50
+            },
+            {
+              "id": "hamburguesa-siempre",
+              "nameKey": "carta.items.hamburguesa-siempre.name",
+              "descriptionKey": "carta.items.hamburguesa-siempre.description",
+              "price": 10.00
+            },
+            {
+              "id": "hamburguesa-pollo",
+              "nameKey": "carta.items.hamburguesa-pollo.name",
+              "descriptionKey": "carta.items.hamburguesa-pollo.description",
+              "price": 10.50
+            },
+            {
+              "id": "hamburguesa-sepia",
+              "nameKey": "carta.items.hamburguesa-sepia.name",
+              "price": 12.00
+            },
+            {
+              "id": "hamburguesa-vegana",
+              "nameKey": "carta.items.hamburguesa-vegana.name",
+              "descriptionKey": "carta.items.hamburguesa-vegana.description",
+              "price": 10.50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parrilla",
+      "nameKey": "carta.categories.parrilla",
+      "subcategories": [
+        {
+          "id": "carnes-parrilla",
+          "nameKey": "carta.subcategories.carnes-parrilla",
+          "items": [
+            {
+              "id": "secreto-cerdo",
+              "nameKey": "carta.items.secreto-cerdo.name",
+              "price": 16.00
+            },
+            {
+              "id": "pinchos-morunos",
+              "nameKey": "carta.items.pinchos-morunos.name",
+              "price": "3,50€/und"
+            },
+            {
+              "id": "entrecot-ternera",
+              "nameKey": "carta.items.entrecot-ternera.name",
+              "price": 24.50
+            },
+            {
+              "id": "chuleton-ternera",
+              "nameKey": "carta.items.chuleton-ternera.name",
+              "price": 38.50
+            },
+            {
+              "id": "chuleton-angus",
+              "nameKey": "carta.items.chuleton-angus.name",
+              "price": 70.00
+            }
+          ]
+        },
+        {
+          "id": "menu-ninos",
+          "nameKey": "carta.subcategories.menu-ninos",
+          "items": [
+            {
+              "id": "escalope-pollo",
+              "nameKey": "carta.items.escalope-pollo.name",
+              "price": 7.50
+            },
+            {
+              "id": "calamares-patatas",
+              "nameKey": "carta.items.calamares-patatas.name",
+              "price": 7.50
+            },
+            {
+              "id": "tortilla-longanizas",
+              "nameKey": "carta.items.tortilla-longanizas.name",
+              "price": 7.50
+            },
+            {
+              "id": "merluza-rebozada",
+              "nameKey": "carta.items.merluza-rebozada.name",
+              "price": 7.50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bebidas",
+      "nameKey": "carta.categories.bebidas",
+      "subcategories": [
+        {
+          "id": "cervezas",
+          "nameKey": "carta.subcategories.cervezas",
+          "items": [
+            {
+              "id": "cana-mahou",
+              "nameKey": "carta.items.cana-mahou.name",
+              "price": 1.50
+            },
+            {
+              "id": "doble-mahou",
+              "nameKey": "carta.items.doble-mahou.name",
+              "price": 2.00
+            },
+            {
+              "id": "jarra-mahou",
+              "nameKey": "carta.items.jarra-mahou.name",
+              "price": 6.00
+            },
+            {
+              "id": "mahou-5-estrellas",
+              "nameKey": "carta.items.mahou-5-estrellas.name",
+              "price": 2.00
+            }
+          ]
+        },
+        {
+          "id": "refrescos",
+          "nameKey": "carta.subcategories.refrescos",
+          "items": [
+            {
+              "id": "coca-cola",
+              "nameKey": "carta.items.coca-cola.name",
+              "price": 1.80
+            },
+            {
+              "id": "coca-cola-zero",
+              "nameKey": "carta.items.coca-cola-zero.name",
+              "price": 1.80
+            },
+            {
+              "id": "aquarius",
+              "nameKey": "carta.items.aquarius.name",
+              "price": 1.80
+            },
+            {
+              "id": "agua-aquabona",
+              "nameKey": "carta.items.agua-aquabona.name",
+              "price": 2.50
+            }
+          ]
+        },
+        {
+          "id": "cafe",
+          "nameKey": "carta.subcategories.cafe",
+          "items": [
+            {
+              "id": "cafe-solo",
+              "nameKey": "carta.items.cafe-solo.name",
+              "price": 1.10
+            },
+            {
+              "id": "cafe-leche",
+              "nameKey": "carta.items.cafe-leche.name",
+              "price": 1.30
+            },
+            {
+              "id": "cappuccino",
+              "nameKey": "carta.items.cappuccino.name",
+              "price": 1.80
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cocteles",
+      "nameKey": "carta.categories.cocteles",
+      "subcategories": [
+        {
+          "id": "cocteles-clasicos",
+          "nameKey": "carta.subcategories.cocteles-clasicos",
+          "items": [
+            {
+              "id": "mojito",
+              "nameKey": "carta.items.mojito.name",
+              "descriptionKey": "carta.items.mojito.description",
+              "price": 7.50
+            },
+            {
+              "id": "pina-colada",
+              "nameKey": "carta.items.pina-colada.name",
+              "descriptionKey": "carta.items.pina-colada.description",
+              "price": 7.50
+            },
+            {
+              "id": "caipirinha",
+              "nameKey": "carta.items.caipirinha.name",
+              "descriptionKey": "carta.items.caipirinha.description",
+              "price": 7.00
+            },
+            {
+              "id": "margarita",
+              "nameKey": "carta.items.margarita.name",
+              "descriptionKey": "carta.items.margarita.description",
+              "price": 7.50
+            }
+          ]
+        },
+        {
+          "id": "cocteles-casa",
+          "nameKey": "carta.subcategories.cocteles-casa",
+          "items": [
+            {
+              "id": "coctel-palleter",
+              "nameKey": "carta.items.coctel-palleter.name",
+              "descriptionKey": "carta.items.coctel-palleter.description",
+              "price": 7.50
+            },
+            {
+              "id": "moscow-mule",
+              "nameKey": "carta.items.moscow-mule.name",
+              "descriptionKey": "carta.items.moscow-mule.description",
+              "price": 7.50
+            },
+            {
+              "id": "sex-on-beach",
+              "nameKey": "carta.items.sex-on-beach.name",
+              "descriptionKey": "carta.items.sex-on-beach.description",
+              "price": 7.50
+            },
+            {
+              "id": "mimosa",
+              "nameKey": "carta.items.mimosa.name",
+              "descriptionKey": "carta.items.mimosa.description",
+              "price": 6.50
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

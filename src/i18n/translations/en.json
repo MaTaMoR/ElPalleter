@@ -70,5 +70,199 @@
       "chef_cooking_alt": "Chef preparing paella in traditional kitchen",
       "chef_cooking_title": "Live artisanal preparation"
     }
+  },
+  "carta": {
+    "title": "Our Menu",
+    "subtitle": "Authentic Mediterranean cuisine since 1985",
+    "categories": {
+      "entrantes": "Starters",
+      "raciones": "Hot Dishes",
+      "hamburguesas": "Burgers",
+      "parrilla": "Grilled Meats",
+      "bebidas": "Drinks",
+      "cocteles": "Cocktails"
+    },
+    "subcategories": {
+      "entrantes-frios": "Cold Starters",
+      "entrantes-calientes": "Hot Starters",
+      "pescados-mariscos": "Fish & Seafood",
+      "guisos-tradicionales": "Traditional Stews",
+      "hamburguesas-gourmet": "Gourmet Burgers",
+      "carnes-parrilla": "Grilled Meats",
+      "menu-ninos": "Kids Menu",
+      "cervezas": "Beers",
+      "refrescos": "Soft Drinks",
+      "cafe": "Coffee",
+      "cocteles-clasicos": "Classic Cocktails",
+      "cocteles-casa": "House Cocktails"
+    },
+    "items": {
+      "ensalada-palleter": {
+        "name": "Palleter Salad",
+        "description": "Bread, alioli and tomato, french fries"
+      },
+      "tabla-jamon-iberico": {
+        "name": "Iberian Ham Board"
+      },
+      "boquerones-vinagre": {
+        "name": "Anchovies in Vinegar"
+      },
+      "aspencat-mojama": {
+        "name": "Aspencat with Mojama"
+      },
+      "ensaladilla-rusa": {
+        "name": "Russian Salad"
+      },
+      "patatas-bravas": {
+        "name": "Patatas Bravas"
+      },
+      "pimientos-padron": {
+        "name": "Padrón Peppers"
+      },
+      "boniato-frito": {
+        "name": "Fried Sweet Potato"
+      },
+      "tabla-quesos-embutidos": {
+        "name": "Cheese & Charcuterie Board"
+      },
+      "sepia-parrilla": {
+        "name": "Grilled Cuttlefish"
+      },
+      "pulpo-parrilla": {
+        "name": "Grilled Octopus"
+      },
+      "gambas-ajillo": {
+        "name": "Garlic Prawns"
+      },
+      "fritura-pescado": {
+        "name": "Fried Fish"
+      },
+      "langostinos-panko": {
+        "name": "Panko Prawns"
+      },
+      "callos": {
+        "name": "Tripe Stew"
+      },
+      "rabo-toro": {
+        "name": "Oxtail"
+      },
+      "albondigas-salsa": {
+        "name": "Meatballs in Sauce"
+      },
+      "magro-tomate": {
+        "name": "Pork in Tomato Sauce"
+      },
+      "hamburguesa-palleter": {
+        "name": "Palleter Burger",
+        "description": "Beef, lettuce, tomato, onion, cheese, bacon, fried egg and mayonnaise"
+      },
+      "hamburguesa-siempre": {
+        "name": "Classic Burger",
+        "description": "Beef, lettuce, tomato, onion, cheese and mayonnaise"
+      },
+      "hamburguesa-pollo": {
+        "name": "Chicken Burger",
+        "description": "Grilled boneless chicken thigh, lettuce, onion, tomato, cheese and mayonnaise"
+      },
+      "hamburguesa-sepia": {
+        "name": "Cuttlefish Burger"
+      },
+      "hamburguesa-vegana": {
+        "name": "Vegan Burger",
+        "description": "Vegetable patty, lettuce, tomato, onion, avocado and vegan mayonnaise"
+      },
+      "secreto-cerdo": {
+        "name": "Pork Secreto"
+      },
+      "pinchos-morunos": {
+        "name": "Homemade Pork Skewers"
+      },
+      "entrecot-ternera": {
+        "name": "Beef Entrecote (Ribeye)"
+      },
+      "chuleton-ternera": {
+        "name": "T-Bone Steak"
+      },
+      "chuleton-angus": {
+        "name": "Angus T-Bone Steak"
+      },
+      "escalope-pollo": {
+        "name": "Chicken Escalope with Potatoes"
+      },
+      "calamares-patatas": {
+        "name": "Squid with Potatoes"
+      },
+      "tortilla-longanizas": {
+        "name": "French Omelette and 2 Sausages"
+      },
+      "merluza-rebozada": {
+        "name": "Battered Hake with Potatoes"
+      },
+      "cana-mahou": {
+        "name": "Mahou Classic Draft"
+      },
+      "doble-mahou": {
+        "name": "Double Mahou Classic"
+      },
+      "jarra-mahou": {
+        "name": "Mahou Classic Pitcher 1L"
+      },
+      "mahou-5-estrellas": {
+        "name": "Mahou 5 Stars 1/3"
+      },
+      "coca-cola": {
+        "name": "Coca Cola"
+      },
+      "coca-cola-zero": {
+        "name": "Coca Cola Zero"
+      },
+      "aquarius": {
+        "name": "Aquarius"
+      },
+      "agua-aquabona": {
+        "name": "Aquabona Water 1.5L"
+      },
+      "cafe-solo": {
+        "name": "Espresso"
+      },
+      "cafe-leche": {
+        "name": "Coffee with Milk"
+      },
+      "cappuccino": {
+        "name": "Cappuccino"
+      },
+      "mojito": {
+        "name": "Mojito",
+        "description": "Havana 5, brown sugar, lime, soda water and fresh mint"
+      },
+      "pina-colada": {
+        "name": "Piña Colada",
+        "description": "Havana 3, pineapple juice, sugar and coconut"
+      },
+      "caipirinha": {
+        "name": "Caipirinha",
+        "description": "Cachaça, soda water, lime and sugar"
+      },
+      "margarita": {
+        "name": "Margarita",
+        "description": "Tequila, triple sec, lime juice and sugar"
+      },
+      "coctel-palleter": {
+        "name": "Palleter",
+        "description": "Watermelon, Havana 3, Pasoa, soda water, lime juice, sugar and fresh mint"
+      },
+      "moscow-mule": {
+        "name": "Moscow Mule",
+        "description": "Vodka, lime, ginger beer and fresh mint"
+      },
+      "sex-on-beach": {
+        "name": "Sex on the Beach",
+        "description": "Vodka, peach liqueur, fresh orange juice and grenadine"
+      },
+      "mimosa": {
+        "name": "Mimosa",
+        "description": "Cava and fresh orange juice"
+      }
+    }
   }
 }
