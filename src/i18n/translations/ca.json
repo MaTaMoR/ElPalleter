@@ -1,21 +1,21 @@
 {
-  "title": "El Palleter - Tapas y Parrilla en Benissa",
-  "description": "Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.",
+  "title": "El Palleter - Tapes i Graella a Benissa",
+  "description": "Restaurant El Palleter a Benissa. Cuina mediterrània autèntica des de 1985.",
   "nav": {
     "home": "Inici",
     "menu": "Carta",
     "story": "Història",
-    "contact": "Contacte",
-    "admin": "Administració"
+    "contact": "Contacte"
   },
   "hero": {
-    "title": "El Palleter",
-    "subtitle": "Autèntica cuina mediterrània",
-    "description": "Descobreix els sabors tradicionals de la Costa Blanca al cor de Benissa"
+    "menu": "Veure Carta"
+  },
+  "story": {
+    "title": "La Nostra Història"
   },
   "carta": {
     "title": "La Nostra Carta",
-    "subtitle": "Autèntica cuina mediterrània des de 1985",
+    "subtitle": "Cuina mediterrània autèntica des de 1985",
     "categories": {
       "entrantes": "Entrants",
       "raciones": "Racions Calentes",
@@ -225,7 +225,7 @@
     },
     "hist_004": {
       "alt": "En un bon menjar no pot faltar un bon postre",
-      "caption": "En un bon menjar no pot faltar un bon postre", 
+      "caption": "En un bon menjar no pot faltar un bon postre",
       "title": "Delicioses postres casolanes"
     }
   }

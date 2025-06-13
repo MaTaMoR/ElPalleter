@@ -1,0 +1,98 @@
+---
+// src/components/pages/HomePage.astro - Componente compartido sin duplicación
+
+// Props del componente
+export interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+
+// Configurar Astro.locals según el idioma recibido
+Astro.locals.locale = locale;
+Astro.locals.cleanPath = '/';
+Astro.locals.isDefaultLocale = locale === 'es';
+
+// Cargar traducciones
+import { I18nConfig } from '../i18n/config.js';
+
+const i18n = I18nConfig.getInstance();
+await i18n.loadTranslations();
+
+
+// Componentes
+import Layout from '../layouts/Layout.astro';
+import Header from './public/Header.astro';
+import Hero from './public/Hero.astro';
+import Historia from './public/Historia.astro';
+import TransitionBridge from './public/TransitionBridge.astro';
+import Carta from './public/Carta.astro';
+import ScrollToTop from './public/ScrollToTop.astro';
+import Footer from './public/Footer.astro';
+
+// Utilidades i18n
+import { 
+  getI18nInfo, 
+  getSEOMetadata, 
+  getAlternateUrls,
+  safeTranslation,
+  getTextDirection 
+} from '../utils/astro-i18n-utils.js';
+
+// Obtener información de i18n
+const { locale: currentLocale, i18n: i18nInstance, isDefaultLocale } = getI18nInfo(Astro);
+
+// Obtener metadatos SEO multiidioma
+const seoData = getSEOMetadata({
+  title: safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
+  description: safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
+}, Astro);
+
+// Obtener URLs alternativas para hreflang
+const alternateUrls = getAlternateUrls(Astro);
+
+// Dirección del texto
+const textDirection = getTextDirection(Astro);
+---
+
+<Layout 
+  title={seoData.title} 
+  description={seoData.description}
+  lang={currentLocale}
+  dir={textDirection}
+>
+  <!-- SEO mejorado con hreflang y multiidioma -->
+  <Fragment slot="head">
+    <link rel="canonical" href={seoData.canonical} />
+    
+    {Object.entries(alternateUrls).map(([langCode, url]) => (
+      <link rel="alternate" hreflang={langCode} href={url} />
+    ))}
+    
+    <link rel="alternate" hreflang="x-default" href={alternateUrls.es} />
+    
+    <meta property="og:locale" content={currentLocale} />
+    <meta property="og:url" content={seoData.openGraph.url} />
+    <meta property="og:title" content={seoData.openGraph.title} />
+    <meta property="og:description" content={seoData.openGraph.description} />
+    
+    {seoData.openGraph.alternateLocales.map(altLocale => (
+      <meta property="og:locale:alternate" content={altLocale} />
+    ))}
+    
+    <meta name="twitter:title" content={seoData.twitter.title} />
+    <meta name="twitter:description" content={seoData.twitter.description} />
+    
+    <script type="application/ld+json" set:html={JSON.stringify(seoData.structuredData)} />
+  </Fragment>
+
+  <!-- Contenido único sin duplicación -->
+  <Header />
+  <Hero />
+  <TransitionBridge />
+  <Historia />
+  <TransitionBridge />
+  <Carta />
+  <ScrollToTop />
+  <Footer />
+</Layout>

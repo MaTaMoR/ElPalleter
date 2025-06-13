@@ -3,12 +3,15 @@
   "description": "Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.",
   "nav": {
     "home": "Inicio",
+    "menu": "Menu",
     "story": "Historia",
-    "menu": "Carta",
     "contact": "Contacto"
   },
   "hero": {
     "menu": "Ver Carta"
+  },
+  "story": {
+    "title": "Nuestra Historia"
   },
   "carta": {
     "title": "Nuestra Carta",
