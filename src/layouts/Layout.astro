@@ -1,18 +1,24 @@
 ---
-// src/layouts/Layout.astro - Layout base con sistema de breakpoints integrado
+// src/layouts/Layout.astro - Layout base con sistema de breakpoints integrado + multiidioma
 export interface Props {
     title: string;
     description?: string;
+    lang?: string;
+    dir?: string;
+    ogImage?: string;
 }
 
 const { 
     title, 
-    description = "El Palleter - Auténtica cocina mediterránea en Benissa. Tapas y parrilla tradicional desde 1985." 
+    description = "El Palleter - Auténtica cocina mediterránea en Benissa. Tapas y parrilla tradicional desde 1985.",
+    lang = "es",
+    dir = "ltr", 
+    ogImage = "/og-image.svg"
 } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang={lang} dir={dir}>
     <head>
         <meta charset="UTF-8" />
         <meta name="description" content={description} />
@@ -24,14 +30,14 @@ const {
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="/og-image.jpg" />
+        <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+        <meta property="og:site_name" content="El Palleter" />
         
-        <!-- Twitter Card -->
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
+        <!-- Slot para contenido específico de página (SEO multiidioma, hreflang, etc.) -->
+        <slot name="head" />
         
         <link rel="stylesheet" href="/src/styles/breakpoints.css">
+        <link rel="script" href="/src/scripts/global-breakpoint-init.js">
 
         <title>{title}</title>
     </head>
@@ -40,76 +46,8 @@ const {
         <slot />
     </body>
 
-    <!-- IMPORTAR SISTEMA DE BREAKPOINTS DESDE ARCHIVO EXTERNO -->
-    <script type="module">
-        // Importar el sistema desde el archivo dedicado
-        import { 
-            breakpointManager, 
-            useBreakpoints, 
-            disableTransitionsDuringResize 
-        } from '../utils/breakpoint-manager.js';
-
-        // Exportar al global para uso en otros scripts inline
-        window.ElPalleterBreakpoints = {
-            manager: breakpointManager,
-            useBreakpoints: useBreakpoints,
-            disableTransitionsDuringResize: disableTransitionsDuringResize,
-            getCurrentBreakpoint: () => breakpointManager.getCurrentBreakpoint(),
-            isMobile: () => breakpointManager.isMobile(),
-            isTabletUp: () => breakpointManager.isTabletUp(),
-            isDesktopUp: () => breakpointManager.isDesktopUp(),
-            getInfo: () => breakpointManager.getBreakpointInfo()
-        };
-
-        // Auto-inicializar el sistema
-        document.addEventListener('DOMContentLoaded', () => {
-            breakpointManager.init();
-            
-            // Debug en desarrollo
-            if (import.meta.env.DEV) {
-                console.log('Sistema de Breakpoints iniciado:', breakpointManager.getBreakpointInfo());
-                
-                // Suscribirse para debug global
-                breakpointManager.subscribe('layout-debug', {
-                    onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
-                        console.log(`[LAYOUT] Breakpoint cambió: ${oldBreakpoint} → ${newBreakpoint}`);
-                        console.log('Componentes suscritos:', breakpointManager.getBreakpointInfo().subscribers);
-                        
-                        // Actualizar indicador visual en desarrollo
-                        if (document.body.hasAttribute('data-debug-breakpoints')) {
-                            document.body.setAttribute('data-current-breakpoint', newBreakpoint);
-                        }
-                    }
-                });
-                
-                // Habilitar debug visual
-                document.body.setAttribute('data-debug-breakpoints', 'true');
-                document.body.setAttribute('data-current-breakpoint', breakpointManager.getCurrentBreakpoint());
-                
-                // Función de diagnóstico en consola
-                window.debugBreakpoints = () => {
-                    const info = breakpointManager.getBreakpointInfo();
-                    console.table({
-                        'Breakpoint Actual': info.current,
-                        'Ancho de Ventana': info.width + 'px',
-                        'Componentes Suscritos': info.subscribers,
-                        'Sistema Inicializado': breakpointManager.isInitialized
-                    });
-                    
-                    console.log('Breakpoints configurados:', info.breakpoints);
-                    console.log('Componentes suscritos:', [...breakpointManager.subscribers.keys()]);
-                };
-            }
-        });
-
-        // Cleanup global al salir de la página
-        window.addEventListener('beforeunload', () => {
-            breakpointManager.cleanup();
-        });
-    </script>
-
     <script is:inline>
-        // ✅ Script centralizado para smooth scroll (TU CÓDIGO ORIGINAL)
+        // Script centralizado para smooth scroll (TU CÓDIGO ORIGINAL)
         document.addEventListener('DOMContentLoaded', () => {
             // Función para obtener la altura del header dinámicamente
             const getHeaderHeight = () => {
@@ -171,7 +109,7 @@ const {
 
             // Handler para clicks de scroll
             const handleScrollClick = (e) => {
-                console.log('🖱️ Click en elemento data-scroll-to detectado'); // Debug log
+                console.log('Click en elemento data-scroll-to detectado'); // Debug log
                 e.preventDefault();
                 const targetId = e.currentTarget.getAttribute('data-scroll-to');
                 if (targetId) {
@@ -295,7 +233,7 @@ const {
         border: 0;
     }
     
-    /* ✅ CLASE HELPER PARA DESHABILITAR TRANSICIONES DURANTE RESIZE */
+    /* CLASE HELPER PARA DESHABILITAR TRANSICIONES DURANTE RESIZE */
     .no-transition,
     .no-transition *,
     .no-transition *:before,

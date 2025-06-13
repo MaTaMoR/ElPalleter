@@ -1,36 +1,12 @@
 ---
+// src/components/public/Historia.astro
+
 import ImageSlider from './ImageSlider.astro';
 import RichText from '../i18n/RichText.astro';
+import { getGalleryImages } from '../../utils/imageUtils.js';
 
-// Importar las imágenes desde assets
-import slider1 from '../../assets/slider/slider-1.jpg';
-import slider2 from '../../assets/slider/slider-2.jpg';
-import slider3 from '../../assets/slider/slider-3.jpg';
-import slider4 from '../../assets/slider/slider-4.jpg';
-
-// Imágenes del local con las rutas correctas
-const localImages = [
-    {
-        src: slider1.src,
-        alt: 'Nuestro restaurante El Palleter',
-        caption: 'Nuestro restaurante El Palleter'
-    },
-    {
-        src: slider2.src,
-        alt: 'Nuestra hamburguesa especial',
-        caption: 'Nuestra hamburguesa especial'
-    },
-    {
-        src: slider3.src,
-        alt: 'Ven y prueba nuestra parrilla',
-        caption: 'Ven y prueba nuestra parrilla'
-    },
-    {
-        src: slider4.src,
-        alt: 'En una buena comida no puede faltar un buen postre',
-        caption: 'En una buena comida no puede faltar un buen postre'
-    }
-];
+// Obtener las imágenes del slider de historia con traducciones
+const imagesToShow = getGalleryImages('historia_slider', Astro);
 ---
 
 <section class="historia-section" id="historia">
@@ -39,7 +15,7 @@ const localImages = [
         <div class="history-content">
             <RichText 
                 key="historia_content" 
-                fallback="Historia no disponible"
+                fallback={'Historia no disponible'}
                 className="historia-rich-content"
                 theme="gold"
             />
@@ -47,7 +23,7 @@ const localImages = [
     
         <!-- Slider de fotos a la derecha -->
         <div class="slider-section">
-            <ImageSlider images={localImages} />
+            <ImageSlider images={imagesToShow} />
         </div>
     </div>
 </section>
@@ -311,14 +287,13 @@ const localImages = [
 </style>
 
 <script>
-    // ✅ VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
-    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoint-manager.js';
+    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
     
     document.addEventListener('DOMContentLoaded', () => {
         const historyContent = document.querySelector('.history-content');
         const sliderSection = document.querySelector('.slider-section');
         
-        // 🔧 Usar el sistema centralizado de breakpoints
+        // Usar el sistema centralizado de breakpoints
         const breakpoints = useBreakpoints('historia-component', {
             element: document.querySelector('.historia-section')
         });

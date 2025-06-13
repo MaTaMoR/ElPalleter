@@ -44,6 +44,8 @@ const { images } = Astro.props;
     /* Slider de fotos */
     .slider-container {
         position: relative;
+        border-radius: 20px;
+        clip-path: inset(0 round 20px);  
         overflow: hidden;
         background: #000;
         height: 100%;
@@ -62,6 +64,7 @@ const { images } = Astro.props;
         background-size: cover;
         background-position: center;
         position: relative;
+        border-radius: 20px;
     }
     
     .slide::before {
@@ -136,16 +139,27 @@ const { images } = Astro.props;
         right: 2rem;
     }
     
-    /* Caption opcional para las fotos */
+    /* Caption con efecto pill - SOLO CAMBIO AQUÍ */
     .slide-caption {
         position: absolute;
         bottom: 4rem;
-        left: 2rem;
-        right: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
         text-align: center;
         color: white;
         font-size: 1.1rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        font-weight: 600;
+        text-shadow: 
+            0 0 8px rgba(0, 0, 0, 0.8),
+            1px 1px 3px rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.25);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        backdrop-filter: blur(3px);
+        display: inline-block;
+        width: max-content;
+        max-width: 85%;
+        line-height: 1.3;
         opacity: 0;
         transition: opacity 0.3s ease;
     }
@@ -172,7 +186,7 @@ const { images } = Astro.props;
         
         .slide-caption {
             font-size: 1rem;
-            bottom: 3rem;
+            bottom: 4rem;
         }
     }
 </style>
@@ -196,6 +210,7 @@ const { images } = Astro.props;
             this.nextBtn = this.container.querySelector('.slider-arrow.next');
             this.totalSlides = this.slides.length;
             this.autoPlayInterval = null;
+            this.isTransitioning = false;
             
             if (this.totalSlides > 0 && this.sliderWrapper) {
                 this.init();
@@ -207,26 +222,32 @@ const { images } = Astro.props;
             // Event listeners para las flechas (solo de este slider)
             if (this.prevBtn) {
                 this.prevBtn.addEventListener('click', () => {
-                    this.clearAutoPlay();
-                    this.prevSlide();
-                    this.startAutoPlay();
+                    if (!this.isTransitioning) {
+                        this.clearAutoPlay();
+                        this.prevSlide();
+                        this.startAutoPlay();
+                    }
                 });
             }
             
             if (this.nextBtn) {
                 this.nextBtn.addEventListener('click', () => {
-                    this.clearAutoPlay();
-                    this.nextSlide();
-                    this.startAutoPlay();
+                    if (!this.isTransitioning) {
+                        this.clearAutoPlay();
+                        this.nextSlide();
+                        this.startAutoPlay();
+                    }
                 });
             }
             
             // Event listeners para los dots (solo de este slider)
             this.dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
-                    this.clearAutoPlay();
-                    this.goToSlide(index);
-                    this.startAutoPlay();
+                    if (!this.isTransitioning) {
+                        this.clearAutoPlay();
+                        this.goToSlide(index);
+                        this.startAutoPlay();
+                    }
                 });
             });
             
@@ -243,6 +264,9 @@ const { images } = Astro.props;
         updateSlider() {
             if (!this.sliderWrapper || this.totalSlides === 0) return;
             
+            // Bloquear nuevas transiciones
+            this.isTransitioning = true;
+            
             // Mover el slider
             const translateX = -this.currentSlide * 100;
             this.sliderWrapper.style.transform = `translateX(${translateX}%)`;
@@ -256,6 +280,11 @@ const { images } = Astro.props;
             this.slides.forEach((slide, index) => {
                 slide.classList.toggle('active', index === this.currentSlide);
             });
+            
+            // Desbloquear después de la transición (0.6s)
+            setTimeout(() => {
+                this.isTransitioning = false;
+            }, 600);
         }
         
         nextSlide() {
@@ -278,7 +307,11 @@ const { images } = Astro.props;
         startAutoPlay() {
             this.clearAutoPlay();
             if (this.totalSlides > 1) {
-                this.autoPlayInterval = setInterval(() => this.nextSlide(), 5000);
+                this.autoPlayInterval = setInterval(() => {
+                    if (!this.isTransitioning) {
+                        this.nextSlide();
+                    }
+                }, 3500);
             }
         }
         

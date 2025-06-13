@@ -3,7 +3,7 @@
  * Se debe importar en el layout principal de Astro
  */
 
-import { breakpointManager } from '../utils/breakpoint-manager.js';
+import { breakpointManager } from '../utils/astro-i18n-utils.js';
 
 // Auto-inicializar el sistema cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,7 +30,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 // Exportar funciones de utilidad globales para usar en otros scripts
-window.ElPalleterBreakpoints = {
+window.Breakpoints = {
     manager: breakpointManager,
     getCurrentBreakpoint: () => breakpointManager.getCurrentBreakpoint(),
     isMobile: () => breakpointManager.isMobile(),

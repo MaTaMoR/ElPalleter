@@ -1,4 +1,6 @@
 {
+  "title": "El Palleter - Tapas y Parrilla en Benissa",
+  "description": "Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.",
   "nav": {
     "home": "Inici",
     "menu": "Carta",
@@ -203,6 +205,28 @@
         "name": "Mimosa",
         "description": "Cava i suc de taronja natural"
       }
+    }
+  },
+  "images": {
+    "hist_001": {
+      "alt": "El nostre restaurant El Palleter",
+      "caption": "El nostre restaurant El Palleter",
+      "title": "Façana principal del restaurant"
+    },
+    "hist_002": {
+      "alt": "La nostra hamburguesa especial",
+      "caption": "La nostra hamburguesa especial",
+      "title": "Hamburguesa gourmet de la casa"
+    },
+    "hist_003": {
+      "alt": "Vine i prova la nostra graella",
+      "caption": "Vine i prova la nostra graella",
+      "title": "Carns a la graella - especialitat de la casa"
+    },
+    "hist_004": {
+      "alt": "En un bon menjar no pot faltar un bon postre",
+      "caption": "En un bon menjar no pot faltar un bon postre", 
+      "title": "Delicioses postres casolanes"
     }
   }
 }

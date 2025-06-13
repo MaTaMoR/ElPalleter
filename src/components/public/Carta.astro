@@ -7,6 +7,7 @@ function formatPrice(price) {
   if (typeof price === 'string') {
     return price; // Para casos como "3,50€/und"
   }
+  
   return `${price.toFixed(2).replace('.', ',')}€`;
 }
 ---
@@ -473,8 +474,8 @@ function formatPrice(price) {
 </style>
 
 <script>
-    // ✅ VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
-    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoint-manager.js';
+    // VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
+    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
     
     document.addEventListener('DOMContentLoaded', () => {
         const navButtons = document.querySelectorAll('.menu-nav-btn');

@@ -25,29 +25,174 @@ export function getI18nInfo(Astro) {
 }
 
 /**
- * Helper para obtener URLs alternativas en diferentes idiomas
+ * Helper mejorado para generar enlaces localizados
+ * @param {string} path - Ruta
+ * @param {string} targetLocale - Idioma objetivo (opcional, usa el actual por defecto)
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {string} - URL localizada
+ */
+export function localizeUrl(path, targetLocale = null, Astro) {
+  const { locale: currentLocale, i18n } = getI18nInfo(Astro);
+  const locale = targetLocale || currentLocale;
+  const baseUrl = Astro.site || '';
+  
+  // Limpiar la ruta
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  
+  // Si es el idioma por defecto, no añadir prefijo
+  if (locale === i18n.getDefaultLocale()) {
+    return `${baseUrl}${cleanPath}`;
+  }
+  
+  // Para otros idiomas, añadir prefijo
+  return `${baseUrl}/${locale}${cleanPath}`;
+}
+
+/**
+ * Helper mejorado para obtener URLs alternativas en diferentes idiomas
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Object} - URLs por idioma
  */
 export function getAlternateUrls(Astro) {
   const { cleanPath, i18n } = getI18nInfo(Astro);
   const baseUrl = Astro.site || Astro.url.origin;
+  const locales = i18n.getLocales();
+  const defaultLocale = i18n.getDefaultLocale();
   
-  return i18n.getAlternateUrls(cleanPath, baseUrl);
+  const alternateUrls = {};
+  
+  locales.forEach(locale => {
+    if (locale === defaultLocale) {
+      // Para el idioma por defecto, usar la ruta sin prefijo
+      alternateUrls[locale] = `${baseUrl}${cleanPath}`;
+    } else {
+      // Para otros idiomas, añadir prefijo
+      alternateUrls[locale] = `${baseUrl}/${locale}${cleanPath}`;
+    }
+  });
+  
+  return alternateUrls;
 }
 
 /**
- * Helper para generar enlaces localizados
- * @param {string} path - Ruta
+ * Helper para cambiar idioma manteniendo la misma página
  * @param {string} targetLocale - Idioma objetivo
  * @param {Object} Astro - Objeto Astro del componente
- * @returns {string} - URL localizada
+ * @returns {string} - URL en el idioma objetivo
  */
-export function localizeUrl(path, targetLocale, Astro) {
-  const { i18n } = getI18nInfo(Astro);
-  const baseUrl = Astro.site || '';
+export function switchLanguageUrl(targetLocale, Astro) {
+  const { cleanPath } = getI18nInfo(Astro);
+  return localizeUrl(cleanPath, targetLocale, Astro);
+}
+
+/**
+ * Helper para detectar si una URL corresponde al idioma actual
+ * @param {string} url - URL a verificar
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {boolean}
+ */
+export function isCurrentLanguageUrl(url, Astro) {
+  const { locale, i18n } = getI18nInfo(Astro);
+  const defaultLocale = i18n.getDefaultLocale();
   
-  return i18n.localizeUrl(path, targetLocale, baseUrl);
+  if (locale === defaultLocale) {
+    // Para idioma por defecto, verificar que no tenga prefijo de idioma
+    return !url.match(/^\/[a-z]{2}\//);
+  } else {
+    // Para otros idiomas, verificar que tenga el prefijo correcto
+    return url.startsWith(`/${locale}/`) || url === `/${locale}`;
+  }
+}
+
+/**
+ * Helper para redireccionar a la versión localizada de una página
+ * @param {string} path - Ruta
+ * @param {string} preferredLocale - Idioma preferido
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Response|null} - Response de redirección o null si no es necesario
+ */
+export function redirectToLocale(path, preferredLocale, Astro) {
+  const { i18n } = getI18nInfo(Astro);
+  
+  if (!i18n.getLocales().includes(preferredLocale)) {
+    return null;
+  }
+  
+  const localizedUrl = localizeUrl(path, preferredLocale, Astro);
+  const currentUrl = Astro.url.pathname;
+  
+  if (currentUrl !== localizedUrl) {
+    return Astro.redirect(localizedUrl, 302);
+  }
+  
+  return null;
+}
+
+/**
+ * Helper para extraer el idioma de una URL
+ * @param {string} url - URL
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Object} - { locale, cleanPath }
+ */
+export function parseLocaleFromUrl(url, Astro) {
+  const { i18n } = getI18nInfo(Astro);
+  const pathname = new URL(url, Astro.url.origin).pathname;
+  
+  const localeMatch = pathname.match(/^\/([a-z]{2})(\/.*)?$/);
+  
+  if (localeMatch) {
+    const [, localeFromUrl, restOfPath] = localeMatch;
+    
+    if (i18n.getLocales().includes(localeFromUrl)) {
+      return {
+        locale: localeFromUrl,
+        cleanPath: restOfPath || '/'
+      };
+    }
+  }
+  
+  return {
+    locale: i18n.getDefaultLocale(),
+    cleanPath: pathname
+  };
+}
+
+/**
+ * Helper para detectar redirecciones automáticas de idioma (opcional)
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Response|null} - Response de redirección o null
+ */
+export function handleLanguageRedirect(Astro) {
+  const { url } = Astro;
+  const pathname = url.pathname;
+  
+  // Solo aplicar en la página raíz
+  if (pathname !== '/') return null;
+  
+  // Obtener idioma preferido del navegador
+  const acceptLanguage = Astro.request.headers.get('accept-language');
+  if (!acceptLanguage) return null;
+  
+  const browserLangs = acceptLanguage
+    .split(',')
+    .map(lang => lang.split(';')[0].split('-')[0].toLowerCase())
+    .filter(lang => lang.length === 2);
+  
+  const { i18n } = getI18nInfo(Astro);
+  const availableLocales = i18n.getLocales();
+  const defaultLocale = i18n.getDefaultLocale();
+  
+  // Encontrar primer idioma soportado
+  const preferredLocale = browserLangs.find(lang => 
+    availableLocales.includes(lang) && lang !== defaultLocale
+  );
+  
+  if (preferredLocale) {
+    const redirectUrl = `/${preferredLocale}/`;
+    return Astro.redirect(redirectUrl, 302);
+  }
+  
+  return null;
 }
 
 /**
@@ -62,10 +207,10 @@ export function getNamespaceTranslations(namespace, Astro) {
 }
 
 /**
- * Helper para obtener metadatos de SEO multiidioma
+ * Helper mejorado para generar metadatos SEO multiidioma
  * @param {Object} pageData - Datos de la página
  * @param {Object} Astro - Objeto Astro del componente
- * @returns {Object} - Metadatos SEO
+ * @returns {Object} - Metadatos SEO completos
  */
 export function getSEOMetadata(pageData, Astro) {
   const { locale, cleanPath, i18n } = getI18nInfo(Astro);
@@ -73,26 +218,40 @@ export function getSEOMetadata(pageData, Astro) {
   const alternateUrls = getAlternateUrls(Astro);
   
   // Obtener traducciones básicas
-  const siteTitle = i18n.getTranslation('hero.title', locale);
-  const siteDescription = i18n.getTranslation('hero.description', locale);
+  const siteTitle = i18n.getTranslation('title', locale) || 'El Palleter';
+  const siteDescription = i18n.getTranslation('description', locale) || 'Restaurante El Palleter en Benissa';
+  
+  const title = pageData.title ? `${pageData.title} | ${siteTitle}` : siteTitle;
+  const description = pageData.description || siteDescription;
+  const canonical = `${baseUrl}${localizeUrl(cleanPath, locale, Astro)}`;
+  
+  // Generar datos estructurados
+  const structuredData = generateStructuredData({
+    type: 'WebPage',
+    name: title,
+    description,
+    path: cleanPath,
+    includeAlternates: true
+  }, Astro);
   
   return {
-    title: pageData.title ? `${pageData.title} | ${siteTitle}` : siteTitle,
-    description: pageData.description || siteDescription,
-    canonical: `${baseUrl}${i18n.localizeUrl(cleanPath, locale)}`,
-    locale: locale,
+    title,
+    description,
+    canonical,
+    locale,
     alternates: alternateUrls,
     openGraph: {
       title: pageData.title || siteTitle,
-      description: pageData.description || siteDescription,
-      url: `${baseUrl}${i18n.localizeUrl(cleanPath, locale)}`,
-      locale: locale,
+      description,
+      url: canonical,
+      locale,
       alternateLocales: i18n.getLocales().filter(l => l !== locale)
     },
     twitter: {
       title: pageData.title || siteTitle,
-      description: pageData.description || siteDescription
-    }
+      description
+    },
+    structuredData
   };
 }
 
@@ -154,7 +313,7 @@ export function localizeBreadcrumbs(breadcrumbs, Astro) {
   
   return breadcrumbs.map(crumb => ({
     ...crumb,
-    url: i18n.localizeUrl(crumb.path, locale),
+    url: localizeUrl(crumb.path, locale, Astro),
     name: crumb.titleKey 
       ? i18n.getTranslation(crumb.titleKey, locale) 
       : crumb.name
@@ -162,7 +321,7 @@ export function localizeBreadcrumbs(breadcrumbs, Astro) {
 }
 
 /**
- * Helper para generar JSON-LD estructurado multiidioma
+ * Helper mejorado para generar JSON-LD estructurado multiidioma
  * @param {Object} data - Datos estructurados
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Object} - JSON-LD
@@ -175,7 +334,7 @@ export function generateStructuredData(data, Astro) {
     "@context": "https://schema.org",
     "@type": data.type || "WebPage",
     "@language": locale,
-    "url": `${baseUrl}${i18n.localizeUrl(data.path || '/', locale)}`,
+    "url": `${baseUrl}${localizeUrl(data.path || '/', locale, Astro)}`,
     "name": data.nameKey 
       ? i18n.getTranslation(data.nameKey, locale) 
       : data.name,
@@ -185,7 +344,7 @@ export function generateStructuredData(data, Astro) {
     "inLanguage": locale,
     "potentialAction": {
       "@type": "ReadAction",
-      "target": `${baseUrl}${i18n.localizeUrl(data.path || '/', locale)}`
+      "target": `${baseUrl}${localizeUrl(data.path || '/', locale, Astro)}`
     }
   };
 

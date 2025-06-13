@@ -1,0 +1,88 @@
+{
+  "images": {
+    "hist_001": {
+      "filename": "historia-restaurant-exterior.jpg",
+      "uploadDate": "2024-01-15T10:30:00Z",
+      "category": "historia",
+      "tags": ["restaurante", "exterior", "fachada"],
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "formats": {
+        "original": "/uploads/images/hist_001_original.jpg",
+        "large": "/uploads/images/hist_001_large.jpg",
+        "medium": "/uploads/images/hist_001_medium.jpg", 
+        "thumbnail": "/uploads/images/hist_001_thumb.jpg"
+      }
+    },
+    "hist_002": {
+      "filename": "historia-hamburguesa-especial.jpg",
+      "uploadDate": "2024-01-15T10:35:00Z",
+      "category": "historia",
+      "tags": ["comida", "hamburguesa", "especialidad"],
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "formats": {
+        "original": "/uploads/images/hist_002_original.jpg",
+        "large": "/uploads/images/hist_002_large.jpg",
+        "medium": "/uploads/images/hist_002_medium.jpg",
+        "thumbnail": "/uploads/images/hist_002_thumb.jpg"
+      }
+    },
+    "hist_003": {
+      "filename": "historia-parrilla.jpg", 
+      "uploadDate": "2024-01-15T10:40:00Z",
+      "category": "historia",
+      "tags": ["parrilla", "cocina", "carnes"],
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "formats": {
+        "original": "/uploads/images/hist_003_original.jpg",
+        "large": "/uploads/images/hist_003_large.jpg",
+        "medium": "/uploads/images/hist_003_medium.jpg",
+        "thumbnail": "/uploads/images/hist_003_thumb.jpg"
+      }
+    },
+    "hist_004": {
+      "filename": "historia-postres.jpg",
+      "uploadDate": "2024-01-15T10:45:00Z", 
+      "category": "historia",
+      "tags": ["postres", "dulces", "comida"],
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "formats": {
+        "original": "/uploads/images/hist_004_original.jpg",
+        "large": "/uploads/images/hist_004_large.jpg",
+        "medium": "/uploads/images/hist_004_medium.jpg",
+        "thumbnail": "/uploads/images/hist_004_thumb.jpg"
+      }
+    }
+  },
+  "galleries": {
+    "historia_slider": {
+      "name": "Historia Slider Principal",
+      "description": "Imágenes principales para el slider de la sección historia",
+      "images": ["hist_001", "hist_002", "hist_003", "hist_004"],
+      "settings": {
+        "autoplay": true,
+        "duration": 5000,
+        "showCaptions": true,
+        "showThumbnails": false
+      }
+    }
+  },
+  "categories": {
+    "historia": "Historia del Restaurante",
+    "carta": "Imágenes de Carta/Comida", 
+    "local": "Instalaciones del Local",
+    "eventos": "Eventos y Celebraciones",
+    "equipo": "Equipo de Trabajo"
+  }
+}
