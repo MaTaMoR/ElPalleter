@@ -13,8 +13,29 @@ const {
     description = "El Palleter - Auténtica cocina mediterránea en Benissa. Tapas y parrilla tradicional desde 1985.",
     lang = "es",
     dir = "ltr", 
-    ogImage = "/og-image.svg"
+    ogImage = "/images/og-image.svg"
 } = Astro.props;
+
+// 🔧 FUNCIÓN HELPER PARA URL ABSOLUTA
+function getAbsoluteUrl(path, baseUrl) {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  
+  if (!baseUrl) {
+    return path;
+  }
+  
+  try {
+    return new URL(path, baseUrl).toString();
+  } catch (error) {
+    console.warn('Error construyendo URL absoluta:', error);
+    return path;
+  }
+}
+
+// URL canónica base
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -30,14 +51,19 @@ const {
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+        <meta property="og:image" content={getAbsoluteUrl(ogImage, Astro.site)} />
         <meta property="og:site_name" content="El Palleter" />
+        
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={getAbsoluteUrl(ogImage, Astro.site)} />
         
         <!-- Slot para contenido específico de página (SEO multiidioma, hreflang, etc.) -->
         <slot name="head" />
         
         <link rel="stylesheet" href="/src/styles/breakpoints.css">
-        <link rel="script" href="/src/scripts/global-breakpoint-init.js">
 
         <title>{title}</title>
     </head>
@@ -109,7 +135,7 @@ const {
 
             // Handler para clicks de scroll
             const handleScrollClick = (e) => {
-                console.log('Click en elemento data-scroll-to detectado'); // Debug log
+                console.log('🖱️ Click en elemento data-scroll-to detectado'); // Debug log
                 e.preventDefault();
                 const targetId = e.currentTarget.getAttribute('data-scroll-to');
                 if (targetId) {
@@ -233,7 +259,7 @@ const {
         border: 0;
     }
     
-    /* CLASE HELPER PARA DESHABILITAR TRANSICIONES DURANTE RESIZE */
+    /* ✅ CLASE HELPER PARA DESHABILITAR TRANSICIONES DURANTE RESIZE */
     .no-transition,
     .no-transition *,
     .no-transition *:before,

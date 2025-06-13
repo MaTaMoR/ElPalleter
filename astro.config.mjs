@@ -7,8 +7,7 @@ export default defineConfig({
     defaultLocale: 'es',
     locales: ['es', 'en', 'ca'],
     routing: {
-      prefixDefaultLocale: false,
-      strategy: 'manual'
+      prefixDefaultLocale: false
     }
   },
   // Tu configuración existente...

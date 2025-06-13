@@ -21,23 +21,16 @@ export async function onRequest(context, next) {
     return next();
   }
   
-  // Detectar idioma desde la URL
-  const localeMatch = pathname.match(/^\/([a-z]{2})(\/.*)?$/);
-  
-  let detectedLocale = null;
-  let cleanPath = pathname;
-  
-  if (localeMatch) {
-    const [, localeFromUrl, restOfPath] = localeMatch;
-    
-    if (i18n.getLocales().includes(localeFromUrl)) {
-      detectedLocale = localeFromUrl;
-      cleanPath = restOfPath || '/';
-    }
+  // 🚀 CARGAR TRADUCCIONES (importante para tu sistema)
+  try {
+    await i18n.loadTranslations();
+    console.log('📚 Traducciones cargadas');
+  } catch (error) {
+    console.warn('⚠️ Error cargando traducciones:', error);
   }
   
-  // Si no se detectó idioma, usar por defecto
-  const locale = detectedLocale || i18n.getDefaultLocale();
+  // Detectar idioma usando tu método
+  const { locale, cleanPath } = i18n.detectLocaleFromPath(pathname);
   
   console.log('🌍 Idioma detectado:', locale, 'cleanPath:', cleanPath);
   
@@ -47,7 +40,32 @@ export async function onRequest(context, next) {
   locals.localeInfo = i18n.getLocaleInfo(locale);
   locals.isDefaultLocale = locale === i18n.getDefaultLocale();
   
-  // 🚀 SIMPLE: Solo pasar al siguiente, Astro maneja el routing
+  // 🔧 CLAVE: Reescribir la URL para idiomas no-defecto
+  if (locale !== i18n.getDefaultLocale() && pathname !== cleanPath) {
+    console.log('🔄 Reescribiendo URL de', pathname, 'a', cleanPath);
+    
+    // Crear nueva URL apuntando al archivo correcto
+    const newUrl = new URL(cleanPath, url.origin);
+    
+    // Crear nueva request
+    const newRequest = new Request(newUrl, {
+      method: context.request.method,
+      headers: context.request.headers,
+      body: context.request.body
+    });
+    
+    // Reemplazar request y URL en el contexto
+    Object.defineProperty(context, 'request', {
+      value: newRequest,
+      writable: false
+    });
+    Object.defineProperty(context, 'url', {
+      value: newUrl,
+      writable: false
+    });
+  }
+  
+  // Continuar con la request
   const response = await next();
   
   // Añadir header de idioma

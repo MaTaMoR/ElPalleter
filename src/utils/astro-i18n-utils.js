@@ -1,22 +1,32 @@
 import { I18nConfig } from '../i18n/config.js';
 
 /**
- * Helper para obtener información de i18n en componentes Astro
+ * Helper para obtener información de i18n en componentes Astro (NATIVO)
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Object} - Información de i18n
  */
 export function getI18nInfo(Astro) {
-  // Obtener idioma desde locals (establecido por el middleware)
-  const locale = Astro.locals.locale || 'es';
-  const cleanPath = Astro.locals.cleanPath || Astro.url.pathname;
-  const localeInfo = Astro.locals.localeInfo || {};
-
+  // 🚀 USAR SOLO SISTEMA NATIVO DE ASTRO
+  const locale = Astro.currentLocale || 'es';
+  
+  // Para cleanPath, extraerlo de la URL actual
+  let cleanPath = Astro.url.pathname;
+  
+  // Si es una URL con prefijo de idioma, extraer la ruta limpia
+  const localeMatch = cleanPath.match(/^\/([a-z]{2})(\/.*)?$/);
+  if (localeMatch) {
+    const [, detectedLocale, restOfPath] = localeMatch;
+    if (['es', 'en', 'ca'].includes(detectedLocale)) {
+      cleanPath = restOfPath || '/';
+    }
+  }
+  
   const i18n = I18nConfig.getInstance();
   
   return {
     locale,
     cleanPath,
-    localeInfo,
+    localeInfo: i18n.getLocaleInfo(locale),
     defaultLocale: i18n.getDefaultLocale(),
     availableLocales: i18n.getLocales(),
     isDefaultLocale: locale === i18n.getDefaultLocale(),
@@ -25,7 +35,7 @@ export function getI18nInfo(Astro) {
 }
 
 /**
- * Helper mejorado para generar enlaces localizados
+ * Helper para generar enlaces localizados (NATIVO)
  * @param {string} path - Ruta
  * @param {string} targetLocale - Idioma objetivo (opcional, usa el actual por defecto)
  * @param {Object} Astro - Objeto Astro del componente
@@ -39,39 +49,21 @@ export function localizeUrl(path, targetLocale = null, Astro) {
   // Limpiar la ruta
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   
-  // Si es el idioma por defecto, no añadir prefijo
-  if (locale === i18n.getDefaultLocale()) {
-    return `${baseUrl}${cleanPath}`;
-  }
-  
-  // Para otros idiomas, añadir prefijo
-  return `${baseUrl}/${locale}${cleanPath}`;
+  // 🚀 USAR LÓGICA DE I18NCONFIG QUE YA TIENES
+  return i18n.localizeUrl(cleanPath, locale, baseUrl);
 }
 
 /**
- * Helper mejorado para obtener URLs alternativas en diferentes idiomas
+ * Helper para obtener URLs alternativas en diferentes idiomas (NATIVO)
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Object} - URLs por idioma
  */
 export function getAlternateUrls(Astro) {
   const { cleanPath, i18n } = getI18nInfo(Astro);
   const baseUrl = Astro.site || Astro.url.origin;
-  const locales = i18n.getLocales();
-  const defaultLocale = i18n.getDefaultLocale();
   
-  const alternateUrls = {};
-  
-  locales.forEach(locale => {
-    if (locale === defaultLocale) {
-      // Para el idioma por defecto, usar la ruta sin prefijo
-      alternateUrls[locale] = `${baseUrl}${cleanPath}`;
-    } else {
-      // Para otros idiomas, añadir prefijo
-      alternateUrls[locale] = `${baseUrl}/${locale}${cleanPath}`;
-    }
-  });
-  
-  return alternateUrls;
+  // 🚀 USAR MÉTODO DE I18NCONFIG QUE YA TIENES
+  return i18n.getAlternateUrls(cleanPath, baseUrl);
 }
 
 /**
@@ -397,7 +389,15 @@ export class I18nError extends Error {
 }
 
 /**
- * Helper para manejar errores de traducción de forma robusta
+ * Helper para detectar si estamos en modo desarrollo
+ * @returns {boolean}
+ */
+export function isDev() {
+  return import.meta.env.DEV;
+}
+
+/**
+ * Helper para manejar errores de traducción de forma robusta (NATIVO)
  * @param {string} key - Clave de traducción
  * @param {Object} Astro - Objeto Astro del componente
  * @param {string} fallback - Texto de fallback
@@ -406,13 +406,17 @@ export class I18nError extends Error {
 export function safeTranslation(key, Astro, fallback = null) {
   try {
     const { locale, i18n } = getI18nInfo(Astro);
-    const translation = i18n.getTranslation(key, locale);
     
-    if (translation === key && fallback) {
-      return fallback;
+    // CARGAR TRADUCCIONES SI ES NECESARIO
+    // Si las traducciones están cargadas, usarlas
+    const translation = i18n.getTranslation(key, locale);
+    if (translation && translation !== key) {
+      return translation;
     }
     
-    return translation;
+    // Fallback
+    return fallback || key;
+    
   } catch (error) {
     if (isDev()) {
       console.warn(`[i18n] Error getting translation for key: ${key}`, error);
