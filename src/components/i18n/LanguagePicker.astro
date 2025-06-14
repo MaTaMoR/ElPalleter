@@ -1,0 +1,446 @@
+---
+// src/components/i18n/LanguagePicker.astro
+// 🌍 LANGUAGE PICKER CON SISTEMA CENTRALIZADO
+
+import { getI18nInfo } from '../../utils/astro-i18n-utils.js';
+import { getLanguagePickerData } from '../../utils/language-config.js';
+
+export interface Props {
+  variant?: 'desktop' | 'mobile';
+  className?: string;
+}
+
+const { variant = 'desktop', className = '' } = Astro.props;
+
+// Obtener información de i18n
+const { locale } = getI18nInfo(Astro);
+
+// 🎯 Obtener datos de idiomas desde el sistema centralizado
+const languages = await getLanguagePickerData(Astro);
+
+// Encontrar idioma actual y otros idiomas
+const currentLanguage = languages.find(lang => lang.isActive) || languages[0];
+const otherLanguages = languages.filter(lang => !lang.isActive);
+---
+
+<div class={`language-picker ${variant} ${className}`} data-language-picker>
+  <!-- Botón principal que muestra el idioma actual -->
+  <button class="lang-current" aria-label={`Idioma actual: ${currentLanguage.name}`} aria-haspopup="true" aria-expanded="false">
+    <span class="lang-flag">
+      {currentLanguage.flag.isEmoji ? (
+        <span class="flag-emoji" aria-hidden="true">{currentLanguage.flag.value}</span>
+      ) : (
+        <img src={currentLanguage.flag.value} alt="" class="flag-svg" aria-hidden="true" />
+      )}
+    </span>
+    <span class="lang-code">{currentLanguage.shortName}</span>
+    <span class="lang-arrow" aria-hidden="true">▼</span>
+  </button>
+  
+  <!-- Dropdown con otros idiomas -->
+  <div class="lang-options" role="menu" aria-label="Seleccionar idioma">
+    {otherLanguages.map((lang) => (
+      <a 
+        href={lang.url}
+        class="lang-option"
+        role="menuitem"
+        aria-label={`Cambiar a ${lang.name}`}
+        title={`Cambiar a ${lang.name}`}
+        hreflang={lang.code}
+      >
+        <span class="lang-flag">
+          {lang.flag.isEmoji ? (
+            <span class="flag-emoji" aria-hidden="true">{lang.flag.value}</span>
+          ) : (
+            <img src={lang.flag.value} alt="" class="flag-svg" aria-hidden="true" />
+          )}
+        </span>
+        <span class="lang-name">{lang.shortName}</span>
+        <span class="lang-full-name">{lang.nativeName}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* === BASE COMPONENT === */
+  .language-picker {
+    position: relative;
+    display: inline-block;
+    font-family: inherit;
+    z-index: 50;
+  }
+
+  /* === BOTÓN PRINCIPAL === */
+  .lang-current {
+    background: rgba(244, 162, 97, 0.15);
+    border: 1px solid rgba(244, 162, 97, 0.4);
+    color: white;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    min-width: 80px;
+    justify-content: center;
+  }
+
+  .lang-current:hover {
+    background: rgba(244, 162, 97, 0.25);
+    border-color: rgba(244, 162, 97, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+  }
+
+  .lang-current:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.3);
+  }
+
+  /* === ELEMENTOS DE BANDERA === */
+  .lang-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .flag-emoji {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .flag-svg {
+    width: 20px;
+    height: 13px;
+    border-radius: 2px;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Elementos del botón */
+  .lang-code {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .lang-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+    margin-left: 0.2rem;
+  }
+
+  .language-picker[data-open="true"] .lang-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* === DROPDOWN === */
+  .lang-options {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: rgba(15, 15, 15, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(244, 162, 97, 0.3);
+    border-radius: 12px;
+    min-width: 160px;
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(244, 162, 97, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .language-picker[data-open="true"] .lang-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* === OPCIONES DEL DROPDOWN === */
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.8rem 1rem;
+    color: white;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(244, 162, 97, 0.1);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .lang-option:last-child {
+    border-bottom: none;
+  }
+
+  .lang-option:hover {
+    background: rgba(244, 162, 97, 0.15);
+    color: #f4a261;
+    transform: translateX(2px);
+  }
+
+  .lang-option:focus {
+    outline: none;
+    background: rgba(244, 162, 97, 0.2);
+    color: #f4a261;
+  }
+
+  /* Bandera en opciones */
+  .lang-option .lang-flag {
+    flex-shrink: 0;
+  }
+
+  .lang-option .flag-svg {
+    width: 18px;
+    height: 12px;
+  }
+
+  .lang-option .lang-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    min-width: 28px;
+  }
+
+  .lang-option .lang-full-name {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: 400;
+  }
+
+  /* === VARIANTES === */
+
+  /* Variante Desktop */
+  .language-picker.desktop {
+    /* Estilos base ya aplicados */
+  }
+
+  /* Variante Mobile */
+  .language-picker.mobile .lang-current {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    min-width: 85px;
+  }
+
+  .language-picker.mobile .lang-options {
+    min-width: 150px;
+    left: 0;
+    right: auto;
+  }
+
+  .language-picker.mobile .lang-option {
+    padding: 0.9rem 1rem;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .language-picker.desktop {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .language-picker.mobile {
+      display: none;
+    }
+  }
+
+  /* === ANIMACIONES ADICIONALES === */
+  .lang-option::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #f4a261;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .lang-option:hover::before {
+    transform: scaleY(1);
+  }
+
+  /* === ACCESIBILIDAD === */
+  @media (prefers-reduced-motion: reduce) {
+    .lang-current,
+    .lang-options,
+    .lang-option {
+      transition: none;
+    }
+    
+    .lang-arrow {
+      transition: none;
+    }
+  }
+
+  /* === ESTADOS DE CARGA === */
+  .language-picker[data-loading="true"] .lang-current {
+    opacity: 0.7;
+    cursor: wait;
+  }
+
+  /* === ESTILOS ESPECÍFICOS PARA SIDEBAR === */
+  .language-picker.sidebar-language {
+    width: 100%;
+  }
+
+  .language-picker.sidebar-language .lang-current {
+    width: 100%;
+    justify-content: flex-start;
+    background: rgba(244, 162, 97, 0.1);
+    border-color: rgba(244, 162, 97, 0.5);
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .language-picker.sidebar-language .lang-options {
+    position: static;
+    background: rgba(244, 162, 97, 0.05);
+    border: 1px solid rgba(244, 162, 97, 0.2);
+    margin-top: 0.5rem;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none;
+  }
+
+  .language-picker.sidebar-language[data-open="true"] .lang-options {
+    display: block;
+  }
+</style>
+
+<script>
+  class LanguagePicker {
+    constructor(element) {
+      this.element = element;
+      this.button = element.querySelector('.lang-current');
+      this.dropdown = element.querySelector('.lang-options');
+      this.options = element.querySelectorAll('.lang-option');
+      this.isOpen = false;
+      
+      this.init();
+    }
+    
+    init() {
+      if (!this.button || !this.dropdown) return;
+      
+      // Event listeners
+      this.button.addEventListener('click', (e) => this.toggleDropdown(e));
+      this.button.addEventListener('keydown', (e) => this.handleKeydown(e));
+      
+      // Cerrar al hacer clic fuera
+      document.addEventListener('click', (e) => this.handleOutsideClick(e));
+      
+      // Navegación con teclado en opciones
+      this.options.forEach((option, index) => {
+        option.addEventListener('keydown', (e) => this.handleOptionKeydown(e, index));
+      });
+      
+      // Escape para cerrar
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.closeDropdown();
+          this.button.focus();
+        }
+      });
+    }
+    
+    toggleDropdown(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (this.isOpen) {
+        this.closeDropdown();
+      } else {
+        this.openDropdown();
+      }
+    }
+    
+    openDropdown() {
+      this.isOpen = true;
+      this.element.setAttribute('data-open', 'true');
+      this.button.setAttribute('aria-expanded', 'true');
+      
+      // Focus en primera opción
+      setTimeout(() => {
+        const firstOption = this.dropdown.querySelector('.lang-option');
+        if (firstOption) firstOption.focus();
+      }, 100);
+    }
+    
+    closeDropdown() {
+      this.isOpen = false;
+      this.element.setAttribute('data-open', 'false');
+      this.button.setAttribute('aria-expanded', 'false');
+    }
+    
+    handleKeydown(event) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+        case 'ArrowDown':
+          event.preventDefault();
+          this.openDropdown();
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          this.openDropdown();
+          // Focus en última opción
+          setTimeout(() => {
+            const lastOption = [...this.options].pop();
+            if (lastOption) lastOption.focus();
+          }, 100);
+          break;
+      }
+    }
+    
+    handleOptionKeydown(event, currentIndex) {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          const nextIndex = (currentIndex + 1) % this.options.length;
+          this.options[nextIndex].focus();
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          const prevIndex = currentIndex === 0 ? this.options.length - 1 : currentIndex - 1;
+          this.options[prevIndex].focus();
+          break;
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          this.options[currentIndex].click();
+          break;
+      }
+    }
+    
+    handleOutsideClick(event) {
+      if (!this.element.contains(event.target) && this.isOpen) {
+        this.closeDropdown();
+      }
+    }
+  }
+  
+  // Inicializar todos los language pickers
+  document.addEventListener('DOMContentLoaded', () => {
+    const pickers = document.querySelectorAll('[data-language-picker]');
+    pickers.forEach(picker => new LanguagePicker(picker));
+  });
+</script>

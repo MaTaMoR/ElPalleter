@@ -5,10 +5,11 @@
     "home": "Inici",
     "menu": "Carta",
     "story": "Història",
-    "contact": "Contacte"
+    "contact": "Contacte",
+    "language": "Idioma"
   },
   "hero": {
-    "menu": "Veure Carta"
+    "menu": "Vore Carta"
   },
   "story": {
     "title": "La Nostra Història"
@@ -27,13 +28,13 @@
     "subcategories": {
       "entrantes-frios": "Entrants Freds",
       "entrantes-calientes": "Entrants Calents",
-      "pescados-mariscos": "Peixos i Mariscs",
+      "pescados-mariscos": "Peixos i Mariscos",
       "guisos-tradicionales": "Guisats Tradicionals",
       "hamburguesas-gourmet": "Hamburgueses Gourmet",
       "carnes-parrilla": "Carns a la Graella",
       "menu-ninos": "Menú Infantil",
       "cervezas": "Cerveses",
-      "refrescos": "Refrescs",
+      "refrescos": "Refrescos",
       "cafe": "Cafè",
       "cocteles-clasicos": "Còctels Clàssics",
       "cocteles-casa": "Còctels de la Casa"
@@ -41,7 +42,7 @@
     "items": {
       "ensalada-palleter": {
         "name": "Amanida Palleter",
-        "description": "Pa, allioli i tomàquet, patates fregides"
+        "description": "Pa, all i oli i tomaca, patates fregides"
       },
       "tabla-jamon-iberico": {
         "name": "Taula de Pernil Ibèric"
@@ -92,26 +93,26 @@
         "name": "Mandonguilles en Salsa"
       },
       "magro-tomate": {
-        "name": "Magre amb Tomàquet"
+        "name": "Magre amb Tomaca"
       },
       "hamburguesa-palleter": {
         "name": "Hamburguesa Palleter",
-        "description": "Vedella, enciam, tomàquet, ceba, formatge, bacon, ou fregit i maionesa"
+        "description": "Vedella, enciam, tomaca, ceba, formatge, bacon, ou fregit i maionesa"
       },
       "hamburguesa-siempre": {
         "name": "Hamburguesa de Sempre",
-        "description": "Vedella, enciam, tomàquet, ceba, formatge i maionesa"
+        "description": "Vedella, enciam, tomaca, ceba, formatge i maionesa"
       },
       "hamburguesa-pollo": {
         "name": "Hamburguesa de Pollastre",
-        "description": "Cuixa de pollastre desossada a la graella, enciam, ceba, tomàquet, formatge i maionesa"
+        "description": "Cuixa de pollastre desossada a la graella, enciam, ceba, tomaca, formatge i maionesa"
       },
       "hamburguesa-sepia": {
         "name": "Hamburguesa de Sípia"
       },
       "hamburguesa-vegana": {
         "name": "Hamburguesa Vegana",
-        "description": "Filet vegetal, enciam, tomàquet, ceba, alvocat i maionesa vegana"
+        "description": "Filet vegetal, enciam, tomaca, ceba, alvocat i maionesa vegana"
       },
       "secreto-cerdo": {
         "name": "Secret de Porc"

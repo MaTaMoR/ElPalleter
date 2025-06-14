@@ -16,7 +16,7 @@ export function getI18nInfo(Astro) {
   const localeMatch = cleanPath.match(/^\/([a-z]{2})(\/.*)?$/);
   if (localeMatch) {
     const [, detectedLocale, restOfPath] = localeMatch;
-    if (['es', 'en', 'ca'].includes(detectedLocale)) {
+    if (['es', 'en', 'val'].includes(detectedLocale)) {
       cleanPath = restOfPath || '/';
     }
   }

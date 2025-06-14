@@ -15,27 +15,6 @@ const {
     dir = "ltr", 
     ogImage = "/images/og-image.svg"
 } = Astro.props;
-
-// 🔧 FUNCIÓN HELPER PARA URL ABSOLUTA
-function getAbsoluteUrl(path, baseUrl) {
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path;
-  }
-  
-  if (!baseUrl) {
-    return path;
-  }
-  
-  try {
-    return new URL(path, baseUrl).toString();
-  } catch (error) {
-    console.warn('Error construyendo URL absoluta:', error);
-    return path;
-  }
-}
-
-// URL canónica base
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -51,14 +30,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content={getAbsoluteUrl(ogImage, Astro.site)} />
+        <meta property="og:image" content={new URL(ogImage, Astro.site)} />
         <meta property="og:site_name" content="El Palleter" />
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={getAbsoluteUrl(ogImage, Astro.site)} />
+        <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
         
         <!-- Slot para contenido específico de página (SEO multiidioma, hreflang, etc.) -->
         <slot name="head" />

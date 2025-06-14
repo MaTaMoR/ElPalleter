@@ -1,5 +1,8 @@
 ---
+// src/components/public/MobileSidebar.astro - ACTUALIZADO con Language Picker
 import logoBlanco from '../../assets/logo-blanco.svg';
+import LanguagePicker from '../i18n/LanguagePicker.astro';
+import Text from '../i18n/Text.astro';
 ---
 
 <!-- Fullscreen Overlay Menu -->
@@ -22,12 +25,22 @@ import logoBlanco from '../../assets/logo-blanco.svg';
             <!-- Navegación del overlay -->
             <nav class="overlay-nav">
                 <ul>
-                    <li><a href="#hero" data-delay="0" data-nav="inicio">INICIO</a></li>
-                    <li><a href="#historia" data-delay="100" data-nav="historia">HISTORIA</a></li>
-                    <li><a href="#carta" data-delay="200" data-nav="carta">CARTA</a></li>
-                    <li><a href="#contacto" data-delay="300" data-nav="contacto">CONTACTO</a></li>
+                    <li><a href="#hero" data-delay="0" data-nav="inicio"><Text key="nav.home"/></a></li>
+                    <li><a href="#historia" data-delay="100" data-nav="historia"><Text key="nav.story"/></a></li>
+                    <li><a href="#carta" data-delay="200" data-nav="carta"><Text key="nav.menu"/></a></li>
+                    <li><a href="#contacto" data-delay="300" data-nav="contacto"><Text key="nav.contact"/></a></li>
                 </ul>
             </nav>
+            
+            <!-- 🔥 NUEVO: Language Picker para el menú móvil -->
+            <div class="mobile-language-section">
+                <div class="mobile-language-title">
+                    <Text key="nav.language" fallback="Idioma" />
+                </div>
+                <div class="mobile-language-picker">
+                    <LanguagePicker variant="mobile" className="sidebar-language" />
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -96,7 +109,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
     /* Container izquierdo */
     .left-content {
         position: absolute;
-        top: 1.25rem; /* 20px - para alinear con el header de 100px */
+        top: 1.25rem;
         left: 3rem;
         display: flex;
         flex-direction: column;
@@ -109,8 +122,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         opacity: 0;
         transform: translateX(-30px);
         transition: all 0.6s ease;
-        /* Ajustar para que coincida con la altura del logo del nav */
-        margin-top: 0.5rem; /* Pequeño ajuste fino */
+        margin-top: 0.5rem;
     }
     
     .fullscreen-menu.active .overlay-logo {
@@ -154,7 +166,6 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         font-weight: 600;
         letter-spacing: 1px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        /* Transiciones específicas solo para propiedades de hover */
         transition: background-color 0.15s ease, 
                     color 0.15s ease, 
                     text-shadow 0.15s ease,
@@ -163,8 +174,6 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         border-radius: 8px;
         text-transform: uppercase;
         border-left: 3px solid transparent;
-        
-        /* Animación inicial - desde la derecha */
         opacity: 0;
         transform: translateX(50px);
     }
@@ -193,14 +202,12 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         transition-delay: 0.7s;
     }
     
-    /* Hover con transición específica para transform */
     .overlay-nav a:hover {
         background: rgba(255, 255, 255, 0.08);
         transform: translateY(-1px);
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         color: white;
         border-left-color: transparent;
-        /* Transición específica solo para el transform del hover */
         transition: background-color 0.15s ease, 
                     color 0.15s ease, 
                     text-shadow 0.15s ease,
@@ -208,15 +215,75 @@ import logoBlanco from '../../assets/logo-blanco.svg';
                     transform 0.15s ease;
     }
     
+    /* 🔥 NUEVO: Sección de idiomas en mobile */
+    .mobile-language-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(244, 162, 97, 0.3);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s ease;
+    }
+    
+    .fullscreen-menu.active .mobile-language-section {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.8s;
+    }
+    
+    .mobile-language-title {
+        color: rgba(244, 162, 97, 0.9);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .mobile-language-picker {
+        /* El componente LanguagePicker maneja sus propios estilos */
+    }
+    
+    /* 🔥 NUEVO: Estilos específicos para el language picker en sidebar */
+    .mobile-language-picker :global(.language-picker.sidebar-language) {
+        width: 100%;
+    }
+    
+    .mobile-language-picker :global(.language-picker.sidebar-language .lang-current) {
+        width: 100%;
+        justify-content: flex-start;
+        background: rgba(244, 162, 97, 0.1);
+        border-color: rgba(244, 162, 97, 0.5);
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+    }
+    
+    .mobile-language-picker :global(.language-picker.sidebar-language .lang-options) {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(244, 162, 97, 0.05);
+        border: 1px solid rgba(244, 162, 97, 0.2);
+        margin-top: 0.5rem;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+    }
+    
+    .mobile-language-picker :global(.language-picker.sidebar-language[data-open="true"] .lang-options) {
+        display: block;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
         .left-content {
-            top: 1rem; /* Ajuste para móvil */
+            top: 1rem;
             left: 2rem;
         }
         
         .overlay-logo {
-            margin-top: 0.25rem; /* Ajuste fino para móvil */
+            margin-top: 0.25rem;
         }
         
         .overlay-logo img {
@@ -245,7 +312,7 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         
         .overlay-logo {
             margin-bottom: 2rem;
-            margin-top: 0.25rem; /* Mantener ajuste fino */
+            margin-top: 0.25rem;
         }
         
         .overlay-logo img {
@@ -253,8 +320,12 @@ import logoBlanco from '../../assets/logo-blanco.svg';
         }
         
         .left-content {
-            top: 0.75rem; /* Ajuste adicional para pantallas muy pequeñas */
+            top: 0.75rem;
             left: 1.5rem;
+        }
+        
+        .mobile-language-title {
+            font-size: 0.9rem;
         }
     }
 </style>

@@ -5,7 +5,8 @@
     "home": "Home",
     "menu": "Menu",
     "story": "Story",
-    "contact": "Contact"
+    "contact": "Contact",
+    "language": "Language"  
   },
   "hero": {
     "menu": "View Menu"

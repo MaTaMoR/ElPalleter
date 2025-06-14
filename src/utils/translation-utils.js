@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Configuración
-const LOCALES = ['es', 'en', 'ca'];
+const LOCALES = ['es', 'en', 'val'];
 const DEFAULT_LOCALE = 'es';
 const TRANSLATIONS_DIR = path.join(__dirname, '../i18n/translations');
 

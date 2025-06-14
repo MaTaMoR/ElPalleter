@@ -1,4 +1,5 @@
 import { translationManager, LOCALES, DEFAULT_LOCALE } from '../utils/translation-utils.js';
+import { LANGUAGE_CONFIG } from '../utils/language-config.js';
 
 /**
  * Configuración de internacionalización para Astro
@@ -145,31 +146,7 @@ class I18nConfig {
    * @returns {Object}
    */
   getLocaleInfo(locale) {
-    const localeData = {
-      es: {
-        code: 'es',
-        name: 'Español',
-        nativeName: 'Español',
-        flag: '🇪🇸',
-        direction: 'ltr'
-      },
-      ca: {
-        code: 'ca',
-        name: 'Catalan',
-        nativeName: 'Català',
-        flag: '🏴󠁥󠁳󠁣󠁴󠁿',
-        direction: 'ltr'
-      },
-      en: {
-        code: 'en',
-        name: 'English',
-        nativeName: 'English',
-        flag: '🇬🇧',
-        direction: 'ltr'
-      }
-    };
-
-    return localeData[locale] || localeData[this.defaultLocale];
+    return LANGUAGE_CONFIG[locale] || LANGUAGE_CONFIG[this.defaultLocale];
   }
 
   /**

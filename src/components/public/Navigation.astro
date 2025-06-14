@@ -1,7 +1,8 @@
 ---
+// src/components/public/Navigation.astro - ACTUALIZADO con Language Picker
 import epLogo from '../../assets/mini-logo.svg';
-
 import Text from '../i18n/Text.astro';
+import LanguagePicker from '../i18n/LanguagePicker.astro';
 import { getI18nInfo, localizeUrl, getAlternateUrls } from '../../utils/astro-i18n-utils.js';
 
 // Obtener información de i18n usando el nuevo sistema
@@ -34,6 +35,10 @@ const localizedUrls = {
         </li>
         <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
         <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
+        <!-- 🔥 NUEVO: Language Picker para Desktop -->
+        <li class="language-item">
+            <LanguagePicker variant="desktop" />
+        </li>
     </ul>
     
     <!-- Logo solo para móvil -->
@@ -41,6 +46,11 @@ const localizedUrls = {
         <a href="#hero" aria-label="Ir a inicio - El Palleter">
             <img src={epLogo.src} alt="El Palleter Logo" />
         </a>
+    </div>
+    
+    <!-- 🔥 NUEVO: Language Picker para Mobile (solo visible en móvil) -->
+    <div class="language-mobile">
+        <LanguagePicker variant="mobile" />
     </div>
 </nav>
 
@@ -98,8 +108,17 @@ const localizedUrls = {
         transform: scale(1.03);
     }
     
+    /* 🔥 NUEVO: Language Picker Mobile */
+    .language-mobile {
+        display: none;
+        position: absolute;
+        right: 1rem;
+        z-index: 102;
+    }
+    
     /* Nav Desktop */
     .nav-desktop {
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -110,7 +129,7 @@ const localizedUrls = {
     }
     
     /* Estilo para items de navegación normales */
-    .nav-desktop li:not(.logo-item) a {
+    .nav-desktop li:not(.logo-item):not(.language-item) a {
         text-decoration: none;
         font-size: 1.1rem;
         font-weight: 600;
@@ -127,14 +146,14 @@ const localizedUrls = {
         cursor: pointer;
     }
     
-    .nav-desktop li:not(.logo-item) a:hover {
+    .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
         background: rgba(255, 255, 255, 0.08);
         transform: translateY(-1px);
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
     }
     
     /* Indicador de sección activa */
-    .nav-desktop li:not(.logo-item) a.active {
+    .nav-desktop li:not(.logo-item):not(.language-item) a.active {
         background: rgba(244, 162, 97, 0.2);
         color: #f4a261;
     }
@@ -165,6 +184,16 @@ const localizedUrls = {
         transform: scale(1.03);
     }
     
+    /* 🔥 NUEVO: Estilo para el item del language picker */
+    .language-item {
+        position: absolute;
+        right: -10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 0.5rem;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
         .hamburger {
@@ -179,6 +208,11 @@ const localizedUrls = {
             display: block;
         }
         
+        /* 🔥 NUEVO: Mostrar language picker mobile */
+        .language-mobile {
+            display: block;
+        }
+        
         nav {
             padding: 0 1rem;
         }
@@ -187,6 +221,11 @@ const localizedUrls = {
     @media (max-width: 480px) {
         .logo-mobile {
             height: 80px;
+        }
+        
+        /* Ajustar posición en pantallas muy pequeñas */
+        .language-mobile {
+            right: 0.5rem;
         }
     }
 </style>
