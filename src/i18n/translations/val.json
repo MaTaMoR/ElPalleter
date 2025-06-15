@@ -229,5 +229,65 @@
       "caption": "En un bon menjar no pot faltar un bon postre",
       "title": "Delicioses postres casolanes"
     }
+  },
+  "contact": {
+    "brand": {
+      "name": "El Palleter"
+    },
+    "sections": {
+      "address": "Ubicació",
+      "phone": "Contacte",
+      "hours": "Horaris",
+      "social": "Segueix-nos"
+    },
+    "fields": {
+      "address": "Adreça", 
+      "phone": "Telèfon",
+      "email": "Email",
+      "website": "Web",
+      "lunch": "Dinars",
+      "dinner": "Sopars",
+      "days": "Dies"
+    },
+    "values": {
+      "allDays": "Dilluns a Diumenge",
+      "reservations": "Reserves i consultes",
+      "followUs": "Mantín-te al dia amb les nostres novetats"
+    },
+    "status": {
+      "open": "Obert ara",
+      "closed": "Tancat", 
+      "closedToday": "Tancat hui",
+      "closingSoon": "Tancant en {{minutes}} min",
+      "openingSoon": "Obrint a les {{time}}",
+      "openingToday": "Hui a les {{time}}",
+      "openingOn": "{{day}} a les {{time}}",
+      "nextOpening": "Pròxima obertura: {{time}}",
+      "checkSchedule": "Consultar horaris"
+    },
+    "days": {
+      "monday": "Dilluns",
+      "tuesday": "Dimarts",
+      "wednesday": "Dimecres",
+      "thursday": "Dijous", 
+      "friday": "Divendres",
+      "saturday": "Dissabte",
+      "sunday": "Diumenge"
+    },
+    "actions": {
+      "viewMap": "Vore Mapa",
+      "call": "Trucar",
+      "reserve": "Reservar",
+      "write": "Escriure",
+      "follow": "Seguir"
+    },
+    "accessibility": {
+      "currentLanguage": "Idioma actual: {{language}}",
+      "changeLanguage": "Canviar a {{language}}",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "twitter": "Twitter",
+      "whatsapp": "WhatsApp"
+    }
   }
 }

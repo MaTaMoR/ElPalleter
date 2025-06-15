@@ -229,5 +229,65 @@
       "caption": "A good meal cannot miss a good dessert",
       "title": "Delicious homemade desserts"
     }
+  },
+  "contact": {
+    "brand": {
+      "name": "El Palleter"
+    },
+    "sections": {
+      "address": "Location",
+      "phone": "Contact",
+      "hours": "Hours", 
+      "social": "Follow Us"
+    },
+    "fields": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email", 
+      "website": "Website",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "days": "Days"
+    },
+    "values": {
+      "allDays": "Monday to Sunday",
+      "reservations": "Reservations and inquiries",
+      "followUs": "Stay updated with our latest news"
+    },
+    "status": {
+      "open": "Open now",
+      "closed": "Closed",
+      "closedToday": "Closed today",
+      "closingSoon": "Closing in {{minutes}} min", 
+      "openingSoon": "Opening at {{time}}",
+      "openingToday": "Today at {{time}}",
+      "openingOn": "{{day}} at {{time}}",
+      "nextOpening": "Next opening: {{time}}",
+      "checkSchedule": "Check schedule"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday", 
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "actions": {
+      "viewMap": "View Map",
+      "call": "Call",
+      "reserve": "Reserve",
+      "write": "Write", 
+      "follow": "Follow"
+    },
+    "accessibility": {
+      "currentLanguage": "Current language: {{language}}",
+      "changeLanguage": "Change to {{language}}",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "twitter": "Twitter", 
+      "whatsapp": "WhatsApp"
+    }
   }
 }

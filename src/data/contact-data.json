@@ -1,0 +1,87 @@
+{
+  "restaurant": {
+    "name": "El Palleter",
+    "brandKey": "contact.brand.name",
+    "type": "restaurant"
+  },
+  "contact": {
+    "address": {
+      "street": "Calle Mediterránea, 15",
+      "city": "Torrevieja",
+      "province": "Alicante",
+      "postalCode": "03182",
+      "country": "España"
+    },
+    "phone": {
+      "main": "+34 965 123 456",
+      "reservations": "+34 965 123 456"
+    },
+    "email": {
+      "main": "info@elpalleter.com",
+      "reservations": "reservas@elpalleter.com"
+    },
+    "website": "https://elpalleter.com"
+  },
+  "hours": {
+    "lunch": {
+      "start": "12:00",
+      "end": "16:00"
+    },
+    "dinner": {
+      "start": "19:00", 
+      "end": "23:30"
+    },
+    "schedule": {
+      "monday": { "open": true, "lunch": true, "dinner": true },
+      "tuesday": { "open": false, "lunch": false, "dinner": false },
+      "wednesday": { "open": true, "lunch": true, "dinner": true },
+      "thursday": { "open": true, "lunch": true, "dinner": true },
+      "friday": { "open": true, "lunch": true, "dinner": true },
+      "saturday": { "open": true, "lunch": true, "dinner": true },
+      "sunday": { "open": true, "lunch": true, "dinner": true }
+    },
+    "exceptions": []
+  },
+  "social": {
+    "facebook": {
+      "url": "https://facebook.com/elpalleter",
+      "handle": "@elpalleter",
+      "icon": "📘",
+      "enabled": true
+    },
+    "instagram": {
+      "url": "https://instagram.com/elpalleter", 
+      "handle": "@elpalleter",
+      "icon": "📷",
+      "enabled": true
+    },
+    "twitter": {
+      "url": "https://twitter.com/elpalleter",
+      "handle": "@elpalleter", 
+      "icon": "🐦",
+      "enabled": true
+    },
+    "whatsapp": {
+      "url": "https://wa.me/34965123456",
+      "phone": "+34 965 123 456",
+      "icon": "💬",
+      "enabled": true
+    }
+  },
+  "status": {
+    "defaultStatus": "open",
+    "checkRealTime": true,
+    "timeZone": "Europe/Madrid"
+  },
+  "config": {
+    "showLogo": true,
+    "showStatus": true,
+    "showSocial": true,
+    "enableHoverEffects": true,
+    "responsiveBreakpoints": {
+      "mobile": 768,
+      "tablet": 1024,
+      "desktop": 1400
+    }
+  }
+}

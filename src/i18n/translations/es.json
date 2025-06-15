@@ -229,5 +229,65 @@
       "caption": "En una buena comida no puede faltar un buen postre",
       "title": "Deliciosos postres caseros"
     }
+  },
+  "contact": {
+    "brand": {
+      "name": "El Palleter"
+    },
+    "sections": {
+      "address": "Dirección",
+      "phone": "Contacto", 
+      "hours": "Horarios",
+      "social": "Síguenos"
+    },
+    "fields": {
+      "address": "Dirección",
+      "phone": "Teléfono",
+      "email": "Email",
+      "website": "Web",
+      "lunch": "Comidas",
+      "dinner": "Cenas",
+      "days": "Días"
+    },
+    "values": {
+      "allDays": "Lunes a Domingo",
+      "reservations": "Reservas y consultas",
+      "followUs": "Mantente al día con nuestras novedades"
+    },
+    "status": {
+      "open": "Abierto ahora",
+      "closed": "Cerrado",
+      "closedToday": "Cerrado hoy",
+      "closingSoon": "Cerrando en {{minutes}} min",
+      "openingSoon": "Abriendo a las {{time}}",
+      "openingToday": "Hoy a las {{time}}",
+      "openingOn": "{{day}} a las {{time}}",
+      "nextOpening": "Próxima apertura: {{time}}",
+      "checkSchedule": "Consultar horarios"
+    },
+    "days": {
+      "monday": "Lunes",
+      "tuesday": "Martes", 
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    },
+    "actions": {
+      "viewMap": "Ver Mapa",
+      "call": "Llamar",
+      "reserve": "Reservar", 
+      "write": "Escribir",
+      "follow": "Seguir"
+    },
+    "accessibility": {
+      "currentLanguage": "Idioma actual: {{language}}",
+      "changeLanguage": "Cambiar a {{language}}",
+      "facebook": "Facebook",
+      "instagram": "Instagram", 
+      "twitter": "Twitter",
+      "whatsapp": "WhatsApp"
+    }
   }
 }

@@ -1,0 +1,538 @@
+---
+import Text from '../i18n/Text.astro';
+import contactData from '../../data/contact-data.json';
+import { i18nCore } from '../../i18n/core.js';
+
+// Obtener información de i18n
+const { locale } = i18nCore.getI18nInfo(Astro);
+
+// Función helper para obtener el estado del restaurante
+function getRestaurantStatus() {
+    // Por ahora retornamos "open", pero aquí se podría integrar 
+    // lógica para verificar horarios reales
+    return contactData.status.defaultStatus;
+}
+
+// Formatear dirección completa
+function getFullAddress() {
+    const addr = contactData.contact.address;
+    return `${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.province}`;
+}
+
+// Obtener redes sociales habilitadas
+function getEnabledSocials() {
+    return Object.entries(contactData.social)
+        .filter(([_, social]) => social.enabled)
+        .map(([key, social]) => ({ key, ...social }));
+}
+
+const currentStatus = getRestaurantStatus();
+const fullAddress = getFullAddress();
+const socialNetworks = getEnabledSocials();
+---
+
+<section class="contact-section" id="contacto">
+    <div class="contact-container container">
+        <!-- Componente de Contacto Combinado -->
+        <div class="contact-component">
+            <!-- Cabecera con Status -->
+            <div class="top-bar">
+                <div class="mini-brand">
+                    {contactData.config.showLogo && (
+                        <div class="logo-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 55" width="45" height="32">
+                                <defs>
+                                    <clipPath id="topHalf">
+                                        <rect x="0" y="0" width="80" height="27"/>
+                                    </clipPath>
+                                    <clipPath id="bottomHalf">
+                                        <rect x="0" y="33" width="80" height="24"/>
+                                    </clipPath>
+                                </defs>
+                                <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#D4A574" clip-path="url(#topHalf)">E</text>
+                                <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#D4A574" clip-path="url(#topHalf)">P</text>
+                                <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#D4A574" clip-path="url(#bottomHalf)">E</text>
+                                <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#D4A574" clip-path="url(#bottomHalf)">P</text>
+                                <line x1="0" y1="30" x2="80" y2="30" stroke="#FF4500" stroke-width="1"/>
+                            </svg>
+                        </div>
+                    )}
+                    <span class="brand-text">
+                        <Text key="contact.brand.name" fallback={contactData.restaurant.name} />
+                    </span>
+                </div>
+                {contactData.config.showStatus && (
+                    <div class={`status status-${currentStatus}`} id="restaurantStatus">
+                        <div class="status-dot"></div>
+                        <span id="statusText">
+                            <Text key={`contact.status.${currentStatus}`} fallback="Estado desconocido" />
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            <!-- Contenido de Contacto -->
+            <div class="contact-content">
+                <div class="contact-grid">
+                    <!-- Sección de Dirección -->
+                    <div class="contact-section">
+                        <h4>
+                            📍 <Text key="contact.sections.address" fallback="Dirección" />
+                        </h4>
+                        <p>{contactData.contact.address.street}</p>
+                        <p>{contactData.contact.address.postalCode} {contactData.contact.address.city}</p>
+                        <p>{contactData.contact.address.province}, {contactData.contact.address.country}</p>
+                    </div>
+
+                    <!-- Sección de Contacto -->
+                    <div class="contact-section">
+                        <h4>
+                            📞 <Text key="contact.sections.phone" fallback="Contacto" />
+                        </h4>
+                        <p>
+                            <strong><Text key="contact.fields.phone" fallback="Teléfono" />:</strong> 
+                            <a href={`tel:${contactData.contact.phone.main}`}>{contactData.contact.phone.main}</a>
+                        </p>
+                        <p>
+                            <strong><Text key="contact.fields.email" fallback="Email" />:</strong> 
+                            <a href={`mailto:${contactData.contact.email.main}`}>{contactData.contact.email.main}</a>
+                        </p>
+                        <p>
+                            <strong><Text key="contact.fields.website" fallback="Web" />:</strong> 
+                            <a href={contactData.contact.website} target="_blank" rel="noopener">elpalleter.com</a>
+                        </p>
+                    </div>
+
+                    <!-- Sección de Horarios -->
+                    <div class="contact-section">
+                        <h4>
+                            🕒 <Text key="contact.sections.hours" fallback="Horarios" />
+                        </h4>
+                        <p>
+                            <strong><Text key="contact.fields.lunch" fallback="Comidas" />:</strong> 
+                            {contactData.hours.lunch.start} - {contactData.hours.lunch.end}
+                        </p>
+                        <p>
+                            <strong><Text key="contact.fields.dinner" fallback="Cenas" />:</strong> 
+                            {contactData.hours.dinner.start} - {contactData.hours.dinner.end}
+                        </p>
+                        <p>
+                            <strong><Text key="contact.fields.days" fallback="Días" />:</strong> 
+                            <Text key="contact.values.allDays" fallback="Lunes a Domingo" />
+                        </p>
+                    </div>
+
+                    <!-- Sección de Redes Sociales -->
+                    {contactData.config.showSocial && (
+                        <div class="contact-section">
+                            <h4>
+                                🌐 <Text key="contact.sections.social" fallback="Síguenos" />
+                            </h4>
+                            <p>
+                                <Text key="contact.values.followUs" fallback="Mantente al día con nuestras novedades" />
+                            </p>
+                            <div class="social-links">
+                                {socialNetworks.map((social) => (
+                                    <a 
+                                        href={social.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        title={social.handle}
+                                        aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
+                                    >
+                                        {social.icon}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* === CONTACT SECTION BASE === */
+    .contact-section {
+        width: 100%;
+        background: rgb(20, 20, 20);
+        /* Mobile base - usando variables globales */
+        padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2.5) 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Efecto de partículas de fondo */
+    .contact-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+                          radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px);
+        background-size: 120px 120px, 150px 150px, 100px 100px;
+        opacity: 0.15;
+        animation: float 25s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px); }
+        25% { transform: translateY(-15px) translateX(5px); }
+        50% { transform: translateY(-25px) translateX(-10px); }
+        75% { transform: translateY(-10px) translateX(8px); }
+    }
+
+    .contact-container {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* === COMPONENTE PRINCIPAL === */
+    .contact-component {
+        background: #2a2a2a;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 2px solid #D4A574;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* === CABECERA CON STATUS === */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #333;
+        padding: calc(var(--padding-mobile) * 1.25) calc(var(--padding-mobile) * 1.5);
+        border-bottom: 1px solid rgba(212, 165, 116, 0.3);
+    }
+
+    .mini-brand {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--gap-mobile) * 0.75);
+    }
+
+    .logo-container {
+        width: 45px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-container svg {
+        width: 45px;
+        height: 32px;
+    }
+
+    .brand-text {
+        color: #D4A574;
+        font-size: 1.3rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+
+    /* === STATUS INDICATOR === */
+    .status {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        padding: calc(var(--padding-mobile) * 0.5) calc(var(--padding-mobile) * 1);
+        border-radius: 20px;
+        font-size: 0.9rem;
+        border: 1px solid #4CAF50;
+        display: flex;
+        align-items: center;
+        gap: calc(var(--gap-mobile) * 0.5);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #4CAF50;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    /* Estados del status */
+    .status.status-closed {
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+        border-color: #f44336;
+    }
+
+    .status.status-closed .status-dot {
+        background: #f44336;
+    }
+
+    .status.status-closingSoon {
+        background: rgba(255, 193, 7, 0.2);
+        color: #FFC107;
+        border-color: #FFC107;
+    }
+
+    .status.status-closingSoon .status-dot {
+        background: #FFC107;
+    }
+
+    /* === CONTENIDO DE CONTACTO === */
+    .contact-content {
+        padding: calc(var(--padding-mobile) * 2.5);
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: calc(var(--gap-mobile) * 2);
+    }
+
+    /* === SECCIONES DE INFORMACIÓN === */
+    .contact-section {
+        padding: calc(var(--padding-mobile) * 1.25);
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+    .contact-section h4 {
+        color: #D4A574;
+        font-size: 1.3rem;
+        margin-bottom: calc(var(--gap-mobile) * 0.9);
+        border-bottom: 2px solid #D4A574;
+        padding-bottom: calc(var(--padding-mobile) * 0.5);
+        display: flex;
+        align-items: center;
+        gap: calc(var(--gap-mobile) * 0.6);
+    }
+
+    .contact-section p {
+        color: #ccc;
+        margin-bottom: calc(var(--gap-mobile) * 0.75);
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .contact-section p:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-section strong {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Enlaces */
+    .contact-section a {
+        color: #D4A574;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .contact-section a:hover {
+        color: #fff;
+        text-decoration: underline;
+    }
+
+    /* === REDES SOCIALES === */
+    .social-links {
+        display: flex;
+        gap: calc(var(--gap-mobile) * 0.75);
+        margin-top: calc(var(--gap-mobile) * 0.9);
+    }
+
+    .social-links a {
+        background: rgba(212, 165, 116, 0.2);
+        color: #D4A574;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 18px;
+    }
+
+    .social-links a:hover {
+        background: #D4A574;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+    }
+
+    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
+
+    /* TABLET Y SUPERIOR (768px+) */
+    @media (min-width: 768px) {
+        .contact-section {
+            padding: calc(var(--padding-tablet) * 2.5) 0 calc(var(--padding-tablet) * 1.67) 0;
+        }
+
+        .top-bar {
+            padding: calc(var(--padding-tablet) * 1) calc(var(--padding-tablet) * 1.2);
+        }
+
+        .mini-brand {
+            gap: var(--gap-tablet);
+        }
+
+        .contact-content {
+            padding: calc(var(--padding-tablet) * 2);
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: calc(var(--gap-tablet) * 1.33);
+        }
+
+        .contact-section {
+            padding: calc(var(--padding-tablet) * 1);
+        }
+
+        .contact-section h4 {
+            margin-bottom: var(--gap-tablet);
+            padding-bottom: calc(var(--padding-tablet) * 0.5);
+            gap: calc(var(--gap-tablet) * 0.5);
+        }
+
+        .contact-section p {
+            margin-bottom: calc(var(--gap-tablet) * 0.67);
+        }
+
+        .social-links {
+            gap: var(--gap-tablet);
+            margin-top: var(--gap-tablet);
+        }
+    }
+
+    /* DESKTOP (1024px+) */
+    @media (min-width: 1024px) {
+        .contact-section {
+            padding: calc(var(--padding-desktop) * 2) 0 calc(var(--padding-desktop) * 1.33) 0;
+        }
+
+        .top-bar {
+            padding: calc(var(--padding-desktop) * 0.8) calc(var(--padding-desktop) * 1);
+        }
+
+        .mini-brand {
+            gap: var(--gap-desktop);
+        }
+
+        .contact-content {
+            padding: calc(var(--padding-desktop) * 1.33);
+        }
+
+        .contact-grid {
+            gap: var(--gap-desktop);
+        }
+
+        .contact-section {
+            padding: calc(var(--padding-desktop) * 0.8);
+        }
+
+        .contact-section h4 {
+            margin-bottom: calc(var(--gap-desktop) * 0.67);
+            padding-bottom: calc(var(--padding-desktop) * 0.33);
+            gap: calc(var(--gap-desktop) * 0.5);
+        }
+
+        .contact-section p {
+            margin-bottom: calc(var(--gap-desktop) * 0.5);
+        }
+
+        .social-links {
+            gap: var(--gap-desktop);
+            margin-top: calc(var(--gap-desktop) * 0.67);
+        }
+    }
+
+    /* DESKTOP LARGE (1400px+) */
+    @media (min-width: 1400px) {
+        .mini-brand {
+            gap: var(--gap-desktop-lg);
+        }
+
+        .contact-grid {
+            gap: var(--gap-desktop-lg);
+        }
+
+        .social-links {
+            gap: var(--gap-desktop-lg);
+        }
+    }
+
+    /* MOBILE PEQUEÑO (0-420px) */
+    @media (max-width: 420px) {
+        .contact-section {
+            padding: calc(var(--padding-mobile) * 4) 0 calc(var(--padding-mobile) * 1.5) 0;
+        }
+
+        .top-bar {
+            flex-direction: column;
+            gap: calc(var(--gap-mobile) * 0.75);
+            text-align: center;
+            padding: var(--padding-mobile);
+        }
+
+        .contact-content {
+            padding: calc(var(--padding-mobile) * 1.5);
+        }
+
+        .contact-grid {
+            gap: var(--gap-mobile);
+        }
+
+        .contact-section {
+            padding: calc(var(--padding-mobile) * 0.75);
+        }
+
+        .contact-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: calc(var(--gap-mobile) * 0.5);
+        }
+
+        .social-links a {
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+        }
+    }
+</style>
+<script>
+    // VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
+    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const contactSection = document.querySelector('.contact-section');
+        const contactSections = document.querySelectorAll('.contact-section .contact-section');
+        
+        // Usar el sistema centralizado de breakpoints
+        const breakpoints = useBreakpoints('contact-component', {
+            element: contactSection
+        });
+        
+        // Suscribirse a cambios de breakpoint
+        breakpoints.subscribe({
+            onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
+                console.log(`Contact: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
+                
+                // Deshabilitar transiciones durante el cambio
+                const elementsToAdjust = [contactSection, ...contactSections];
+                disableTransitionsDuringResize(elementsToAdjust);
+            }
+        });
+    });
+</script>
