@@ -158,8 +158,55 @@ export class I18nCore {
     }
   }
 
-  getBaseUrl(Astro) {
-    return Astro.site?.toString() || '';
+  // ===============================================
+  // 🌐 NUEVOS MÉTODOS PARA URLS DINÁMICAS
+  // ===============================================
+
+  /**
+   * 🌐 Obtiene la URL base actual de forma dinámica
+   * Prioriza Astro.url.origin sobre Astro.site para auto-detección
+   */
+  getCurrentOrigin(Astro) {
+    // 1. Usar el origin actual (auto-detecta el dominio)
+    if (Astro?.url?.origin) {
+      return Astro.url.origin;
+    }
+    
+    // 2. Fallback a Astro.site si existe
+    if (Astro?.site) {
+      return Astro.site.toString().replace(/\/$/, '');
+    }
+    
+    // 3. Fallback para desarrollo local
+    return '';
+  }
+
+  /**
+   * 🔗 Genera URL relativa para navegación (SIN dominio)
+   * Perfecto para language picker y navegación interna
+   */
+  getRelativeUrl(path, locale = DEFAULT_LOCALE) {
+    // 🧹 Normalizar path: remover barras al inicio y final
+    let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
+    
+    // 🛡️ Si es locale por defecto, devolver path simple
+    if (locale === DEFAULT_LOCALE) {
+      return cleanPath === '' ? '/' : `/${cleanPath}`;
+    }
+    
+    // 🌍 Para otros locales, añadir prefijo de idioma
+    return cleanPath === '' ? `/${locale}` : `/${locale}/${cleanPath}`;
+  }
+
+  /**
+   * 🌍 Genera URL completa (CON dominio) para SEO/metadatos
+   * Solo cuando realmente necesites el dominio completo
+   */
+  getAbsoluteUrl(path, locale = DEFAULT_LOCALE, Astro) {
+    const origin = this.getCurrentOrigin(Astro);
+    const relativePath = this.getRelativeUrl(path, locale);
+    
+    return origin ? `${origin}${relativePath}` : relativePath;
   }
 
   /**
@@ -355,18 +402,15 @@ export class I18nCore {
   }
 
   /**
-   * 🔗 Construye una URL localizada (maneja strings y objetos URL)
-   * @param {string|URL|null|undefined} path - Ruta a localizar
-   * @param {string} locale - Idioma de destino
-   * @param {string} baseUrl - URL base del sitio
-   * @returns {string} - URL localizada
+   * 🔗 MÉTODO LEGACY - Mantener compatibilidad
+   * @deprecated Usar getRelativeUrl() o getAbsoluteUrl() en su lugar
    */
   localizeUrl(path, locale = DEFAULT_LOCALE, baseUrl = '') {
     // 🧹 Normalizar path: remover barras al inicio y final
-    let cleanPath = path.replace(/^\/+|\/+$/g, '');
+    let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
     
     // 🧹 Normalizar baseUrl: remover barra al final si existe
-    let cleanBaseUrl = baseUrl.replace(/\/+$/, '');
+    let cleanBaseUrl = baseUrl?.replace(/\/+$/, '') || '';
     
     // 🛡️ Si es locale por defecto, devolver path simple
     if (locale === DEFAULT_LOCALE) {
@@ -385,12 +429,17 @@ export class I18nCore {
 
   /**
    * 🌍 Obtiene todas las variantes de URL para diferentes idiomas
+   * ACTUALIZADO: Ahora usa URLs relativas por defecto
    */
-  getAlternateUrls(path, baseUrl = '') {
+  getAlternateUrls(path, Astro = null, absolute = false) {
     const urls = {};
 
     LOCALES.forEach(locale => {
-      urls[locale] = this.localizeUrl(path, locale, baseUrl);
+      if (absolute && Astro) {
+        urls[locale] = this.getAbsoluteUrl(path, locale, Astro);
+      } else {
+        urls[locale] = this.getRelativeUrl(path, locale);
+      }
     });
 
     return urls;
@@ -466,7 +515,7 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🔧 HELPERS PARA ASTRO
+  // 🔧 HELPERS PARA ASTRO - ACTUALIZADOS
   // ===============================================
 
   /**
@@ -501,30 +550,37 @@ export class I18nCore {
 
   /**
    * 🔗 Helper para generar enlaces localizados con Astro
+   * ACTUALIZADO: Ahora soporta URLs relativas y absolutas
    */
-  localizeUrlWithAstro(path, targetLocale = null, Astro) {
+  localizeUrlWithAstro(path, targetLocale = null, Astro, absolute = false) {
     const { locale: currentLocale } = this.getI18nInfo(Astro);
     const locale = targetLocale || currentLocale;
 
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    return this.localizeUrl(cleanPath, locale, this.getBaseUrl(Astro));
+    const cleanPath = path?.startsWith('/') ? path : `/${path || ''}`;
+    
+    if (absolute) {
+      return this.getAbsoluteUrl(cleanPath, locale, Astro);
+    } else {
+      return this.getRelativeUrl(cleanPath, locale);
+    }
   }
 
   /**
    * 🌐 Helper para obtener URLs alternativas con Astro
+   * ACTUALIZADO: Soporta URLs relativas por defecto
    */
-  getAlternateUrlsWithAstro(Astro) {
+  getAlternateUrlsWithAstro(Astro, absolute = false) {
     const { cleanPath } = this.getI18nInfo(Astro);
-
-    return this.getAlternateUrls(cleanPath, this.getBaseUrl(Astro));
+    return this.getAlternateUrls(cleanPath, Astro, absolute);
   }
 
   /**
    * 🔄 Helper para cambiar idioma manteniendo la misma página
+   * ACTUALIZADO: URLs relativas por defecto
    */
-  switchLanguageUrl(targetLocale, Astro) {
+  switchLanguageUrl(targetLocale, Astro, absolute = false) {
     const { cleanPath } = this.getI18nInfo(Astro);
-    return this.localizeUrlWithAstro(cleanPath, targetLocale, Astro);
+    return this.localizeUrlWithAstro(cleanPath, targetLocale, Astro, absolute);
   }
 
   /**
@@ -583,20 +639,23 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🎨 LANGUAGE PICKER
+  // 🎨 LANGUAGE PICKER - ACTUALIZADO PARA URLS RELATIVAS
   // ===============================================
 
   /**
    * 🎨 Genera datos para el language picker con Astro
+   * ACTUALIZADO: Usa URLs relativas que funcionan en cualquier dominio
    */
-  getLanguagePickerData(currentLocale, currentPath, baseUrl = '') {
+  getLanguagePickerData(currentLocale, currentPath, absolute = false, Astro = null) {
     return this.languages.map(lang => ({
       code: lang.code,
       name: lang.name,
       nativeName: lang.nativeName,
       shortName: lang.shortName,
       flag: FlagRenderer.getFlagElement(lang.flag),
-      url: this.localizeUrl(currentPath, lang.code, baseUrl),
+      url: absolute && Astro 
+        ? this.getAbsoluteUrl(currentPath, lang.code, Astro)
+        : this.getRelativeUrl(currentPath, lang.code),
       isActive: lang.code === currentLocale,
       direction: lang.direction
     }));
@@ -604,23 +663,24 @@ export class I18nCore {
 
   /**
    * 🎨 Helper conveniente para language picker con Astro
+   * ACTUALIZADO: URLs relativas por defecto
    */
-  getLanguagePickerDataWithAstro(Astro) {
+  getLanguagePickerDataWithAstro(Astro, absolute = false) {
     const { locale, cleanPath } = this.getI18nInfo(Astro);
-
-    return this.getLanguagePickerData(locale, cleanPath, this.getBaseUrl(Astro));
+    return this.getLanguagePickerData(locale, cleanPath, absolute, Astro);
   }
 
   // ===============================================
-  // 🏗️ SEO Y METADATOS
+  // 🏗️ SEO Y METADATOS - ACTUALIZADOS
   // ===============================================
 
   /**
    * 🏗️ Helper para generar metadatos SEO multiidioma con Astro
+   * ACTUALIZADO: Detecta automáticamente el dominio actual
    */
   getSEOMetadata(pageData, Astro) {
     const { locale, cleanPath } = this.getI18nInfo(Astro);
-    const alternateUrls = this.getAlternateUrlsWithAstro(Astro);
+    const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true); // URLs absolutas para SEO
 
     // Obtener traducciones básicas
     const siteTitle = this.getTranslation('title', locale) || 'El Palleter';
@@ -628,7 +688,7 @@ export class I18nCore {
 
     const title = pageData.title ? `${pageData.title} | ${siteTitle}` : siteTitle;
     const description = pageData.description || siteDescription;
-    const canonical = `${this.getBaseUrl(Astro)}${this.localizeUrl(cleanPath, locale, '')}`;
+    const canonical = this.getAbsoluteUrl(cleanPath, locale, Astro);
 
     // Generar datos estructurados
     const structuredData = this.generateStructuredData({
@@ -662,16 +722,17 @@ export class I18nCore {
 
   /**
    * 🏗️ Helper para generar JSON-LD estructurado multiidioma
+   * ACTUALIZADO: Detecta automáticamente el dominio
    */
   generateStructuredData(data, Astro) {
     const { locale } = this.getI18nInfo(Astro);
-    const baseUrl = Astro.site || Astro.url.origin;
+    const baseUrl = this.getCurrentOrigin(Astro);
 
     const structuredData = {
       "@context": "https://schema.org",
       "@type": data.type || "WebPage",
       "@language": locale,
-      "url": `${baseUrl}${this.localizeUrl(data.path || '/', locale, '')}`,
+      "url": this.getAbsoluteUrl(data.path || '/', locale, Astro),
       "name": data.nameKey
         ? this.getTranslation(data.nameKey, locale)
         : data.name,
@@ -681,13 +742,13 @@ export class I18nCore {
       "inLanguage": locale,
       "potentialAction": {
         "@type": "ReadAction",
-        "target": `${baseUrl}${this.localizeUrl(data.path || '/', locale, '')}`
+        "target": this.getAbsoluteUrl(data.path || '/', locale, Astro)
       }
     };
 
     // Añadir URLs alternativas
     if (data.includeAlternates !== false) {
-      const alternateUrls = this.getAlternateUrlsWithAstro(Astro);
+      const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true);
       structuredData.alternateName = Object.entries(alternateUrls)
         .filter(([lang]) => lang !== locale)
         .map(([lang, url]) => ({
@@ -807,13 +868,14 @@ export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) 
 
 /**
  * 🌐 Función helper para obtener datos del language picker con Astro
+ * ACTUALIZADO: URLs relativas por defecto
  */
-export async function getLanguagePickerData(Astro) {
+export async function getLanguagePickerData(Astro, absolute = false) {
   if (!i18nCore.loaded) {
     await i18nCore.init();
   }
 
-  return i18nCore.getLanguagePickerDataWithAstro(Astro);
+  return i18nCore.getLanguagePickerDataWithAstro(Astro, absolute);
 }
 
 /**
@@ -836,7 +898,7 @@ export class I18nError extends Error {
     super(message);
     this.name = 'I18nError';
     this.locale = locale;
-    key = key;
+    this.key = key;
   }
 }
 
