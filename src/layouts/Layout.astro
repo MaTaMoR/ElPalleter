@@ -1,5 +1,4 @@
 ---
-// src/layouts/Layout.astro - Layout base con sistema de breakpoints integrado + multiidioma
 export interface Props {
     title: string;
     description?: string;
@@ -15,6 +14,8 @@ const {
     dir = "ltr", 
     ogImage = "/images/og-image.svg"
 } = Astro.props;
+
+import '../styles/breakpoints.css';
 ---
 
 <!DOCTYPE html>
@@ -41,8 +42,6 @@ const {
         
         <!-- Slot para contenido específico de página (SEO multiidioma, hreflang, etc.) -->
         <slot name="head" />
-        
-        <link rel="stylesheet" href="/src/styles/breakpoints.css">
 
         <title>{title}</title>
     </head>
