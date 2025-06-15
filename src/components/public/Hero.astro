@@ -49,8 +49,8 @@ import Text from '../i18n/Text.astro';
 
     .hero-logo {
         /* Mobile base */
-        max-width: 400px;
-        width: 90%;
+        max-width: 650px;
+        width: 100%;
         height: auto;
         margin-bottom: 2rem;
         filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
@@ -181,9 +181,65 @@ import Text from '../i18n/Text.astro';
     }
 
     /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
-    
+
+    /* DESKTOP LARGE (1400px+) */
+    @media (min-width: 1400px) {
+        .hero-footer {
+            gap: var(--gap-desktop);
+            padding-bottom: var(--padding-desktop);
+        }
+
+        .hero-logo {
+            max-width: 650px;
+        }
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-desktop) * 0.45) calc(var(--padding-desktop) * 0.9);
+            font-size: 0.85rem;
+            letter-spacing: 0.8px;
+            margin-top: 0.8rem;
+            max-width: 200px;
+        }
+    }
+
+    /* DESKTOP (1024px+) */
+    @media (min-width: 1024px) and (max-width: 1399px) {
+        .hero-header {
+            padding-top: calc(var(--padding-desktop) * 3.5); /* Equivalente a 100px con sistema */
+            padding-left: var(--padding-desktop);
+            padding-right: var(--padding-desktop);
+        }
+
+        .cta-btn-carta {
+            padding: calc(var(--padding-desktop) * 0.5) calc(var(--padding-desktop) * 1);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+            border-radius: 6px;
+        }
+
+        .hero-logo {
+            max-width: 600px;
+        }
+
+        .cta-btn {
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+        }
+
+        .hero-footer {
+            gap: var(--gap-desktop);
+            padding-bottom: var(--padding-desktop);
+        }
+
+        .description {
+            padding: 0 var(--padding-desktop);
+        }
+    }
+
     /* TABLET Y SUPERIOR (768px+) */
-    @media (min-width: 768px) {
+    @media (min-width: 768px) and (max-width: 1023px) {
         .hero-header {
             padding-top: calc(var(--padding-tablet) * 4); /* Equivalente a 100px */
             padding-left: var(--padding-tablet);
@@ -192,8 +248,6 @@ import Text from '../i18n/Text.astro';
 
         .hero-logo {
             max-width: 500px;
-            width: 80%;
-            margin-bottom: 2.5rem;
         }
 
         .cta-btn-carta {
@@ -225,73 +279,14 @@ import Text from '../i18n/Text.astro';
         }
     }
 
-    /* DESKTOP (1024px+) */
-    @media (min-width: 1024px) {
-        .hero-header {
-            padding-top: calc(var(--padding-desktop) * 3.5); /* Equivalente a 100px con sistema */
-            padding-left: var(--padding-desktop);
-            padding-right: var(--padding-desktop);
-        }
-
-        .hero-logo {
-            max-width: 600px;
-        }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.5) calc(var(--padding-desktop) * 1);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            margin-top: 1rem;
-            border-radius: 6px;
-        }
-
-        .cta-btn {
-            padding: 0.8rem 0;
-            font-size: 1rem;
-            letter-spacing: 1.5px;
-        }
-
-        .hero-footer {
-            gap: var(--gap-desktop);
-            padding-bottom: var(--padding-desktop);
-        }
-
-        .description {
-            padding: 0 var(--padding-desktop);
-        }
-    }
-
-    /* DESKTOP LARGE (1400px+) */
-    @media (min-width: 1400px) {
-        .hero-logo {
-            max-width: 550px;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-footer {
-            gap: var(--gap-desktop);
-            padding-bottom: var(--padding-desktop);
-        }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.45) calc(var(--padding-desktop) * 0.9);
-            font-size: 0.85rem;
-            letter-spacing: 0.8px;
-            margin-top: 0.8rem;
-            max-width: 200px;
-        }
-    }
-
-    /* MOBILE PEQUEÑO (0-480px) */
-    @media (max-width: 480px) {
+    /* MOBILE PEQUEÑO (0-420px) */
+    @media (min-width: 420px) and (max-width: 767px) {
         .hero-header {
             padding-top: calc(var(--padding-mobile) * 3); /* Equivalente a 60px */
         }
 
         .hero-logo {
-            max-width: 350px;
-            width: 95%;
-            margin-bottom: 1.5rem;
+            max-width: 420px;
         }
 
         .cta-btn-carta {

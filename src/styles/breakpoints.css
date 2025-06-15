@@ -1,6 +1,6 @@
 :root {
   /* Valores de breakpoints */
-  --bp-mobile-sm: 480px;
+  --bp-mobile-sm: 420px;
   --bp-mobile: 767px;
   --bp-tablet: 768px;
   --bp-desktop: 1024px;

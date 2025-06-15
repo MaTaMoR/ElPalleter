@@ -3,27 +3,11 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run build:i18n",
     "preview": "astro preview",
-    
-    "setup:db": "node scripts/setup-database.js",
-    "migrate:translations": "node scripts/complete-translations-migration.js migrate",
-    "export:translations": "node scripts/complete-translations-migration.js export",
-    
-    "build:i18n": "node scripts/build-i18n.js",
-    "build:i18n:dev": "node scripts/build-i18n.js --env=development --validate=false",
-    "build:i18n:production": "node scripts/build-i18n.js --env=production",
-    
-    "validate:system": "node scripts/validate-system.js",
-    "watch:translations": "node scripts/watch-translations.js",
-    "dev:with-watch": "concurrently \"npm run dev\" \"npm run watch:translations\"",
-    
-    "deploy:netlify": "netlify deploy --prod",
     "deploy:vercel": "vercel --prod"
   },
   "dependencies": {
     "astro": "^4.0.0",
-    "better-sqlite3": "^9.2.2",
     "lodash": "^4.17.21"
   }
 }

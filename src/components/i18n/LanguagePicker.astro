@@ -26,7 +26,6 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
         <img src={currentLanguage.flag.value} alt="" class="flag-svg" aria-hidden="true" />
       )}
     </span>
-    <span class="lang-code">{currentLanguage.shortName}</span>
     <span class="lang-arrow" aria-hidden="true">▼</span>
   </button>
   
@@ -48,7 +47,6 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
             <img src={lang.flag.value} alt="" class="flag-svg" aria-hidden="true" />
           )}
         </span>
-        <span class="lang-name">{lang.shortName}</span>
         <span class="lang-full-name">{lang.nativeName}</span>
       </a>
     ))}
@@ -66,35 +64,35 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   /* === BOTÓN PRINCIPAL === */
   .lang-current {
-    background: rgba(244, 162, 97, 0.15);
-    border: 1px solid rgba(244, 162, 97, 0.4);
-    color: white;
-    padding: 0.6rem 0.9rem;
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.7rem 1rem;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 0.6rem;
+    transition: all 0.3s ease;
     font-size: 0.9rem;
-    font-weight: 600;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    min-width: 80px;
+    font-weight: 500;
+    min-width: 70px;
     justify-content: center;
   }
 
   .lang-current:hover {
-    background: rgba(244, 162, 97, 0.25);
-    border-color: rgba(244, 162, 97, 0.6);
+    color: white;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
   }
 
   .lang-current:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.3);
+    color: white;
+  }
+
+  /* Estado activo solo cuando está abierto el dropdown */
+  .language-picker[data-open="true"] .lang-current {
+    color: white;
   }
 
   /* === ELEMENTOS DE BANDERA === */
@@ -102,33 +100,27 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
   }
 
   .flag-emoji {
-    font-size: 1rem;
+    font-size: 1.6rem;
     line-height: 1;
   }
 
   .flag-svg {
-    width: 20px;
-    height: 13px;
-    border-radius: 2px;
+    width: 32px;
+    height: 21px;
+    border-radius: 3px;
     object-fit: cover;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Elementos del botón */
-  .lang-code {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .lang-arrow {
     font-size: 0.7rem;
     transition: transform 0.3s ease;
-    margin-left: 0.2rem;
+    margin-left: 0.1rem;
   }
 
   .language-picker[data-open="true"] .lang-arrow {
@@ -143,12 +135,13 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     background: rgba(15, 15, 15, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(244, 162, 97, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    min-width: 160px;
+    min-width: 140px;
+    width: max-content;
     box-shadow: 
       0 10px 30px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(244, 162, 97, 0.1);
+      0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -172,9 +165,10 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     color: white;
     text-decoration: none;
     transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(244, 162, 97, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
   }
 
   .lang-option:last-child {
@@ -182,40 +176,23 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option:hover {
-    background: rgba(244, 162, 97, 0.15);
-    color: #f4a261;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
     transform: translateX(2px);
-  }
-
-  .lang-option:focus {
-    outline: none; /* Quitar outline siempre */
   }
 
   /* Usar focus-visible para mostrar focus solo con teclado */
   .lang-option:focus-visible {
-    background: rgba(244, 162, 97, 0.2);
-    color: #f4a261;
-    outline: 2px solid #f4a261;
-    outline-offset: -2px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: 1px solid rgba(255, 255, 255, 0.2);
+    outline-offset: -1px;
   }
 
   /* Asegurar que hover tenga prioridad sobre focus */
-  .lang-option:hover {
-    background: rgba(244, 162, 97, 0.15);
-    color: #f4a261;
-    transform: translateX(2px);
-  }
-
-  /* ALTERNATIVA: Si quieres que focus y hover sean mutuamente exclusivos */
   .lang-option:focus:not(:hover) {
-    background: rgba(244, 162, 97, 0.1);
-    color: #f4a261;
-  }
-
-  .lang-option:hover {
-    background: rgba(244, 162, 97, 0.15) !important;
-    color: #f4a261 !important;
-    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
   }
 
   /* Para mejor accesibilidad en móvil, aumentar área táctil */
@@ -234,33 +211,33 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     /* Solo mostrar hover/touch en móvil */
     .lang-option:hover,
     .lang-option:active {
-      background: rgba(244, 162, 97, 0.15);
-      color: #f4a261;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
       transform: none; /* Sin animación de deslizamiento en móvil */
     }
   }
 
-  /* Bandera en opciones */
+  /* Bandera en opciones del dropdown */
   .lang-option .lang-flag {
     flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+  }
+
+  .lang-option .flag-emoji {
+    font-size: 1.3rem;
   }
 
   .lang-option .flag-svg {
-    width: 18px;
-    height: 12px;
-  }
-
-  .lang-option .lang-name {
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    min-width: 28px;
+    width: 26px;
+    height: 17px;
+    border-radius: 2px;
   }
 
   .lang-option .lang-full-name {
-    font-size: 0.8rem;
-    opacity: 0.8;
-    font-weight: 400;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
   }
 
   /* === VARIANTES === */
@@ -272,13 +249,14 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   /* Variante Mobile */
   .language-picker.mobile .lang-current {
-    padding: 0.7rem 1rem;
+    padding: 0.8rem 1.1rem;
     font-size: 0.85rem;
-    min-width: 85px;
+    min-width: 75px;
   }
 
   .language-picker.mobile .lang-options {
-    min-width: 150px;
+    min-width: 130px;
+    width: max-content;
     left: auto;
     right: 0;
   }
@@ -307,8 +285,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: #f4a261;
+    width: 2px;
+    background: #ff4444;
     transform: scaleY(0);
     transition: transform 0.2s ease;
   }
