@@ -1,17 +1,3 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 📁 Configuración de rutas
-const TRANSLATIONS_DIR = path.join(__dirname, './translations');
-
-/**
- * 🎯 CONFIGURACIÓN CENTRAL DE IDIOMAS - ÚNICA FUENTE DE VERDAD
- * Solo necesitas modificar este objeto para añadir/cambiar idiomas
- */
 export const LANGUAGE_CONFIG = {
   es: {
     code: 'es',
@@ -100,7 +86,7 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🚀 INICIALIZACIÓN Y CARGA
+  // 🚀 INICIALIZACIÓN Y CARGA - NUEVO CON IMPORTS DINÁMICOS
   // ===============================================
 
   /**
@@ -134,14 +120,18 @@ export class I18nCore {
     }
   }
 
+  /**
+   * 📚 NUEVO MÉTODO: Carga con imports dinámicos para Vercel
+   */
   async _performLoad() {
     try {
       const loadPromises = LOCALES.map(async (locale) => {
-        const translationPath = path.join(TRANSLATIONS_DIR, `${locale}.json`);
-
         try {
-          const content = await fs.readFile(translationPath, 'utf-8');
-          const translations = JSON.parse(content);
+          // 🚀 AQUÍ ESTÁ EL CAMBIO PRINCIPAL: Usar import dinámico
+          const translationModule = await import(`./translations/${locale}.json`);
+          
+          // Los módulos JSON tienen el contenido en .default
+          const translations = translationModule.default;
           const flattened = this.flattenObject(translations);
           this.translations.set(locale, flattened);
 
@@ -846,7 +836,7 @@ export class I18nError extends Error {
     super(message);
     this.name = 'I18nError';
     this.locale = locale;
-    this.key = key;
+    key = key;
   }
 }
 
