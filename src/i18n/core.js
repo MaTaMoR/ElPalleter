@@ -372,38 +372,25 @@ export class I18nCore {
    * @returns {string} - URL localizada
    */
   localizeUrl(path, locale = DEFAULT_LOCALE, baseUrl = '') {
-    // 🛡️ Manejar diferentes tipos de path
-    let cleanPath;
-
-
-    if (!path) {
-      cleanPath = '/';
-    } else if (path instanceof URL) {
-      // 🔗 Si es un objeto URL, usar pathname
-      cleanPath = path.pathname;
-    } else if (typeof path === 'string') {
-      // 📝 Si es string, usarlo directamente
-      cleanPath = path.startsWith('/') ? path : `/${path}`;
-    } else {
-      // 🔄 Convertir cualquier otra cosa a string
-      console.warn(`[I18nCore] Unexpected path type: ${typeof path}, converting to string`);
-      cleanPath = String(path);
-      cleanPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
-
-      console.log(path);
-    }
-
-    // 🧹 Asegurar que cleanPath empiece con /
-    if (!cleanPath.startsWith('/')) {
-      cleanPath = `/${cleanPath}`;
-    }
-
+    // 🧹 Normalizar path: remover barras al inicio y final
+    let cleanPath = path.replace(/^\/+|\/+$/g, '');
+    
+    // 🧹 Normalizar baseUrl: remover barra al final si existe
+    let cleanBaseUrl = baseUrl.replace(/\/+$/, '');
+    
+    // 🛡️ Si es locale por defecto, devolver path simple
     if (locale === DEFAULT_LOCALE) {
-      return `${baseUrl}${cleanPath}`;
-    } else {
-      const localizedPath = cleanPath === '/' ? `/${locale}` : `/${locale}${cleanPath}`;
-      return `${baseUrl}${localizedPath}`;
+      return cleanPath === '' 
+        ? (cleanBaseUrl || '/') 
+        : `${cleanBaseUrl}/${cleanPath}`;
     }
+    
+    // 🌍 Para otros locales, añadir prefijo de idioma
+    const localizedPath = cleanPath === '' 
+      ? `/${locale}` 
+      : `/${locale}/${cleanPath}`;
+      
+    return `${cleanBaseUrl}${localizedPath}`;
   }
 
   /**

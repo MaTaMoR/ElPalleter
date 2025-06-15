@@ -57,10 +57,15 @@ if (maxLength && htmlContent.length > maxLength) {
   }
 }
 
+const elementProps = {
+  class: `richtext-editor ${theme}-theme ${className || ''}`.trim(),
+  ...restProps
+};
+
 const Element = tag;
 ---
 
-<Element set:html={htmlContent} />
+<Element {...elementProps} set:html={htmlContent} />
 
 <style>
   /* === SISTEMA DE TEMAS CON CSS CUSTOM PROPERTIES === */

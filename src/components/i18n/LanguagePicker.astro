@@ -188,9 +188,56 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option:focus {
-    outline: none;
+    outline: none; /* Quitar outline siempre */
+  }
+
+  /* Usar focus-visible para mostrar focus solo con teclado */
+  .lang-option:focus-visible {
     background: rgba(244, 162, 97, 0.2);
     color: #f4a261;
+    outline: 2px solid #f4a261;
+    outline-offset: -2px;
+  }
+
+  /* Asegurar que hover tenga prioridad sobre focus */
+  .lang-option:hover {
+    background: rgba(244, 162, 97, 0.15);
+    color: #f4a261;
+    transform: translateX(2px);
+  }
+
+  /* ALTERNATIVA: Si quieres que focus y hover sean mutuamente exclusivos */
+  .lang-option:focus:not(:hover) {
+    background: rgba(244, 162, 97, 0.1);
+    color: #f4a261;
+  }
+
+  .lang-option:hover {
+    background: rgba(244, 162, 97, 0.15) !important;
+    color: #f4a261 !important;
+    transform: translateX(2px);
+  }
+
+  /* Para mejor accesibilidad en móvil, aumentar área táctil */
+  @media (max-width: 768px) {
+    .lang-option {
+      padding: 1rem;
+      min-height: 44px; /* Área táctil mínima recomendada */
+    }
+    
+    /* En móvil, no mostrar efectos de focus ya que no hay teclado */
+    .lang-option:focus {
+      background: transparent;
+      color: inherit;
+    }
+    
+    /* Solo mostrar hover/touch en móvil */
+    .lang-option:hover,
+    .lang-option:active {
+      background: rgba(244, 162, 97, 0.15);
+      color: #f4a261;
+      transform: none; /* Sin animación de deslizamiento en móvil */
+    }
   }
 
   /* Bandera en opciones */
@@ -232,8 +279,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   .language-picker.mobile .lang-options {
     min-width: 150px;
-    left: 0;
-    right: auto;
+    left: auto;
+    right: 0;
   }
 
   .language-picker.mobile .lang-option {
@@ -331,6 +378,11 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       this.init();
     }
     
+    // Detectar si es dispositivo móvil
+    isMobile() {
+      return window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+    
     init() {
       if (!this.button || !this.dropdown) return;
       
@@ -344,6 +396,14 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       // Navegación con teclado en opciones
       this.options.forEach((option, index) => {
         option.addEventListener('keydown', (e) => this.handleOptionKeydown(e, index));
+        
+        // Limpiar focus al hacer hover para evitar doble selección
+        option.addEventListener('mouseenter', () => {
+          if (!this.isMobile()) {
+            // En desktop, remover focus de todas las opciones al hacer hover
+            this.options.forEach(opt => opt.blur());
+          }
+        });
       });
       
       // Escape para cerrar
@@ -371,17 +431,22 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       this.element.setAttribute('data-open', 'true');
       this.button.setAttribute('aria-expanded', 'true');
       
-      // Focus en primera opción
-      setTimeout(() => {
-        const firstOption = this.dropdown.querySelector('.lang-option');
-        if (firstOption) firstOption.focus();
-      }, 100);
+      // Solo hacer autofocus en desktop, no en móvil
+      if (!this.isMobile()) {
+        setTimeout(() => {
+          const firstOption = this.dropdown.querySelector('.lang-option');
+          if (firstOption) firstOption.focus();
+        }, 100);
+      }
     }
     
     closeDropdown() {
       this.isOpen = false;
       this.element.setAttribute('data-open', 'false');
       this.button.setAttribute('aria-expanded', 'false');
+      
+      // Limpiar cualquier focus activo en las opciones
+      this.options.forEach(option => option.blur());
     }
     
     handleKeydown(event) {
@@ -396,15 +461,20 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
           event.preventDefault();
           this.openDropdown();
           // Focus en última opción
-          setTimeout(() => {
-            const lastOption = [...this.options].pop();
-            if (lastOption) lastOption.focus();
-          }, 100);
+          if (!this.isMobile()) {
+            setTimeout(() => {
+              const lastOption = [...this.options].pop();
+              if (lastOption) lastOption.focus();
+            }, 100);
+          }
           break;
       }
     }
     
     handleOptionKeydown(event, currentIndex) {
+      // Solo manejar navegación con teclado en desktop
+      if (this.isMobile()) return;
+      
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault();
