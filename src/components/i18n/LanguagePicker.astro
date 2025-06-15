@@ -1,9 +1,5 @@
 ---
-// src/components/i18n/LanguagePicker.astro
-// 🌍 LANGUAGE PICKER CON SISTEMA CENTRALIZADO
-
-import { getI18nInfo } from '../../utils/astro-i18n-utils.js';
-import { getLanguagePickerData } from '../../utils/language-config.js';
+import { i18nCore } from '../../i18n/core.js';
 
 export interface Props {
   variant?: 'desktop' | 'mobile';
@@ -12,11 +8,8 @@ export interface Props {
 
 const { variant = 'desktop', className = '' } = Astro.props;
 
-// Obtener información de i18n
-const { locale } = getI18nInfo(Astro);
-
 // 🎯 Obtener datos de idiomas desde el sistema centralizado
-const languages = await getLanguagePickerData(Astro);
+const languages = await i18nCore.getLanguagePickerDataWithAstro(Astro);
 
 // Encontrar idioma actual y otros idiomas
 const currentLanguage = languages.find(lang => lang.isActive) || languages[0];

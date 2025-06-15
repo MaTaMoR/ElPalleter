@@ -3,17 +3,6 @@
 import epLogo from '../../assets/mini-logo.svg';
 import Text from '../i18n/Text.astro';
 import LanguagePicker from '../i18n/LanguagePicker.astro';
-import { getI18nInfo, localizeUrl, getAlternateUrls } from '../../utils/astro-i18n-utils.js';
-
-// Obtener información de i18n usando el nuevo sistema
-const { locale } = getI18nInfo(Astro);
-
-const localizedUrls = {
-    home: localizeUrl('#home', locale, Astro),
-    story: localizeUrl('#historia', locale, Astro),
-    menu: localizeUrl('#carta', locale, Astro),
-    contact: localizeUrl('#contacto', locale, Astro)
-}
 ---
 
 <nav>

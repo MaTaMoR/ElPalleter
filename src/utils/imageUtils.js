@@ -1,15 +1,5 @@
-// src/utils/imageUtils.js
-// Utilidades para integración de imágenes con el sistema i18n existente
+import { i18nCore } from '../i18n/core.js';
 
-import { i18nConfig } from '../i18n/config.js';
-import { getI18nInfo, safeTranslation } from './astro-i18n-utils.js';
-
-await i18nConfig.loadTranslations();
-
-/**
- * Configuración temporal de imágenes hasta implementar el sistema completo
- * Esta será reemplazada por el sistema dinámico más adelante
- */
 const TEMP_IMAGES_CONFIG = {
     galleries: {
         historia_slider: {
@@ -17,7 +7,7 @@ const TEMP_IMAGES_CONFIG = {
             images: [
                 {
                     id: "hist_001",
-                    src: "/images/slider/slider-1.jpg", // Usa tus imágenes actuales
+                    src: "/images/slider/slider-1.jpg",
                     category: "historia",
                     tags: ["restaurante", "exterior", "fachada"]
                 },
@@ -51,20 +41,20 @@ const TEMP_IMAGES_CONFIG = {
  * @returns {Array} - Array de imágenes con traducciones
  */
 export function getGalleryImages(galleryId, Astro) {
-    const { locale, i18n } = getI18nInfo(Astro);
+    const { locale } = i18nCore.getI18nInfo(Astro);
     const gallery = TEMP_IMAGES_CONFIG.galleries[galleryId];
     
     if (!gallery) {
-        console.warn(`[Images] Gallery "${galleryId}" not found`);
+        logImageInfo(`Gallery "${galleryId}" not found`);
         return [];
     }
     
     return gallery.images.map(image => ({
         id: image.id,
         src: image.src,
-        alt: safeTranslation(`images.${image.id}.alt`, Astro, `Imagen ${image.id}`),
-        caption: safeTranslation(`images.${image.id}.caption`, Astro, ''),
-        title: safeTranslation(`images.${image.id}.title`, Astro, ''),
+        alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
+        caption: getImageTranslation(`${image.id}.caption`, locale, ''),
+        title: getImageTranslation(`${image.id}.title`, locale, ''),
         category: image.category,
         tags: image.tags
     }));
@@ -77,7 +67,7 @@ export function getGalleryImages(galleryId, Astro) {
  * @returns {Object|null} - Datos de la imagen con traducciones
  */
 export function getImageById(imageId, Astro) {
-    const { locale, i18n } = getI18nInfo(Astro);
+    const { locale } = i18nCore.getI18nInfo(Astro);
     
     // Buscar en todas las galerías
     for (const [galleryId, gallery] of Object.entries(TEMP_IMAGES_CONFIG.galleries)) {
@@ -86,9 +76,9 @@ export function getImageById(imageId, Astro) {
             return {
                 id: image.id,
                 src: image.src,
-                alt: safeTranslation(`images.${image.id}.alt`, Astro, `Imagen ${image.id}`),
-                caption: safeTranslation(`images.${image.id}.caption`, Astro, ''),
-                title: safeTranslation(`images.${image.id}.title`, Astro, ''),
+                alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
+                caption: getImageTranslation(`${image.id}.caption`, locale, ''),
+                title: getImageTranslation(`${image.id}.title`, locale, ''),
                 category: image.category,
                 tags: image.tags,
                 galleryId
@@ -100,29 +90,52 @@ export function getImageById(imageId, Astro) {
 }
 
 /**
- * Obtiene imágenes fallback con traducciones cuando no hay contenido dinámico
+ * Helper interno para obtener traducciones de imágenes
+ * @param {string} key - Clave de traducción (relativa a images.)
+ * @param {string} locale - Idioma
+ * @param {string} fallback - Fallback
+ * @returns {string} - Traducción
+ */
+function getImageTranslation(key, locale, fallback) {
+    const fullKey = `images.${key}`;
+    
+    // Usar el core unificado directamente
+    if (i18nCore.loaded) {
+        const translation = i18nCore.getTranslation(fullKey, locale);
+        if (translation && translation !== fullKey) {
+            return translation;
+        }
+    }
+    
+    return fallback;
+}
+
+/**
+ * Obtiene imágenes fallback con traducciones
  * @param {string} type - Tipo de fallback ('historia', 'carta', etc.)
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Array} - Array de imágenes fallback
  */
 export function getFallbackImages(type, Astro) {
+    const { locale } = i18nCore.getI18nInfo(Astro);
+    
     const fallbacks = {
         historia: [
             {
                 id: 'fallback_historia_1',
                 src: '/images/placeholder-restaurant.jpg',
-                alt: safeTranslation('images.fallback.restaurant_alt', Astro, 'El Palleter Restaurant'),
-                caption: safeTranslation('images.fallback.restaurant_caption', Astro, 'Nuestro restaurante'),
-                title: safeTranslation('images.fallback.restaurant_title', Astro, 'Restaurante El Palleter')
+                alt: getImageTranslation('fallback.restaurant_alt', locale, 'El Palleter Restaurant'),
+                caption: getImageTranslation('fallback.restaurant_caption', locale, 'Nuestro restaurante'),
+                title: getImageTranslation('fallback.restaurant_title', locale, 'Restaurante El Palleter')
             }
         ],
         carta: [
             {
                 id: 'fallback_carta_1',
                 src: '/images/placeholder-food.jpg',
-                alt: safeTranslation('images.fallback.food_alt', Astro, 'Comida de El Palleter'),
-                caption: safeTranslation('images.fallback.food_caption', Astro, 'Nuestra comida'),
-                title: safeTranslation('images.fallback.food_title', Astro, 'Especialidades culinarias')
+                alt: getImageTranslation('fallback.food_alt', locale, 'Comida de El Palleter'),
+                caption: getImageTranslation('fallback.food_caption', locale, 'Nuestra comida'),
+                title: getImageTranslation('fallback.food_title', locale, 'Especialidades culinarias')
             }
         ]
     };
@@ -159,19 +172,117 @@ export function getAvailableGalleries() {
  * @returns {Array} - Array en el nuevo formato
  */
 export function migrateStaticImages(staticImages, Astro) {
+    const { locale } = i18nCore.getI18nInfo(Astro);
+    
     return staticImages.map((image, index) => ({
         id: `migrated_${index}`,
         src: image.src,
-        alt: image.alt || safeTranslation(`images.migrated_${index}.alt`, Astro, `Imagen ${index + 1}`),
-        caption: image.caption || safeTranslation(`images.migrated_${index}.caption`, Astro, ''),
-        title: image.title || safeTranslation(`images.migrated_${index}.title`, Astro, ''),
+        alt: image.alt || getImageTranslation(`migrated_${index}.alt`, locale, `Imagen ${index + 1}`),
+        caption: image.caption || getImageTranslation(`migrated_${index}.caption`, locale, ''),
+        title: image.title || getImageTranslation(`migrated_${index}.title`, locale, ''),
         category: 'migrated',
         tags: []
     }));
 }
 
 /**
- * Utildad para logging de imágenes en desarrollo
+ * Helper para imágenes responsivas
+ * @param {string} imageId - ID de la imagen
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Object|null} - Objeto con URLs y srcset para responsive
+ */
+export function getResponsiveImageData(imageId, Astro) {
+    const image = getImageById(imageId, Astro);
+    if (!image) return null;
+
+    // Por ahora, usar la misma imagen para todos los tamaños
+    // En el futuro, esto se conectará con el sistema de procesamiento de imágenes
+    return {
+        src: image.src,
+        srcset: `
+            ${image.src} 300w,
+            ${image.src} 768w,
+            ${image.src} 1200w,
+            ${image.src} 1920w
+        `,
+        sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+        alt: image.alt,
+        title: image.title
+    };
+}
+
+/**
+ * Función para usar en componentes Astro para obtener imágenes con traducciones
+ * @param {string} galleryId - ID de la galería
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Array} - Array de imágenes con traducciones
+ */
+export function getGalleryWithTranslations(galleryId, Astro) {
+    return getGalleryImages(galleryId, Astro);
+}
+
+/**
+ * Busca imágenes por tags
+ * @param {Array} tags - Array de tags para buscar
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Array} - Array de imágenes que contienen los tags
+ */
+export function searchImagesByTags(tags, Astro) {
+    const { locale } = i18nCore.getI18nInfo(Astro);
+    const results = [];
+    
+    // Buscar en todas las galerías
+    for (const [galleryId, gallery] of Object.entries(TEMP_IMAGES_CONFIG.galleries)) {
+        const matchingImages = gallery.images.filter(image => 
+            tags.some(tag => image.tags.includes(tag))
+        );
+        
+        matchingImages.forEach(image => {
+            results.push({
+                id: image.id,
+                src: image.src,
+                alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
+                caption: getImageTranslation(`${image.id}.caption`, locale, ''),
+                title: getImageTranslation(`${image.id}.title`, locale, ''),
+                category: image.category,
+                tags: image.tags,
+                galleryId
+            });
+        });
+    }
+    
+    return results;
+}
+
+/**
+ * Obtiene estadísticas de imágenes
+ * @returns {Object} - Estadísticas
+ */
+export function getImageStats() {
+    const stats = {
+        totalGalleries: Object.keys(TEMP_IMAGES_CONFIG.galleries).length,
+        totalImages: 0,
+        imagesByCategory: {},
+        imagesByGallery: {}
+    };
+    
+    for (const [galleryId, gallery] of Object.entries(TEMP_IMAGES_CONFIG.galleries)) {
+        stats.totalImages += gallery.images.length;
+        stats.imagesByGallery[galleryId] = gallery.images.length;
+        
+        gallery.images.forEach(image => {
+            if (!stats.imagesByCategory[image.category]) {
+                stats.imagesByCategory[image.category] = 0;
+            }
+            stats.imagesByCategory[image.category]++;
+        });
+    }
+    
+    return stats;
+}
+
+/**
+ * Utilidad para logging de imágenes en desarrollo
  * @param {string} message - Mensaje
  * @param {Object} data - Datos adicionales
  */

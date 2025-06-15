@@ -1,6 +1,6 @@
 ---
-import { getI18nInfo } from '../../utils/astro-i18n-utils.js';
 import richContent from '../../data/rich-content.json';
+import { i18nCore } from '../../i18n/core';
 
 export interface Props {
   key: string;
@@ -24,7 +24,7 @@ const {
   ...restProps 
 } = Astro.props;
 
-const { locale } = getI18nInfo(Astro);
+const { locale } = i18nCore.getI18nInfo(Astro);
 
 function getRichContent(contentKey: string, lang: string): string {
   const content = richContent[contentKey as keyof typeof richContent];
@@ -57,18 +57,10 @@ if (maxLength && htmlContent.length > maxLength) {
   }
 }
 
-const elementProps = {
-  class: `richtext-editor ${theme}-theme ${className || ''}`.trim(),
-  'data-rich-text-key': key,
-  'data-locale': locale,
-  'data-theme': theme,
-  ...restProps
-};
-
 const Element = tag;
 ---
 
-<Element {...elementProps} set:html={htmlContent} />
+<Element set:html={htmlContent} />
 
 <style>
   /* === SISTEMA DE TEMAS CON CSS CUSTOM PROPERTIES === */
@@ -383,47 +375,9 @@ const Element = tag;
       left: 0.25rem;
     }
   }
-  
-  /* === INDICADOR DE DESARROLLO === */
-  .richtext-editor[data-rich-text-missing="true"] {
-    background-color: rgba(255, 165, 0, 0.1);
-    border: 1px dashed orange;
-    padding: 1rem;
-    border-radius: 4px;
-  }
-  
-  .richtext-editor[data-rich-text-missing="true"]::before {
-    content: "⚠️ Missing rich content for key: " attr(data-rich-text-key);
-    display: block;
-    font-size: 0.8rem;
-    color: orange;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-  }
 </style>
 
 <script>
-  if (import.meta.env.DEV) {
-    document.addEventListener('DOMContentLoaded', () => {
-      const richTextElements = document.querySelectorAll('[data-rich-text-key]');
-      
-      richTextElements.forEach(element => {
-        const key = element.getAttribute('data-rich-text-key');
-        const content = element.innerHTML.trim();
-        
-        if (content === key || content.length < 10) {
-          element.setAttribute('data-rich-text-missing', 'true');
-          console.warn(`[RichText] Missing or invalid rich content for key: ${key}`);
-        }
-        
-        if (content.includes('<script')) {
-          console.error(`[RichText] Security warning: Script tags found in rich content for key: ${key}`);
-        }
-      });
-    });
-  }
-  
-  // Función para ayudar con futuros editores
   window.RichTextEditor = {
     themes: ['light', 'dark', 'gold', 'custom'],
     elements: [

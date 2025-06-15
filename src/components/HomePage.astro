@@ -14,11 +14,7 @@ Astro.locals.cleanPath = '/';
 Astro.locals.isDefaultLocale = locale === 'es';
 
 // Cargar traducciones
-import { I18nConfig } from '../i18n/config.js';
-
-const i18n = I18nConfig.getInstance();
-await i18n.loadTranslations();
-
+import { i18nCore } from '../i18n/core.js';
 
 // Componentes
 import Layout from '../layouts/Layout.astro';
@@ -30,29 +26,20 @@ import Carta from './public/Carta.astro';
 import ScrollToTop from './public/ScrollToTop.astro';
 import Footer from './public/Footer.astro';
 
-// Utilidades i18n
-import { 
-  getI18nInfo, 
-  getSEOMetadata, 
-  getAlternateUrls,
-  safeTranslation,
-  getTextDirection 
-} from '../utils/astro-i18n-utils.js';
-
 // Obtener información de i18n
-const { locale: currentLocale, i18n: i18nInstance, isDefaultLocale } = getI18nInfo(Astro);
+const { locale: currentLocale } = i18nCore.getI18nInfo(Astro);
 
 // Obtener metadatos SEO multiidioma
-const seoData = getSEOMetadata({
-  title: safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
-  description: safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
+const seoData = i18nCore.getSEOMetadata({
+  title: i18nCore.safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
+  description: i18nCore.safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
 }, Astro);
 
 // Obtener URLs alternativas para hreflang
-const alternateUrls = getAlternateUrls(Astro);
+const alternateUrls = i18nCore.getAlternateUrlsWithAstro(Astro);
 
 // Dirección del texto
-const textDirection = getTextDirection(Astro);
+const textDirection = i18nCore.getTextDirectionWithAstro(Astro);
 ---
 
 <Layout 
