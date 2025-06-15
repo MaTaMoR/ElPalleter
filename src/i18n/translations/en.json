@@ -235,10 +235,12 @@
       "name": "El Palleter"
     },
     "sections": {
+      "contact": "Contact",
       "address": "Location",
       "phone": "Contact",
       "hours": "Hours", 
-      "social": "Follow Us"
+      "social": "Follow Us",
+      "status": "Current Status"
     },
     "fields": {
       "address": "Address",
@@ -252,7 +254,8 @@
     "values": {
       "allDays": "Monday to Sunday",
       "reservations": "Reservations and inquiries",
-      "followUs": "Stay updated with our latest news"
+      "followUs": "Stay updated with our latest news",
+      "scheduleNote": "Hours may vary by day"
     },
     "status": {
       "open": "Open now",

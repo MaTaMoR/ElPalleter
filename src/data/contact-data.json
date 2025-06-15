@@ -32,13 +32,65 @@
       "end": "23:30"
     },
     "schedule": {
-      "monday": { "open": true, "lunch": true, "dinner": true },
-      "tuesday": { "open": false, "lunch": false, "dinner": false },
-      "wednesday": { "open": true, "lunch": true, "dinner": true },
-      "thursday": { "open": true, "lunch": true, "dinner": true },
-      "friday": { "open": true, "lunch": true, "dinner": true },
-      "saturday": { "open": true, "lunch": true, "dinner": true },
-      "sunday": { "open": true, "lunch": true, "dinner": true }
+      "monday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:00" },
+          "dinner": { "start": "19:00", "end": "23:30" }
+        }
+      },
+      "tuesday": { 
+        "open": false, 
+        "lunch": false, 
+        "dinner": false 
+      },
+      "wednesday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:00" },
+          "dinner": { "start": "19:00", "end": "23:30" }
+        }
+      },
+      "thursday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:00" },
+          "dinner": { "start": "19:00", "end": "23:30" }
+        }
+      },
+      "friday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:00" },
+          "dinner": { "start": "19:00", "end": "24:00" }
+        }
+      },
+      "saturday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:30" },
+          "dinner": { "start": "19:00", "end": "24:00" }
+        }
+      },
+      "sunday": { 
+        "open": true, 
+        "lunch": true, 
+        "dinner": true,
+        "hours": {
+          "lunch": { "start": "12:00", "end": "16:30" },
+          "dinner": { "start": "19:00", "end": "23:00" }
+        }
+      }
     },
     "exceptions": []
   },

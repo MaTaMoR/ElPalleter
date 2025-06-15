@@ -235,10 +235,12 @@
       "name": "El Palleter"
     },
     "sections": {
+      "contact": "Contacte",
       "address": "Ubicació",
       "phone": "Contacte",
       "hours": "Horaris",
-      "social": "Segueix-nos"
+      "social": "Segueix-nos",
+      "status": "Estat Actual"
     },
     "fields": {
       "address": "Adreça", 
@@ -252,7 +254,8 @@
     "values": {
       "allDays": "Dilluns a Diumenge",
       "reservations": "Reserves i consultes",
-      "followUs": "Mantín-te al dia amb les nostres novetats"
+      "followUs": "Mantín-te al dia amb les nostres novetats",
+      "scheduleNote": "Els horaris poden variar segons el dia"
     },
     "status": {
       "open": "Obert ara",

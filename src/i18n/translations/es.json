@@ -93,7 +93,7 @@
         "name": "Albóndigas en Salsa"
       },
       "magro-tomate": {
-        "name": "Magro con Tomate"
+        "name": "Magre con Tomate"
       },
       "hamburguesa-palleter": {
         "name": "Hamburguesa Palleter",
@@ -235,10 +235,12 @@
       "name": "El Palleter"
     },
     "sections": {
+      "contact": "Contacto",
       "address": "Dirección",
-      "phone": "Contacto", 
+      "phone": "Contacto",
       "hours": "Horarios",
-      "social": "Síguenos"
+      "social": "Síguenos",
+      "status": "Estado Actual"
     },
     "fields": {
       "address": "Dirección",
@@ -252,7 +254,8 @@
     "values": {
       "allDays": "Lunes a Domingo",
       "reservations": "Reservas y consultas",
-      "followUs": "Mantente al día con nuestras novedades"
+      "followUs": "Mantente al día con nuestras novedades",
+      "scheduleNote": "Los horarios pueden variar según el día"
     },
     "status": {
       "open": "Abierto ahora",

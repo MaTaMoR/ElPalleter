@@ -1,4 +1,4 @@
-// src/services/ContactService.js
+// src/services/ContactService.js - ACTUALIZADO para horarios por día
 
 import contactData from '../data/contact-data.json';
 
@@ -38,20 +38,35 @@ export class ContactService {
             };
         }
 
-        // Convertir horarios a minutos
-        const lunchStart = this.timeToMinutes(contactData.hours.lunch.start);
-        const lunchEnd = this.timeToMinutes(contactData.hours.lunch.end);
-        const dinnerStart = this.timeToMinutes(contactData.hours.dinner.start);
-        const dinnerEnd = this.timeToMinutes(contactData.hours.dinner.end);
+        // 🔥 NUEVO: Obtener horarios específicos del día actual
+        const todayHours = this.getDaySpecificHours(dayNames[currentDay]);
+        
+        if (!todayHours) {
+            return {
+                status: 'closed',
+                translationKey: 'contact.status.closed',
+                params: {}
+            };
+        }
+
+        // Convertir horarios a minutos usando los horarios específicos del día
+        const lunchStart = todayHours.lunch ? this.timeToMinutes(todayHours.lunch.start) : null;
+        const lunchEnd = todayHours.lunch ? this.timeToMinutes(todayHours.lunch.end) : null;
+        const dinnerStart = todayHours.dinner ? this.timeToMinutes(todayHours.dinner.start) : null;
+        const dinnerEnd = todayHours.dinner ? this.timeToMinutes(todayHours.dinner.end) : null;
 
         // Verificar si está abierto
-        const isLunchTime = currentTime >= lunchStart && currentTime <= lunchEnd && todaySchedule.lunch;
-        const isDinnerTime = currentTime >= dinnerStart && currentTime <= dinnerEnd && todaySchedule.dinner;
+        const isLunchTime = lunchStart && lunchEnd && 
+                           currentTime >= lunchStart && currentTime <= lunchEnd && 
+                           todaySchedule.lunch;
+        const isDinnerTime = dinnerStart && dinnerEnd && 
+                            currentTime >= dinnerStart && currentTime <= dinnerEnd && 
+                            todaySchedule.dinner;
 
         if (isLunchTime || isDinnerTime) {
             // Verificar si está cerrando pronto (30 minutos antes del cierre)
-            const lunchClosingSoon = isLunchTime && (lunchEnd - currentTime) <= 30;
-            const dinnerClosingSoon = isDinnerTime && (dinnerEnd - currentTime) <= 30;
+            const lunchClosingSoon = isLunchTime && lunchEnd && (lunchEnd - currentTime) <= 30;
+            const dinnerClosingSoon = isDinnerTime && dinnerEnd && (dinnerEnd - currentTime) <= 30;
             
             if (lunchClosingSoon || dinnerClosingSoon) {
                 const minutesLeft = isLunchTime ? lunchEnd - currentTime : dinnerEnd - currentTime;
@@ -71,15 +86,18 @@ export class ContactService {
         }
 
         // Verificar si abre pronto (1 hora antes)
-        const openingSoonLunch = todaySchedule.lunch && currentTime < lunchStart && (lunchStart - currentTime) <= 60;
-        const openingSoonDinner = todaySchedule.dinner && currentTime > lunchEnd && currentTime < dinnerStart && (dinnerStart - currentTime) <= 60;
+        const openingSoonLunch = lunchStart && todaySchedule.lunch && 
+                                currentTime < lunchStart && (lunchStart - currentTime) <= 60;
+        const openingSoonDinner = dinnerStart && todaySchedule.dinner && 
+                                 lunchEnd && currentTime > lunchEnd && 
+                                 currentTime < dinnerStart && (dinnerStart - currentTime) <= 60;
 
         if (openingSoonLunch) {
             return {
                 status: 'openingSoon',
                 translationKey: 'contact.status.openingSoon',
-                params: { time: contactData.hours.lunch.start },
-                openingTime: contactData.hours.lunch.start
+                params: { time: todayHours.lunch.start },
+                openingTime: todayHours.lunch.start
             };
         }
 
@@ -87,8 +105,8 @@ export class ContactService {
             return {
                 status: 'openingSoon',
                 translationKey: 'contact.status.openingSoon', 
-                params: { time: contactData.hours.dinner.start },
-                openingTime: contactData.hours.dinner.start
+                params: { time: todayHours.dinner.start },
+                openingTime: todayHours.dinner.start
             };
         }
 
@@ -102,6 +120,46 @@ export class ContactService {
     }
 
     /**
+     * 🔥 NUEVO: Obtiene los horarios específicos de un día
+     * @param {string} day - Día de la semana ('monday', 'tuesday', etc.)
+     * @returns {Object|null} - Horarios específicos del día
+     */
+    static getDaySpecificHours(day) {
+        const daySchedule = contactData.hours.schedule[day];
+        if (!daySchedule || !daySchedule.open) {
+            return null;
+        }
+
+        const result = {};
+
+        // Si el día tiene horarios específicos, usarlos
+        if (daySchedule.hours) {
+            if (daySchedule.hours.lunch && daySchedule.lunch) {
+                result.lunch = daySchedule.hours.lunch;
+            }
+            if (daySchedule.hours.dinner && daySchedule.dinner) {
+                result.dinner = daySchedule.hours.dinner;
+            }
+        } else {
+            // Fallback a horarios generales si no hay específicos
+            if (daySchedule.lunch) {
+                result.lunch = {
+                    start: contactData.hours.lunch.start,
+                    end: contactData.hours.lunch.end
+                };
+            }
+            if (daySchedule.dinner) {
+                result.dinner = {
+                    start: contactData.hours.dinner.start,
+                    end: contactData.hours.dinner.end
+                };
+            }
+        }
+
+        return Object.keys(result).length > 0 ? result : null;
+    }
+
+    /**
      * Convierte tiempo en formato HH:MM a minutos desde medianoche
      * @param {string} time - Tiempo en formato "HH:MM"
      * @returns {number} - Minutos desde medianoche
@@ -112,7 +170,7 @@ export class ContactService {
     }
 
     /**
-     * Obtiene datos de la próxima apertura del restaurante
+     * 🔥 ACTUALIZADO: Obtiene datos de la próxima apertura con horarios específicos por día
      * @returns {Object} - Datos estructurados de la próxima apertura
      */
     static getNextOpeningData() {
@@ -129,52 +187,59 @@ export class ContactService {
             
             if (!daySchedule.open) continue;
             
-            const lunchStart = this.timeToMinutes(contactData.hours.lunch.start);
-            const dinnerStart = this.timeToMinutes(contactData.hours.dinner.start);
+            const dayHours = this.getDaySpecificHours(dayNames[checkDay]);
+            if (!dayHours) continue;
             
             // Si es hoy, verificar si aún no han pasado los horarios
             if (i === 0) {
-                if (daySchedule.lunch && currentTime < lunchStart) {
-                    return {
-                        translationKey: 'contact.status.openingToday',
-                        params: { time: contactData.hours.lunch.start },
-                        day: checkDay,
-                        time: contactData.hours.lunch.start,
-                        type: 'lunch'
-                    };
+                if (dayHours.lunch && daySchedule.lunch) {
+                    const lunchStart = this.timeToMinutes(dayHours.lunch.start);
+                    if (currentTime < lunchStart) {
+                        return {
+                            translationKey: 'contact.status.openingToday',
+                            params: { time: dayHours.lunch.start },
+                            day: checkDay,
+                            time: dayHours.lunch.start,
+                            type: 'lunch'
+                        };
+                    }
                 }
-                if (daySchedule.dinner && currentTime < dinnerStart) {
-                    return {
-                        translationKey: 'contact.status.openingToday', 
-                        params: { time: contactData.hours.dinner.start },
-                        day: checkDay,
-                        time: contactData.hours.dinner.start,
-                        type: 'dinner'
-                    };
+                if (dayHours.dinner && daySchedule.dinner) {
+                    const dinnerStart = this.timeToMinutes(dayHours.dinner.start);
+                    const lunchEnd = dayHours.lunch ? this.timeToMinutes(dayHours.lunch.end) : 0;
+                    if (currentTime < dinnerStart && (!dayHours.lunch || currentTime > lunchEnd)) {
+                        return {
+                            translationKey: 'contact.status.openingToday', 
+                            params: { time: dayHours.dinner.start },
+                            day: checkDay,
+                            time: dayHours.dinner.start,
+                            type: 'dinner'
+                        };
+                    }
                 }
             } else {
                 // Para otros días, tomar el primer horario disponible
-                if (daySchedule.lunch) {
+                if (dayHours.lunch && daySchedule.lunch) {
                     return {
                         translationKey: 'contact.status.openingOn',
                         params: { 
                             day: `contact.days.${dayNames[checkDay]}`,
-                            time: contactData.hours.lunch.start 
+                            time: dayHours.lunch.start 
                         },
                         day: checkDay,
-                        time: contactData.hours.lunch.start,
+                        time: dayHours.lunch.start,
                         type: 'lunch'
                     };
                 }
-                if (daySchedule.dinner) {
+                if (dayHours.dinner && daySchedule.dinner) {
                     return {
                         translationKey: 'contact.status.openingOn',
                         params: { 
                             day: `contact.days.${dayNames[checkDay]}`,
-                            time: contactData.hours.dinner.start 
+                            time: dayHours.dinner.start 
                         },
                         day: checkDay,
-                        time: contactData.hours.dinner.start,
+                        time: dayHours.dinner.start,
                         type: 'dinner'
                     };
                 }
@@ -238,7 +303,7 @@ export class ContactService {
     }
 
     /**
-     * Obtiene los horarios de un día específico
+     * 🔥 ACTUALIZADO: Obtiene los horarios de un día específico con horarios por día
      * @param {number} dayOfWeek - Día de la semana (0 = domingo)
      * @returns {Object|null} - Horarios del día o null si está cerrado
      */
@@ -246,27 +311,76 @@ export class ContactService {
         if (!this.isOpenOnDay(dayOfWeek)) return null;
         
         const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        const daySchedule = contactData.hours.schedule[dayNames[dayOfWeek]];
+        const dayName = dayNames[dayOfWeek];
+        const daySchedule = contactData.hours.schedule[dayName];
+        const dayHours = this.getDaySpecificHours(dayName);
+        
+        if (!dayHours) return null;
         
         const schedule = [];
         
-        if (daySchedule.lunch) {
+        if (dayHours.lunch && daySchedule.lunch) {
             schedule.push({
                 type: 'lunch',
-                start: contactData.hours.lunch.start,
-                end: contactData.hours.lunch.end
+                start: dayHours.lunch.start,
+                end: dayHours.lunch.end
             });
         }
         
-        if (daySchedule.dinner) {
+        if (dayHours.dinner && daySchedule.dinner) {
             schedule.push({
                 type: 'dinner', 
-                start: contactData.hours.dinner.start,
-                end: contactData.hours.dinner.end
+                start: dayHours.dinner.start,
+                end: dayHours.dinner.end
             });
         }
         
         return schedule;
+    }
+
+    /**
+     * 🔥 NUEVO: Obtiene horarios formateados para mostrar en UI
+     * @returns {Array} - Array con horarios por día formateados
+     */
+    static getWeekSchedule() {
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        
+        return dayNames.map((dayName, index) => {
+            const daySchedule = contactData.hours.schedule[dayName];
+            const dayHours = this.getDaySpecificHours(dayName);
+            
+            return {
+                dayName,
+                dayIndex: index,
+                isOpen: daySchedule.open,
+                schedule: dayHours,
+                formattedSchedule: this.formatDaySchedule(dayHours, daySchedule)
+            };
+        });
+    }
+
+    /**
+     * 🔥 NUEVO: Formatea los horarios de un día para mostrar
+     * @param {Object} dayHours - Horarios del día
+     * @param {Object} daySchedule - Configuración del día
+     * @returns {string} - Horarios formateados
+     */
+    static formatDaySchedule(dayHours, daySchedule) {
+        if (!dayHours || !daySchedule.open) {
+            return 'Cerrado';
+        }
+
+        const parts = [];
+        
+        if (dayHours.lunch && daySchedule.lunch) {
+            parts.push(`${dayHours.lunch.start} - ${dayHours.lunch.end}`);
+        }
+        
+        if (dayHours.dinner && daySchedule.dinner) {
+            parts.push(`${dayHours.dinner.start} - ${dayHours.dinner.end}`);
+        }
+        
+        return parts.join(' | ') || 'Cerrado';
     }
 
     /**
@@ -284,6 +398,46 @@ export class ContactService {
             "postalCode": addr.postalCode,
             "addressCountry": addr.country
         };
+    }
+
+    /**
+     * 🔥 ACTUALIZADO: Genera especificación de horarios para JSON-LD con horarios específicos
+     * @returns {Array} - Array de especificaciones de horarios
+     */
+    static getOpeningHoursSpecification() {
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const dayNameMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const openingHours = [];
+        
+        dayNames.forEach((day, index) => {
+            const schedule = contactData.hours.schedule[day];
+            if (!schedule.open) return;
+            
+            const dayHours = this.getDaySpecificHours(day);
+            if (!dayHours) return;
+            
+            const dayName = dayNameMap[index];
+            
+            if (dayHours.lunch && schedule.lunch) {
+                openingHours.push({
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": dayName,
+                    "opens": dayHours.lunch.start,
+                    "closes": dayHours.lunch.end
+                });
+            }
+            
+            if (dayHours.dinner && schedule.dinner) {
+                openingHours.push({
+                    "@type": "OpeningHoursSpecification", 
+                    "dayOfWeek": dayName,
+                    "opens": dayHours.dinner.start,
+                    "closes": dayHours.dinner.end
+                });
+            }
+        });
+        
+        return openingHours;
     }
 
     /**
@@ -312,42 +466,6 @@ export class ContactService {
     }
 
     /**
-     * Genera especificación de horarios para JSON-LD
-     * @returns {Array} - Array de especificaciones de horarios
-     */
-    static getOpeningHoursSpecification() {
-        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        const openingHours = [];
-        
-        dayNames.forEach((day, index) => {
-            const schedule = contactData.hours.schedule[day];
-            if (!schedule.open) return;
-            
-            const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][index];
-            
-            if (schedule.lunch) {
-                openingHours.push({
-                    "@type": "OpeningHoursSpecification",
-                    "dayOfWeek": dayName,
-                    "opens": contactData.hours.lunch.start,
-                    "closes": contactData.hours.lunch.end
-                });
-            }
-            
-            if (schedule.dinner) {
-                openingHours.push({
-                    "@type": "OpeningHoursSpecification", 
-                    "dayOfWeek": dayName,
-                    "opens": contactData.hours.dinner.start,
-                    "closes": contactData.hours.dinner.end
-                });
-            }
-        });
-        
-        return openingHours;
-    }
-
-    /**
      * Función helper para usar en Astro con traducciones
      * @param {Object} i18nInstance - Instancia de i18n
      * @param {string} locale - Idioma actual
@@ -357,6 +475,7 @@ export class ContactService {
         const statusData = this.getRestaurantStatus();
         const socials = this.getEnabledSocials();
         const actionLinks = this.getActionLinks();
+        const weekSchedule = this.getWeekSchedule();
         
         // Obtener mensaje traducido usando el sistema i18n
         let translatedMessage = i18nInstance.getTranslation(
@@ -381,6 +500,7 @@ export class ContactService {
             restaurant: contactData.restaurant,
             contact: contactData.contact,
             hours: contactData.hours,
+            weekSchedule, // 🔥 NUEVO: Horarios de la semana
             status: {
                 ...statusData,
                 translatedMessage,
@@ -394,19 +514,13 @@ export class ContactService {
     }
 }
 
-/**
- * Hook para usar en el frontend (cliente)
- */
+// El resto de las clases se mantienen igual...
 export class ContactStatusManager {
     constructor() {
         this.statusUpdateInterval = null;
         this.callbacks = [];
     }
 
-    /**
-     * Inicia el monitoreo de estado en tiempo real
-     * @param {number} intervalMs - Intervalo en milisegundos (default: 60000)
-     */
     startMonitoring(intervalMs = 60000) {
         this.updateStatus();
         this.statusUpdateInterval = setInterval(() => {
@@ -414,9 +528,6 @@ export class ContactStatusManager {
         }, intervalMs);
     }
 
-    /**
-     * Detiene el monitoreo
-     */
     stopMonitoring() {
         if (this.statusUpdateInterval) {
             clearInterval(this.statusUpdateInterval);
@@ -424,21 +535,13 @@ export class ContactStatusManager {
         }
     }
 
-    /**
-     * Añade un callback para cuando cambie el estado
-     * @param {Function} callback - Función a ejecutar cuando cambie el estado
-     */
     onStatusChange(callback) {
         this.callbacks.push(callback);
     }
 
-    /**
-     * Actualiza el estado y notifica a los callbacks
-     */
     updateStatus() {
         const newStatus = ContactService.getRestaurantStatus();
         
-        // Notificar a todos los callbacks
         this.callbacks.forEach(callback => {
             try {
                 callback(newStatus);
@@ -448,11 +551,6 @@ export class ContactStatusManager {
         });
     }
 
-    /**
-     * Actualiza los elementos DOM con el nuevo estado
-     * @param {Object} statusData - Datos del estado del restaurante
-     * @param {Function} translateFn - Función de traducción
-     */
     updateStatusElements(statusData, translateFn = null) {
         const statusElement = document.getElementById('restaurantStatus');
         const statusText = document.getElementById('statusText');
@@ -462,11 +560,9 @@ export class ContactStatusManager {
         }
         
         if (statusText && translateFn) {
-            // Usar función de traducción si está disponible
             const translatedText = translateFn(statusData.translationKey, statusData.params);
             statusText.textContent = translatedText;
         } else if (statusText && statusData.translatedMessage) {
-            // Usar mensaje ya traducido si está disponible
             statusText.textContent = statusData.translatedMessage;
         }
     }
