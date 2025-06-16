@@ -2,40 +2,24 @@
 import Text from '../i18n/Text.astro';
 import contactData from '../../data/contact-data.json';
 import { i18nCore } from '../../i18n/core.js';
+import { ContactService } from '../../services/ContactService.js';
 
 // Obtener información de i18n
 const { locale } = i18nCore.getI18nInfo(Astro);
 
-// Función helper para obtener el estado del restaurante
-function getRestaurantStatus() {
-    // Por ahora retornamos "open", pero aquí se podría integrar 
-    // lógica para verificar horarios reales
-    return contactData.status.defaultStatus;
-}
-
-// Formatear dirección completa
-function getFullAddress() {
-    const addr = contactData.contact.address;
-    return `${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.province}`;
-}
-
-// Obtener redes sociales habilitadas
-function getEnabledSocials() {
-    return Object.entries(contactData.social)
-        .filter(([_, social]) => social.enabled)
-        .map(([key, social]) => ({ key, ...social }));
-}
-
-const currentStatus = getRestaurantStatus();
-const fullAddress = getFullAddress();
-const socialNetworks = getEnabledSocials();
+// Obtener datos del servicio actualizado
+const contactServiceData = ContactService.getContactDataWithTranslations(i18nCore, locale);
+const currentStatus = contactServiceData.status;
+const fullAddress = contactServiceData.fullAddress;
+const socialNetworks = contactServiceData.socials;
+const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: horarios agrupados
 ---
 
 <section class="contact-section" id="contacto">
     <div class="contact-container container">
-        <!-- Componente de Contacto Combinado - DISEÑO ORIGINAL MANTENIDO -->
+        <!-- Componente de Contacto -->
         <div class="contact-component">
-            <!-- Cabecera con Status - IGUAL QUE ANTES -->
+            <!-- Cabecera con Status -->
             <div class="top-bar">
                 <div class="mini-brand">
                     {contactData.config.showLogo && (
@@ -62,20 +46,20 @@ const socialNetworks = getEnabledSocials();
                     </span>
                 </div>
                 {contactData.config.showStatus && (
-                    <div class={`status status-${currentStatus}`} id="restaurantStatus">
+                    <div class={`status status-${currentStatus.status}`} id="restaurantStatus">
                         <div class="status-dot"></div>
-                        <span id="statusText">
-                            <Text key={`contact.status.${currentStatus}`} fallback="Estado desconocido" />
+                        <span id="statusText" class="status-message">
+                            {currentStatus.fullMessage || "No Disponible"}
                         </span>
                     </div>
                 )}
             </div>
 
-            <!-- Contenido de Contacto - ESTRUCTURA ORIGINAL -->
+            <!-- Contenido de Contacto -->
             <div class="contact-content">
                 <div class="contact-grid">
                     <!-- Sección de Dirección -->
-                    <div class="contact-section">
+                    <div class="contact-info-section">
                         <h4>
                             📍 <Text key="contact.sections.address" fallback="Dirección" />
                         </h4>
@@ -85,7 +69,7 @@ const socialNetworks = getEnabledSocials();
                     </div>
 
                     <!-- Sección de Contacto -->
-                    <div class="contact-section">
+                    <div class="contact-info-section">
                         <h4>
                             📞 <Text key="contact.sections.phone" fallback="Contacto" />
                         </h4>
@@ -103,28 +87,39 @@ const socialNetworks = getEnabledSocials();
                         </p>
                     </div>
 
-                    <!-- Sección de Horarios -->
-                    <div class="contact-section">
+                    <!-- Sección de Horarios ACTUALIZADA -->
+                    <div class="contact-info-section">
                         <h4>
                             🕒 <Text key="contact.sections.hours" fallback="Horarios" />
                         </h4>
-                        <p>
-                            <strong><Text key="contact.fields.lunch" fallback="Comidas" />:</strong> 
-                            {contactData.hours.lunch.start} - {contactData.hours.lunch.end}
-                        </p>
-                        <p>
-                            <strong><Text key="contact.fields.dinner" fallback="Cenas" />:</strong> 
-                            {contactData.hours.dinner.start} - {contactData.hours.dinner.end}
-                        </p>
-                        <p>
-                            <strong><Text key="contact.fields.days" fallback="Días" />:</strong> 
-                            <Text key="contact.values.allDays" fallback="Lunes a Domingo" />
-                        </p>
+                        {groupedSchedule.map((group) => (
+                            <div class="schedule-group">
+                                <p class="schedule-days">
+                                    <strong>{group.daysDisplay}:</strong>
+                                </p>
+                                {group.closed ? (
+                                    <p class="schedule-closed">
+                                        <Text key="contact.status.states.closed" fallback="Cerrado" />
+                                    </p>
+                                ) : (
+                                    <div class="schedule-ranges">
+                                        {group.ranges.map((range) => (
+                                            <p class="schedule-range">
+                                                {range.translatedName && (
+                                                    <span class="range-name">{range.translatedName}: </span>
+                                                )}
+                                                <span class="range-time">{range.start} - {range.end}</span>
+                                            </p>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
 
                     <!-- Sección de Redes Sociales -->
                     {contactData.config.showSocial && (
-                        <div class="contact-section">
+                        <div class="contact-info-section">
                             <h4>
                                 🌐 <Text key="contact.sections.social" fallback="Síguenos" />
                             </h4>
@@ -153,12 +148,12 @@ const socialNetworks = getEnabledSocials();
 </section>
 
 <style>
-    /* === CONTACT SECTION BASE - TAMAÑO IGUAL A OTROS COMPONENTES === */
+    /* === CONTACT SECTION BASE - MISMO TAMAÑO QUE OTROS COMPONENTES === */
     .contact-section {
         width: 100%;
-        background: rgb(20, 20, 20); /* 🔥 MISMO FONDO que Historia/Carta */
-        /* 🔥 MISMO PADDING que otros componentes */
-        padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2.5) 0;
+        background: rgb(20, 20, 20); /* MISMO FONDO que Historia/Carta */
+        /* 🔥 MISMO PADDING que otros componentes principales */
+        padding: calc(var(--padding-mobile) * 6) 0 calc(var(--padding-mobile) * 3) 0;
         position: relative;
         z-index: 2;
     }
@@ -192,27 +187,27 @@ const socialNetworks = getEnabledSocials();
         z-index: 2;
     }
 
-    /* === COMPONENTE PRINCIPAL - ESTRUCTURA ORIGINAL === */
+    /* === COMPONENTE PRINCIPAL - SIN HOVER === */
     .contact-component {
-        /* 🔥 COLORES ACTUALIZADOS pero DISEÑO ORIGINAL */
         background: rgba(0, 0, 0, 0.6); /* Mismo que otros componentes */
-        border-radius: 20px; /* 🔥 BORDES REDONDEADOS */
+        border-radius: 20px;
         overflow: hidden;
-        border: 2px solid rgba(244, 162, 97, 0.2); /* 🔥 COLORES CONSISTENTES */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Mismo que otros */
-        backdrop-filter: blur(10px); /* 🔥 AÑADIDO para consistencia */
+        border: 2px solid rgba(244, 162, 97, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
         max-width: 1000px;
         margin: 0 auto;
+        /* 🔥 REMOVIDO: No hay hover effects */
     }
 
-    /* === CABECERA CON STATUS - COLORES ACTUALIZADOS === */
+    /* === CABECERA CON STATUS === */
     .top-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(0, 0, 0, 0.4); /* 🔥 ACTUALIZADO */
+        background: rgba(0, 0, 0, 0.4);
         padding: calc(var(--padding-mobile) * 1.25) calc(var(--padding-mobile) * 1.5);
-        border-bottom: 1px solid rgba(244, 162, 97, 0.3); /* 🔥 COLORES CONSISTENTES */
+        border-bottom: 1px solid rgba(244, 162, 97, 0.3);
     }
 
     .mini-brand {
@@ -235,18 +230,18 @@ const socialNetworks = getEnabledSocials();
     }
 
     .brand-text {
-        color: #f4a261; /* 🔥 COLORES CONSISTENTES */
+        color: #f4a261;
         font-size: 1.3rem;
         font-weight: 500;
         letter-spacing: 1px;
     }
 
-    /* === STATUS INDICATOR - COLORES ACTUALIZADOS === */
+    /* === STATUS INDICATOR === */
     .status {
         background: rgba(76, 175, 80, 0.2);
         color: #4CAF50;
         padding: calc(var(--padding-mobile) * 0.5) calc(var(--padding-mobile) * 1);
-        border-radius: 20px; /* 🔥 BORDES REDONDEADOS */
+        border-radius: 20px;
         font-size: 0.9rem;
         border: 1px solid #4CAF50;
         display: flex;
@@ -291,72 +286,106 @@ const socialNetworks = getEnabledSocials();
         background: #FFC107;
     }
 
-    /* === CONTENIDO DE CONTACTO - ESTRUCTURA ORIGINAL === */
+    /* === CONTENIDO DE CONTACTO === */
     .contact-content {
-        padding: calc(var(--padding-mobile) * 2.5); /* 🔥 PADDING CONSISTENTE */
+        padding: calc(var(--padding-mobile) * 3); /* 🔥 AUMENTADO para igualar otros componentes */
     }
 
     .contact-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: calc(var(--gap-mobile) * 2); /* 🔥 GAP USANDO VARIABLES GLOBALES */
+        gap: calc(var(--gap-mobile) * 2.5); /* 🔥 AUMENTADO el gap */
     }
 
-    /* === SECCIONES DE INFORMACIÓN - COLORES ACTUALIZADOS === */
-    .contact-section {
-        padding: calc(var(--padding-mobile) * 1.25);
-        transition: all 0.3s ease;
+    /* === SECCIONES DE INFORMACIÓN - SIN HOVER === */
+    .contact-info-section {
+        padding: calc(var(--padding-mobile) * 1.5); /* 🔥 AUMENTADO padding */
         border: 1px solid transparent;
-        border-radius: 15px; /* 🔥 BORDES REDONDEADOS */
-        background: rgba(244, 162, 97, 0.05); /* 🔥 FONDO SUTIL CONSISTENTE */
+        border-radius: 15px;
+        background: rgba(244, 162, 97, 0.05);
+        /* 🔥 REMOVIDO: No hay hover effects ni transformaciones */
     }
 
-    .contact-section:hover {
-        border-color: rgba(244, 162, 97, 0.3); /* 🔥 HOVER CONSISTENTE */
-        transform: translateY(-2px);
-        background: rgba(244, 162, 97, 0.08);
-    }
-
-    .contact-section h4 {
-        color: #f4a261; /* 🔥 COLORES CONSISTENTES */
+    .contact-info-section h4 {
+        color: #f4a261;
         font-size: 1.3rem;
-        margin-bottom: calc(var(--gap-mobile) * 0.9);
-        border-bottom: 2px solid rgba(244, 162, 97, 0.3); /* 🔥 BORDER CONSISTENTE */
+        margin-bottom: calc(var(--gap-mobile) * 1.2); /* 🔥 AUMENTADO margen */
+        border-bottom: 2px solid rgba(244, 162, 97, 0.3);
         padding-bottom: calc(var(--padding-mobile) * 0.5);
         display: flex;
         align-items: center;
         gap: calc(var(--gap-mobile) * 0.6);
     }
 
-    .contact-section p {
+    .contact-info-section p {
         color: #ccc;
         margin-bottom: calc(var(--gap-mobile) * 0.75);
         font-size: 1rem;
         line-height: 1.5;
     }
 
-    .contact-section p:last-child {
+    .contact-info-section p:last-child {
         margin-bottom: 0;
     }
 
-    .contact-section strong {
+    .contact-info-section strong {
         color: #fff;
         font-weight: 600;
     }
 
     /* Enlaces */
-    .contact-section a {
-        color: #f4a261; /* 🔥 COLORES CONSISTENTES */
+    .contact-info-section a {
+        color: #f4a261;
         text-decoration: none;
         transition: all 0.3s ease;
     }
 
-    .contact-section a:hover {
+    .contact-info-section a:hover {
         color: #fff;
         text-decoration: underline;
     }
 
-    /* === REDES SOCIALES - DISEÑO ORIGINAL CON COLORES ACTUALIZADOS === */
+    /* === HORARIOS ACTUALIZADOS === */
+    .schedule-group {
+        margin-bottom: calc(var(--gap-mobile) * 1);
+    }
+
+    .schedule-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .schedule-days {
+        margin-bottom: calc(var(--gap-mobile) * 0.5) !important;
+    }
+
+    .schedule-closed {
+        color: #f44336;
+        font-style: italic;
+        margin-bottom: calc(var(--gap-mobile) * 0.5) !important;
+    }
+
+    .schedule-ranges {
+        margin-left: calc(var(--padding-mobile) * 1);
+    }
+
+    .schedule-range {
+        margin-bottom: calc(var(--gap-mobile) * 0.25) !important;
+        display: flex;
+        align-items: center;
+        gap: calc(var(--gap-mobile) * 0.5);
+    }
+
+    .range-name {
+        color: #f4a261;
+        font-weight: 500;
+        min-width: 80px;
+    }
+
+    .range-time {
+        color: #ccc;
+    }
+
+    /* === REDES SOCIALES === */
     .social-links {
         display: flex;
         gap: calc(var(--gap-mobile) * 0.75);
@@ -364,22 +393,22 @@ const socialNetworks = getEnabledSocials();
     }
 
     .social-links a {
-        background: rgba(244, 162, 97, 0.2); /* 🔥 COLORES CONSISTENTES */
+        background: rgba(244, 162, 97, 0.2);
         color: #f4a261;
         width: 40px;
         height: 40px;
-        border-radius: 10px; /* 🔥 BORDES REDONDEADOS */
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
         transition: all 0.3s ease;
         font-size: 18px;
-        border: 1px solid rgba(244, 162, 97, 0.3); /* 🔥 BORDER CONSISTENTE */
+        border: 1px solid rgba(244, 162, 97, 0.3);
     }
 
     .social-links a:hover {
-        background: rgba(244, 162, 97, 0.4); /* 🔥 HOVER CONSISTENTE */
+        background: rgba(244, 162, 97, 0.4);
         color: #fff;
         transform: translateY(-2px);
         border-color: rgba(244, 162, 97, 0.6);
@@ -390,7 +419,7 @@ const socialNetworks = getEnabledSocials();
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .contact-section {
-            padding: calc(var(--padding-tablet) * 2.5) 0 calc(var(--padding-tablet) * 1.67) 0;
+            padding: calc(var(--padding-tablet) * 3) 0 calc(var(--padding-tablet) * 2) 0;
         }
 
         .top-bar {
@@ -402,24 +431,24 @@ const socialNetworks = getEnabledSocials();
         }
 
         .contact-content {
-            padding: calc(var(--padding-tablet) * 2);
+            padding: calc(var(--padding-tablet) * 2.5);
         }
 
         .contact-grid {
-            gap: calc(var(--gap-tablet) * 1.33);
+            gap: calc(var(--gap-tablet) * 1.5);
         }
 
-        .contact-section {
-            padding: calc(var(--padding-tablet) * 1);
+        .contact-info-section {
+            padding: calc(var(--padding-tablet) * 1.25);
         }
 
-        .contact-section h4 {
-            margin-bottom: var(--gap-tablet);
+        .contact-info-section h4 {
+            margin-bottom: calc(var(--gap-tablet) * 1.2);
             padding-bottom: calc(var(--padding-tablet) * 0.5);
             gap: calc(var(--gap-tablet) * 0.5);
         }
 
-        .contact-section p {
+        .contact-info-section p {
             margin-bottom: calc(var(--gap-tablet) * 0.67);
         }
 
@@ -427,12 +456,20 @@ const socialNetworks = getEnabledSocials();
             gap: var(--gap-tablet);
             margin-top: var(--gap-tablet);
         }
+
+        .schedule-group {
+            margin-bottom: calc(var(--gap-tablet) * 1);
+        }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-tablet) * 1);
+        }
     }
 
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .contact-section {
-            padding: calc(var(--padding-desktop) * 2) 0 calc(var(--padding-desktop) * 1.33) 0;
+            padding: calc(var(--padding-desktop) * 2.5) 0 calc(var(--padding-desktop) * 1.67) 0;
         }
 
         .top-bar {
@@ -444,30 +481,38 @@ const socialNetworks = getEnabledSocials();
         }
 
         .contact-content {
-            padding: calc(var(--padding-desktop) * 1.33);
+            padding: calc(var(--padding-desktop) * 2);
         }
 
         .contact-grid {
-            gap: var(--gap-desktop);
+            gap: calc(var(--gap-desktop) * 1.25);
         }
 
-        .contact-section {
-            padding: calc(var(--padding-desktop) * 0.8);
+        .contact-info-section {
+            padding: calc(var(--padding-desktop) * 1);
         }
 
-        .contact-section h4 {
-            margin-bottom: calc(var(--gap-desktop) * 0.67);
+        .contact-info-section h4 {
+            margin-bottom: calc(var(--gap-desktop) * 0.8);
             padding-bottom: calc(var(--padding-desktop) * 0.33);
             gap: calc(var(--gap-desktop) * 0.5);
         }
 
-        .contact-section p {
+        .contact-info-section p {
             margin-bottom: calc(var(--gap-desktop) * 0.5);
         }
 
         .social-links {
             gap: var(--gap-desktop);
             margin-top: calc(var(--gap-desktop) * 0.67);
+        }
+
+        .schedule-group {
+            margin-bottom: calc(var(--gap-desktop) * 0.8);
+        }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-desktop) * 1);
         }
     }
 
@@ -489,7 +534,7 @@ const socialNetworks = getEnabledSocials();
     /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
         .contact-section {
-            padding: calc(var(--padding-mobile) * 4) 0 calc(var(--padding-mobile) * 1.5) 0;
+            padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2) 0;
         }
 
         .top-bar {
@@ -500,21 +545,21 @@ const socialNetworks = getEnabledSocials();
         }
 
         .contact-content {
-            padding: calc(var(--padding-mobile) * 1.5);
+            padding: calc(var(--padding-mobile) * 2);
         }
 
         .contact-grid {
             grid-template-columns: 1fr; /* Una columna en móvil */
-            gap: var(--gap-mobile);
+            gap: calc(var(--gap-mobile) * 1.5);
         }
 
-        .contact-section {
-            padding: calc(var(--padding-mobile) * 0.75);
+        .contact-info-section {
+            padding: calc(var(--padding-mobile) * 1);
         }
 
-        .contact-section h4 {
+        .contact-info-section h4 {
             font-size: 1.2rem;
-            margin-bottom: calc(var(--gap-mobile) * 0.5);
+            margin-bottom: calc(var(--gap-mobile) * 0.75);
         }
 
         .social-links a {
@@ -522,16 +567,19 @@ const socialNetworks = getEnabledSocials();
             height: 35px;
             font-size: 16px;
         }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-mobile) * 0.5);
+        }
     }
 </style>
 
 <script>
-    // VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
     import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
     
     document.addEventListener('DOMContentLoaded', () => {
         const contactSection = document.querySelector('.contact-section');
-        const contactSections = document.querySelectorAll('.contact-section .contact-section');
+        const contactSections = document.querySelectorAll('.contact-info-section');
         
         // Usar el sistema centralizado de breakpoints
         const breakpoints = useBreakpoints('contact-component', {
@@ -548,5 +596,40 @@ const socialNetworks = getEnabledSocials();
                 disableTransitionsDuringResize(elementsToAdjust);
             }
         });
+
+        // 🔥 SIMPLIFICADO: Formatear mensajes de estado para hacer bold la parte del estado
+        function formatStatusMessage() {
+            const statusTextElement = document.getElementById('statusText');
+            if (!statusTextElement) return;
+
+            const message = statusTextElement.textContent.trim();
+            
+            // Verificar si el mensaje tiene formato "Estado: Mensaje"
+            if (message.includes(':')) {
+                const [statusPart, ...messageParts] = message.split(':');
+                const messageRest = messageParts.join(':').trim();
+                
+                // Crear HTML con el estado en bold
+                statusTextElement.innerHTML = `<strong>${statusPart.trim()}</strong>: ${messageRest}`;
+            }
+        }
+
+        // Ejecutar formateo inicial
+        formatStatusMessage();
+
+        // Observer para detectar cambios en el texto del status (para actualizaciones dinámicas)
+        const statusTextElement = document.getElementById('statusText');
+        if (statusTextElement) {
+            const observer = new MutationObserver(() => {
+                // Pequeño delay para evitar formatear mientras se está actualizando
+                setTimeout(formatStatusMessage, 10);
+            });
+            
+            observer.observe(statusTextElement, { 
+                childList: true, 
+                characterData: true, 
+                subtree: true 
+            });
+        }
     });
 </script>

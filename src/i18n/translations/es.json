@@ -257,16 +257,29 @@
       "followUs": "Mantente al día con nuestras novedades",
       "scheduleNote": "Los horarios pueden variar según el día"
     },
+    "ranges": {
+      "morning": "Mañana",
+      "lunch": "Comidas",
+      "dinner": "Cenas",
+      "allDay": "Todo el día",
+      "breakfast": "Desayunos",
+      "afternoon": "Tarde",
+      "evening": "Noche"
+    },
     "status": {
-      "open": "Abierto ahora",
-      "closed": "Cerrado",
-      "closedToday": "Cerrado hoy",
-      "closingSoon": "Cerrando en {{minutes}} min",
-      "openingSoon": "Abriendo a las {{time}}",
-      "openingToday": "Hoy a las {{time}}",
-      "openingOn": "{{day}} a las {{time}}",
-      "nextOpening": "Próxima apertura: {{time}}",
-      "checkSchedule": "Consultar horarios"
+      "and": "y",
+      "states": {
+        "open": "Abierto",
+        "closed": "Cerrado",
+        "vacation": "Vacaciones"
+      },
+      "messages": {
+        "until": "Hasta las {{time}}",
+        "closingIn": "Cerrando en {{minutes}} min",
+        "openingAt": "Abriendo a las {{time}}",
+        "openingToday": "Abre hoy a las {{time}}",
+        "openingOn": "Abre el {{day}} a las {{time}}"
+      }
     },
     "days": {
       "monday": "Lunes",

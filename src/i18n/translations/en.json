@@ -257,16 +257,28 @@
       "followUs": "Stay updated with our latest news",
       "scheduleNote": "Hours may vary by day"
     },
+    "ranges": {
+      "morning": "Morning",
+      "lunch": "Lunch", 
+      "dinner": "Dinner",
+      "allDay": "All day",
+      "breakfast": "Breakfast",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
     "status": {
-      "open": "Open now",
-      "closed": "Closed",
-      "closedToday": "Closed today",
-      "closingSoon": "Closing in {{minutes}} min", 
-      "openingSoon": "Opening at {{time}}",
-      "openingToday": "Today at {{time}}",
-      "openingOn": "{{day}} at {{time}}",
-      "nextOpening": "Next opening: {{time}}",
-      "checkSchedule": "Check schedule"
+      "states": {
+        "open": "Open",
+        "closed": "Closed",
+        "vacation": "Vacations"
+      },
+      "messages": {
+        "until": "Until {{time}}",
+        "closingIn": "Closes in {{minutes}} min",
+        "openingAt": "Opens at {{time}}",
+        "openingToday": "Opens today at {{time}}",
+        "openingOn": "Opens {{day}} at {{time}}"
+      }
     },
     "days": {
       "monday": "Monday",

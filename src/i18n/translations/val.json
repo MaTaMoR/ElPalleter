@@ -257,16 +257,28 @@
       "followUs": "Mantín-te al dia amb les nostres novetats",
       "scheduleNote": "Els horaris poden variar segons el dia"
     },
+    "ranges": {
+      "morning": "Matí",
+      "lunch": "Dinars",
+      "dinner": "Sopars",
+      "allDay": "Tot el dia",
+      "breakfast": "Esmorzars",
+      "afternoon": "Vesprada",
+      "evening": "Nit"
+    },
     "status": {
-      "open": "Obert ara",
-      "closed": "Tancat", 
-      "closedToday": "Tancat hui",
-      "closingSoon": "Tancant en {{minutes}} min",
-      "openingSoon": "Obrint a les {{time}}",
-      "openingToday": "Hui a les {{time}}",
-      "openingOn": "{{day}} a les {{time}}",
-      "nextOpening": "Pròxima obertura: {{time}}",
-      "checkSchedule": "Consultar horaris"
+      "states": {
+        "open": "Obert",
+        "closed": "Tancat",
+        "vacation": "Vacances"
+      },
+      "messages": {
+        "until": "Fins les {{time}}",
+        "closingIn": "Tancant en {{minutes}} min",
+        "openingAt": "Obrint a les {{time}}",
+        "openingToday": "Obri hui a les {{time}}",
+        "openingOn": "Obri el {{day}} a les {{time}}"
+      }
     },
     "days": {
       "monday": "Dilluns",
