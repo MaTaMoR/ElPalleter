@@ -1,5 +1,6 @@
 ---
 import ImageSlider from './ImageSlider.astro';
+import Text from '../i18n/Text.astro';
 import RichText from '../i18n/RichText.astro';
 import { getGalleryImages } from '../../utils/imageUtils.js';
 
@@ -9,6 +10,14 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
 
 <!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="historia-section" id="historia">
+    <div class="historia-header">
+        <h2 class="historia-title">
+            <Text key="story.title" fallback="Historia" />
+        </h2>
+        <p class="historia-subtitle">
+            <Text key="story.subtitle" fallback="Desde 1985 en el corazón de Benissa con mucho orgullo" />
+        </p>
+    </div>
     <div class="historia-container container">
         <!-- Historia a la izquierda -->
         <div class="history-content">
@@ -28,9 +37,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
 </section>
 
 <style>
-    /* 🔥 ELIMINADO: Ya no necesita background, padding externo ni efectos de partículas */
-    
-    /* === SECCIÓN BASE SIMPLIFICADA === */
+    /* === SECCIÓN BASE  === */
     .historia-section {
         width: 100%;
         height: fit-content;
@@ -39,8 +46,26 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         position: relative;
         overflow: hidden;
         box-sizing: border-box;
-        
-        /* 🚫 ELIMINADO: background, padding externo, efectos ::before */
+        flex-direction: column;
+    }
+
+    .historia-header {
+        text-align: center;
+        margin-bottom: calc(var(--gap-mobile) * 3);
+    }
+
+    .historia-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 300;
+        color: #f4a261;
+        margin-bottom: var(--gap-mobile);
+        letter-spacing: 2px;
+    }
+
+    .historia-subtitle {
+        font-size: 1.1rem;
+        color: #ccc;
+        opacity: 0.8;
     }
 
     /* 🚫 ELIMINADO: Efectos de partículas (los maneja el MainContent) */

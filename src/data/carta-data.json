@@ -1,6 +1,85 @@
 {
   "categories": [
     {
+      "id": "bebidas",
+      "nameKey": "carta.categories.bebidas",
+      "subcategories": [
+        {
+          "id": "cervezas",
+          "nameKey": "carta.subcategories.cervezas",
+          "items": [
+            {
+              "id": "cana-mahou",
+              "nameKey": "carta.items.cana-mahou.name",
+              "price": 1.50
+            },
+            {
+              "id": "doble-mahou",
+              "nameKey": "carta.items.doble-mahou.name",
+              "price": 2.00
+            },
+            {
+              "id": "jarra-mahou",
+              "nameKey": "carta.items.jarra-mahou.name",
+              "price": 6.00
+            },
+            {
+              "id": "mahou-5-estrellas",
+              "nameKey": "carta.items.mahou-5-estrellas.name",
+              "price": 2.00
+            }
+          ]
+        },
+        {
+          "id": "refrescos",
+          "nameKey": "carta.subcategories.refrescos",
+          "items": [
+            {
+              "id": "coca-cola",
+              "nameKey": "carta.items.coca-cola.name",
+              "price": 1.80
+            },
+            {
+              "id": "coca-cola-zero",
+              "nameKey": "carta.items.coca-cola-zero.name",
+              "price": 1.80
+            },
+            {
+              "id": "aquarius",
+              "nameKey": "carta.items.aquarius.name",
+              "price": 1.80
+            },
+            {
+              "id": "agua-aquabona",
+              "nameKey": "carta.items.agua-aquabona.name",
+              "price": 2.50
+            }
+          ]
+        },
+        {
+          "id": "cafe",
+          "nameKey": "carta.subcategories.cafe",
+          "items": [
+            {
+              "id": "cafe-solo",
+              "nameKey": "carta.items.cafe-solo.name",
+              "price": 1.10
+            },
+            {
+              "id": "cafe-leche",
+              "nameKey": "carta.items.cafe-leche.name",
+              "price": 1.30
+            },
+            {
+              "id": "cappuccino",
+              "nameKey": "carta.items.cappuccino.name",
+              "price": 1.80
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "entrantes",
       "nameKey": "carta.categories.entrantes",
       "subcategories": [
@@ -226,85 +305,6 @@
               "id": "merluza-rebozada",
               "nameKey": "carta.items.merluza-rebozada.name",
               "price": 7.50
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "bebidas",
-      "nameKey": "carta.categories.bebidas",
-      "subcategories": [
-        {
-          "id": "cervezas",
-          "nameKey": "carta.subcategories.cervezas",
-          "items": [
-            {
-              "id": "cana-mahou",
-              "nameKey": "carta.items.cana-mahou.name",
-              "price": 1.50
-            },
-            {
-              "id": "doble-mahou",
-              "nameKey": "carta.items.doble-mahou.name",
-              "price": 2.00
-            },
-            {
-              "id": "jarra-mahou",
-              "nameKey": "carta.items.jarra-mahou.name",
-              "price": 6.00
-            },
-            {
-              "id": "mahou-5-estrellas",
-              "nameKey": "carta.items.mahou-5-estrellas.name",
-              "price": 2.00
-            }
-          ]
-        },
-        {
-          "id": "refrescos",
-          "nameKey": "carta.subcategories.refrescos",
-          "items": [
-            {
-              "id": "coca-cola",
-              "nameKey": "carta.items.coca-cola.name",
-              "price": 1.80
-            },
-            {
-              "id": "coca-cola-zero",
-              "nameKey": "carta.items.coca-cola-zero.name",
-              "price": 1.80
-            },
-            {
-              "id": "aquarius",
-              "nameKey": "carta.items.aquarius.name",
-              "price": 1.80
-            },
-            {
-              "id": "agua-aquabona",
-              "nameKey": "carta.items.agua-aquabona.name",
-              "price": 2.50
-            }
-          ]
-        },
-        {
-          "id": "cafe",
-          "nameKey": "carta.subcategories.cafe",
-          "items": [
-            {
-              "id": "cafe-solo",
-              "nameKey": "carta.items.cafe-solo.name",
-              "price": 1.10
-            },
-            {
-              "id": "cafe-leche",
-              "nameKey": "carta.items.cafe-leche.name",
-              "price": 1.30
-            },
-            {
-              "id": "cappuccino",
-              "nameKey": "carta.items.cappuccino.name",
-              "price": 1.80
             }
           ]
         }

@@ -12,10 +12,11 @@
     "menu": "Vore Carta"
   },
   "story": {
-    "title": "La Nostra Història"
+    "title": "Història",
+    "subtitle": "Des de 1985 al cor de Benissa amb gran orgull"
   },
   "carta": {
-    "title": "La Nostra Carta",
+    "title": "Carta",
     "subtitle": "Cuina mediterrània autèntica des de 1985",
     "categories": {
       "entrantes": "Entrants",

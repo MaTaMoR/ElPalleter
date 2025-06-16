@@ -12,10 +12,11 @@
     "menu": "View Menu"
   },
   "story": {
-    "title": "Our Story"
+    "title": "Story",
+    "subtitle": "Since 1985 in the heart of Benissa with great pride"
   },
   "carta": {
-    "title": "Our Menu",
+    "title": "Menu",
     "subtitle": "Authentic Mediterranean cuisine since 1985",
     "categories": {
       "entrantes": "Starters",

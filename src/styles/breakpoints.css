@@ -24,37 +24,6 @@
   --padding-desktop: 3rem;
 }
 
-/* === CLASES UTILITARIAS DE BREAKPOINTS === */
-
-/* Container responsive estándar */
-.container {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 var(--padding-mobile);
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: var(--container-tablet);
-    padding: 0 var(--padding-tablet);
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    max-width: var(--container-desktop);
-    padding: 0 var(--padding-desktop);
-  }
-}
-
-@media (min-width: 1400px) {
-  .container {
-    max-width: var(--container-desktop-lg);
-  }
-}
-
-/* === MIXINS CSS (usando @apply si usas Tailwind, sino usar clases) === */
-
 /* Clases para mostrar/ocultar por breakpoint */
 .mobile-only {
   display: block;

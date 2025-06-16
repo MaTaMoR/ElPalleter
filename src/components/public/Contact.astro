@@ -20,6 +20,14 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
 <!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="contact-section" id="contacto">
+    <div class="contact-header">
+        <h2 class="contact-title">
+            <Text key="contact.title" fallback="Contacto" />
+        </h2>
+        <p class="contact-subtitle">
+            <Text key="contact.subtitle" fallback="Donde estamos y como contactarnos" />
+        </p>
+    </div>
     <div class="contact-container container">
         <!-- Componente de Contacto -->
         <div class="contact-component">
@@ -289,18 +297,31 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 </section>
 
 <style>
-    /* 🔥 ELIMINADO: background, padding externo, efectos de partículas */
-    
     /* === CONTACT SECTION SIMPLIFICADA === */
     .contact-section {
         width: 100%;
         position: relative;
-        
-        /* 🚫 ELIMINADO: background, padding externo, z-index, efectos ::before */
     }
 
-    /* 🚫 ELIMINADO: Efectos de partículas (los maneja MainContent) */
-    /* 🚫 ELIMINADO: @keyframes float */
+    /* === HEADER === */
+    .contact-header {
+        text-align: center;
+        margin-bottom: calc(var(--gap-mobile) * 3);
+    }
+
+    .contact-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 300;
+        color: #f4a261;
+        margin-bottom: var(--gap-mobile);
+        letter-spacing: 2px;
+    }
+
+    .contact-subtitle {
+        font-size: 1.1rem;
+        color: #ccc;
+        opacity: 0.8;
+    }
 
     .contact-container {
         position: relative;
@@ -560,7 +581,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
         /* Reducir padding del container en móvil */
         .contact-content {
-            padding: calc(var(--padding-mobile) * 2);
+            padding: var(--padding-mobile);
         }
 
         /* Ajustar padding de las secciones */
@@ -586,7 +607,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
 
         .contact-content {
-            padding: calc(var(--padding-mobile) * 1.5);
+            padding: var(--padding-mobile);
         }
 
         .contact-info-section {
@@ -625,7 +646,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
 
         .contact-content {
-            padding: calc(var(--padding-tablet) * 2.5);
+            padding: var(--padding-mobile);
         }
 
         .contact-grid {
@@ -672,7 +693,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
 
         .contact-content {
-            padding: calc(var(--padding-desktop) * 2);
+            padding: var(--padding-mobile);
         }
 
         .contact-grid {

@@ -17,7 +17,7 @@ function formatPrice(price) {
     <div class="carta-container container">
         <div class="carta-header">
             <h2 class="carta-title">
-                <Text key="carta.title" fallback="Nuestra Carta" />
+                <Text key="carta.title" fallback="Carta" />
             </h2>
             <p class="carta-subtitle">
                 <Text key="carta.subtitle" fallback="Auténtica cocina mediterránea desde 1985" />
@@ -75,18 +75,11 @@ function formatPrice(price) {
 </section>
 
 <style>
-    /* 🔥 ELIMINADO: background, padding externo, efectos de partículas */
-    
     /* === CARTA SECTION SIMPLIFICADA === */
     .carta-section {
-        min-height: 100vh;
+        min-height: 90vh;
         position: relative;
-        
-        /* 🚫 ELIMINADO: background, padding externo, efectos ::before */
     }
-
-    /* 🚫 ELIMINADO: Efectos de partículas (los maneja MainContent) */
-    /* 🚫 ELIMINADO: @keyframes float */
 
     .carta-container {
         z-index: 2;

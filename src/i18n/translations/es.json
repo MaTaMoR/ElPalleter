@@ -12,10 +12,11 @@
     "menu": "Ver Carta"
   },
   "story": {
-    "title": "Nuestra Historia"
+    "title": "Historia",
+    "subtitle": "Desde 1985 en el corazón de Benissa con gran orgullo"
   },
   "carta": {
-    "title": "Nuestra Carta",
+    "title": "Carta",
     "subtitle": "Auténtica cocina mediterránea desde 1985",
     "categories": {
       "entrantes": "Entrantes",
