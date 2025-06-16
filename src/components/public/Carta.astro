@@ -12,6 +12,7 @@ function formatPrice(price) {
 }
 ---
 
+<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="carta-section" id="carta">
     <div class="carta-container container">
         <div class="carta-header">
@@ -74,47 +75,18 @@ function formatPrice(price) {
 </section>
 
 <style>
-    /* === CARTA SECTION - USANDO SISTEMA GLOBAL === */
+    /* 🔥 ELIMINADO: background, padding externo, efectos de partículas */
+    
+    /* === CARTA SECTION SIMPLIFICADA === */
     .carta-section {
         min-height: 100vh;
-        background: rgb(20, 20, 20);
         position: relative;
-        padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2.5) 0;
+        
+        /* 🚫 ELIMINADO: background, padding externo, efectos ::before */
     }
 
-    /* Efecto de partículas animadas en el fondo */
-    .carta-section:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
-                        radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-                        radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
-                        radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
-                        radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
-        background-size: 120px 120px, 150px 150px, 100px 100px, 180px 180px, 90px 90px;
-        opacity: 0.15;
-        animation: float 25s ease-in-out infinite;
-        z-index: 1;
-    }
-
-    @keyframes float {
-        0%, 100% { 
-            transform: translateY(0px) translateX(0px); 
-        }
-        25% { 
-            transform: translateY(-15px) translateX(5px); 
-        }
-        50% { 
-            transform: translateY(-25px) translateX(-10px); 
-        }
-        75% { 
-            transform: translateY(-10px) translateX(8px); 
-        }
-    }
+    /* 🚫 ELIMINADO: Efectos de partículas (los maneja MainContent) */
+    /* 🚫 ELIMINADO: @keyframes float */
 
     .carta-container {
         z-index: 2;
@@ -267,14 +239,10 @@ function formatPrice(price) {
         }
     }
 
-    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
+    /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
     
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
-        .carta-section {
-            padding: calc(var(--padding-tablet) * 6) 0 calc(var(--padding-tablet) * 2.5) 0;
-        }
-
         .carta-header {
             margin-bottom: calc(var(--gap-tablet) * 2);
         }
@@ -340,10 +308,6 @@ function formatPrice(price) {
 
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
-        .carta-section {
-            padding: calc(var(--padding-desktop) * 4) 0 calc(var(--padding-desktop) * 2.67) 0;
-        }
-
         .carta-header {
             margin-bottom: calc(var(--gap-desktop) * 1.33);
         }
@@ -413,10 +377,6 @@ function formatPrice(price) {
 
     /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
-        .carta-section {
-            padding: calc(var(--padding-mobile) * 4) 0 calc(var(--padding-mobile) * 1.5) 0;
-        }
-
         .carta-header {
             margin-bottom: calc(var(--gap-mobile) * 2);
         }
@@ -474,7 +434,6 @@ function formatPrice(price) {
 </style>
 
 <script>
-    // VERSIÓN REFACTORIZADA CON SISTEMA CENTRALIZADO
     import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -483,7 +442,7 @@ function formatPrice(price) {
         const cartaSection = document.querySelector('.carta-section');
         const menuCategories = document.querySelectorAll('.menu-category');
         
-        // 🔧 Usar el sistema centralizado de breakpoints
+        // 🎯 SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal para fondo
         const breakpoints = useBreakpoints('carta-component', {
             element: cartaSection
         });
@@ -494,13 +453,8 @@ function formatPrice(price) {
                 console.log(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
                 // Deshabilitar transiciones durante el cambio para evitar glitches
-                const elementsToAdjust = [cartaSection, ...menuCategories];
+                const elementsToAdjust = [...menuCategories];
                 disableTransitionsDuringResize(elementsToAdjust);
-            },
-            
-            onResize: (currentBreakpoint) => {
-                // Lógica adicional de resize si es necesaria
-                // console.log(`🔄 Carta: Resize en breakpoint ${currentBreakpoint}`);
             }
         });
 

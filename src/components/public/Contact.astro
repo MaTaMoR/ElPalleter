@@ -18,6 +18,7 @@ const socialNetworks = contactServiceData.socials;
 const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: horarios agrupados
 ---
 
+<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="contact-section" id="contacto">
     <div class="contact-container container">
         <!-- Componente de Contacto -->
@@ -202,7 +203,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                         </p>
                     </div>
 
-                    <!-- Sección de Horarios ACTUALIZADA -->
+                    <!-- Sección de Horarios -->
                     <div class="contact-info-section">
                         <h4>
                             🕒 <Text
@@ -288,65 +289,27 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 </section>
 
 <style>
-    /* === CONTACT SECTION BASE - MISMO TAMAÑO QUE OTROS COMPONENTES === */
+    /* 🔥 ELIMINADO: background, padding externo, efectos de partículas */
+    
+    /* === CONTACT SECTION SIMPLIFICADA === */
     .contact-section {
         width: 100%;
-        background: rgb(20, 20, 20); /* MISMO FONDO que Historia/Carta */
-        /* 🔥 MISMO PADDING que otros componentes principales */
-        padding: calc(var(--padding-mobile) * 6) 0
-            calc(var(--padding-mobile) * 3) 0;
         position: relative;
-        z-index: 2;
+        
+        /* 🚫 ELIMINADO: background, padding externo, z-index, efectos ::before */
     }
 
-    /* 🔥 MISMO EFECTO DE PARTÍCULAS que otros componentes */
-    .contact-section::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: radial-gradient(
-                circle at 25% 25%,
-                #f4a261 1px,
-                transparent 1px
-            ),
-            radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-            radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px);
-        background-size:
-            120px 120px,
-            150px 150px,
-            100px 100px;
-        opacity: 0.15;
-        animation: float 25s ease-in-out infinite;
-        z-index: 1;
-    }
-
-    @keyframes float {
-        0%,
-        100% {
-            transform: translateY(0px) translateX(0px);
-        }
-        25% {
-            transform: translateY(-15px) translateX(5px);
-        }
-        50% {
-            transform: translateY(-25px) translateX(-10px);
-        }
-        75% {
-            transform: translateY(-10px) translateX(8px);
-        }
-    }
+    /* 🚫 ELIMINADO: Efectos de partículas (los maneja MainContent) */
+    /* 🚫 ELIMINADO: @keyframes float */
 
     .contact-container {
         position: relative;
         z-index: 2;
     }
 
-    /* === COMPONENTE PRINCIPAL - SIN HOVER === */
+    /* === COMPONENTE PRINCIPAL === */
     .contact-component {
-        background: rgba(0, 0, 0, 0.6); /* Mismo que otros componentes */
+        background: rgba(0, 0, 0, 0.6);
         border-radius: 20px;
         overflow: hidden;
         border: 2px solid rgba(244, 162, 97, 0.2);
@@ -461,7 +424,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         gap: calc(var(--gap-mobile) * 2.5);
     }
 
-    /* === SECCIONES DE INFORMACIÓN - SIN HOVER === */
+    /* === SECCIONES DE INFORMACIÓN === */
     .contact-info-section {
         padding: calc(var(--padding-mobile) * 1.5);
         border: 1px solid transparent;
@@ -508,7 +471,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         text-decoration: underline;
     }
 
-    /* === HORARIOS ACTUALIZADOS === */
+    /* === HORARIOS === */
     .schedule-group {
         margin-bottom: calc(var(--gap-mobile) * 1);
     }
@@ -577,9 +540,9 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         border-color: rgba(244, 162, 97, 0.6);
     }
 
-    /* === RESPONSIVE BREAKPOINTS === */
+    /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
 
-    /* 🔥 MOBILE (hasta 767px) - Comportamiento móvil principal */
+    /* MOBILE (hasta 767px) */
     @media (max-width: 767px) {
         /* Header en columna para móvil */
         .top-bar {
@@ -615,13 +578,8 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* 🔥 MOBILE PEQUEÑO (hasta 420px) - Ajustes adicionales para pantallas muy pequeñas */
+    /* MOBILE PEQUEÑO (hasta 420px) */
     @media (max-width: 420px) {
-        .contact-section {
-            padding: calc(var(--padding-mobile) * 5) 0
-                calc(var(--padding-mobile) * 2) 0;
-        }
-
         .top-bar {
             padding: calc(var(--padding-mobile) * 1);
             gap: calc(var(--gap-mobile) * 0.75);
@@ -657,11 +615,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
-        .contact-section {
-            padding: calc(var(--padding-tablet) * 3) 0
-                calc(var(--padding-tablet) * 2) 0;
-        }
-
         .top-bar {
             padding: calc(var(--padding-tablet) * 1)
                 calc(var(--padding-tablet) * 1.2);
@@ -709,11 +662,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
-        .contact-section {
-            padding: calc(var(--padding-desktop) * 2.5) 0
-                calc(var(--padding-desktop) * 1.67) 0;
-        }
-
         .top-bar {
             padding: calc(var(--padding-desktop) * 0.8)
                 calc(var(--padding-desktop) * 1);
@@ -787,7 +735,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             ".contact-info-section",
         );
 
-        // Usar el sistema centralizado de breakpoints
+        // 🎯 SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal para fondo
         const breakpoints = useBreakpoints("contact-component", {
             element: contactSection,
         });
@@ -800,12 +748,12 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                 );
 
                 // Deshabilitar transiciones durante el cambio
-                const elementsToAdjust = [contactSection, ...contactSections];
+                const elementsToAdjust = [...contactSections];
                 disableTransitionsDuringResize(elementsToAdjust);
             },
         });
 
-        // 🔥 SIMPLIFICADO: Formatear mensajes de estado para hacer bold la parte del estado
+        // Formatear mensajes de estado para hacer bold la parte del estado
         function formatStatusMessage() {
             const statusTextElement = document.getElementById("statusText");
             if (!statusTextElement) return;

@@ -1,0 +1,255 @@
+---
+// src/components/layouts/MainContent.astro
+export interface Props {
+  gap?: 'none' | 'tiny' | 'small' | 'medium' | 'large' | 'xl';
+  background?: 'dark' | 'darker' | 'gradient';
+  particles?: boolean;
+}
+
+const { 
+  gap = 'medium', // Cambiado default de 'large' a 'medium'
+  background = 'dark', 
+  particles = true 
+} = Astro.props;
+---
+
+<main class={`main-content main-content--gap-${gap} main-content--bg-${background} ${particles ? 'main-content--particles' : ''}`}>
+  <slot />
+</main>
+
+<style>
+  /* === BASE CONTAINER === */
+  .main-content {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === BACKGROUNDS === */
+  .main-content--bg-dark {
+    background: rgb(20, 20, 20);
+  }
+
+  .main-content--bg-darker {
+    background: rgb(15, 15, 15);
+  }
+
+  .main-content--bg-gradient {
+    background: linear-gradient(180deg, rgb(20, 20, 20) 0%, rgb(15, 15, 15) 100%);
+  }
+
+  /* === EFECTO DE PARTÍCULAS UNIFICADO === */
+  .main-content--particles::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
+    background-size: 
+      120px 120px, 
+      150px 150px, 
+      100px 100px, 
+      180px 180px, 
+      90px 90px;
+    opacity: 0.15;
+    animation: float 25s ease-in-out infinite;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px); 
+    }
+    25% { 
+      transform: translateY(-15px) translateX(5px); 
+    }
+    50% { 
+      transform: translateY(-25px) translateX(-10px); 
+    }
+    75% { 
+      transform: translateY(-10px) translateX(8px); 
+    }
+  }
+
+  /* === GAPS ENTRE SECCIONES === */
+  .main-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Mobile gaps - REDUCIDOS */
+  .main-content--gap-none {
+    gap: 0; /* Sin gap */
+  }
+
+  .main-content--gap-tiny {
+    gap: calc(var(--padding-mobile) * 0.25); /* 0.25rem */
+  }
+
+  .main-content--gap-small {
+    gap: calc(var(--padding-mobile) * 0.5); /* 0.5rem */
+  }
+
+  .main-content--gap-medium {
+    gap: calc(var(--padding-mobile) * 1); /* 1rem */
+  }
+
+  .main-content--gap-large {
+    gap: calc(var(--padding-mobile) * 1.5); /* 1.5rem */
+  }
+
+  .main-content--gap-xl {
+    gap: calc(var(--padding-mobile) * 2.5); /* 2.5rem */
+  }
+
+  /* === RESPONSIVE GAPS === */
+  
+  /* TABLET (768px+) - GAPS REDUCIDOS */
+  @media (min-width: 768px) {
+    .main-content--gap-none {
+      gap: 0;
+    }
+
+    .main-content--gap-tiny {
+      gap: calc(var(--padding-tablet) * 0.25); /* 0.5rem */
+    }
+
+    .main-content--gap-small {
+      gap: calc(var(--padding-tablet) * 0.5); /* 1rem */
+    }
+
+    .main-content--gap-medium {
+      gap: calc(var(--padding-tablet) * 0.75); /* 1.5rem */
+    }
+
+    .main-content--gap-large {
+      gap: calc(var(--padding-tablet) * 1); /* 2rem */
+    }
+
+    .main-content--gap-xl {
+      gap: calc(var(--padding-tablet) * 1.5); /* 3rem */
+    }
+  }
+
+  /* DESKTOP (1024px+) - GAPS REDUCIDOS */
+  @media (min-width: 1024px) {
+    .main-content--gap-none {
+      gap: 0;
+    }
+
+    .main-content--gap-tiny {
+      gap: calc(var(--padding-desktop) * 0.17); /* 0.5rem */
+    }
+
+    .main-content--gap-small {
+      gap: calc(var(--padding-desktop) * 0.33); /* 1rem */
+    }
+
+    .main-content--gap-medium {
+      gap: calc(var(--padding-desktop) * 0.5); /* 1.5rem */
+    }
+
+    .main-content--gap-large {
+      gap: calc(var(--padding-desktop) * 0.67); /* 2rem */
+    }
+
+    .main-content--gap-xl {
+      gap: calc(var(--padding-desktop) * 1); /* 3rem */
+    }
+  }
+
+  /* === SECCIONES HIJAS UNIFICADAS === */
+  .main-content > :global(section) {
+    position: relative;
+    z-index: 2;
+    
+    /* Padding REDUCIDO para todas las secciones */
+    padding: calc(var(--padding-mobile) * 1.5) 0; /* Reducido de 3 a 1.5 */
+    
+    /* Eliminar el fondo de las secciones hijas ya que lo maneja el padre */
+    background: transparent !important;
+  }
+
+  .main-content > :global(section)::before {
+    /* Eliminar efectos de partículas de secciones hijas */
+    display: none !important;
+  }
+
+  /* === RESPONSIVE PADDING PARA SECCIONES === */
+  
+  /* TABLET (768px+) */
+  @media (min-width: 768px) {
+    .main-content > :global(section) {
+      padding: calc(var(--padding-tablet) * 1.25) 0; /* Reducido de 2.5 a 1.25 */
+    }
+  }
+
+  /* DESKTOP (1024px+) */
+  @media (min-width: 1024px) {
+    .main-content > :global(section) {
+      padding: calc(var(--padding-desktop) * 1) 0; /* Reducido de 2 a 1 */
+    }
+  }
+
+  /* === ALTERNATIVAS DE ESTILO PARA SECCIONES === */
+  
+  /* Secciones con tarjetas internas */
+  .main-content > :global(.section-card) {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(244, 162, 97, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    margin: 0 var(--padding-mobile);
+    padding: calc(var(--padding-mobile) * 2);
+  }
+
+  @media (min-width: 768px) {
+    .main-content > :global(.section-card) {
+      margin: 0 var(--padding-tablet);
+      padding: calc(var(--padding-tablet) * 2);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .main-content > :global(.section-card) {
+      margin: 0 var(--padding-desktop);
+      padding: calc(var(--padding-desktop) * 1.5);
+    }
+  }
+
+  /* === VARIANTE SIN OVERLAP === */
+  .main-content--no-overlap > :global(section) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .main-content--no-overlap > :global(section):first-child {
+    padding-top: calc(var(--padding-mobile) * 2);
+  }
+
+  .main-content--no-overlap > :global(section):last-child {
+    padding-bottom: calc(var(--padding-mobile) * 2);
+  }
+
+  /* === MOBILE AJUSTES === */
+  @media (max-width: 420px) {
+    .main-content > :global(section) {
+      padding: calc(var(--padding-mobile) * 2) 0;
+    }
+
+    .main-content > :global(.section-card) {
+      margin: 0 calc(var(--padding-mobile) * 0.75);
+      padding: calc(var(--padding-mobile) * 1.5);
+      border-radius: 15px;
+    }
+  }
+</style>

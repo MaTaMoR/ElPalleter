@@ -7,6 +7,7 @@ import { getGalleryImages } from '../../utils/imageUtils.js';
 const imagesToShow = getGalleryImages('historia_slider', Astro);
 ---
 
+<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="historia-section" id="historia">
     <div class="historia-container container">
         <!-- Historia a la izquierda -->
@@ -27,53 +28,22 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
 </section>
 
 <style>
-    /* === BASE SECTION === */
+    /* 🔥 ELIMINADO: Ya no necesita background, padding externo ni efectos de partículas */
+    
+    /* === SECCIÓN BASE SIMPLIFICADA === */
     .historia-section {
         width: 100%;
-        min-height: 900px;
-        max-height: 1000px;
-        background: rgb(20, 20, 20);
-        padding: 120px 0;
+        min-height: fit-content;
         display: flex;
         align-items: stretch;
         position: relative;
         overflow: hidden;
         box-sizing: border-box;
+        
+        /* 🚫 ELIMINADO: background, padding externo, efectos ::before */
     }
 
-    /* Efecto de partículas animadas en el fondo */
-    .historia-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
-        background-size: 120px 120px, 150px 150px, 100px 100px, 180px 180px, 90px 90px;
-        opacity: 0.15;
-        animation: float 25s ease-in-out infinite;
-        z-index: 1;
-    }
-
-    @keyframes float {
-        0%, 100% { 
-            transform: translateY(0px) translateX(0px); 
-        }
-        25% { 
-            transform: translateY(-15px) translateX(5px); 
-        }
-        50% { 
-            transform: translateY(-25px) translateX(-10px); 
-        }
-        75% { 
-            transform: translateY(-10px) translateX(8px); 
-        }
-    }
+    /* 🚫 ELIMINADO: Efectos de partículas (los maneja el MainContent) */
 
     /* === CONTAINER USANDO SISTEMA GLOBAL === */
     .historia-container {
@@ -85,13 +55,15 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         z-index: 2;
     }
 
-    /* === CONTENT SECTIONS BASE === */
+    /* === CONTENT SECTIONS - SIN BACKGROUND DUPLICADO === */
     .history-content {
         flex: 1.2;
         padding: var(--padding-mobile);
         display: flex;
         flex-direction: column;
         justify-content: center;
+        
+        /* 🎯 MANTENIDO: Estilos específicos del contenido */
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
@@ -111,6 +83,8 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         height: 100%;
         display: grid;
         place-items: center;
+        
+        /* 🎯 MANTENIDO: Estilos específicos del slider */
         background: rgba(0, 0, 0, 0.4);
         border-radius: 20px;
         border: 1px solid rgba(244, 162, 97, 0.15);
@@ -122,7 +96,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* === ANIMACIONES ACTIVAS BASE === */
+    /* === ANIMACIONES ACTIVAS === */
     .history-content.slide-in-active {
         opacity: 1;
     }
@@ -132,9 +106,9 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         transition-delay: 0.2s;
     }
 
-    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
+    /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
     
-    /* TABLET Y SUPERIOR (768px+) - Animación horizontal */
+    /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .historia-container {
             gap: var(--gap-tablet);
@@ -186,25 +160,10 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         }
     }
 
-    /* TABLET ESPECÍFICO (768px-1023px) */
-    @media (min-width: 768px) and (max-width: 1023px) {
-        .historia-section {
-            min-height: 800px;
-            max-height: 900px;
-            padding: 100px 0;
-        }
-        
-        .historia-container {
-            height: 600px;
-        }
-    }
-
-    /* MOBILE (0-767px) - Animación vertical */
+    /* MOBILE (0-767px) */
     @media (max-width: 767px) {
         .historia-section {
-            min-height: auto;
-            max-height: none;
-            padding: 120px 0 40px 0;
+            /* 🚫 ELIMINADO: padding externo */
             display: block;
             align-items: unset;
         }
@@ -255,20 +214,10 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
             transform: translateY(0);
             transition-delay: 0.3s;
         }
-        
-        /* Partículas más sutiles en móvil */
-        .historia-section::before {
-            opacity: 0.08;
-            animation-duration: 30s;
-        }
     }
 
     /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
-        .historia-section {
-            padding: 100px 0 30px 0;
-        }
-        
         .historia-container {
             gap: calc(var(--gap-mobile) * 0.75);
         }
@@ -291,7 +240,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         const historyContent = document.querySelector('.history-content');
         const sliderSection = document.querySelector('.slider-section');
         
-        // Usar el sistema centralizado de breakpoints
+        // 🎯 SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal
         const breakpoints = useBreakpoints('historia-component', {
             element: document.querySelector('.historia-section')
         });
@@ -318,18 +267,12 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
-                // Deshabilitar transiciones temporalmente durante el cambio
                 const elementsToAdjust = [historyContent, sliderSection].filter(Boolean);
                 disableTransitionsDuringResize(elementsToAdjust);
-            },
-            
-            onResize: (currentBreakpoint) => {
-                // Lógica adicional específica para historia si es necesaria
-                // console.log(`🔄 Historia: Resize en breakpoint ${currentBreakpoint}`);
             }
         });
         
-        // Cleanup al descargar la página
+        // Cleanup
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
             observer.disconnect();

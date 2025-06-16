@@ -20,8 +20,9 @@ import { i18nCore } from '../i18n/core.js';
 import Layout from '../layouts/Layout.astro';
 import Header from './public/Header.astro';
 import Hero from './public/Hero.astro';
-import Historia from './public/Historia.astro';
 import TransitionBridge from './public/TransitionBridge.astro';
+import MainContent from './public/MainContent.astro';
+import Historia from './public/Historia.astro';
 import Carta from './public/Carta.astro';
 import Contact from './public/Contact.astro'; 
 import ScrollToTop from './public/ScrollToTop.astro';
@@ -74,13 +75,15 @@ const textDirection = i18nCore.getTextDirectionWithAstro(Astro);
     <script type="application/ld+json" set:html={JSON.stringify(seoData.structuredData)} />
   </Fragment>
 
-  <!-- Contenido único sin duplicación -->
   <Header />
   <Hero />
   <TransitionBridge />
-  <Historia />
-  <Carta />
-  <Contact />
+  <MainContent gap="large" background="dark" particles={true}>
+    <TransitionBridge />
+    <Historia />
+    <Carta />
+    <Contact />
+  </MainContent>
   <ScrollToTop />
   <Footer />
 </Layout>
