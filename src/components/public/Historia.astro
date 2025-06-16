@@ -33,7 +33,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     /* === SECCIÓN BASE SIMPLIFICADA === */
     .historia-section {
         width: 100%;
-        min-height: fit-content;
+        height: fit-content;
         display: flex;
         align-items: stretch;
         position: relative;
@@ -118,6 +118,12 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
             padding: var(--padding-tablet);
         }
         
+        .slider-section {
+            /* Asegurar que use todo el height disponible en desktop */
+            height: 100%;
+            min-height: auto; /* Resetear min-height de móvil */
+        }
+        
         .history-content:not(.slide-in-active) {
             transform: translateX(-60px);
             transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
@@ -163,6 +169,8 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     /* MOBILE (0-767px) */
     @media (max-width: 767px) {
         .historia-section {
+            min-height: auto;
+            max-height: none;
             /* 🚫 ELIMINADO: padding externo */
             display: block;
             align-items: unset;
@@ -182,8 +190,8 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         
         .slider-section {
             order: 1;
-            min-height: 60vh;
-            height: 60vh;
+            min-height: 40vh; /* Reducido de 60vh a 40vh para que sea más cuadrado */
+            height: 40vh;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             border: 1px solid rgba(244, 162, 97, 0.2);
@@ -223,8 +231,8 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         }
         
         .slider-section {
-            min-height: 50vh;
-            height: 50vh;
+            min-height: 35vh; /* Reducido de 50vh a 35vh para mejor proporción */
+            height: 35vh;
         }
         
         .history-content {
