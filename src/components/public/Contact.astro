@@ -1,14 +1,17 @@
 ---
-import Text from '../i18n/Text.astro';
-import contactData from '../../data/contact-data.json';
-import { i18nCore } from '../../i18n/core.js';
-import { ContactService } from '../../services/ContactService.js';
+import Text from "../i18n/Text.astro";
+import contactData from "../../data/contact-data.json";
+import { i18nCore } from "../../i18n/core.js";
+import { ContactService } from "../../services/ContactService.js";
 
 // Obtener información de i18n
 const { locale } = i18nCore.getI18nInfo(Astro);
 
 // Obtener datos del servicio actualizado
-const contactServiceData = ContactService.getContactDataWithTranslations(i18nCore, locale);
+const contactServiceData = ContactService.getContactDataWithTranslations(
+    i18nCore,
+    locale,
+);
 const currentStatus = contactServiceData.status;
 const fullAddress = contactServiceData.fullAddress;
 const socialNetworks = contactServiceData.socials;
@@ -22,37 +25,113 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             <!-- Cabecera con Status -->
             <div class="top-bar">
                 <div class="mini-brand">
-                    {contactData.config.showLogo && (
-                        <div class="logo-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 55" width="45" height="32">
-                                <defs>
-                                    <clipPath id="topHalf">
-                                        <rect x="0" y="0" width="80" height="27"/>
-                                    </clipPath>
-                                    <clipPath id="bottomHalf">
-                                        <rect x="0" y="33" width="80" height="24"/>
-                                    </clipPath>
-                                </defs>
-                                <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#f4a261" clip-path="url(#topHalf)">E</text>
-                                <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#f4a261" clip-path="url(#topHalf)">P</text>
-                                <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#f4a261" clip-path="url(#bottomHalf)">E</text>
-                                <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="#f4a261" clip-path="url(#bottomHalf)">P</text>
-                                <line x1="0" y1="30" x2="80" y2="30" stroke="#f4a261" stroke-width="1"/>
-                            </svg>
-                        </div>
-                    )}
+                    {
+                        contactData.config.showLogo && (
+                            <div class="logo-container">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 80 55"
+                                    width="45"
+                                    height="32"
+                                >
+                                    <defs>
+                                        <clipPath id="topHalf">
+                                            <rect
+                                                x="0"
+                                                y="0"
+                                                width="80"
+                                                height="27"
+                                            />
+                                        </clipPath>
+                                        <clipPath id="bottomHalf">
+                                            <rect
+                                                x="0"
+                                                y="33"
+                                                width="80"
+                                                height="24"
+                                            />
+                                        </clipPath>
+                                    </defs>
+                                    <text
+                                        x="20"
+                                        y="45"
+                                        text-anchor="middle"
+                                        font-family="serif"
+                                        font-size="50"
+                                        font-weight="900"
+                                        fill="#f4a261"
+                                        clip-path="url(#topHalf)"
+                                    >
+                                        E
+                                    </text>
+                                    <text
+                                        x="60"
+                                        y="45"
+                                        text-anchor="middle"
+                                        font-family="serif"
+                                        font-size="50"
+                                        font-weight="900"
+                                        fill="#f4a261"
+                                        clip-path="url(#topHalf)"
+                                    >
+                                        P
+                                    </text>
+                                    <text
+                                        x="20"
+                                        y="45"
+                                        text-anchor="middle"
+                                        font-family="serif"
+                                        font-size="50"
+                                        font-weight="900"
+                                        fill="#f4a261"
+                                        clip-path="url(#bottomHalf)"
+                                    >
+                                        E
+                                    </text>
+                                    <text
+                                        x="60"
+                                        y="45"
+                                        text-anchor="middle"
+                                        font-family="serif"
+                                        font-size="50"
+                                        font-weight="900"
+                                        fill="#f4a261"
+                                        clip-path="url(#bottomHalf)"
+                                    >
+                                        P
+                                    </text>
+                                    <line
+                                        x1="0"
+                                        y1="30"
+                                        x2="80"
+                                        y2="30"
+                                        stroke="#f4a261"
+                                        stroke-width="1"
+                                    />
+                                </svg>
+                            </div>
+                        )
+                    }
                     <span class="brand-text">
-                        <Text key="contact.brand.name" fallback={contactData.restaurant.name} />
+                        <Text
+                            key="contact.brand.name"
+                            fallback={contactData.restaurant.name}
+                        />
                     </span>
                 </div>
-                {contactData.config.showStatus && (
-                    <div class={`status status-${currentStatus.status}`} id="restaurantStatus">
-                        <div class="status-dot"></div>
-                        <span id="statusText" class="status-message">
-                            {currentStatus.fullMessage || "No Disponible"}
-                        </span>
-                    </div>
-                )}
+                {
+                    contactData.config.showStatus && (
+                        <div
+                            class={`status status-${currentStatus.status}`}
+                            id="restaurantStatus"
+                        >
+                            <div class="status-dot" />
+                            <span id="statusText" class="status-message">
+                                {currentStatus.fullMessage || "No Disponible"}
+                            </span>
+                        </div>
+                    )
+                }
             </div>
 
             <!-- Contenido de Contacto -->
@@ -61,86 +140,147 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                     <!-- Sección de Dirección -->
                     <div class="contact-info-section">
                         <h4>
-                            📍 <Text key="contact.sections.address" fallback="Dirección" />
+                            📍 <Text
+                                key="contact.sections.address"
+                                fallback="Dirección"
+                            />
                         </h4>
                         <p>{contactData.contact.address.street}</p>
-                        <p>{contactData.contact.address.postalCode} {contactData.contact.address.city}</p>
-                        <p>{contactData.contact.address.province}, {contactData.contact.address.country}</p>
+                        <p>
+                            {contactData.contact.address.postalCode}
+                            {contactData.contact.address.city}
+                        </p>
+                        <p>
+                            {contactData.contact.address.province}, {
+                                contactData.contact.address.country
+                            }
+                        </p>
                     </div>
 
                     <!-- Sección de Contacto -->
                     <div class="contact-info-section">
                         <h4>
-                            📞 <Text key="contact.sections.phone" fallback="Contacto" />
+                            📞 <Text
+                                key="contact.sections.phone"
+                                fallback="Contacto"
+                            />
                         </h4>
                         <p>
-                            <strong><Text key="contact.fields.phone" fallback="Teléfono" />:</strong> 
-                            <a href={`tel:${contactData.contact.phone.main}`}>{contactData.contact.phone.main}</a>
+                            <strong
+                                ><Text
+                                    key="contact.fields.phone"
+                                    fallback="Teléfono"
+                                />:</strong
+                            >
+                            <a href={`tel:${contactData.contact.phone.main}`}
+                                >{contactData.contact.phone.main}</a
+                            >
                         </p>
                         <p>
-                            <strong><Text key="contact.fields.email" fallback="Email" />:</strong> 
-                            <a href={`mailto:${contactData.contact.email.main}`}>{contactData.contact.email.main}</a>
+                            <strong
+                                ><Text
+                                    key="contact.fields.email"
+                                    fallback="Email"
+                                />:</strong
+                            >
+                            <a href={`mailto:${contactData.contact.email.main}`}
+                                >{contactData.contact.email.main}</a
+                            >
                         </p>
                         <p>
-                            <strong><Text key="contact.fields.website" fallback="Web" />:</strong> 
-                            <a href={contactData.contact.website} target="_blank" rel="noopener">elpalleter.com</a>
+                            <strong
+                                ><Text
+                                    key="contact.fields.website"
+                                    fallback="Web"
+                                />:</strong
+                            >
+                            <a
+                                href={contactData.contact.website}
+                                target="_blank"
+                                rel="noopener">elpalleter.com</a
+                            >
                         </p>
                     </div>
 
                     <!-- Sección de Horarios ACTUALIZADA -->
                     <div class="contact-info-section">
                         <h4>
-                            🕒 <Text key="contact.sections.hours" fallback="Horarios" />
+                            🕒 <Text
+                                key="contact.sections.hours"
+                                fallback="Horarios"
+                            />
                         </h4>
-                        {groupedSchedule.map((group) => (
-                            <div class="schedule-group">
-                                <p class="schedule-days">
-                                    <strong>{group.daysDisplay}:</strong>
-                                </p>
-                                {group.closed ? (
-                                    <p class="schedule-closed">
-                                        <Text key="contact.status.states.closed" fallback="Cerrado" />
+                        {
+                            groupedSchedule.map((group) => (
+                                <div class="schedule-group">
+                                    <p class="schedule-days">
+                                        <strong>{group.daysDisplay}:</strong>
                                     </p>
-                                ) : (
-                                    <div class="schedule-ranges">
-                                        {group.ranges.map((range) => (
-                                            <p class="schedule-range">
-                                                {range.translatedName && (
-                                                    <span class="range-name">{range.translatedName}: </span>
-                                                )}
-                                                <span class="range-time">{range.start} - {range.end}</span>
-                                            </p>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                    {group.closed ? (
+                                        <p class="schedule-closed">
+                                            <Text
+                                                key="contact.status.states.closed"
+                                                fallback="Cerrado"
+                                            />
+                                        </p>
+                                    ) : (
+                                        <div class="schedule-ranges">
+                                            {group.ranges.map((range) => (
+                                                <p class="schedule-range">
+                                                    {range.translatedName && (
+                                                        <span class="range-name">
+                                                            {
+                                                                range.translatedName
+                                                            }
+                                                            :{" "}
+                                                        </span>
+                                                    )}
+                                                    <span class="range-time">
+                                                        {range.start} -{" "}
+                                                        {range.end}
+                                                    </span>
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        }
                     </div>
 
                     <!-- Sección de Redes Sociales -->
-                    {contactData.config.showSocial && (
-                        <div class="contact-info-section">
-                            <h4>
-                                🌐 <Text key="contact.sections.social" fallback="Síguenos" />
-                            </h4>
-                            <p>
-                                <Text key="contact.values.followUs" fallback="Mantente al día con nuestras novedades" />
-                            </p>
-                            <div class="social-links">
-                                {socialNetworks.map((social) => (
-                                    <a 
-                                        href={social.url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        title={social.handle}
-                                        aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
-                                    >
-                                        {social.icon}
-                                    </a>
-                                ))}
+                    {
+                        contactData.config.showSocial && (
+                            <div class="contact-info-section">
+                                <h4>
+                                    🌐{" "}
+                                    <Text
+                                        key="contact.sections.social"
+                                        fallback="Síguenos"
+                                    />
+                                </h4>
+                                <p>
+                                    <Text
+                                        key="contact.values.followUs"
+                                        fallback="Mantente al día con nuestras novedades"
+                                    />
+                                </p>
+                                <div class="social-links">
+                                    {socialNetworks.map((social) => (
+                                        <a
+                                            href={social.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            title={social.handle}
+                                            aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
+                                        >
+                                            {social.icon}
+                                        </a>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )
+                    }
                 </div>
             </div>
         </div>
@@ -153,33 +293,50 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         width: 100%;
         background: rgb(20, 20, 20); /* MISMO FONDO que Historia/Carta */
         /* 🔥 MISMO PADDING que otros componentes principales */
-        padding: calc(var(--padding-mobile) * 6) 0 calc(var(--padding-mobile) * 3) 0;
+        padding: calc(var(--padding-mobile) * 6) 0
+            calc(var(--padding-mobile) * 3) 0;
         position: relative;
         z-index: 2;
     }
 
     /* 🔥 MISMO EFECTO DE PARTÍCULAS que otros componentes */
     .contact-section::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-                          radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px);
-        background-size: 120px 120px, 150px 150px, 100px 100px;
+        background-image: radial-gradient(
+                circle at 25% 25%,
+                #f4a261 1px,
+                transparent 1px
+            ),
+            radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+            radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px);
+        background-size:
+            120px 120px,
+            150px 150px,
+            100px 100px;
         opacity: 0.15;
         animation: float 25s ease-in-out infinite;
         z-index: 1;
     }
 
     @keyframes float {
-        0%, 100% { transform: translateY(0px) translateX(0px); }
-        25% { transform: translateY(-15px) translateX(5px); }
-        50% { transform: translateY(-25px) translateX(-10px); }
-        75% { transform: translateY(-10px) translateX(8px); }
+        0%,
+        100% {
+            transform: translateY(0px) translateX(0px);
+        }
+        25% {
+            transform: translateY(-15px) translateX(5px);
+        }
+        50% {
+            transform: translateY(-25px) translateX(-10px);
+        }
+        75% {
+            transform: translateY(-10px) translateX(8px);
+        }
     }
 
     .contact-container {
@@ -197,7 +354,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         backdrop-filter: blur(10px);
         max-width: 1200px;
         margin: 0 auto;
-        /* 🔥 REMOVIDO: No hay hover effects */
     }
 
     /* === CABECERA CON STATUS === */
@@ -206,7 +362,8 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         justify-content: space-between;
         align-items: center;
         background: rgba(0, 0, 0, 0.4);
-        padding: calc(var(--padding-mobile) * 1.25) calc(var(--padding-mobile) * 1.5);
+        padding: calc(var(--padding-mobile) * 1.25)
+            calc(var(--padding-mobile) * 1.5);
         border-bottom: 1px solid rgba(244, 162, 97, 0.3);
     }
 
@@ -239,11 +396,12 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
     /* === STATUS INDICATOR === */
     .status {
         background: rgba(76, 175, 80, 0.2);
-        color: #4CAF50;
-        padding: calc(var(--padding-mobile) * 0.5) calc(var(--padding-mobile) * 1);
+        color: #4caf50;
+        padding: calc(var(--padding-mobile) * 0.5)
+            calc(var(--padding-mobile) * 1);
         border-radius: 20px;
         font-size: 0.9rem;
-        border: 1px solid #4CAF50;
+        border: 1px solid #4caf50;
         display: flex;
         align-items: center;
         gap: calc(var(--gap-mobile) * 0.5);
@@ -254,15 +412,21 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
     .status-dot {
         width: 8px;
         height: 8px;
-        background: #4CAF50;
+        background: #4caf50;
         border-radius: 50%;
         animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 
     /* Estados del status */
@@ -278,38 +442,37 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
     .status.status-closingSoon {
         background: rgba(255, 193, 7, 0.2);
-        color: #FFC107;
-        border-color: #FFC107;
+        color: #ffc107;
+        border-color: #ffc107;
     }
 
     .status.status-closingSoon .status-dot {
-        background: #FFC107;
+        background: #ffc107;
     }
 
     /* === CONTENIDO DE CONTACTO === */
     .contact-content {
-        padding: calc(var(--padding-mobile) * 3); /* 🔥 AUMENTADO para igualar otros componentes */
+        padding: calc(var(--padding-mobile) * 3);
     }
 
     .contact-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: calc(var(--gap-mobile) * 2.5); /* 🔥 AUMENTADO el gap */
+        gap: calc(var(--gap-mobile) * 2.5);
     }
 
     /* === SECCIONES DE INFORMACIÓN - SIN HOVER === */
     .contact-info-section {
-        padding: calc(var(--padding-mobile) * 1.5); /* 🔥 AUMENTADO padding */
+        padding: calc(var(--padding-mobile) * 1.5);
         border: 1px solid transparent;
         border-radius: 15px;
         background: rgba(244, 162, 97, 0.05);
-        /* 🔥 REMOVIDO: No hay hover effects ni transformaciones */
     }
 
     .contact-info-section h4 {
         color: #f4a261;
         font-size: 1.3rem;
-        margin-bottom: calc(var(--gap-mobile) * 1.2); /* 🔥 AUMENTADO margen */
+        margin-bottom: calc(var(--gap-mobile) * 1.2);
         border-bottom: 2px solid rgba(244, 162, 97, 0.3);
         padding-bottom: calc(var(--padding-mobile) * 0.5);
         display: flex;
@@ -414,16 +577,94 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         border-color: rgba(244, 162, 97, 0.6);
     }
 
-    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
+    /* === RESPONSIVE BREAKPOINTS === */
+
+    /* 🔥 MOBILE (hasta 767px) - Comportamiento móvil principal */
+    @media (max-width: 767px) {
+        /* Header en columna para móvil */
+        .top-bar {
+            flex-direction: column;
+            gap: calc(var(--gap-mobile) * 1);
+            text-align: center;
+            padding: calc(var(--padding-mobile) * 1.25);
+        }
+
+        /* Grid de una sola columna en móvil */
+        .contact-grid {
+            grid-template-columns: 1fr;
+            gap: calc(var(--gap-mobile) * 1.5);
+        }
+
+        /* Reducir padding del container en móvil */
+        .contact-content {
+            padding: calc(var(--padding-mobile) * 2);
+        }
+
+        /* Ajustar padding de las secciones */
+        .contact-info-section {
+            padding: calc(var(--padding-mobile) * 1.25);
+        }
+
+        .contact-info-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: calc(var(--gap-mobile) * 1);
+        }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-mobile) * 0.75);
+        }
+    }
+
+    /* 🔥 MOBILE PEQUEÑO (hasta 420px) - Ajustes adicionales para pantallas muy pequeñas */
+    @media (max-width: 420px) {
+        .contact-section {
+            padding: calc(var(--padding-mobile) * 5) 0
+                calc(var(--padding-mobile) * 2) 0;
+        }
+
+        .top-bar {
+            padding: calc(var(--padding-mobile) * 1);
+            gap: calc(var(--gap-mobile) * 0.75);
+        }
+
+        .contact-content {
+            padding: calc(var(--padding-mobile) * 1.5);
+        }
+
+        .contact-info-section {
+            padding: calc(var(--padding-mobile) * 1);
+        }
+
+        .contact-info-section h4 {
+            font-size: 1.1rem;
+            margin-bottom: calc(var(--gap-mobile) * 0.75);
+        }
+
+        .social-links a {
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+        }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-mobile) * 0.5);
+        }
+
+        .brand-text {
+            font-size: 1.1rem;
+        }
+    }
 
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .contact-section {
-            padding: calc(var(--padding-tablet) * 3) 0 calc(var(--padding-tablet) * 2) 0;
+            padding: calc(var(--padding-tablet) * 3) 0
+                calc(var(--padding-tablet) * 2) 0;
         }
 
         .top-bar {
-            padding: calc(var(--padding-tablet) * 1) calc(var(--padding-tablet) * 1.2);
+            padding: calc(var(--padding-tablet) * 1)
+                calc(var(--padding-tablet) * 1.2);
         }
 
         .mini-brand {
@@ -469,11 +710,13 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .contact-section {
-            padding: calc(var(--padding-desktop) * 2.5) 0 calc(var(--padding-desktop) * 1.67) 0;
+            padding: calc(var(--padding-desktop) * 2.5) 0
+                calc(var(--padding-desktop) * 1.67) 0;
         }
 
         .top-bar {
-            padding: calc(var(--padding-desktop) * 0.8) calc(var(--padding-desktop) * 1);
+            padding: calc(var(--padding-desktop) * 0.8)
+                calc(var(--padding-desktop) * 1);
         }
 
         .mini-brand {
@@ -530,85 +773,50 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             gap: var(--gap-desktop-lg);
         }
     }
-
-    /* MOBILE PEQUEÑO (0-420px) */
-    @media (max-width: 420px) {
-        .contact-section {
-            padding: calc(var(--padding-mobile) * 5) 0 calc(var(--padding-mobile) * 2) 0;
-        }
-
-        .top-bar {
-            flex-direction: column;
-            gap: calc(var(--gap-mobile) * 0.75);
-            text-align: center;
-            padding: var(--padding-mobile);
-        }
-
-        .contact-content {
-            padding: calc(var(--padding-mobile) * 2);
-        }
-
-        .contact-grid {
-            grid-template-columns: 1fr; /* Una columna en móvil */
-            gap: calc(var(--gap-mobile) * 1.5);
-        }
-
-        .contact-info-section {
-            padding: calc(var(--padding-mobile) * 1);
-        }
-
-        .contact-info-section h4 {
-            font-size: 1.2rem;
-            margin-bottom: calc(var(--gap-mobile) * 0.75);
-        }
-
-        .social-links a {
-            width: 35px;
-            height: 35px;
-            font-size: 16px;
-        }
-
-        .schedule-ranges {
-            margin-left: calc(var(--padding-mobile) * 0.5);
-        }
-    }
 </style>
 
 <script>
-    import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const contactSection = document.querySelector('.contact-section');
-        const contactSections = document.querySelectorAll('.contact-info-section');
-        
+    import {
+        useBreakpoints,
+        disableTransitionsDuringResize,
+    } from "../../utils/breakpoints.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const contactSection = document.querySelector(".contact-section");
+        const contactSections = document.querySelectorAll(
+            ".contact-info-section",
+        );
+
         // Usar el sistema centralizado de breakpoints
-        const breakpoints = useBreakpoints('contact-component', {
-            element: contactSection
+        const breakpoints = useBreakpoints("contact-component", {
+            element: contactSection,
         });
-        
+
         // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
-                console.log(`Contact: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
-                
+                console.log(
+                    `Contact: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`,
+                );
+
                 // Deshabilitar transiciones durante el cambio
                 const elementsToAdjust = [contactSection, ...contactSections];
                 disableTransitionsDuringResize(elementsToAdjust);
-            }
+            },
         });
 
         // 🔥 SIMPLIFICADO: Formatear mensajes de estado para hacer bold la parte del estado
         function formatStatusMessage() {
-            const statusTextElement = document.getElementById('statusText');
+            const statusTextElement = document.getElementById("statusText");
             if (!statusTextElement) return;
 
             const message = statusTextElement.textContent.trim();
-            
+
             // Verificar si el mensaje tiene formato "Estado: Mensaje"
-            if (message.includes(':')) {
-                const [statusPart, ...messageParts] = message.split(':');
-                const messageRest = messageParts.join(':').trim();
-                
+            if (message.includes(":")) {
+                const [statusPart, ...messageParts] = message.split(":");
+                const messageRest = messageParts.join(":").trim();
+
                 // Crear HTML con el estado en bold
                 statusTextElement.innerHTML = `<strong>${statusPart.trim()}</strong>: ${messageRest}`;
             }
@@ -618,17 +826,17 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         formatStatusMessage();
 
         // Observer para detectar cambios en el texto del status (para actualizaciones dinámicas)
-        const statusTextElement = document.getElementById('statusText');
+        const statusTextElement = document.getElementById("statusText");
         if (statusTextElement) {
             const observer = new MutationObserver(() => {
                 // Pequeño delay para evitar formatear mientras se está actualizando
                 setTimeout(formatStatusMessage, 10);
             });
-            
-            observer.observe(statusTextElement, { 
-                childList: true, 
-                characterData: true, 
-                subtree: true 
+
+            observer.observe(statusTextElement, {
+                childList: true,
+                characterData: true,
+                subtree: true,
             });
         }
     });
