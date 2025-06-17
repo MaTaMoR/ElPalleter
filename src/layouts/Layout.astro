@@ -16,6 +16,7 @@ const {
 } = Astro.props;
 
 import '../styles/breakpoints.css';
+import '../utils/breakpoints.js';
 ---
 
 <!DOCTYPE html>
@@ -23,7 +24,7 @@ import '../styles/breakpoints.css';
     <head>
         <meta charset="UTF-8" />
         <meta name="description" content={description} />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         
@@ -39,7 +40,7 @@ import '../styles/breakpoints.css';
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
-        
+
         <!-- Slot para contenido específico de página (SEO multiidioma, hreflang, etc.) -->
         <slot name="head" />
 
