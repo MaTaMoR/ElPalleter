@@ -1,3 +1,7 @@
+import esTranslations from './translations/es.json';
+import enTranslations from './translations/en.json';
+import valTranslations from './translations/val.json';
+
 export const LANGUAGE_CONFIG = {
   es: {
     code: 'es',
@@ -9,7 +13,8 @@ export const LANGUAGE_CONFIG = {
       type: 'emoji',
       value: '🇪🇸'
     },
-    direction: 'ltr'
+    direction: 'ltr',
+    file: esTranslations
   },
   en: {
     code: 'en',
@@ -21,7 +26,8 @@ export const LANGUAGE_CONFIG = {
       type: 'emoji',
       value: '🇬🇧'
     },
-    direction: 'ltr'
+    direction: 'ltr',
+    file: enTranslations
   },
   val: {
     code: 'val',
@@ -33,7 +39,8 @@ export const LANGUAGE_CONFIG = {
       type: 'svg',
       value: '/flags/valencia.svg'
     },
-    direction: 'ltr'
+    direction: 'ltr',
+    file: valTranslations
   }
 };
 
@@ -127,11 +134,14 @@ export class I18nCore {
     try {
       const loadPromises = LOCALES.map(async (locale) => {
         try {
-          // 🚀 AQUÍ ESTÁ EL CAMBIO PRINCIPAL: Usar import dinámico
-          const translationModule = await import(`./translations/${locale}.json`);
+          const translations = LANGUAGE_CONFIG[locale].file;
+        
+          if (!translations || typeof translations !== 'object') {
+            console.warn(`[I18nCore] Warning: Invalid translations for ${locale}`);
+            this.translations.set(locale, {});
+            return;
+          }
           
-          // Los módulos JSON tienen el contenido en .default
-          const translations = translationModule.default;
           const flattened = this.flattenObject(translations);
           this.translations.set(locale, flattened);
 
