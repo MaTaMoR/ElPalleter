@@ -232,6 +232,8 @@
     }
   },
   "contact": {
+    "title": "Contacto",
+    "subtitle": "Ponte en contacto con nosotros para reservas, eventos o cualquier consulta. ¡Estaremos encantados de atenderte!",
     "brand": {
       "name": "El Palleter"
     },

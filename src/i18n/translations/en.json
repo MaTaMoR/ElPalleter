@@ -232,6 +232,8 @@
     }
   },
   "contact": {
+    "title": "Contact",
+    "subtitle": "Contact us for reservations, events, or any inquiries. We will be happy to assist you!",
     "brand": {
       "name": "El Palleter"
     },
