@@ -1,276 +1,174 @@
 ---
-import epLogo from '../../assets/mini-logo.svg';
+// Footer simplificado - Solo copyright y crédito del desarrollador
 ---
 
 <footer class="footer">
-    <div class="footer-container container">
-        <!-- Logo y descripción -->
-        <div class="footer-brand">
-            <img src={epLogo.src} alt="El Palleter Logo" class="footer-logo" />
-            <p class="footer-description">
-                Auténtica cocina mediterránea en el corazón de Benissa desde 1985.
+    <div class="footer-container">
+        <div class="footer-content">
+            <p class="footer-copyright">
+                &copy; 2025 El Palleter. Todos los derechos reservados.
             </p>
-        </div>
-
-        <!-- Información de contacto -->
-        <div class="footer-contact">
-            <h3 class="footer-title">Contacto</h3>
-            <div class="contact-info">
-                <p>📍 Benissa, Valencia</p>
-                <p>📞 +34 XXX XXX XXX</p>
-                <p>✉️ info@elpalleter.com</p>
-            </div>
-        </div>
-
-        <!-- Horarios -->
-        <div class="footer-hours">
-            <h3 class="footer-title">Horarios</h3>
-            <div class="hours-info">
-                <p><strong>Lunes - Viernes</strong></p>
-                <p>12:00 - 16:00 | 19:00 - 23:00</p>
-                <p><strong>Sábados - Domingos</strong></p>
-                <p>12:00 - 23:00</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Copyright -->
-    <div class="footer-bottom">
-        <div class="footer-container container">
-            <p>&copy; 2025 El Palleter. Todos los derechos reservados.</p>
-            <div class="footer-social">
-                <a href="#" aria-label="Facebook">📘</a>
-                <a href="#" aria-label="Instagram">📷</a>
-                <a href="#" aria-label="Google Reviews">⭐</a>
-            </div>
+            <p class="footer-credit">
+                Desarrollado por <a href="https://tudominio.dev" target="_blank" rel="noopener" class="developer-link">santiagogonzalez.dev</a>
+            </p>
         </div>
     </div>
 </footer>
 
 <style>
-    /* FOOTER BASE */
+    /* =========================================== */
+    /* === CONTAINER EXTERIOR (footer) === */
+    /* =========================================== */
+    
     .footer {
+        width: 100%;
         background: rgb(15, 15, 15);
-        color: white;
-        padding-top: calc(var(--padding-mobile) * 4);
         border-top: 1px solid rgba(244, 162, 97, 0.2);
-    }
-
-    /* CONTAINER PRINCIPAL usando sistema global */
-    .footer-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--gap-mobile);
-    }
-
-    /* SECCIÓN DE MARCA */
-    .footer-brand {
+        position: relative;
+        z-index: 1;
+        
+        /* SOLO centra horizontalmente */
         display: flex;
-        flex-direction: column;
-        gap: var(--gap-mobile);
-        text-align: center;
-        align-items: center;
-    }
-
-    .footer-logo {
-        height: 60px;
-        width: auto;
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
-    }
-
-    .footer-description {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        opacity: 0.8;
-        color: #ccc;
-        max-width: 400px;
-    }
-
-    /* TÍTULOS DE SECCIÓN */
-    .footer-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        color: #f4a261;
-        letter-spacing: 0.5px;
-    }
-
-    /* INFORMACIÓN DE CONTACTO Y HORARIOS */
-    .footer-contact,
-    .footer-hours {
-        text-align: center;
-    }
-
-    .contact-info p,
-    .hours-info p {
-        margin-bottom: 0.8rem;
-        font-size: 0.95rem;
-        color: #ccc;
-        line-height: 1.5;
-    }
-
-    .hours-info strong {
-        color: #f4a261;
-        font-weight: 600;
-    }
-
-    /* FOOTER INFERIOR */
-    .footer-bottom {
-        background: rgba(0, 0, 0, 0.3);
-        margin-top: calc(var(--gap-mobile) * 3);
-        padding: calc(var(--padding-mobile) * 1.5) 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .footer-bottom .footer-container {
-        display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: var(--gap-mobile);
-        grid-template-columns: none;
-        text-align: center;
+        
+        /* Padding vertical mínimo */
+        padding: calc(var(--padding-mobile) * 1.5) 0;
     }
 
-    .footer-bottom p {
+    /* ============================================== */
+    /* === CONTAINER INTERIOR (footer-container) === */
+    /* ============================================== */
+    
+    .footer-container {
+        max-width: 1200px;
+        width: 100%;
+        position: relative;
+        z-index: 2;
+        
+        /* Padding responsivo */
+        padding: 0 var(--padding-mobile);
+    }
+
+    /* === RESPONSIVE PADDING DEL CONTAINER INTERIOR === */
+    @media (min-width: 768px) {
+        .footer-container {
+            padding: 0 var(--padding-tablet);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .footer-container {
+            padding: 0 var(--padding-desktop);
+        }
+    }
+
+    /* ======================================= */
+    /* === CONTENIDO DEL FOOTER === */
+    /* ======================================= */
+    
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: var(--gap-mobile);
+    }
+
+    /* Copyright a la izquierda */
+    .footer-copyright {
         margin: 0;
         font-size: 0.9rem;
         color: #999;
+        flex: 1;
     }
 
-    /* REDES SOCIALES */
-    .footer-social {
-        display: flex;
-        gap: var(--gap-mobile);
-        justify-content: center;
+    /* Crédito del desarrollador a la derecha */
+    .footer-credit {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #999;
+        text-align: right;
+        flex: 1;
     }
 
-    .footer-social a {
-        font-size: 1.5rem;
+    .developer-link {
+        color: #f4a261;
+        font-weight: 500;
         text-decoration: none;
         transition: all 0.3s ease;
-        padding: 0.5rem;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.05);
     }
 
-    .footer-social a:hover {
-        background: rgba(244, 162, 97, 0.2);
-        transform: translateY(-2px);
+    .developer-link:hover {
+        color: #fff;
+        text-decoration: underline;
     }
 
-    /* === BREAKPOINTS ESTÁNDAR === */
+    /* === RESPONSIVE === */
     
+    /* MOBILE (hasta 767px) - Layout en columna */
+    @media (max-width: 767px) {
+        .footer {
+            padding: calc(var(--padding-mobile) * 2) 0;
+        }
+
+        .footer-content {
+            flex-direction: column-reverse;
+            text-align: center;
+            gap: calc(var(--gap-mobile) * 0.5);
+        }
+
+        .footer-copyright,
+        .footer-credit {
+            text-align: center;
+            flex: none;
+        }
+
+        .footer-copyright {
+            order: 2;
+        }
+
+        .footer-credit {
+            order: 1;
+        }
+    }
+
     /* TABLET (768px+) */
     @media (min-width: 768px) {
         .footer {
-            padding-top: calc(var(--padding-tablet) * 2);
+            padding: calc(var(--padding-tablet) * 1.25) 0;
         }
-        
-        .footer-container {
-            grid-template-columns: 1fr 1fr;
+
+        .footer-content {
             gap: var(--gap-tablet);
         }
-        
-        .footer-brand {
-            grid-column: 1 / -1;
-            text-align: center;
-            align-items: center;
-        }
-        
-        .footer-contact,
-        .footer-hours {
-            text-align: center;
-        }
-        
-        .footer-bottom {
-            margin-top: calc(var(--gap-tablet) * 2);
-            padding: var(--padding-tablet) 0;
-        }
-        
-        .footer-bottom .footer-container {
-            flex-direction: row;
-            justify-content: space-between;
-            text-align: left;
-        }
-        
-        .footer-social {
-            gap: var(--gap-tablet);
+
+        .footer-copyright,
+        .footer-credit {
+            font-size: 1rem;
         }
     }
 
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .footer {
-            padding-top: calc(var(--padding-desktop) * 2);
+            padding: calc(var(--padding-desktop) * 1) 0;
         }
-        
-        .footer-container {
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: var(--gap-desktop);
-        }
-        
-        .footer-brand {
-            grid-column: 1;
-            text-align: left;
-            align-items: flex-start;
-        }
-        
-        .footer-contact,
-        .footer-hours {
-            text-align: left;
-        }
-        
-        .footer-bottom {
-            margin-top: var(--gap-desktop);
-            padding: var(--padding-desktop) 0;
-        }
-        
-        .footer-social {
+
+        .footer-content {
             gap: var(--gap-desktop);
         }
     }
 
-    /* DESKTOP GRANDE (1400px+) */
-    @media (min-width: 1400px) {
-        .footer-container {
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: var(--gap-desktop-lg);
+    /* MOBILE PEQUEÑO (hasta 420px) */
+    @media (max-width: 420px) {
+        .footer {
+            padding: calc(var(--padding-mobile) * 1.5) 0;
         }
-        
-        .footer-social {
-            gap: var(--gap-desktop-lg);
+
+        .footer-copyright,
+        .footer-credit {
+            font-size: 0.85rem;
         }
     }
 </style>
-
-<script>
-    // Funcionalidad de navegación suave para el footer
-    document.addEventListener('DOMContentLoaded', () => {
-        const smoothScrollTo = (targetId) => {
-            const target = document.querySelector(`#${targetId}`);
-            if (target) {
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        };
-
-        // Event listeners para enlaces del footer
-        const footerLinks = document.querySelectorAll('footer a[href^="#"]');
-        footerLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const href = link.getAttribute('href');
-                const targetId = href.substring(1);
-                if (targetId) {
-                    smoothScrollTo(targetId);
-                }
-            });
-        });
-    });
-</script>

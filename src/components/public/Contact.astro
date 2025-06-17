@@ -149,7 +149,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                     <!-- Sección de Dirección -->
                     <div class="contact-info-section">
                         <h4>
-                            📍 <Text
+                            <Text
                                 key="contact.sections.address"
                                 fallback="Dirección"
                             />
@@ -169,7 +169,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                     <!-- Sección de Contacto -->
                     <div class="contact-info-section">
                         <h4>
-                            📞 <Text
+                            <Text
                                 key="contact.sections.phone"
                                 fallback="Contacto"
                             />
@@ -196,25 +196,12 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                                 >{contactData.contact.email.main}</a
                             >
                         </p>
-                        <p>
-                            <strong
-                                ><Text
-                                    key="contact.fields.website"
-                                    fallback="Web"
-                                />:</strong
-                            >
-                            <a
-                                href={contactData.contact.website}
-                                target="_blank"
-                                rel="noopener">elpalleter.com</a
-                            >
-                        </p>
                     </div>
 
                     <!-- Sección de Horarios -->
                     <div class="contact-info-section">
                         <h4>
-                            🕒 <Text
+                            <Text
                                 key="contact.sections.hours"
                                 fallback="Horarios"
                             />
@@ -262,7 +249,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                         contactData.config.showSocial && (
                             <div class="contact-info-section">
                                 <h4>
-                                    🌐{" "}
                                     <Text
                                         key="contact.sections.social"
                                         fallback="Síguenos"
