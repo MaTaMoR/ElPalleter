@@ -209,26 +209,12 @@
       }
     }
   },
-  "images": {
-    "hist_001": {
-      "alt": "El nostre restaurant El Palleter",
-      "caption": "El nostre restaurant El Palleter",
-      "title": "Façana principal del restaurant"
-    },
-    "hist_002": {
-      "alt": "La nostra hamburguesa especial",
-      "caption": "La nostra hamburguesa especial",
-      "title": "Hamburguesa gourmet de la casa"
-    },
-    "hist_003": {
-      "alt": "Vine i prova la nostra graella",
-      "caption": "Vine i prova la nostra graella",
-      "title": "Carns a la graella - especialitat de la casa"
-    },
-    "hist_004": {
-      "alt": "En un bon menjar no pot faltar un bon postre",
-      "caption": "En un bon menjar no pot faltar un bon postre",
-      "title": "Delicioses postres casolanes"
+  "galleries": {
+    "historia": {
+      "historia-1": "El nostre restaurant El Palleter",
+      "historia-2": "La nostra hamburguesa especial",
+      "historia-3": "Vine i prova la nostra graella",
+      "historia-4": "En un bon menjar no pot faltar un bon postre"
     }
   },
   "contact": {

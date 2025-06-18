@@ -209,26 +209,12 @@
       }
     }
   },
-  "images": {
-    "hist_001": {
-      "alt": "Our restaurant El Palleter",
-      "caption": "Our restaurant El Palleter",
-      "title": "Main facade of the restaurant"
-    },
-    "hist_002": {
-      "alt": "Our special burger",
-      "caption": "Our special burger",
-      "title": "House gourmet burger"
-    },
-    "hist_003": {
-      "alt": "Come and try our grill",
-      "caption": "Come and try our grill",
-      "title": "Grilled meats - house specialty"
-    },
-    "hist_004": {
-      "alt": "A good meal cannot miss a good dessert",
-      "caption": "A good meal cannot miss a good dessert",
-      "title": "Delicious homemade desserts"
+  "galleries": {
+    "historia": {
+      "historia-1": "Our restaurant El Palleter",
+      "historia-2": "Our special burger",
+      "historia-3": "Come and try our grill",
+      "historia-4": "A good meal cannot miss a good dessert"
     }
   },
   "contact": {

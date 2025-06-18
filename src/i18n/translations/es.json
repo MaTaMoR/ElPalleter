@@ -209,26 +209,12 @@
       }
     }
   },
-  "images": {
-    "hist_001": {
-      "alt": "Nuestro restaurante El Palleter",
-      "caption": "Nuestro restaurante El Palleter",
-      "title": "Fachada principal del restaurante"
-    },
-    "hist_002": {
-      "alt": "Nuestra hamburguesa especial",
-      "caption": "Nuestra hamburguesa especial", 
-      "title": "Hamburguesa gourmet de la casa"
-    },
-    "hist_003": {
-      "alt": "Ven y prueba nuestra parrilla",
-      "caption": "Ven y prueba nuestra parrilla",
-      "title": "Carnes a la parrilla - especialidad de la casa"
-    },
-    "hist_004": {
-      "alt": "En una buena comida no puede faltar un buen postre",
-      "caption": "En una buena comida no puede faltar un buen postre",
-      "title": "Deliciosos postres caseros"
+  "galleries": {
+    "historia": {
+      "historia-1": "Nuestro restaurante El Palleter",
+      "historia-2": "Nuestra hamburguesa especial",
+      "historia-3": "Ven y prueba nuestra parrilla",
+      "historia-4": "En una buena comida no puede faltar un buen postre"
     }
   },
   "contact": {

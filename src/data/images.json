@@ -1,0 +1,59 @@
+{
+  "images": {
+    "hero-main": {
+      "id": "hero-main",
+      "path": "/images/hero-main",
+      "responsive": {
+        "mobile": "/images/hero-main/hero-main-mobile-800w.jpg",
+        "tablet": "/images/hero-main/hero-main-tablet-1200w.jpg",
+        "desktop": "/images/hero-main/hero-main-desktop-1920w.jpg",
+        "desktop_xl": "/images/hero-main/hero-main-xl-2560w.jpg"
+      },
+      "fallback": "/images/hero-main/hero-main-desktop-1920w.jpg"
+    },
+    "historia-1": {
+      "id": "historia-1",
+      "path": "/images/historia-1",
+      "responsive": {
+        "mobile": "/images/historia-1/historia-1-mobile-800w.jpg",
+        "tablet": "/images/historia-1/historia-1-tablet-1200w.jpg", 
+        "desktop": "/images/historia-1/historia-1-desktop-1920w.jpg",
+        "desktop_xl": "/images/historia-1/historia-1-xl-2560w.jpg"
+      },
+      "fallback": "/images/historia-1/historia-1-desktop-1920w.jpg"
+    },
+    "historia-2": {
+      "id": "historia-2",
+      "path": "/images/historia-2",
+      "responsive": {
+        "mobile": "/images/historia-2/historia-2-mobile-800w.jpg",
+        "tablet": "/images/historia-2/historia-2-tablet-1200w.jpg",
+        "desktop": "/images/historia-2/historia-2-desktop-1920w.jpg", 
+        "desktop_xl": "/images/historia-2/historia-2-xl-2560w.jpg"
+      },
+      "fallback": "/images/historia-2/historia-2-desktop-1920w.jpg"
+    },
+    "historia-3": {
+      "id": "historia-3",
+      "path": "/images/historia-3", 
+      "responsive": {
+        "mobile": "/images/historia-3/historia-3-mobile-800w.jpg",
+        "tablet": "/images/historia-3/historia-3-tablet-1200w.jpg",
+        "desktop": "/images/historia-3/historia-3-desktop-1920w.jpg",
+        "desktop_xl": "/images/historia-3/historia-3-xl-2560w.jpg"
+      },
+      "fallback": "/images/historia-3/historia-3-desktop-1920w.jpg"
+    },
+    "historia-4": {
+      "id": "historia-4",
+      "path": "/images/historia-4",
+      "responsive": {
+        "mobile": "/images/historia-4/historia-4-mobile-800w.jpg",
+        "tablet": "/images/historia-4/historia-4-tablet-1200w.jpg",
+        "desktop": "/images/historia-4/historia-4-desktop-1920w.jpg",
+        "desktop_xl": "/images/historia-4/historia-4-xl-2560w.jpg"
+      },
+      "fallback": "/images/historia-4/historia-4-desktop-1920w.jpg"
+    }
+  }
+}

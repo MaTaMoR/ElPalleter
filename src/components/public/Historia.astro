@@ -4,8 +4,16 @@ import Text from '../i18n/Text.astro';
 import RichText from '../i18n/RichText.astro';
 import { getGalleryImages } from '../../utils/imageUtils.js';
 
-// Obtener las imágenes del slider de historia con traducciones
-const imagesToShow = getGalleryImages('historia_slider', Astro);
+// 🎯 ACTUALIZADO: Usar nuevo sistema simplificado
+const imagesToShow = await getGalleryImages('historia', Astro);
+
+// 🔍 Debug en desarrollo
+if (import.meta.env.DEV) {
+    console.log('📸 Historia: Imágenes cargadas:', {
+        count: imagesToShow.length,
+        images: imagesToShow.map(img => ({ id: img.id, name: img.alt }))
+    });
+}
 ---
 
 <section class="historia-section" id="historia">
@@ -30,12 +38,32 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     
         <!-- Slider de fotos a la derecha -->
         <div class="slider-section">
-            <ImageSlider images={imagesToShow} />
+            {/* 🎯 MEJORADO: Fallback más elegante si no hay imágenes */}
+            {imagesToShow && imagesToShow.length > 0 ? (
+                <ImageSlider images={imagesToShow} />
+            ) : (
+                <div class="no-images-fallback">
+                    <div class="fallback-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                        </svg>
+                        <p>
+                            <Text key="historia.no_images" fallback="Imágenes no disponibles" />
+                        </p>
+                        {import.meta.env.DEV && (
+                            <small>Configura en galleries.json</small>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     </div>
 </section>
 
 <style>
+    /* === RESTO DEL CSS EXACTAMENTE IGUAL === */
     /* === SECCIÓN BASE  === */
     .historia-section {
         width: 100%;
@@ -127,6 +155,38 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
         opacity: 0;
         transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* === NUEVO: Fallback para cuando no hay imágenes === */
+    .no-images-fallback {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(244, 162, 97, 0.6);
+    }
+
+    .fallback-content {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .fallback-content svg {
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .fallback-content p {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: rgba(244, 162, 97, 0.8);
+    }
+
+    .fallback-content small {
+        font-size: 0.9rem;
+        opacity: 0.6;
+        font-family: 'Courier New', monospace;
     }
 
     /* === ANIMACIONES ACTIVAS === */

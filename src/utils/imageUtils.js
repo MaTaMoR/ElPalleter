@@ -1,172 +1,216 @@
-// src/utils/imageUtils.js - Versión dinámica que lee configuración externa
+// src/utils/imageUtils.js - Arquitectura simplificada: Imágenes individuales + Galería Historia
 import { i18nCore } from '../i18n/core.js';
 
-// 🎯 CONFIGURACIÓN DINÁMICA: Lee desde archivo JSON
+// 🎯 CONFIGURACIONES SEPARADAS
 let IMAGES_CONFIG = null;
-let configLoaded = false;
+let GALLERIES_CONFIG = null;
+let configsLoaded = false;
 
 /**
- * Carga la configuración de imágenes desde archivo JSON
- * @returns {Promise<Object>} - Configuración de imágenes
+ * Carga las configuraciones de imágenes y galerías
+ * @returns {Promise<{images: Object, galleries: Object}>}
  */
-async function loadImagesConfig() {
-    if (configLoaded && IMAGES_CONFIG) {
-        return IMAGES_CONFIG;
+async function loadConfigs() {
+    if (configsLoaded && IMAGES_CONFIG && GALLERIES_CONFIG) {
+        return { images: IMAGES_CONFIG, galleries: GALLERIES_CONFIG };
     }
 
     try {
-        // Server-side: cargar directamente desde archivo
         const fs = await import('fs');
         const path = await import('path');
-        const configPath = path.resolve('src/utils/imageConfig.json');
         
-        if (fs.existsSync(configPath)) {
-            const configData = fs.readFileSync(configPath, 'utf8');
-            IMAGES_CONFIG = JSON.parse(configData);
+        // Cargar images.json
+        const imagesPath = path.resolve('src/data/images.json');
+        const galleriesPath = path.resolve('src/data/galleries.json');
+        
+        if (fs.existsSync(imagesPath)) {
+            const imagesData = fs.readFileSync(imagesPath, 'utf8');
+            IMAGES_CONFIG = JSON.parse(imagesData);
         } else {
-            console.warn('📸 imageConfig.json no encontrado, usando configuración por defecto');
-            IMAGES_CONFIG = getDefaultConfig();
+            console.warn('📸 images.json no encontrado, usando configuración por defecto');
+            IMAGES_CONFIG = getDefaultImagesConfig();
         }
         
-        configLoaded = true;
-        logImageInfo('Configuración de imágenes cargada', { 
-            galleries: Object.keys(IMAGES_CONFIG.galleries || {}).length 
+        if (fs.existsSync(galleriesPath)) {
+            const galleriesData = fs.readFileSync(galleriesPath, 'utf8');
+            GALLERIES_CONFIG = JSON.parse(galleriesData);
+        } else {
+            console.warn('🖼️ galleries.json no encontrado, usando configuración por defecto');
+            GALLERIES_CONFIG = getDefaultGalleriesConfig();
+        }
+        
+        configsLoaded = true;
+        logImageInfo('Configuraciones cargadas', { 
+            images: Object.keys(IMAGES_CONFIG.images || {}).length,
+            galleries: Object.keys(GALLERIES_CONFIG.galleries || {}).length
         });
         
     } catch (error) {
-        console.error('❌ Error cargando configuración de imágenes:', error);
-        IMAGES_CONFIG = getDefaultConfig();
-        configLoaded = true;
+        console.error('❌ Error cargando configuraciones:', error);
+        IMAGES_CONFIG = getDefaultImagesConfig();
+        GALLERIES_CONFIG = getDefaultGalleriesConfig();
+        configsLoaded = true;
     }
 
-    return IMAGES_CONFIG;
+    return { images: IMAGES_CONFIG, galleries: GALLERIES_CONFIG };
 }
 
 /**
- * Configuración por defecto para fallback
- * @returns {Object} - Configuración básica
+ * Configuración por defecto de imágenes
  */
-function getDefaultConfig() {
+function getDefaultImagesConfig() {
     return {
-        galleries: {
-            hero_backgrounds: {
-                name: "Imágenes de Hero y Backgrounds",
-                images: [
-                    {
-                        id: "hero_main",
-                        category: "hero",
-                        tags: ["restaurante", "principal", "hero"],
-                        responsive: {
-                            mobile: "/images/hero/hero-mobile-800w.jpg",
-                            tablet: "/images/hero/hero-tablet-1200w.jpg",
-                            desktop: "/images/hero/hero-desktop-1920w.jpg",
-                            desktop_xl: "/images/hero/hero-xl-2560w.jpg"
-                        },
-                        src: "/images/hero/hero-desktop-1920w.jpg"
-                    }
-                ]
-            },
-            historia_slider: {
-                name: "Historia Slider Principal", 
-                images: [
-                    {
-                        id: "hist_001",
-                        src: "/images/slider/slider-1.jpg",
-                        category: "historia",
-                        tags: ["restaurante", "exterior", "fachada"]
-                    }
-                ]
+        images: {
+            hero_main: {
+                id: "hero_main",
+                path: "/images/hero_main",
+                responsive: {
+                    mobile: "/images/hero_main/hero_main-mobile-800w.jpg",
+                    tablet: "/images/hero_main/hero_main-tablet-1200w.jpg", 
+                    desktop: "/images/hero_main/hero_main-desktop-1920w.jpg",
+                    desktop_xl: "/images/hero_main/hero_main-xl-2560w.jpg"
+                },
+                fallback: "/images/hero_main/hero_main-desktop-1920w.jpg"
             }
         }
     };
 }
 
 /**
- * Obtiene las imágenes de una galería con traducciones integradas
- * @param {string} galleryId - ID de la galería
+ * Configuración por defecto de galerías
+ */
+function getDefaultGalleriesConfig() {
+    return {
+        galleries: {
+            historia: {
+                images: []
+            }
+        }
+    };
+}
+
+/**
+ * Obtiene una imagen individual por ID
+ * @param {string} imageId - ID de la imagen
+ * @param {Object} Astro - Objeto Astro del componente
+ * @returns {Promise<Object|null>} - Datos de la imagen
+ */
+export async function getImageById(imageId, Astro) {
+    const { images } = await loadConfigs();
+    const image = images.images[imageId];
+    
+    if (!image) {
+        logImageInfo(`Imagen "${imageId}" no encontrada`);
+        return null;
+    }
+    
+    // Estructura simplificada - sin category ni tags
+    return {
+        id: image.id,
+        path: image.path,
+        responsive: image.responsive,
+        fallback: image.fallback,
+        
+        // Para compatibilidad con componentes existentes
+        src: image.fallback,
+        alt: `${image.id}`, // Sin traducción para imágenes individuales
+        caption: '', // Sin traducción
+        title: '' // Sin traducción
+    };
+}
+
+/**
+ * Obtiene las imágenes de la galería historia con sus traducciones
+ * @param {string} galleryId - ID de la galería (solo 'historia' por ahora)
  * @param {Object} Astro - Objeto Astro del componente
  * @returns {Promise<Array>} - Array de imágenes con traducciones
  */
 export async function getGalleryImages(galleryId, Astro) {
-    const config = await loadImagesConfig();
+    const { images, galleries } = await loadConfigs();
     const { locale } = i18nCore.getI18nInfo(Astro);
-    const gallery = config.galleries[galleryId];
+    const gallery = galleries.galleries[galleryId];
     
-    if (!gallery) {
-        logImageInfo(`Gallery "${galleryId}" not found`);
-        return [];
-    }
-    
-    return gallery.images.map(image => ({
-        id: image.id,
-        src: image.src,
-        alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
-        caption: getImageTranslation(`${image.id}.caption`, locale, ''),
-        title: getImageTranslation(`${image.id}.title`, locale, ''),
-        category: image.category,
-        tags: image.tags || [],
-        responsive: image.responsive || null
-    }));
-}
-
-/**
- * Obtiene una imagen específica por ID con traducciones
- * @param {string} imageId - ID de la imagen
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Object|null>} - Datos de la imagen con traducciones
- */
-export async function getImageById(imageId, Astro) {
-    const config = await loadImagesConfig();
-    const { locale } = i18nCore.getI18nInfo(Astro);
-    
-    // Buscar en todas las galerías
-    for (const [galleryId, gallery] of Object.entries(config.galleries)) {
-        const image = gallery.images.find(img => img.id === imageId);
-        if (image) {
-            return {
-                id: image.id,
-                src: image.src,
-                alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
-                caption: getImageTranslation(`${image.id}.caption`, locale, ''),
-                title: getImageTranslation(`${image.id}.title`, locale, ''),
-                category: image.category,
-                tags: image.tags || [],
-                galleryId,
-                responsive: image.responsive || null
-            };
+    // 🔍 Debug mejorado
+    if (import.meta.env.DEV) {
+        console.log(`🔍 [getGalleryImages] Buscando galería: "${galleryId}"`);
+        console.log(`📁 Galerías disponibles:`, Object.keys(galleries.galleries));
+        console.log(`📸 Galería encontrada:`, !!gallery);
+        if (gallery) {
+            console.log(`🖼️ Referencias en galería:`, gallery.images?.length || 0);
         }
     }
     
-    return null;
+    if (!gallery) {
+        logImageInfo(`Galería "${galleryId}" no encontrada. Galerías disponibles:`, Object.keys(galleries.galleries));
+        return [];
+    }
+    
+    if (!gallery.images || !Array.isArray(gallery.images)) {
+        logImageInfo(`Galería "${galleryId}" no tiene imágenes`);
+        return [];
+    }
+    
+    // Construir array de imágenes con datos completos
+    const galleryImages = [];
+    
+    for (const galleryItem of gallery.images) {
+        const imageData = images.images[galleryItem.image];
+        
+        if (!imageData) {
+            console.warn(`⚠️ Imagen "${galleryItem.image}" referenciada en galería "${galleryId}" no encontrada`);
+            continue;
+        }
+        
+        // Combinar datos de imagen + galería + traducción del name
+        const imageName = getGalleryTranslation(galleryItem.name, locale, `Imagen ${imageData.id}`);
+        
+        galleryImages.push({
+            id: imageData.id,
+            path: imageData.path,
+            responsive: imageData.responsive,
+            
+            // Para compatibilidad con ImageSlider existente
+            src: imageData.fallback,
+            alt: imageName,
+            caption: '', // Sin caption - solo name
+            title: imageName, // Usar el mismo name como title
+            
+            // Metadatos de galería
+            galleryOrder: galleryItem.order || 0,
+            galleryName: galleryItem.name
+        });
+    }
+    
+    // Ordenar por orden especificado en galería
+    galleryImages.sort((a, b) => a.galleryOrder - b.galleryOrder);
+    
+    if (import.meta.env.DEV) {
+        console.log(`✅ Galería "${galleryId}" cargada con ${galleryImages.length} imágenes`);
+    }
+    
+    return galleryImages;
 }
 
 /**
- * Obtiene datos de imagen responsiva completos para backgrounds
+ * Obtiene datos de imagen responsiva para backgrounds (principalmente para hero)
  * @param {string} imageId - ID de la imagen
  * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Object|null>} - Datos completos de imagen responsiva
+ * @returns {Promise<Object|null>} - Datos responsivos completos
  */
 export async function getResponsiveBackgroundImage(imageId, Astro) {
     const image = await getImageById(imageId, Astro);
     
     if (!image || !image.responsive) {
-        logImageInfo(`Responsive image "${imageId}" not found or not configured`);
+        logImageInfo(`Imagen responsiva "${imageId}" no encontrada o no configurada`);
         return null;
     }
 
     return {
         id: image.id,
-        category: image.category,
-        tags: image.tags,
-        
-        // Metadatos con traducciones
-        alt: image.alt,
-        title: image.title,
-        caption: image.caption,
         
         // URLs responsivas
         responsive: image.responsive,
-        fallback: image.src,
+        fallback: image.fallback,
         
         // CSS Background properties para diferentes breakpoints
         cssBackgrounds: {
@@ -174,7 +218,7 @@ export async function getResponsiveBackgroundImage(imageId, Astro) {
             tablet: `url('${image.responsive.tablet}')`, 
             desktop: `url('${image.responsive.desktop}')`,
             desktop_xl: `url('${image.responsive.desktop_xl}')`,
-            fallback: `url('${image.src}')`
+            fallback: `url('${image.fallback}')`
         },
         
         // Media queries CSS strings
@@ -188,70 +232,60 @@ export async function getResponsiveBackgroundImage(imageId, Astro) {
 }
 
 /**
- * Genera CSS completo para background responsivo
- * @param {string} imageId - ID de la imagen
- * @param {Object} Astro - Objeto Astro del componente
- * @param {Object} options - Opciones adicionales de CSS
- * @returns {Promise<string>} - CSS string completo
+ * Obtiene todas las imágenes disponibles
+ * @returns {Promise<Array>} - Array de todas las imágenes
  */
-export async function generateResponsiveBackgroundCSS(imageId, Astro, options = {}) {
-    const imageData = await getResponsiveBackgroundImage(imageId, Astro);
-    if (!imageData) return '';
-    
-    const {
-        size = 'cover',
-        position = 'center center',
-        repeat = 'no-repeat',
-        attachment = 'scroll',
-        className = '.hero-background'
-    } = options;
-    
-    return `
-        /* Fallback para todos los dispositivos */
-        ${className} {
-            background-image: ${imageData.cssBackgrounds.fallback};
-            background-size: ${size};
-            background-position: ${position};
-            background-repeat: ${repeat};
-            background-attachment: ${attachment};
-        }
-        
-        /* Mobile optimizado */
-        @media ${imageData.mediaQueries.mobile} {
-            ${className} {
-                background-image: ${imageData.cssBackgrounds.mobile};
-            }
-        }
-        
-        /* Tablet optimizado */
-        @media ${imageData.mediaQueries.tablet} {
-            ${className} {
-                background-image: ${imageData.cssBackgrounds.tablet};
-            }
-        }
-        
-        /* Desktop optimizado */
-        @media ${imageData.mediaQueries.desktop} {
-            ${className} {
-                background-image: ${imageData.cssBackgrounds.desktop};
-            }
-        }
-        
-        /* Desktop XL/4K optimizado */
-        @media ${imageData.mediaQueries.desktop_xl} {
-            ${className} {
-                background-image: ${imageData.cssBackgrounds.desktop_xl};
-            }
-        }
-    `.trim();
+export async function getAllImages() {
+    const { images } = await loadConfigs();
+    return Object.values(images.images);
 }
 
 /**
- * Obtiene preload links para imágenes críticas
+ * Verifica si una imagen existe
  * @param {string} imageId - ID de la imagen
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Array>} - Array de objetos con datos para <link rel="preload">
+ * @returns {Promise<boolean>} - True si existe
  */
+export async function imageExists(imageId) {
+    const { images } = await loadConfigs();
+    return !!images.images[imageId];
+}
+
+/**
+ * Verifica si la galería historia existe y tiene imágenes
+ * @returns {Promise<boolean>} - True si existe y tiene imágenes
+ */
+export async function hasHistoriaGallery() {
+    const { galleries } = await loadConfigs();
+    const historia = galleries.galleries.historia;
+    return historia && historia.images && historia.images.length > 0;
+}
+
+/**
+ * Obtiene estadísticas del sistema
+ * @returns {Promise<Object>} - Estadísticas
+ */
+export async function getImageStats() {
+    const { images, galleries } = await loadConfigs();
+    
+    const stats = {
+        totalImages: Object.keys(images.images).length,
+        historiaImages: 0
+    };
+    
+    // Contar imágenes en historia
+    const historia = galleries.galleries.historia;
+    if (historia && historia.images) {
+        stats.historiaImages = historia.images.length;
+    }
+    
+    return stats;
+}
+
+/**
+ * Funciones de compatibilidad con API anterior
+ */
+
+// Obtiene preload links para imágenes críticas (principalmente hero)
 export async function getImagePreloadData(imageId, Astro) {
     const imageData = await getResponsiveBackgroundImage(imageId, Astro);
     if (!imageData) return [];
@@ -280,19 +314,14 @@ export async function getImagePreloadData(imageId, Astro) {
     ];
 }
 
-/**
- * Genera un srcset para imágenes <img> responsivas (no backgrounds)
- * @param {string} imageId - ID de la imagen
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Object|null>} - Datos para srcset
- */
+// Genera srcset para imágenes <img> responsivas
 export async function getResponsiveImageSrcSet(imageId, Astro) {
     const image = await getImageById(imageId, Astro);
     
     if (!image || !image.responsive) return null;
     
     return {
-        src: image.responsive.desktop, // Imagen por defecto
+        src: image.responsive.desktop,
         srcset: [
             `${image.responsive.mobile} 800w`,
             `${image.responsive.tablet} 1200w`, 
@@ -306,182 +335,27 @@ export async function getResponsiveImageSrcSet(imageId, Astro) {
 }
 
 /**
- * Verifica si una imagen tiene configuración responsiva
- * @param {string} imageId - ID de la imagen
- * @returns {Promise<boolean>} - True si tiene configuración responsiva
+ * Recarga las configuraciones (útil en desarrollo)
  */
-export async function hasResponsiveConfig(imageId) {
-    const config = await loadImagesConfig();
-    
-    for (const gallery of Object.values(config.galleries)) {
-        const image = gallery.images.find(img => img.id === imageId);
-        if (image && image.responsive && typeof image.responsive === 'object') {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Obtiene todas las imágenes hero disponibles
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Array>} - Array de imágenes hero con metadatos
- */
-export async function getHeroImages(Astro) {
-    return await getGalleryImages('hero_backgrounds', Astro);
-}
-
-/**
- * Obtiene imágenes fallback con traducciones
- * @param {string} type - Tipo de fallback ('historia', 'carta', etc.)
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Array} - Array de imágenes fallback
- */
-export function getFallbackImages(type, Astro) {
-    const { locale } = i18nCore.getI18nInfo(Astro);
-    
-    const fallbacks = {
-        historia: [
-            {
-                id: 'fallback_historia_1',
-                src: '/images/placeholder-restaurant.jpg',
-                alt: getImageTranslation('fallback.restaurant_alt', locale, 'El Palleter Restaurant'),
-                caption: getImageTranslation('fallback.restaurant_caption', locale, 'Nuestro restaurante'),
-                title: getImageTranslation('fallback.restaurant_title', locale, 'Restaurante El Palleter')
-            }
-        ],
-        carta: [
-            {
-                id: 'fallback_carta_1',
-                src: '/images/placeholder-food.jpg',
-                alt: getImageTranslation('fallback.food_alt', locale, 'Comida de El Palleter'),
-                caption: getImageTranslation('fallback.food_caption', locale, 'Nuestra comida'),
-                title: getImageTranslation('fallback.food_title', locale, 'Especialidades culinarias')
-            }
-        ]
-    };
-    
-    return fallbacks[type] || [];
-}
-
-/**
- * Verifica si una galería tiene imágenes disponibles
- * @param {string} galleryId - ID de la galería
- * @returns {Promise<boolean>} - True si tiene imágenes
- */
-export async function hasGalleryImages(galleryId) {
-    const config = await loadImagesConfig();
-    const gallery = config.galleries[galleryId];
-    return gallery && gallery.images && gallery.images.length > 0;
-}
-
-/**
- * Obtiene todas las galerías disponibles
- * @returns {Promise<Array>} - Array con información de galerías
- */
-export async function getAvailableGalleries() {
-    const config = await loadImagesConfig();
-    return Object.entries(config.galleries).map(([id, gallery]) => ({
-        id,
-        name: gallery.name,
-        imageCount: gallery.images.length
-    }));
-}
-
-/**
- * Busca imágenes por tags
- * @param {Array} tags - Array de tags para buscar
- * @param {Object} Astro - Objeto Astro del componente
- * @returns {Promise<Array>} - Array de imágenes que contienen los tags
- */
-export async function searchImagesByTags(tags, Astro) {
-    const config = await loadImagesConfig();
-    const { locale } = i18nCore.getI18nInfo(Astro);
-    const results = [];
-    
-    // Buscar en todas las galerías
-    for (const [galleryId, gallery] of Object.entries(config.galleries)) {
-        const matchingImages = gallery.images.filter(image => 
-            tags.some(tag => (image.tags || []).includes(tag))
-        );
-        
-        matchingImages.forEach(image => {
-            results.push({
-                id: image.id,
-                src: image.src,
-                alt: getImageTranslation(`${image.id}.alt`, locale, `Imagen ${image.id}`),
-                caption: getImageTranslation(`${image.id}.caption`, locale, ''),
-                title: getImageTranslation(`${image.id}.title`, locale, ''),
-                category: image.category,
-                tags: image.tags || [],
-                galleryId,
-                responsive: image.responsive || null
-            });
-        });
-    }
-    
-    return results;
-}
-
-/**
- * Obtiene estadísticas de imágenes
- * @returns {Promise<Object>} - Estadísticas
- */
-export async function getImageStats() {
-    const config = await loadImagesConfig();
-    const stats = {
-        totalGalleries: Object.keys(config.galleries).length,
-        totalImages: 0,
-        imagesByCategory: {},
-        imagesByGallery: {},
-        responsiveImages: 0
-    };
-    
-    for (const [galleryId, gallery] of Object.entries(config.galleries)) {
-        stats.totalImages += gallery.images.length;
-        stats.imagesByGallery[galleryId] = gallery.images.length;
-        
-        gallery.images.forEach(image => {
-            // Contar por categoría
-            if (!stats.imagesByCategory[image.category]) {
-                stats.imagesByCategory[image.category] = 0;
-            }
-            stats.imagesByCategory[image.category]++;
-            
-            // Contar imágenes responsivas
-            if (image.responsive) {
-                stats.responsiveImages++;
-            }
-        });
-    }
-    
-    return stats;
-}
-
-/**
- * Recarga la configuración de imágenes (útil en desarrollo)
- * @returns {Promise<Object>} - Nueva configuración
- */
-export async function reloadImagesConfig() {
-    configLoaded = false;
+export async function reloadConfigs() {
+    configsLoaded = false;
     IMAGES_CONFIG = null;
-    return await loadImagesConfig();
+    GALLERIES_CONFIG = null;
+    return await loadConfigs();
 }
 
 /**
- * Helper interno para obtener traducciones de imágenes
- * @param {string} key - Clave de traducción (relativa a images.)
+ * Helper para traducciones de galerías
+ * @param {string} key - Clave de traducción
  * @param {string} locale - Idioma
  * @param {string} fallback - Fallback
  * @returns {string} - Traducción
  */
-function getImageTranslation(key, locale, fallback) {
-    const fullKey = `images.${key}`;
-    
-    // Usar el core unificado directamente
+function getGalleryTranslation(key, locale, fallback) {
+    // Las claves ya vienen con el prefijo completo (galleries.historia.imagen-1)
     if (i18nCore.loaded) {
-        const translation = i18nCore.getTranslation(fullKey, locale);
-        if (translation && translation !== fullKey) {
+        const translation = i18nCore.getTranslation(key, locale);
+        if (translation && translation !== key) {
             return translation;
         }
     }
@@ -490,9 +364,7 @@ function getImageTranslation(key, locale, fallback) {
 }
 
 /**
- * Utilidad para logging de imágenes en desarrollo
- * @param {string} message - Mensaje
- * @param {Object} data - Datos adicionales
+ * Utilidad para logging
  */
 export function logImageInfo(message, data = {}) {
     if (import.meta.env.DEV) {
@@ -500,65 +372,18 @@ export function logImageInfo(message, data = {}) {
     }
 }
 
-// 🎯 FUNCIONES DE UTILIDAD PARA DESARROLLO
-
 /**
- * Debug: Muestra la configuración actual en consola
- * @returns {Promise<void>}
+ * Debug: Muestra configuraciones actuales
  */
-export async function debugImageConfig() {
-    const config = await loadImagesConfig();
-    console.log('🔍 Configuración actual de imágenes:', config);
+export async function debugConfigs() {
+    const { images, galleries } = await loadConfigs();
+    console.log('🔍 Configuración de imágenes:', images);
+    console.log('🔍 Configuración de galerías:', galleries);
     
     const stats = await getImageStats();
     console.log('📊 Estadísticas:', stats);
 }
 
-/**
- * Migra imágenes del sistema hardcodeado al dinámico
- * @param {Object} oldConfig - Configuración antigua hardcodeada
- * @returns {Promise<void>}
- */
-export async function migrateToJsonConfig(oldConfig) {
-    if (typeof window !== 'undefined') {
-        console.warn('⚠️ La migración solo funciona en server-side');
-        return;
-    }
-    
-    try {
-        const fs = await import('fs');
-        const path = await import('path');
-        const configPath = path.resolve('src/utils/imageConfig.json');
-        
-        // Escribir la nueva configuración
-        fs.writeFileSync(configPath, JSON.stringify(oldConfig, null, 2));
-        
-        console.log('✅ Configuración migrada a imageConfig.json');
-        console.log('💡 Ahora puedes eliminar la configuración hardcodeada');
-        
-        // Recargar configuración
-        await reloadImagesConfig();
-        
-    } catch (error) {
-        console.error('❌ Error en migración:', error);
-    }
-}
-
-// Helper para compatibilidad con código existente
-export const migrateStaticImages = async (staticImages, Astro) => {
-    const { locale } = i18nCore.getI18nInfo(Astro);
-    
-    return staticImages.map((image, index) => ({
-        id: `migrated_${index}`,
-        src: image.src,
-        alt: image.alt || getImageTranslation(`migrated_${index}.alt`, locale, `Imagen ${index + 1}`),
-        caption: image.caption || getImageTranslation(`migrated_${index}.caption`, locale, ''),
-        title: image.title || getImageTranslation(`migrated_${index}.title`, locale, ''),
-        category: 'migrated',
-        tags: []
-    }));
-};
-
-// Alias para mantener compatibilidad
+// Aliases para compatibilidad con código existente
 export const getGalleryWithTranslations = getGalleryImages;
-export const getResponsiveImageData = getResponsiveImageSrcSet;
+export const hasGalleryImages = hasHistoriaGallery;

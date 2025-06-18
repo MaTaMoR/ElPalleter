@@ -3,7 +3,7 @@ export interface Props {
     images: Array<{
         src: string;
         alt: string;
-        caption?: string;
+        title?: string;
     }>;
 }
 
@@ -17,8 +17,8 @@ const { images } = Astro.props;
                 class={`slide ${index === 0 ? 'active' : ''}`}
                 style={`background-image: url('${image.src}')`}
             >
-                {image.caption && (
-                    <div class="slide-caption">{image.caption}</div>
+                {image.title && (
+                    <div class="slide-caption">{image.title}</div>
                 )}
             </div>
         ))}
