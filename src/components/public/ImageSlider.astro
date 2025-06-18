@@ -49,7 +49,6 @@ const { images } = Astro.props;
         background: #000;
         height: 100%;
         width: 100%;
-        /* 🎯 SOLUCIÓN: Prevenir overflow horizontal durante transiciones */
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         isolation: isolate;
@@ -61,7 +60,6 @@ const { images } = Astro.props;
         transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         height: 100%;
         width: 100%;
-        /* 🎯 CRÍTICO: Prevenir que los slides causen overflow */
         transform: translate3d(0, 0, 0);
         will-change: transform;
         backface-visibility: hidden;
@@ -74,7 +72,6 @@ const { images } = Astro.props;
         background-size: cover;
         background-position: center;
         position: relative;
-        /* 🎯 IMPORTANTE: Forzar que no exceda el contenedor */
         flex-shrink: 0;
         backface-visibility: hidden;
         contain: layout style paint;

@@ -44,12 +44,12 @@ export const LANGUAGE_CONFIG = {
   }
 };
 
-// 🔧 Constantes derivadas (se generan automáticamente)
+// Constantes derivadas (se generan automáticamente)
 export const LOCALES = Object.keys(LANGUAGE_CONFIG);
 export const DEFAULT_LOCALE = Object.values(LANGUAGE_CONFIG).find(lang => lang.isDefault)?.code || 'es';
 
 /**
- * 🎨 Clase para manejar banderas (emoji o SVG)
+ * Clase para manejar banderas (emoji o SVG)
  */
 export class FlagRenderer {
   static renderFlag(flagConfig, className = '', size = '1rem') {
@@ -71,10 +71,6 @@ export class FlagRenderer {
   }
 }
 
-/**
- * 🌍 CLASE PRINCIPAL I18N COMPLETAMENTE UNIFICADA
- * TODO el sistema i18n en una sola clase
- */
 export class I18nCore {
   constructor() {
     // Singleton pattern
@@ -93,11 +89,11 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🚀 INICIALIZACIÓN Y CARGA - NUEVO CON IMPORTS DINÁMICOS
+  // INICIALIZACIÓN Y CARGA - NUEVO CON IMPORTS DINÁMICOS
   // ===============================================
 
   /**
-   * 🚀 Inicialización (carga las traducciones)
+   * Inicialización (carga las traducciones)
    */
   async init() {
     if (!this.loaded && !this.loading) {
@@ -107,7 +103,7 @@ export class I18nCore {
   }
 
   /**
-   * 📚 Carga todas las traducciones con protección contra carga múltiple
+   * Carga todas las traducciones con protección contra carga múltiple
    */
   async loadAllTranslations() {
     if (this.loaded) return;
@@ -126,10 +122,7 @@ export class I18nCore {
       this.loadPromise = null;
     }
   }
-
-  /**
-   * 📚 NUEVO MÉTODO: Carga con imports dinámicos para Vercel
-   */
+  
   async _performLoad() {
     try {
       const loadPromises = LOCALES.map(async (locale) => {
@@ -168,12 +161,8 @@ export class I18nCore {
     }
   }
 
-  // ===============================================
-  // 🌐 NUEVOS MÉTODOS PARA URLS DINÁMICAS
-  // ===============================================
-
   /**
-   * 🌐 Obtiene la URL base actual de forma dinámica
+   * Obtiene la URL base actual de forma dinámica
    * Prioriza Astro.url.origin sobre Astro.site para auto-detección
    */
   getCurrentOrigin(Astro) {
@@ -192,24 +181,24 @@ export class I18nCore {
   }
 
   /**
-   * 🔗 Genera URL relativa para navegación (SIN dominio)
+   * Genera URL relativa para navegación (SIN dominio)
    * Perfecto para language picker y navegación interna
    */
   getRelativeUrl(path, locale = DEFAULT_LOCALE) {
     // 🧹 Normalizar path: remover barras al inicio y final
     let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
     
-    // 🛡️ Si es locale por defecto, devolver path simple
+    // Si es locale por defecto, devolver path simple
     if (locale === DEFAULT_LOCALE) {
       return cleanPath === '' ? '/' : `/${cleanPath}`;
     }
     
-    // 🌍 Para otros locales, añadir prefijo de idioma
+    // Para otros locales, añadir prefijo de idioma
     return cleanPath === '' ? `/${locale}` : `/${locale}/${cleanPath}`;
   }
 
   /**
-   * 🌍 Genera URL completa (CON dominio) para SEO/metadatos
+   * Genera URL completa (CON dominio) para SEO/metadatos
    * Solo cuando realmente necesites el dominio completo
    */
   getAbsoluteUrl(path, locale = DEFAULT_LOCALE, Astro) {
@@ -220,7 +209,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔧 Aplana un objeto anidado para facilitar el acceso
+   * Aplana un objeto anidado para facilitar el acceso
    */
   flattenObject(obj, prefix = '') {
     const flattened = {};
@@ -243,7 +232,7 @@ export class I18nCore {
   // ===============================================
 
   /**
-   * 🔤 Obtiene una traducción
+   * Obtiene una traducción
    */
   getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
     if (!this.loaded) {
@@ -286,7 +275,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔄 Reemplaza parámetros en una traducción
+   * Reemplaza parámetros en una traducción
    */
   replaceParams(text, params) {
     let result = text;
@@ -300,14 +289,14 @@ export class I18nCore {
   }
 
   /**
-   * 📊 Obtiene todas las traducciones para un idioma
+   * Obtiene todas las traducciones para un idioma
    */
   getAllTranslations(locale) {
     return this.translations.get(locale) || {};
   }
 
   /**
-   * ✅ Verifica si existe una traducción
+   * Verifica si existe una traducción
    */
   hasTranslation(key, locale) {
     const translations = this.translations.get(locale);
@@ -315,7 +304,7 @@ export class I18nCore {
   }
 
   /**
-   * 📈 Obtiene estadísticas de traducciones
+   * Obtiene estadísticas de traducciones
    */
   getStats() {
     const stats = {};
@@ -343,7 +332,7 @@ export class I18nCore {
   }
 
   /**
-   * 📁 Obtiene todas las traducciones para un namespace específico
+   * Obtiene todas las traducciones para un namespace específico
    */
   getNamespaceTranslations(namespace, locale = DEFAULT_LOCALE) {
     if (!this.loaded) {
@@ -366,70 +355,70 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🌐 GESTIÓN DE IDIOMAS
+  // GESTIÓN DE IDIOMAS
   // ===============================================
 
   /**
-   * 🌐 Obtiene lista de idiomas disponibles
+   * Obtiene lista de idiomas disponibles
    */
   getAvailableLanguages() {
     return this.languages;
   }
 
   /**
-   * 🏠 Obtiene el idioma por defecto
+   * Obtiene el idioma por defecto
    */
   getDefaultLanguage() {
     return this.defaultLanguage;
   }
 
   /**
-   * 🔍 Obtiene información de un idioma específico
+   * Obtiene información de un idioma específico
    */
   getLanguage(code) {
     return this.languages.find(lang => lang.code === code);
   }
 
   /**
-   * 📝 Obtiene códigos de idiomas disponibles
+   * Obtiene códigos de idiomas disponibles
    */
   getLanguageCodes() {
     return LOCALES;
   }
 
   /**
-   * ✅ Verifica si un código de idioma es válido
+   * Verifica si un código de idioma es válido
    */
   isValidLanguage(code) {
     return LOCALES.includes(code);
   }
 
   /**
-   * 📖 Obtiene información completa del idioma
+   * Obtiene información completa del idioma
    */
   getLocaleInfo(locale) {
     return LANGUAGE_CONFIG[locale] || LANGUAGE_CONFIG[DEFAULT_LOCALE];
   }
 
   /**
-   * 🔗 MÉTODO LEGACY - Mantener compatibilidad
+   * MÉTODO LEGACY - Mantener compatibilidad
    * @deprecated Usar getRelativeUrl() o getAbsoluteUrl() en su lugar
    */
   localizeUrl(path, locale = DEFAULT_LOCALE, baseUrl = '') {
-    // 🧹 Normalizar path: remover barras al inicio y final
+    // Normalizar path: remover barras al inicio y final
     let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
     
-    // 🧹 Normalizar baseUrl: remover barra al final si existe
+    // Normalizar baseUrl: remover barra al final si existe
     let cleanBaseUrl = baseUrl?.replace(/\/+$/, '') || '';
     
-    // 🛡️ Si es locale por defecto, devolver path simple
+    // Si es locale por defecto, devolver path simple
     if (locale === DEFAULT_LOCALE) {
       return cleanPath === '' 
         ? (cleanBaseUrl || '/') 
         : `${cleanBaseUrl}/${cleanPath}`;
     }
     
-    // 🌍 Para otros locales, añadir prefijo de idioma
+    // Para otros locales, añadir prefijo de idioma
     const localizedPath = cleanPath === '' 
       ? `/${locale}` 
       : `/${locale}/${cleanPath}`;
@@ -438,7 +427,7 @@ export class I18nCore {
   }
 
   /**
-   * 🌍 Obtiene todas las variantes de URL para diferentes idiomas
+   * Obtiene todas las variantes de URL para diferentes idiomas
    * ACTUALIZADO: Ahora usa URLs relativas por defecto
    */
   getAlternateUrls(path, Astro = null, absolute = false) {
@@ -456,7 +445,7 @@ export class I18nCore {
   }
 
   /**
-   * 🧭 Detecta el idioma de una URL
+   * Detecta el idioma de una URL
    */
   detectLocaleFromPath(pathname) {
     const segments = pathname.split('/').filter(Boolean);
@@ -479,11 +468,11 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 📅 FORMATEO
+  // FORMATEO
   // ===============================================
 
   /**
-   * 📅 Formatea una fecha según el idioma
+   * Formatea una fecha según el idioma
    */
   formatDate(date, locale = DEFAULT_LOCALE, options = {}) {
     const defaultOptions = {
@@ -503,7 +492,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔢 Formatea un número según el idioma
+   * Formatea un número según el idioma
    */
   formatNumber(number, locale = DEFAULT_LOCALE, options = {}) {
     try {
@@ -515,7 +504,7 @@ export class I18nCore {
   }
 
   /**
-   * 💰 Formatea una moneda según el idioma
+   * Formatea una moneda según el idioma
    */
   formatCurrency(amount, currency = 'EUR', locale = DEFAULT_LOCALE) {
     return this.formatNumber(amount, locale, {
@@ -529,7 +518,7 @@ export class I18nCore {
   // ===============================================
 
   /**
-   * 🌍 Helper principal para obtener información de i18n en componentes Astro
+   * Helper principal para obtener información de i18n en componentes Astro
    */
   getI18nInfo(Astro) {
     // Obtener locale desde Astro (nativo)
@@ -559,7 +548,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔗 Helper para generar enlaces localizados con Astro
+   * Helper para generar enlaces localizados con Astro
    * ACTUALIZADO: Ahora soporta URLs relativas y absolutas
    */
   localizeUrlWithAstro(path, targetLocale = null, Astro, absolute = false) {
@@ -576,7 +565,7 @@ export class I18nCore {
   }
 
   /**
-   * 🌐 Helper para obtener URLs alternativas con Astro
+   * Helper para obtener URLs alternativas con Astro
    * ACTUALIZADO: Soporta URLs relativas por defecto
    */
   getAlternateUrlsWithAstro(Astro, absolute = false) {
@@ -585,7 +574,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔄 Helper para cambiar idioma manteniendo la misma página
+   * Helper para cambiar idioma manteniendo la misma página
    * ACTUALIZADO: URLs relativas por defecto
    */
   switchLanguageUrl(targetLocale, Astro, absolute = false) {
@@ -594,7 +583,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔤 Helper robusto para obtener traducciones con Astro
+   * Helper robusto para obtener traducciones con Astro
    */
   safeTranslation(key, Astro, fallback, params = {}) {
     try {
@@ -616,7 +605,7 @@ export class I18nCore {
   }
 
   /**
-   * 📅 Helper para formatear fechas con Astro
+   * Helper para formatear fechas con Astro
    */
   formatDateWithAstro(date, Astro, options = {}) {
     const { locale } = this.getI18nInfo(Astro);
@@ -624,7 +613,7 @@ export class I18nCore {
   }
 
   /**
-   * 🔢 Helper para formatear números con Astro
+   * Helper para formatear números con Astro
    */
   formatNumberWithAstro(number, Astro, options = {}) {
     const { locale } = this.getI18nInfo(Astro);
@@ -632,7 +621,7 @@ export class I18nCore {
   }
 
   /**
-   * 💰 Helper para formatear precios con Astro
+   * Helper para formatear precios con Astro
    */
   formatPriceWithAstro(amount, Astro, currency = 'EUR') {
     const { locale } = this.getI18nInfo(Astro);
@@ -640,7 +629,7 @@ export class I18nCore {
   }
 
   /**
-   * 📖 Helper para obtener dirección del texto con Astro
+   * Helper para obtener dirección del texto con Astro
    */
   getTextDirectionWithAstro(Astro) {
     const { locale } = this.getI18nInfo(Astro);
@@ -648,14 +637,10 @@ export class I18nCore {
     return localeInfo.direction || 'ltr';
   }
 
-  // ===============================================
-  // 🎨 LANGUAGE PICKER - ACTUALIZADO PARA URLS RELATIVAS
-  // ===============================================
-
   /**
-   * 🎨 Genera datos para el language picker con Astro
-   * ACTUALIZADO: Usa URLs relativas que funcionan en cualquier dominio
+   * Genera datos para el language picker con Astro
    */
+
   getLanguagePickerData(currentLocale, currentPath, absolute = false, Astro = null) {
     return this.languages.map(lang => ({
       code: lang.code,
@@ -672,7 +657,7 @@ export class I18nCore {
   }
 
   /**
-   * 🎨 Helper conveniente para language picker con Astro
+   * Helper conveniente para language picker con Astro
    * ACTUALIZADO: URLs relativas por defecto
    */
   getLanguagePickerDataWithAstro(Astro, absolute = false) {
@@ -681,13 +666,9 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🏗️ SEO Y METADATOS - ACTUALIZADOS
+  // SEO Y METADATOS - ACTUALIZADOS
   // ===============================================
 
-  /**
-   * 🏗️ Helper para generar metadatos SEO multiidioma con Astro
-   * ACTUALIZADO: Detecta automáticamente el dominio actual
-   */
   getSEOMetadata(pageData, Astro) {
     const { locale, cleanPath } = this.getI18nInfo(Astro);
     const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true); // URLs absolutas para SEO
@@ -731,8 +712,7 @@ export class I18nCore {
   }
 
   /**
-   * 🏗️ Helper para generar JSON-LD estructurado multiidioma
-   * ACTUALIZADO: Detecta automáticamente el dominio
+   * Helper para generar JSON-LD estructurado multiidioma
    */
   generateStructuredData(data, Astro) {
     const { locale } = this.getI18nInfo(Astro);
@@ -772,11 +752,11 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🔧 UTILIDADES
+  // UTILIDADES
   // ===============================================
 
   /**
-   * ✅ Helper para detectar si una URL corresponde al idioma actual
+   * Helper para detectar si una URL corresponde al idioma actual
    */
   isCurrentLanguageUrl(url, Astro) {
     const { locale } = this.getI18nInfo(Astro);
@@ -789,7 +769,7 @@ export class I18nCore {
   }
 
   /**
-   * 🧭 Helper para detectar redirecciones automáticas de idioma
+   * Helper para detectar redirecciones automáticas de idioma
    */
   handleLanguageRedirect(Astro) {
     const { url } = Astro;
@@ -823,7 +803,7 @@ export class I18nCore {
   }
 
   /**
-   * 🎨 Renderiza una bandera
+   * Renderiza una bandera
    */
   renderFlag(flagConfig, className = '', size = '1rem') {
     return FlagRenderer.renderFlag(flagConfig, className, size);
@@ -837,7 +817,7 @@ export class I18nCore {
   }
 
   /**
-   * 📝 Helper para logging con información de idioma
+   * Helper para logging con información de idioma
    */
   logWithLocale(message, Astro, level = 'log') {
     if (this.isDev()) {
@@ -848,11 +828,11 @@ export class I18nCore {
 }
 
 // ===============================================
-// 🎯 INSTANCIA SINGLETON Y EXPORTS
+// INSTANCIA SINGLETON Y EXPORTS
 // ===============================================
 
 /**
- * 🎯 Instancia singleton - LA ÚNICA QUE NECESITAS
+ * Instancia singleton - LA ÚNICA QUE NECESITAS
  */
 export const i18nCore = new I18nCore();
 
@@ -862,11 +842,11 @@ if (typeof window === 'undefined') { // Solo en el servidor
 }
 
 // ===============================================
-// 🔄 FUNCIONES DE CONVENIENCIA (WRAPPERS)
+// FUNCIONES DE CONVENIENCIA (WRAPPERS)
 // ===============================================
 
 /**
- * 🔤 Función helper para obtener traducciones
+ * Función helper para obtener traducciones
  */
 export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
   if (!i18nCore.loaded) {
@@ -877,8 +857,7 @@ export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) 
 }
 
 /**
- * 🌐 Función helper para obtener datos del language picker con Astro
- * ACTUALIZADO: URLs relativas por defecto
+ * Función helper para obtener datos del language picker con Astro
  */
 export async function getLanguagePickerData(Astro, absolute = false) {
   if (!i18nCore.loaded) {
@@ -889,7 +868,7 @@ export async function getLanguagePickerData(Astro, absolute = false) {
 }
 
 /**
- * 🚀 Hook para precargar traducciones en el servidor
+ * Hook para precargar traducciones en el servidor
  */
 export async function preloadTranslations() {
   await i18nCore.init();
@@ -897,11 +876,11 @@ export async function preloadTranslations() {
 }
 
 // ===============================================
-// 🎨 CLASE HELPER PARA ERRORES
+// CLASE HELPER PARA ERRORES
 // ===============================================
 
 /**
- * 🎨 Clase helper para manejo de errores de i18n
+ * Clase helper para manejo de errores de i18n
  */
 export class I18nError extends Error {
   constructor(message, locale, key) {
@@ -913,11 +892,11 @@ export class I18nError extends Error {
 }
 
 // ===============================================
-// 🔄 COMPATIBILIDAD CON CÓDIGO EXISTENTE
+// COMPATIBILIDAD CON CÓDIGO EXISTENTE
 // ===============================================
 
 /**
- * 🔄 Aliases para compatibilidad con código existente
+ * Aliases para compatibilidad con código existente
  * @deprecated Usar i18nCore directamente
  */
 export class I18nConfig {

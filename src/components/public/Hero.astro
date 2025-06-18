@@ -1,312 +1,405 @@
 ---
-import logoBlanco from '../../assets/logo-blanco.svg';
+// src/components/public/Hero.astro - Versión actualizada para sistema dinámico
 import Text from '../i18n/Text.astro';
+import { getResponsiveBackgroundImage, getImagePreloadData } from '../../utils/imageUtils.js';
+
+// 🎯 NUEVO: Obtener la imagen hero principal del sistema dinámico
+const heroImageData = await getResponsiveBackgroundImage('hero_main', Astro);
+const preloadData = heroImageData ? await getImagePreloadData('hero_main', Astro) : [];
+
+// 🔍 Debug en desarrollo
+if (import.meta.env.DEV) {
+    console.log('📸 Hero: Imagen cargada:', {
+        found: !!heroImageData,
+        id: heroImageData?.id,
+        responsive: !!heroImageData?.responsive,
+        preloads: preloadData.length
+    });
+}
+
+// Fallback si no hay imagen configurada
+const defaultHeroImage = '/images/hero/hero-desktop-1920w.jpg';
 ---
 
-<section class="hero" id="inicio">
-    <!-- Sección central: título y subtítulo -->
-    <div class="hero-header">
-        <img src={logoBlanco.src} alt="El Palleter Logo" class="hero-logo" />
-    </div>
-    <!-- Sección inferior: descripción + flecha -->
-    <div class="hero-footer">
-        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta"><Text key="hero.menu" /></a>
-        <div class="scroll-indicator" data-scroll-to="historia">
-            <div class="scroll-arrow">↓</div>
+<!-- Preload crítico de imágenes (solo si tenemos imagen responsiva) -->
+{preloadData.map(preload => (
+    <link 
+        rel="preload" 
+        href={preload.href} 
+        as={preload.as}
+        media={preload.media}
+        fetchpriority="high"
+    />
+))}
+
+<section class="hero-section" id="hero">
+    <!-- Background responsivo -->
+    <div class="hero-background" aria-hidden="true"></div>
+    
+    <!-- Overlay para mejor legibilidad -->
+    <div class="hero-overlay"></div>
+    
+    <!-- Contenido del hero -->
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">
+                <Text key="hero.title" fallback="Bienvenido a El Palleter" />
+            </h1>
+            <p class="hero-subtitle">
+                <Text key="hero.subtitle" fallback="Tradición culinaria desde 1985 en el corazón de Benissa" />
+            </p>
+            <div class="hero-actions">
+                <a href="#carta" class="hero-btn primary">
+                    <Text key="hero.btn_menu" fallback="Ver Carta" />
+                </a>
+                <a href="#reservas" class="hero-btn secondary">
+                    <Text key="hero.btn_reserve" fallback="Reservar Mesa" />
+                </a>
+            </div>
         </div>
     </div>
+    
+    <!-- Fallback message si no hay imagen (solo en desarrollo) -->
+    {!heroImageData && import.meta.env.DEV && (
+        <div class="hero-debug-notice">
+            <p>⚠️ No se encontró 'hero_main' en imageConfig.json</p>
+            <small>Agrega con: node scripts/image-manager.js add imagen.jpg hero_main hero</small>
+        </div>
+    )}
 </section>
 
-<style>
-    /* === HERO BASE === */
-    .hero {
-        width: 100%;
-        height: 100svh;
-        background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('../../assets/fondo.jpg') center/cover;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
+<style define:vars={{ 
+    heroMobile: heroImageData?.responsive?.mobile || defaultHeroImage,
+    heroTablet: heroImageData?.responsive?.tablet || defaultHeroImage,
+    heroDesktop: heroImageData?.responsive?.desktop || defaultHeroImage,
+    heroXL: heroImageData?.responsive?.desktop_xl || defaultHeroImage,
+    heroFallback: heroImageData?.fallback || defaultHeroImage
+}}>
+    /* === HERO SECTION === */
+    .hero-section {
         position: relative;
-        color: white;
-    }
-
-    /* === SECCIÓN CENTRAL - USANDO SISTEMA GLOBAL === */
-    .hero-header {
-        width: 100%;
-        text-align: center;
-        z-index: 2;
-        flex: 1;
+        height: 100vh;
+        min-height: 600px;
         display: flex;
-        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        align-items: center;
-        /* Mobile base - usando variables globales */
-        padding-top: calc(var(--padding-mobile) * 5); /* Equivalente a 80px con padding base */
-        padding-left: var(--padding-mobile);
-        padding-right: var(--padding-mobile);
+        overflow: hidden;
+        isolation: isolate;
     }
 
-    .hero-logo {
-        /* Mobile base */
-        max-width: 650px;
-        width: 100%;
-        height: auto;
-        margin-bottom: 2rem;
-        filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* === BOTONES - USANDO SISTEMA GLOBAL === */
-    .cta-btn-carta {
-        background: transparent;
-        border: 2px solid white;
-        color: white;
-        /* Mobile base */
-        padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.5);
-        font-size: 0.85rem;
-        font-weight: 600;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 1rem;
-        border-radius: 6px;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-    }
-
-    .cta-btn-carta:hover {
-        border-color: #ffffff;
-        color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 
-                    0 0 0 1px rgba(255, 255, 255, 1);
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-    }
-
-    /* Botón original mantenido para compatibilidad */
-    .cta-btn {
-        background: none;
-        border: none;
-        color: white;
-        padding: 0.6rem 0;
-        font-size: 0.85rem;
-        font-weight: 400;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-block;
-        position: relative;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.6);
-    }
-
-    .cta-btn::after {
-        content: '';
+    /* === BACKGROUND RESPONSIVO DINÁMICO === */
+    .hero-background {
         position: absolute;
-        bottom: -2px;
+        top: 0;
         left: 0;
-        width: 0;
-        height: 2px;
-        background: #f4a261;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .cta-btn:hover::after {
         width: 100%;
+        height: 100%;
+        z-index: 1;
+        
+        /* Imagen fallback por defecto */
+        background-image: url(var(--heroFallback));
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        
+        /* Optimización de rendimiento */
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        will-change: transform;
     }
 
-    .cta-btn:hover {
-        color: #f4a261;
-        transform: translateY(-1px);
+    /* 🎯 NUEVO: Imágenes responsivas inyectadas dinámicamente via CSS vars */
+    
+    /* Mobile optimizado */
+    @media (max-width: 767px) {
+        .hero-background {
+            background-image: url(var(--heroMobile));
+            background-attachment: scroll; /* Mejor performance en móvil */
+        }
+    }
+    
+    /* Tablet optimizado */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .hero-background {
+            background-image: url(var(--heroTablet));
+        }
+    }
+    
+    /* Desktop optimizado */
+    @media (min-width: 1024px) and (max-width: 1399px) {
+        .hero-background {
+            background-image: url(var(--heroDesktop));
+        }
+    }
+    
+    /* Desktop XL/4K optimizado */
+    @media (min-width: 1400px) {
+        .hero-background {
+            background-image: url(var(--heroXL));
+        }
     }
 
-    /* === SECCIÓN INFERIOR - USANDO SISTEMA GLOBAL === */
-    .hero-footer {
+    /* === OVERLAY === */
+    .hero-overlay {
         position: absolute;
-        bottom: 0;
-        text-align: center;
-        z-index: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--gap-mobile); /* Gap responsivo automático */
-        /* Mobile base */
-        padding-bottom: calc(var(--padding-mobile) * 1.5);
+        top: 0;
+        left: 0;
         width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.4) 0%,
+            rgba(0, 0, 0, 0.2) 50%,
+            rgba(0, 0, 0, 0.6) 100%
+        );
+        z-index: 2;
     }
 
-    .description {
-        font-size: clamp(0.9rem, 2vw, 1.3rem);
-        font-weight: 300;
-        max-width: 90%;
-        margin: 0;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-        opacity: 0.9;
-        line-height: 1.4;
-        /* Mobile base */
+    /* === CONTENIDO === */
+    .hero-content {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        color: white;
+        max-width: 800px;
         padding: 0 var(--padding-mobile);
     }
 
-    .scroll-indicator {
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: var(--padding-mobile);
+    .hero-text {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 1s ease-out 0.5s forwards;
     }
 
-    .scroll-indicator:hover {
-        transform: translateY(-5px);
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
-    .scroll-arrow {
-        /* Mobile base */
-        font-size: 2rem;
-        animation: bounce 2s infinite;
-        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        line-height: 1.5;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
 
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
+    /* === BOTONES === */
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 150px;
+        text-align: center;
+    }
+
+    .hero-btn.primary {
+        background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(244, 162, 97, 0.4);
+    }
+
+    .hero-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(244, 162, 97, 0.6);
+    }
+
+    .hero-btn.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-btn.secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    /* === DEBUG NOTICE (solo desarrollo) === */
+    .hero-debug-notice {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        z-index: 10;
+        background: rgba(255, 193, 7, 0.9);
+        color: #333;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        max-width: 300px;
+    }
+
+    .hero-debug-notice small {
+        display: block;
+        margin-top: 0.25rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.7rem;
+    }
+
+    /* === ANIMACIONES === */
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
             transform: translateY(0);
         }
-        40% {
-            transform: translateY(-10px);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 767px) {
+        .hero-section {
+            min-height: 500px;
+            height: 100svh; /* Usar viewport units seguros en móvil */
         }
-        60% {
-            transform: translateY(-5px);
+        
+        .hero-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-btn {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .hero-debug-notice {
+            position: relative;
+            margin-top: 2rem;
+            left: auto;
+            bottom: auto;
         }
     }
 
-    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
-
-    /* DESKTOP LARGE (1400px+) */
-    @media (min-width: 1400px) {
-        .hero-footer {
-            gap: var(--gap-desktop);
-            padding-bottom: var(--padding-desktop);
-        }
-
-        .hero-logo {
-            max-width: 650px;
-        }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.45) calc(var(--padding-desktop) * 0.9);
-            font-size: 0.85rem;
-            letter-spacing: 0.8px;
-            margin-top: 0.8rem;
-            max-width: 200px;
+    @media (max-width: 480px) {
+        .hero-content {
+            padding: 0 1rem;
         }
     }
 
-    /* DESKTOP (1024px+) */
-    @media (min-width: 1024px) and (max-width: 1399px) {
-        .hero-header {
-            padding-top: calc(var(--padding-desktop) * 3.5); /* Equivalente a 100px con sistema */
-            padding-left: var(--padding-desktop);
-            padding-right: var(--padding-desktop);
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    @media (prefers-reduced-motion: reduce) {
+        .hero-text {
+            animation: none;
+            opacity: 1;
+            transform: none;
         }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.5) calc(var(--padding-desktop) * 1);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            margin-top: 1rem;
-            border-radius: 6px;
+        
+        .hero-btn {
+            transition: none;
         }
-
-        .hero-logo {
-            max-width: 600px;
-        }
-
-        .cta-btn {
-            padding: 0.8rem 0;
-            font-size: 1rem;
-            letter-spacing: 1.5px;
-        }
-
-        .hero-footer {
-            gap: var(--gap-desktop);
-            padding-bottom: var(--padding-desktop);
-        }
-
-        .description {
-            padding: 0 var(--padding-desktop);
+        
+        .hero-background {
+            background-attachment: scroll;
         }
     }
 
-    /* TABLET Y SUPERIOR (768px+) */
-    @media (min-width: 768px) and (max-width: 1023px) {
-        .hero-header {
-            padding-top: calc(var(--padding-tablet) * 4); /* Equivalente a 100px */
-            padding-left: var(--padding-tablet);
-            padding-right: var(--padding-tablet);
-        }
-
-        .hero-logo {
-            max-width: 500px;
-        }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-tablet) * 0.6) calc(var(--padding-tablet) * 1.2);
-            font-size: 0.95rem;
-            letter-spacing: 1.2px;
-            margin-top: 1.2rem;
-        }
-
-        .cta-btn {
-            padding: 0.7rem 0;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
-        .hero-footer {
-            gap: var(--gap-tablet);
-            padding-bottom: calc(var(--padding-tablet) * 1.5);
-        }
-
-        .description {
-            font-size: clamp(1rem, 2vw, 1.3rem);
-            max-width: 700px;
-            padding: 0 var(--padding-tablet);
-        }
-
-        .scroll-arrow {
-            font-size: 2.5rem;
-        }
-    }
-
-    /* MOBILE PEQUEÑO (0-420px) */
-    @media (min-width: 420px) and (max-width: 767px) {
-        .hero-header {
-            padding-top: calc(var(--padding-mobile) * 3); /* Equivalente a 60px */
-        }
-
-        .hero-logo {
-            max-width: 420px;
-        }
-
-        .cta-btn-carta {
-            padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.2);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-        }
-
-        .cta-btn {
-            padding: 0.6rem 0;
-            font-size: 0.85rem;
-            letter-spacing: 0.8px;
-        }
-
-        .description {
-            font-size: 0.9rem;
-        }
-
-        .scroll-arrow {
-            font-size: 1.8rem;
+    /* === SOPORTE PARA DARK MODE === */
+    @media (prefers-color-scheme: dark) {
+        .hero-overlay {
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 0, 0.6) 0%,
+                rgba(0, 0, 0, 0.4) 50%,
+                rgba(0, 0, 0, 0.7) 100%
+            );
         }
     }
 </style>
+
+<script>
+    // Lazy loading adicional para imágenes no críticas
+    document.addEventListener('DOMContentLoaded', () => {
+        const heroBackground = document.querySelector('.hero-background');
+        
+        if (heroBackground) {
+            // Observar cuando el hero está visible para cargar imágenes adicionales
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Precargar imagen de siguiente sección si es necesario
+                        prefetchNextSectionImages();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            observer.observe(heroBackground);
+        }
+        
+        // Optimización: pausar animaciones cuando no están visibles
+        handleVisibilityChange();
+    });
+    
+    function prefetchNextSectionImages() {
+        // Precargar imágenes de la siguiente sección visible (historia)
+        // Esto mejora la transición entre secciones
+        const nextImages = [
+            '/images/historia/hist_001-mobile-800w.jpg', // Primeras imágenes de historia
+            '/images/historia/hist_001-tablet-1200w.jpg'
+        ];
+        
+        nextImages.forEach(src => {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = src;
+            link.as = 'image';
+            document.head.appendChild(link);
+        });
+    }
+    
+    function handleVisibilityChange() {
+        document.addEventListener('visibilitychange', () => {
+            const heroBackground = document.querySelector('.hero-background');
+            if (heroBackground) {
+                if (document.hidden) {
+                    // Pausar animaciones cuando la página no es visible
+                    heroBackground.style.animationPlayState = 'paused';
+                } else {
+                    heroBackground.style.animationPlayState = 'running';
+                }
+            }
+        });
+    }
+    
+    // 🔍 Debug helper en desarrollo
+    if (import.meta.env.DEV) {
+        window.heroDebug = {
+            checkImages: () => {
+                const bg = getComputedStyle(document.querySelector('.hero-background'));
+                console.log('🎯 Hero current background:', bg.backgroundImage);
+                
+                // Verificar qué imagen se está usando en cada breakpoint
+                const breakpoints = [
+                    { name: 'mobile', media: '(max-width: 767px)' },
+                    { name: 'tablet', media: '(min-width: 768px) and (max-width: 1023px)' },
+                    { name: 'desktop', media: '(min-width: 1024px) and (max-width: 1399px)' },
+                    { name: 'xl', media: '(min-width: 1400px)' }
+                ];
+                
+                breakpoints.forEach(bp => {
+                    if (window.matchMedia(bp.media).matches) {
+                        console.log(`📱 Current breakpoint: ${bp.name}`);
+                    }
+                });
+            }
+        };
+        
+        // Ejecutar debug después de cargar
+        setTimeout(() => window.heroDebug?.checkImages(), 1000);
+    }
+</script>

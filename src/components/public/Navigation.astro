@@ -1,5 +1,4 @@
 ---
-// src/components/public/Navigation.astro - ACTUALIZADO con Language Picker
 import epLogo from '../../assets/mini-logo.svg';
 import Text from '../i18n/Text.astro';
 import LanguagePicker from '../i18n/LanguagePicker.astro';
@@ -24,7 +23,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         </li>
         <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
         <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
-        <!-- 🔥 NUEVO: Language Picker para Desktop -->
+        <!-- Language Picker para Desktop -->
         <li class="language-item">
             <LanguagePicker variant="desktop" />
         </li>
@@ -37,7 +36,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         </a>
     </div>
     
-    <!-- 🔥 NUEVO: Language Picker para Mobile (solo visible en móvil) -->
+    <!-- Language Picker para Mobile (solo visible en móvil) -->
     <div class="language-mobile">
         <LanguagePicker variant="mobile" />
     </div>

@@ -1,7 +1,5 @@
 ---
-// src/components/public/MobileSidebar.astro - ACTUALIZADO con Language Picker
 import logoBlanco from '../../assets/logo-blanco.svg';
-import LanguagePicker from '../i18n/LanguagePicker.astro';
 import Text from '../i18n/Text.astro';
 ---
 
@@ -31,16 +29,6 @@ import Text from '../i18n/Text.astro';
                     <li><a href="#contacto" data-delay="300" data-nav="contacto"><Text key="nav.contact"/></a></li>
                 </ul>
             </nav>
-            
-            <!-- 🔥 NUEVO: Language Picker para el menú móvil -->
-            <div class="mobile-language-section">
-                <div class="mobile-language-title">
-                    <Text key="nav.language" fallback="Idioma" />
-                </div>
-                <div class="mobile-language-picker">
-                    <LanguagePicker variant="mobile" className="sidebar-language" />
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -240,41 +228,6 @@ import Text from '../i18n/Text.astro';
         letter-spacing: 1px;
     }
     
-    .mobile-language-picker {
-        /* El componente LanguagePicker maneja sus propios estilos */
-    }
-    
-    /* 🔥 NUEVO: Estilos específicos para el language picker en sidebar */
-    .mobile-language-picker :global(.language-picker.sidebar-language) {
-        width: 100%;
-    }
-    
-    .mobile-language-picker :global(.language-picker.sidebar-language .lang-current) {
-        width: 100%;
-        justify-content: flex-start;
-        background: rgba(244, 162, 97, 0.1);
-        border-color: rgba(244, 162, 97, 0.5);
-        padding: 0.8rem 1.2rem;
-        font-size: 1rem;
-    }
-    
-    .mobile-language-picker :global(.language-picker.sidebar-language .lang-options) {
-        position: relative;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: rgba(244, 162, 97, 0.05);
-        border: 1px solid rgba(244, 162, 97, 0.2);
-        margin-top: 0.5rem;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-    }
-    
-    .mobile-language-picker :global(.language-picker.sidebar-language[data-open="true"] .lang-options) {
-        display: block;
-    }
-    
     /* Responsive */
     @media (max-width: 768px) {
         .left-content {
@@ -322,10 +275,6 @@ import Text from '../i18n/Text.astro';
         .left-content {
             top: 0.75rem;
             left: 1.5rem;
-        }
-        
-        .mobile-language-title {
-            font-size: 0.9rem;
         }
     }
 </style>

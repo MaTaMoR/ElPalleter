@@ -1,6 +1,5 @@
 {
   "name": "el-palleter",
-  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -8,7 +7,8 @@
     "deploy:vercel": "vercel --prod"
   },
   "dependencies": {
-    "astro": "^4.0.0",
-    "lodash": "^4.17.21"
+    "astro": "^5.9.4",
+    "lodash": "^4.17.21",
+    "sharp": "^0.34.2"
   }
 }

@@ -8,7 +8,6 @@ import { getGalleryImages } from '../../utils/imageUtils.js';
 const imagesToShow = getGalleryImages('historia_slider', Astro);
 ---
 
-<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="historia-section" id="historia">
     <div class="historia-header">
         <h2 class="historia-title">
@@ -76,6 +75,8 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         gap: var(--gap-mobile);
         position: relative;
         z-index: 2;
+        /* 🎯 SOLUCIÓN: Prevenir overflow durante carga inicial */
+        overflow: hidden;
     }
 
     /* === CONTENT SECTIONS - SIN BACKGROUND DUPLICADO === */
@@ -86,7 +87,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         flex-direction: column;
         justify-content: center;
         
-        /* 🎯 MANTENIDO: Estilos específicos del contenido */
+        /* MANTENIDO: Estilos específicos del contenido */
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
@@ -95,6 +96,9 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         overflow: hidden;
         height: 100%;
+        
+        min-height: 0;
+        max-height: 100%;
         
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
         opacity: 0;
@@ -107,7 +111,6 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         display: grid;
         place-items: center;
         
-        /* 🎯 SOLUCIÓN FINAL: Prevenir overflow + hardware acceleration */
         background: rgba(0, 0, 0, 0.4);
         border-radius: 20px;
         border: 1px solid rgba(244, 162, 97, 0.15);
@@ -117,6 +120,9 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         backface-visibility: hidden;
         isolation: isolate;
         contain: layout style;
+        
+        min-height: 0;
+        max-height: 100%;
         
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
         opacity: 0;
@@ -131,6 +137,21 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     .slider-section.slide-in-active {
         opacity: 1;
         transition-delay: 0.2s;
+    }
+
+    .history-content :global(.historia-rich-content) {
+        width: 100%;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .history-content :global(.historia-rich-content p),
+    .history-content :global(.historia-rich-content div),
+    .history-content :global(.historia-rich-content span) {
+        max-width: 100%;
+        overflow-wrap: break-word;
     }
 
     /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
@@ -219,7 +240,6 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
             min-height: 40vh;
             height: 40vh;
             background: rgba(0, 0, 0, 0.3);
-            /* 🎯 SOLUCIÓN FINAL: border-radius + hardware acceleration */
             border-radius: 15px;
             border: 1px solid rgba(244, 162, 97, 0.2);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -275,28 +295,45 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     document.addEventListener('DOMContentLoaded', () => {
         const historyContent = document.querySelector('.history-content');
         const sliderSection = document.querySelector('.slider-section');
+        const historiaSection = document.querySelector('.historia-section');
         
-        // 🎯 SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal
+        // SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal
         const breakpoints = useBreakpoints('historia-component', {
-            element: document.querySelector('.historia-section')
+            element: historiaSection
         });
         
-        // Observer para animaciones de entrada
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('slide-in-active');
+        // 🎯 SOLUCIÓN: Asegurar que el layout esté estable antes de observar
+        const initializeWhenReady = () => {
+            // Esperar a que las imágenes y contenido estén listos
+            setTimeout(() => {
+                // Marcar como cargado para mostrar el contenedor
+                if (historiaSection) {
+                    historiaSection.classList.add('loaded');
                 }
-            });
-        }, observerOptions);
+                
+                // Observer para animaciones de entrada
+                const observerOptions = {
+                    threshold: 0.15,
+                    rootMargin: '0px 0px -50px 0px'
+                };
 
-        if (historyContent) observer.observe(historyContent);
-        if (sliderSection) observer.observe(sliderSection);
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('slide-in-active');
+                        }
+                    });
+                }, observerOptions);
+
+                if (historyContent) observer.observe(historyContent);
+                if (sliderSection) observer.observe(sliderSection);
+                
+                // Cleanup al descargar
+                window.addEventListener('beforeunload', () => {
+                    observer.disconnect();
+                });
+            }, 150);
+        };
         
         // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
@@ -308,10 +345,12 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
             }
         });
         
+        // Inicializar cuando esté listo
+        initializeWhenReady();
+        
         // Cleanup
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
-            observer.disconnect();
         });
     });
 </script>

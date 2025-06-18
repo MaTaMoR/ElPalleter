@@ -8,7 +8,7 @@ export interface Props {
 
 const { variant = 'desktop', className = '' } = Astro.props;
 
-// 🎯 Obtener datos de idiomas desde el sistema centralizado
+// Obtener datos de idiomas desde el sistema centralizado
 const languages = await i18nCore.getLanguagePickerDataWithAstro(Astro);
 
 // Encontrar idioma actual y otros idiomas
