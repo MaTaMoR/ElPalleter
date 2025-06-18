@@ -68,8 +68,6 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         opacity: 0.8;
     }
 
-    /* 🚫 ELIMINADO: Efectos de partículas (los maneja el MainContent) */
-
     /* === CONTAINER USANDO SISTEMA GLOBAL === */
     .historia-container {
         height: 660px;
@@ -109,12 +107,16 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         display: grid;
         place-items: center;
         
-        /* 🎯 MANTENIDO: Estilos específicos del slider */
+        /* 🎯 SOLUCIÓN FINAL: Prevenir overflow + hardware acceleration */
         background: rgba(0, 0, 0, 0.4);
         border-radius: 20px;
         border: 1px solid rgba(244, 162, 97, 0.15);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         overflow: hidden;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        isolation: isolate;
+        contain: layout style;
         
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
         opacity: 0;
@@ -196,7 +198,6 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         .historia-section {
             min-height: auto;
             max-height: none;
-            /* 🚫 ELIMINADO: padding externo */
             display: block;
             align-items: unset;
         }
@@ -204,7 +205,7 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         .historia-container {
             flex-direction: column;
             height: auto;
-            gap: var(--gap-mobile);
+            gap: calc(var(--gap-mobile) * 1.5);
         }
         
         .history-content {
@@ -215,12 +216,14 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
         
         .slider-section {
             order: 1;
-            min-height: 40vh; /* Reducido de 60vh a 40vh para que sea más cuadrado */
+            min-height: 40vh;
             height: 40vh;
             background: rgba(0, 0, 0, 0.3);
+            /* 🎯 SOLUCIÓN FINAL: border-radius + hardware acceleration */
             border-radius: 15px;
             border: 1px solid rgba(244, 162, 97, 0.2);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translate3d(0, 0, 0);
         }
         
         /* Animaciones móvil */
@@ -252,11 +255,11 @@ const imagesToShow = getGalleryImages('historia_slider', Astro);
     /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
         .historia-container {
-            gap: calc(var(--gap-mobile) * 0.75);
+            gap: calc(var(--gap-mobile) * 1.5);
         }
         
         .slider-section {
-            min-height: 35vh; /* Reducido de 50vh a 35vh para mejor proporción */
+            min-height: 35vh;
             height: 35vh;
         }
         

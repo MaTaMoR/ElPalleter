@@ -1,0 +1,182 @@
+/* Reset y estilos globales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 🎯 HTML - MEJORADO PARA PREVENIR OVERFLOW */
+html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+}
+
+/* 🎯 BODY - MEJORADO PARA PREVENIR OVERFLOW */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    line-height: 1.6;
+    background-color: #C2C2C2;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+}
+
+/* 🎯 PREVENIR OVERFLOW EN CONTAINERS Y SECCIONES */
+.container,
+[class*="container"],
+[class*="section"],
+section {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* 🎯 PREVENIR QUE ELEMENTOS CON TRANSFORM CAUSEN OVERFLOW */
+*[style*="transform"],
+*[class*="slide"],
+*[class*="slider"] {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* 🎯 ESPECÍFICO PARA SLIDERS */
+[data-slider] {
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+/* ✅ VARIABLES CSS PARA SISTEMA DE BREAKPOINTS */
+:root {
+    /* Breakpoints */
+    --breakpoint-mobile: 767px;
+    --breakpoint-tablet: 1023px;
+    --breakpoint-desktop: 1399px;
+    
+    /* Variables de padding y gap responsivas */
+    --padding-mobile: 20px;
+    --padding-tablet: 25px;
+    --padding-desktop: 30px;
+    
+    --gap-mobile: 1rem;
+    --gap-tablet: 1.5rem;
+    --gap-desktop: 2rem;
+    --gap-desktop-lg: 2.5rem;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ✅ CLASE HELPER PARA DESHABILITAR TRANSICIONES DURANTE RESIZE */
+.no-transition,
+.no-transition *,
+.no-transition *:before,
+.no-transition *:after {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Animaciones globales */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Clases de utilidad para animaciones */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+/* Focus styles para accesibilidad */
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #f4a261;
+    outline-offset: 2px;
+}
+
+/* Smooth scroll para Safari */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Respetar preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ESTILOS DE DEBUG PARA DESARROLLO */
+body[data-debug-breakpoints="true"] {
+    position: relative;
+}
+
+body[data-debug-breakpoints="true"]:before {
+    content: attr(data-current-breakpoint);
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    z-index: 10000;
+    pointer-events: none;
+    border: 1px solid #f4a261;
+}
