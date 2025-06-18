@@ -104,10 +104,5 @@
       "handle": "+34 965 123 456",
       "icon": "💬"
     }
-  },
-  "config": {
-    "showLogo": true,
-    "showStatus": true,
-    "showSocial": true
   }
 }

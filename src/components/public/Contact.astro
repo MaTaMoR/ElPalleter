@@ -33,114 +33,15 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         <div class="contact-component">
             <!-- Cabecera con Status -->
             <div class="top-bar">
-                <div class="mini-brand">
-                    {
-                        contactData.config.showLogo && (
-                            <div class="logo-container">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 80 55"
-                                    width="45"
-                                    height="32"
-                                >
-                                    <defs>
-                                        <clipPath id="topHalf">
-                                            <rect
-                                                x="0"
-                                                y="0"
-                                                width="80"
-                                                height="27"
-                                            />
-                                        </clipPath>
-                                        <clipPath id="bottomHalf">
-                                            <rect
-                                                x="0"
-                                                y="33"
-                                                width="80"
-                                                height="24"
-                                            />
-                                        </clipPath>
-                                    </defs>
-                                    <text
-                                        x="20"
-                                        y="45"
-                                        text-anchor="middle"
-                                        font-family="serif"
-                                        font-size="50"
-                                        font-weight="900"
-                                        fill="#f4a261"
-                                        clip-path="url(#topHalf)"
-                                    >
-                                        E
-                                    </text>
-                                    <text
-                                        x="60"
-                                        y="45"
-                                        text-anchor="middle"
-                                        font-family="serif"
-                                        font-size="50"
-                                        font-weight="900"
-                                        fill="#f4a261"
-                                        clip-path="url(#topHalf)"
-                                    >
-                                        P
-                                    </text>
-                                    <text
-                                        x="20"
-                                        y="45"
-                                        text-anchor="middle"
-                                        font-family="serif"
-                                        font-size="50"
-                                        font-weight="900"
-                                        fill="#f4a261"
-                                        clip-path="url(#bottomHalf)"
-                                    >
-                                        E
-                                    </text>
-                                    <text
-                                        x="60"
-                                        y="45"
-                                        text-anchor="middle"
-                                        font-family="serif"
-                                        font-size="50"
-                                        font-weight="900"
-                                        fill="#f4a261"
-                                        clip-path="url(#bottomHalf)"
-                                    >
-                                        P
-                                    </text>
-                                    <line
-                                        x1="0"
-                                        y1="30"
-                                        x2="80"
-                                        y2="30"
-                                        stroke="#f4a261"
-                                        stroke-width="1"
-                                    />
-                                </svg>
-                            </div>
-                        )
-                    }
-                    <span class="brand-text">
-                        <Text
-                            key="contact.brand.name"
-                            fallback={contactData.restaurant.name}
-                        />
+                <div
+                    class={`status status-${currentStatus.status}`}
+                    id="restaurantStatus"
+                >
+                    <div class="status-dot" />
+                    <span id="statusText" class="status-message">
+                        {currentStatus.fullMessage || "No Disponible"}
                     </span>
                 </div>
-                {
-                    contactData.config.showStatus && (
-                        <div
-                            class={`status status-${currentStatus.status}`}
-                            id="restaurantStatus"
-                        >
-                            <div class="status-dot" />
-                            <span id="statusText" class="status-message">
-                                {currentStatus.fullMessage || "No Disponible"}
-                            </span>
-                        </div>
-                    )
-                }
             </div>
 
             <!-- Contenido de Contacto -->
@@ -243,39 +144,33 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                             ))
                         }
                     </div>
-
-                    <!-- Sección de Redes Sociales -->
-                    {
-                        contactData.config.showSocial && (
-                            <div class="contact-info-section">
-                                <h4>
-                                    <Text
-                                        key="contact.sections.social"
-                                        fallback="Síguenos"
-                                    />
-                                </h4>
-                                <p>
-                                    <Text
-                                        key="contact.values.followUs"
-                                        fallback="Mantente al día con nuestras novedades"
-                                    />
-                                </p>
-                                <div class="social-links">
-                                    {socialNetworks.map((social) => (
-                                        <a
-                                            href={social.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            title={social.handle}
-                                            aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
-                                        >
-                                            {social.icon}
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )
-                    }
+                    <div class="contact-info-section">
+                        <h4>
+                            <Text
+                                key="contact.sections.social"
+                                fallback="Síguenos"
+                            />
+                        </h4>
+                        <p>
+                            <Text
+                                key="contact.values.followUs"
+                                fallback="Mantente al día con nuestras novedades"
+                            />
+                        </p>
+                        <div class="social-links">
+                            {socialNetworks.map((social) => (
+                                <a
+                                    href={social.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={social.handle}
+                                    aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
+                                >
+                                    {social.icon}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -329,7 +224,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
     /* === CABECERA CON STATUS === */
     .top-bar {
         display: flex;
-        justify-content: space-between;
+        justify-content: end;
         align-items: center;
         background: rgba(0, 0, 0, 0.4);
         padding: calc(var(--padding-mobile) * 1.25)
