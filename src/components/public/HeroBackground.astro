@@ -1,0 +1,226 @@
+---
+import ResponsiveImage from './ResponsiveImage.astro';
+
+interface Props {
+    imageId: string;
+    alt?: string;
+    className?: string;
+    overlayColor?: string;
+    overlayOpacity?: number;
+    fallbackImage?: string;
+}
+
+const {
+    imageId,
+    alt = "Fondo Hero",
+    className = '',
+    overlayColor = 'rgba(0, 0, 0, 0.25)',
+    overlayOpacity = 1,
+    fallbackImage = '/src/assets/fondo.jpg'
+} = Astro.props;
+
+// ID único para evitar conflictos de z-index
+const heroId = `hero-bg-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class={`hero-background ${className}`} id={heroId}>
+    <!-- Imagen de fondo responsiva -->
+    <ResponsiveImage
+        imageId={imageId}
+        alt={alt}
+        className="hero-bg-image"
+        loading="eager"
+        decoding="async"
+        sizes="100vw"
+        objectFit="cover"
+        objectPosition="center"
+        priority={true}
+        fallbackText="Imagen de fondo no disponible"
+        fallbackIcon="picture"
+    />
+    
+    <!-- Overlay con gradiente personalizable -->
+    <div 
+        class="hero-overlay" 
+        style={`
+            background: linear-gradient(${overlayColor}, ${overlayColor});
+            opacity: ${overlayOpacity};
+        `}
+    ></div>
+    
+    <!-- Slot para contenido del hero -->
+    <div class="hero-content">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .hero-background {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+    }
+
+    /* === IMAGEN DE FONDO === */
+    .hero-background :global(.hero-bg-image) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    /* === FALLBACK PERSONALIZADO PARA HERO === */
+    .hero-background :global(.responsive-image-fallback) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        /* Estilo hero para fallback */
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border: none;
+        border-radius: 0;
+        color: rgba(255, 255, 255, 0.8);
+        min-height: 100vh;
+    }
+
+    .hero-background :global(.responsive-image-fallback .fallback-icon) {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .hero-background :global(.responsive-image-fallback .fallback-title) {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* === OVERLAY === */
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* === CONTENIDO === */
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* === VARIANTES === */
+    
+    /* Hero con altura personalizada */
+    .hero-background.custom-height {
+        height: auto;
+        min-height: 60vh;
+    }
+
+    /* Hero con parallax (opcional) */
+    .hero-background.parallax .hero-bg-image {
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+    }
+
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    .hero-background {
+        /* Mejorar rendering */
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        
+        /* Contener el layout para mejor performance */
+        contain: layout style;
+    }
+
+    .hero-background :global(.hero-bg-image) {
+        /* Optimización de GPU */
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+    }
+
+    /* === RESPONSIVE === */
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .hero-background {
+            /* En móvil, usar viewport units más estables */
+            height: 100svh;
+        }
+        
+        .hero-background :global(.responsive-image-fallback .fallback-content) {
+            padding: 2rem 1rem;
+        }
+    }
+
+    /* Reducir motion para usuarios que lo prefieran */
+    @media (prefers-reduced-motion: reduce) {
+        .hero-background.parallax .hero-bg-image {
+            transform: none;
+            will-change: auto;
+        }
+    }
+</style>
+
+<script>
+    // Script opcional para efectos avanzados
+    document.addEventListener('DOMContentLoaded', () => {
+        const heroBackgrounds = document.querySelectorAll('.hero-background');
+        
+        heroBackgrounds.forEach(hero => {
+            const img = hero.querySelector('.hero-bg-image');
+            
+            if (img) {
+                // Preload para mejor performance
+                if ('loading' in HTMLImageElement.prototype) {
+                    img.loading = 'eager';
+                }
+                
+                // Opcional: Parallax effect
+                if (hero.classList.contains('parallax')) {
+                    const handleScroll = () => {
+                        const scrolled = window.pageYOffset;
+                        const parallaxSpeed = 0.5;
+                        img.style.transform = `translate3d(0, ${scrolled * parallaxSpeed}px, 0)`;
+                    };
+                    
+                    // Throttle scroll events
+                    let ticking = false;
+                    const scrollHandler = () => {
+                        if (!ticking) {
+                            requestAnimationFrame(() => {
+                                handleScroll();
+                                ticking = false;
+                            });
+                            ticking = true;
+                        }
+                    };
+                    
+                    window.addEventListener('scroll', scrollHandler, { passive: true });
+                    
+                    // Cleanup
+                    hero.addEventListener('disconnect', () => {
+                        window.removeEventListener('scroll', scrollHandler);
+                    });
+                }
+            }
+        });
+    });
+</script>

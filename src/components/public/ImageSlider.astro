@@ -1,9 +1,12 @@
 ---
+import ResponsiveImage from './ResponsiveImage.astro';
+import { i18nCore } from '../../i18n/core';
+
 export interface Props {
     images: Array<{
-        src: string;
-        alt: string;
-        title?: string;
+        imageId: string;
+        name: string;
+        order?: number;
     }>;
 }
 
@@ -13,12 +16,20 @@ const { images } = Astro.props;
 <div class="slider-container" data-slider="historia-slider">
     <div class="slider-wrapper">
         {images.map((image, index) => (
-            <div 
-                class={`slide ${index === 0 ? 'active' : ''}`}
-                style={`background-image: url('${image.src}')`}
-            >
-                {image.title && (
-                    <div class="slide-caption">{image.title}</div>
+            <div class={`slide ${index === 0 ? 'active' : ''}`}>
+                <ResponsiveImage
+                    imageId={image.imageId}
+                    alt={image.name}
+                    className="slide-background"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    priority={index === 0}
+                    showFallback={true}
+                    fallbackText="Imagen no disponible"
+                    fallbackIcon="image"
+                />
+                
+                {image.name && (
+                    <div class="slide-caption">{i18nCore.safeTranslation(image.name, Astro, image.name)}</div>
                 )}
             </div>
         ))}
@@ -41,7 +52,7 @@ const { images } = Astro.props;
 </div>
 
 <style>
-    /* === SLIDER DE FOTOS - SOLUCIÓN FINAL === */
+    /* === SLIDER DE FOTOS - FUNCIONALIDAD EXACTAMENTE IGUAL === */
     .slider-container {
         position: relative;
         border-radius: 20px;
@@ -69,25 +80,25 @@ const { images } = Astro.props;
         min-width: 100%;
         max-width: 100%;
         height: 100%;
-        background-size: cover;
-        background-position: center;
         position: relative;
         flex-shrink: 0;
         backface-visibility: hidden;
         contain: layout style paint;
+        overflow: hidden;
     }
     
-    .slide::before {
-        content: '';
+    .slide :global(.slide-background) {
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.2);
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: 0;
     }
     
-    /* === CONTROLES DEL SLIDER === */
+    /* === CONTROLES DEL SLIDER - SIN CAMBIOS === */
     .slider-nav {
         position: absolute;
         bottom: 2rem;
@@ -118,7 +129,7 @@ const { images } = Astro.props;
         background: rgba(255, 255, 255, 0.8);
     }
     
-    /* === FLECHAS DEL SLIDER === */
+    /* === FLECHAS DEL SLIDER - SIN CAMBIOS === */
     .slider-arrow {
         position: absolute;
         top: 50%;
@@ -149,7 +160,7 @@ const { images } = Astro.props;
         right: 2rem;
     }
     
-    /* === CAPTION CON EFECTO PILL === */
+    /* === CAPTION CON EFECTO PILL - SIN CAMBIOS === */
     .slide-caption {
         position: absolute;
         bottom: 4rem;
@@ -178,7 +189,7 @@ const { images } = Astro.props;
         opacity: 1;
     }
     
-    /* === RESPONSIVE === */
+    /* === RESPONSIVE - SIN CAMBIOS === */
     
     /* MÓVIL - BORDER-RADIUS MENOR */
     @media (max-width: 767px) {

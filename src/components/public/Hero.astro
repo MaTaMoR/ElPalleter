@@ -1,103 +1,49 @@
 ---
 import logoBlanco from '../../assets/logo-blanco.svg';
 import Text from '../i18n/Text.astro';
-import { getResponsiveBackgroundImage } from '../../utils/imageUtils.js';
-
-// 🎯 NUEVO: Obtener imagen hero del sistema dinámico simplificado
-const heroImageData = await getResponsiveBackgroundImage('hero-main', Astro);
-
-// 🔍 Debug en desarrollo
-if (import.meta.env.DEV) {
-    console.log('📸 Hero: Imagen cargada:', {
-        found: !!heroImageData,
-        id: heroImageData?.id,
-        responsive: heroImageData?.responsive
-    });
-}
-
-// Fallback si no hay imagen configurada
-const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
+import HeroBackground from './HeroBackground.astro';
 ---
 
-<section class="hero" id="inicio" style={heroImageData ? `
-    --hero-mobile: url('${heroImageData.responsive.mobile}');
-    --hero-tablet: url('${heroImageData.responsive.tablet}'); 
-    --hero-desktop: url('${heroImageData.responsive.desktop}');
-    --hero-xl: url('${heroImageData.responsive.desktop_xl}');
-    --hero-fallback: url('${heroImageData.fallback}');
-` : `--hero-fallback: url('${fallbackImage}');`}>
-    <!-- Sección central: título y subtítulo -->
+<HeroBackground 
+    imageId="hero-main"
+    alt="Fondo principal El Palleter"
+    className="hero-main"
+>
+    <!-- Header: Logo -->
     <div class="hero-header">
         <img src={logoBlanco.src} alt="El Palleter Logo" class="hero-logo" />
     </div>
-    <!-- Sección inferior: descripción + flecha -->
+    
+    <!-- Footer: CTA y scroll indicator -->
     <div class="hero-footer">
-        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta"><Text key="hero.menu" /></a>
+        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta">
+            <Text key="hero.menu" />
+        </a>
         <div class="scroll-indicator" data-scroll-to="historia">
             <div class="scroll-arrow">↓</div>
         </div>
     </div>
-</section>
+</HeroBackground>
 
 <style>
-    /* === HERO BASE === */
-    .hero {
-        width: 100%;
-        height: 100svh;
-        /* 🎯 ÚNICO CAMBIO: Background ahora usa variables CSS inline */
-        background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), var(--hero-fallback) center/cover;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        color: white;
-    }
-
-    /* 🎯 NUEVO: Imágenes responsivas (mantiene tu gradiente exacto) */
-    @media (max-width: 767px) {
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), var(--hero-mobile) center/cover;
-        }
-    }
+    /* === LAYOUT HERO === */
+    /* Ya no necesitas definir backgrounds ni media queries para imágenes! */
     
-    @media (min-width: 768px) and (max-width: 1023px) {
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), var(--hero-tablet) center/cover;
-        }
-    }
-    
-    @media (min-width: 1024px) and (max-width: 1399px) {
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), var(--hero-desktop) center/cover;
-        }
-    }
-    
-    @media (min-width: 1400px) {
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), var(--hero-xl) center/cover;
-        }
-    }
-
-    /* === RESTO DEL CSS EXACTAMENTE IGUAL === */
-    /* === SECCIÓN CENTRAL - USANDO SISTEMA GLOBAL === */
     .hero-header {
         width: 100%;
         text-align: center;
-        z-index: 2;
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        /* Mobile base - usando variables globales */
-        padding-top: calc(var(--padding-mobile) * 5); /* Equivalente a 80px con padding base */
+        /* Mobile base usando variables globales */
+        padding-top: calc(var(--padding-mobile) * 5);
         padding-left: var(--padding-mobile);
         padding-right: var(--padding-mobile);
     }
 
     .hero-logo {
-        /* Mobile base */
         max-width: 650px;
         width: 100%;
         height: auto;
@@ -106,12 +52,11 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* === BOTONES - USANDO SISTEMA GLOBAL === */
+    /* === BOTONES === */
     .cta-btn-carta {
         background: transparent;
         border: 2px solid white;
         color: white;
-        /* Mobile base */
         padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.5);
         font-size: 0.85rem;
         font-weight: 600;
@@ -135,69 +80,18 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
         text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
     }
 
-    /* Botón original mantenido para compatibilidad */
-    .cta-btn {
-        background: none;
-        border: none;
-        color: white;
-        padding: 0.6rem 0;
-        font-size: 0.85rem;
-        font-weight: 400;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-block;
-        position: relative;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.6);
-    }
-
-    .cta-btn::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: #f4a261;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .cta-btn:hover::after {
-        width: 100%;
-    }
-
-    .cta-btn:hover {
-        color: #f4a261;
-        transform: translateY(-1px);
-    }
-
-    /* === SECCIÓN INFERIOR - USANDO SISTEMA GLOBAL === */
+    /* === FOOTER === */
     .hero-footer {
         position: absolute;
         bottom: 0;
         text-align: center;
-        z-index: 2;
+        z-index: 3; /* 🎯 SOLUCION: Por encima del header */
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--gap-mobile); /* Gap responsivo automático */
-        /* Mobile base */
+        gap: var(--gap-mobile);
         padding-bottom: calc(var(--padding-mobile) * 1.5);
         width: 100%;
-    }
-
-    .description {
-        font-size: clamp(0.9rem, 2vw, 1.3rem);
-        font-weight: 300;
-        max-width: 90%;
-        margin: 0;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-        opacity: 0.9;
-        line-height: 1.4;
-        /* Mobile base */
-        padding: 0 var(--padding-mobile);
     }
 
     .scroll-indicator {
@@ -211,7 +105,6 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
     }
 
     .scroll-arrow {
-        /* Mobile base */
         font-size: 2rem;
         animation: bounce 2s infinite;
         text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
@@ -229,8 +122,8 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
         }
     }
 
-    /* === BREAKPOINTS USANDO SISTEMA GLOBAL === */
-
+    /* === RESPONSIVE - SOLO PARA LAYOUT, NO PARA IMÁGENES === */
+    
     /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .hero-footer {
@@ -254,7 +147,7 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) and (max-width: 1399px) {
         .hero-header {
-            padding-top: calc(var(--padding-desktop) * 3.5); /* Equivalente a 100px con sistema */
+            padding-top: calc(var(--padding-desktop) * 3.5);
             padding-left: var(--padding-desktop);
             padding-right: var(--padding-desktop);
         }
@@ -271,26 +164,16 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
             max-width: 600px;
         }
 
-        .cta-btn {
-            padding: 0.8rem 0;
-            font-size: 1rem;
-            letter-spacing: 1.5px;
-        }
-
         .hero-footer {
             gap: var(--gap-desktop);
             padding-bottom: var(--padding-desktop);
         }
-
-        .description {
-            padding: 0 var(--padding-desktop);
-        }
     }
 
-    /* TABLET Y SUPERIOR (768px+) */
+    /* TABLET (768px+) */
     @media (min-width: 768px) and (max-width: 1023px) {
         .hero-header {
-            padding-top: calc(var(--padding-tablet) * 4); /* Equivalente a 100px */
+            padding-top: calc(var(--padding-tablet) * 4);
             padding-left: var(--padding-tablet);
             padding-right: var(--padding-tablet);
         }
@@ -306,21 +189,9 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
             margin-top: 1.2rem;
         }
 
-        .cta-btn {
-            padding: 0.7rem 0;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
         .hero-footer {
             gap: var(--gap-tablet);
             padding-bottom: calc(var(--padding-tablet) * 1.5);
-        }
-
-        .description {
-            font-size: clamp(1rem, 2vw, 1.3rem);
-            max-width: 700px;
-            padding: 0 var(--padding-tablet);
         }
 
         .scroll-arrow {
@@ -328,10 +199,10 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
         }
     }
 
-    /* MOBILE PEQUEÑO (0-420px) */
+    /* MOBILE (420px+) */
     @media (min-width: 420px) and (max-width: 767px) {
         .hero-header {
-            padding-top: calc(var(--padding-mobile) * 3); /* Equivalente a 60px */
+            padding-top: calc(var(--padding-mobile) * 3);
         }
 
         .hero-logo {
@@ -342,16 +213,6 @@ const fallbackImage = '/src/assets/fondo.jpg'; // Usar ruta absoluta
             padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.2);
             font-size: 0.85rem;
             letter-spacing: 1px;
-        }
-
-        .cta-btn {
-            padding: 0.6rem 0;
-            font-size: 0.85rem;
-            letter-spacing: 0.8px;
-        }
-
-        .description {
-            font-size: 0.9rem;
         }
 
         .scroll-arrow {

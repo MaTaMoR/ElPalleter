@@ -10,8 +10,7 @@ export const LANGUAGE_CONFIG = {
     shortName: 'ES',
     isDefault: true,
     flag: {
-      type: 'emoji',
-      value: '🇪🇸'
+      value: '/flags/spain.svg'
     },
     direction: 'ltr',
     file: esTranslations
@@ -23,8 +22,7 @@ export const LANGUAGE_CONFIG = {
     shortName: 'EN',
     isDefault: false,
     flag: {
-      type: 'emoji',
-      value: '🇬🇧'
+      value: '/flags/united-kingdom.svg'
     },
     direction: 'ltr',
     file: enTranslations
@@ -36,7 +34,6 @@ export const LANGUAGE_CONFIG = {
     shortName: 'VAL',
     isDefault: false,
     flag: {
-      type: 'svg',
       value: '/flags/valencia.svg'
     },
     direction: 'ltr',
@@ -53,19 +50,13 @@ export const DEFAULT_LOCALE = Object.values(LANGUAGE_CONFIG).find(lang => lang.i
  */
 export class FlagRenderer {
   static renderFlag(flagConfig, className = '', size = '1rem') {
-    if (flagConfig.type === 'emoji') {
-      return `<span class="flag-emoji ${className}" style="font-size: ${size};" aria-hidden="true">${flagConfig.value}</span>`;
-    } else if (flagConfig.type === 'svg') {
-      return `<img src="${flagConfig.value}" alt="" class="flag-svg ${className}" style="width: ${size}; height: ${size};" aria-hidden="true" />`;
-    }
-    return '';
+    return `<img src="${flagConfig.value}" alt="" class="flag-svg ${className}" style="width: ${size}; height: ${size};" aria-hidden="true" />`;
   }
 
   static getFlagElement(flagConfig) {
     return {
       type: flagConfig.type,
       value: flagConfig.value,
-      isEmoji: flagConfig.type === 'emoji',
       isSvg: flagConfig.type === 'svg'
     };
   }

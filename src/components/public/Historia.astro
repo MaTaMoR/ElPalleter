@@ -2,18 +2,9 @@
 import ImageSlider from './ImageSlider.astro';
 import Text from '../i18n/Text.astro';
 import RichText from '../i18n/RichText.astro';
-import { getGalleryImages } from '../../utils/imageUtils.js';
+import { ImageService } from '../../services/ImageService.js';
 
-// 🎯 ACTUALIZADO: Usar nuevo sistema simplificado
-const imagesToShow = await getGalleryImages('historia', Astro);
-
-// 🔍 Debug en desarrollo
-if (import.meta.env.DEV) {
-    console.log('📸 Historia: Imágenes cargadas:', {
-        count: imagesToShow.length,
-        images: imagesToShow.map(img => ({ id: img.id, name: img.alt }))
-    });
-}
+const imagesToShow = ImageService.getGalleryImages('historia');
 ---
 
 <section class="historia-section" id="historia">
@@ -38,33 +29,15 @@ if (import.meta.env.DEV) {
     
         <!-- Slider de fotos a la derecha -->
         <div class="slider-section">
-            {/* 🎯 MEJORADO: Fallback más elegante si no hay imágenes */}
-            {imagesToShow && imagesToShow.length > 0 ? (
-                <ImageSlider images={imagesToShow} />
-            ) : (
-                <div class="no-images-fallback">
-                    <div class="fallback-content">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                        <p>
-                            <Text key="historia.no_images" fallback="Imágenes no disponibles" />
-                        </p>
-                        {import.meta.env.DEV && (
-                            <small>Configura en galleries.json</small>
-                        )}
-                    </div>
-                </div>
-            )}
+            <ImageSlider 
+                images={imagesToShow}
+            />
         </div>
     </div>
 </section>
 
 <style>
-    /* === RESTO DEL CSS EXACTAMENTE IGUAL === */
-    /* === SECCIÓN BASE  === */
+    /* === SECCIÓN BASE === */
     .historia-section {
         width: 100%;
         height: fit-content;
@@ -103,11 +76,10 @@ if (import.meta.env.DEV) {
         gap: var(--gap-mobile);
         position: relative;
         z-index: 2;
-        /* 🎯 SOLUCIÓN: Prevenir overflow durante carga inicial */
         overflow: hidden;
     }
 
-    /* === CONTENT SECTIONS - SIN BACKGROUND DUPLICADO === */
+    /* === CONTENT SECTIONS === */
     .history-content {
         flex: 1.2;
         padding: var(--padding-mobile);
@@ -115,7 +87,6 @@ if (import.meta.env.DEV) {
         flex-direction: column;
         justify-content: center;
         
-        /* MANTENIDO: Estilos específicos del contenido */
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
@@ -129,8 +100,6 @@ if (import.meta.env.DEV) {
         max-height: 100%;
         
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
-        opacity: 0;
-        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .slider-section {
@@ -144,7 +113,6 @@ if (import.meta.env.DEV) {
         border: 1px solid rgba(244, 162, 97, 0.15);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         overflow: hidden;
-        transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         isolation: isolate;
         contain: layout style;
@@ -153,40 +121,6 @@ if (import.meta.env.DEV) {
         max-height: 100%;
         
         /* SISTEMA DE ANIMACIÓN UNIFICADO */
-        opacity: 0;
-        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* === NUEVO: Fallback para cuando no hay imágenes === */
-    .no-images-fallback {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(244, 162, 97, 0.6);
-    }
-
-    .fallback-content {
-        text-align: center;
-        padding: 2rem;
-    }
-
-    .fallback-content svg {
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    .fallback-content p {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-        color: rgba(244, 162, 97, 0.8);
-    }
-
-    .fallback-content small {
-        font-size: 0.9rem;
-        opacity: 0.6;
-        font-family: 'Courier New', monospace;
     }
 
     /* === ANIMACIONES ACTIVAS === */
@@ -227,32 +161,8 @@ if (import.meta.env.DEV) {
         }
         
         .slider-section {
-            /* Asegurar que use todo el height disponible en desktop */
             height: 100%;
-            min-height: auto; /* Resetear min-height de móvil */
-        }
-        
-        .history-content:not(.slide-in-active) {
-            transform: translateX(-60px);
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .slider-section:not(.slide-in-active) {
-            transform: translateX(60px);
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .history-content.slide-in-active {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .slider-section.slide-in-active {
-            opacity: 1;
-            transform: translateX(0);
-            transition-delay: 0.2s;
+            min-height: auto;
         }
     }
 
@@ -305,31 +215,6 @@ if (import.meta.env.DEV) {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             transform: translate3d(0, 0, 0);
         }
-        
-        /* Animaciones móvil */
-        .slider-section:not(.slide-in-active) {
-            transform: translateY(-30px);
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .history-content:not(.slide-in-active) {
-            transform: translateY(30px);
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                       transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .slider-section.slide-in-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.1s;
-        }
-        
-        .history-content.slide-in-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.3s;
-        }
     }
 
     /* MOBILE PEQUEÑO (0-420px) */
@@ -357,21 +242,16 @@ if (import.meta.env.DEV) {
         const sliderSection = document.querySelector('.slider-section');
         const historiaSection = document.querySelector('.historia-section');
         
-        // SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal
         const breakpoints = useBreakpoints('historia-component', {
             element: historiaSection
         });
         
-        // 🎯 SOLUCIÓN: Asegurar que el layout esté estable antes de observar
         const initializeWhenReady = () => {
-            // Esperar a que las imágenes y contenido estén listos
             setTimeout(() => {
-                // Marcar como cargado para mostrar el contenedor
                 if (historiaSection) {
                     historiaSection.classList.add('loaded');
                 }
                 
-                // Observer para animaciones de entrada
                 const observerOptions = {
                     threshold: 0.15,
                     rootMargin: '0px 0px -50px 0px'
@@ -388,14 +268,12 @@ if (import.meta.env.DEV) {
                 if (historyContent) observer.observe(historyContent);
                 if (sliderSection) observer.observe(sliderSection);
                 
-                // Cleanup al descargar
                 window.addEventListener('beforeunload', () => {
                     observer.disconnect();
                 });
             }, 150);
         };
         
-        // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
@@ -405,10 +283,8 @@ if (import.meta.env.DEV) {
             }
         });
         
-        // Inicializar cuando esté listo
         initializeWhenReady();
         
-        // Cleanup
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
         });
