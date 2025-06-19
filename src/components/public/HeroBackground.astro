@@ -15,15 +15,11 @@ const {
     alt = "Fondo Hero",
     className = '',
     overlayColor = 'rgba(0, 0, 0, 0.25)',
-    overlayOpacity = 1,
-    fallbackImage = '/src/assets/fondo.jpg'
+    overlayOpacity = 1
 } = Astro.props;
-
-// ID único para evitar conflictos de z-index
-const heroId = `hero-bg-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<div class={`hero-background ${className}`} id={heroId}>
+<div class={`hero-background ${className}`} id="hero">
     <!-- Imagen de fondo responsiva -->
     <ResponsiveImage
         imageId={imageId}
