@@ -1,15 +1,7 @@
 ---
 import Text from '../../components/i18n/Text.astro';
 import cartaData from '../../data/carta-data.json';
-
-// Helper para formatear precios
-function formatPrice(price) {
-  if (typeof price === 'string') {
-    return price; // Para casos como "3,50€/und"
-  }
-  
-  return `${price.toFixed(2).replace('.', ',')}€`;
-}
+import { i18nCore } from '../../i18n/core.js';
 ---
 
 <!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
@@ -42,6 +34,7 @@ function formatPrice(price) {
                 <div 
                     class={`menu-section ${categoryIndex === 0 ? 'active' : ''}`} 
                     id={category.id}
+                    style={categoryIndex !== 0 ? "visibility: hidden; position: absolute; pointer-events: none;" : ""}
                 >
                     {category.subcategories.map((subcategory) => (
                         <div class="menu-category">
@@ -62,7 +55,7 @@ function formatPrice(price) {
                                         )}
                                     </div>
                                     <div class="item-price">
-                                        {formatPrice(item.price)}
+                                        {i18nCore.formatCurrency(item.price)}
                                     </div>
                                 </div>
                             ))}
@@ -143,6 +136,7 @@ function formatPrice(price) {
         grid-template-columns: 1fr;
         gap: var(--gap-mobile);
         margin-bottom: var(--gap-mobile);
+        overflow: hidden;
     }
 
     .menu-category {
@@ -230,6 +224,13 @@ function formatPrice(price) {
             opacity: 1;
             transform: translateY(0);
         }
+    }
+
+    /* === CSS CRÍTICO PARA EVITAR FLASH === */
+    /* Solo durante la carga inicial */
+    .menu-content:not(.ready) {
+        overflow: hidden !important;
+        max-height: 80vh !important;
     }
 
     /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
@@ -434,8 +435,14 @@ function formatPrice(price) {
         const menuSections = document.querySelectorAll('.menu-section');
         const cartaSection = document.querySelector('.carta-section');
         const menuCategories = document.querySelectorAll('.menu-category');
+        const menuContent = document.querySelector('.menu-content');
         
-        // 🎯 SIMPLIFICADO: Ya no necesita gestionar el elemento sección principal para fondo
+        // SOLUCIÓN SIMPLE: Solo quitar el overflow hidden después de cargar
+        setTimeout(() => {
+            //menuContent.classList.add('ready');
+        }, 150); 
+        
+        // Pequeño delay para que se aplique el CSS inicial
         const breakpoints = useBreakpoints('carta-component', {
             element: cartaSection
         });
