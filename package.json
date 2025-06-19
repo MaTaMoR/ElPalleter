@@ -4,11 +4,27 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy:vercel": "vercel --prod"
+    "deploy:vercel": "vercel --prod",
+    "hash-passwords": "node scripts/hash-passwords.js"
   },
   "dependencies": {
+    "@astrojs/vercel": "^8.2.0",
     "astro": "^5.9.4",
+    "bcryptjs": "^3.0.2",
+    "cookie": "^1.0.2",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "sharp": "^0.34.2"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0",
+    "node-fetch": "^3.3.2",
+    "path-to-regexp": "^6.3.0",
+    "semver": "^7.6.3",
+    "got": "^12.6.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }

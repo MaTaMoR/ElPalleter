@@ -1,0 +1,490 @@
+---
+// src/layouts/AdminLayout.astro
+export interface Props {
+    title?: string;
+    description?: string;
+    showHeader?: boolean;
+    showSidebar?: boolean;
+}
+
+const { 
+    title = "Administración - El Palleter",
+    description = "Panel de administración del restaurante El Palleter",
+    showHeader = true,
+    showSidebar = true
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Admin Styles -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        
+        .admin-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .admin-main {
+            display: flex;
+            flex: 1;
+        }
+        
+        .admin-content {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+        }
+        
+        .admin-content.with-sidebar {
+            margin-left: 280px;
+        }
+        
+        .admin-content.with-header {
+            padding-top: 70px;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-content.with-sidebar {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        {showHeader && (
+            <header class="admin-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button class="sidebar-toggle" id="sidebarToggle">
+                            <span class="hamburger"></span>
+                        </button>
+                        <h1 class="header-title">El Palleter Admin</h1>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-menu">
+                            <button class="user-button" id="userMenuButton">
+                                <span class="user-avatar">👤</span>
+                                <span class="user-name">Admin</span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <div class="user-dropdown" id="userDropdown">
+                                <a href="#" class="dropdown-item">
+                                    <span class="item-icon">⚙️</span>
+                                    Configuración
+                                </a>
+                                <a href="#" class="dropdown-item" id="logoutButton">
+                                    <span class="item-icon">🚪</span>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        )}
+
+        <div class="admin-main">
+            {showSidebar && (
+                <aside class="admin-sidebar" id="adminSidebar">
+                    <nav class="sidebar-nav">
+                        <div class="nav-section">
+                            <h3 class="nav-section-title">Principal</h3>
+                            <ul class="nav-list">
+                                <li class="nav-item">
+                                    <a href="/admin/dashboard" class="nav-link active">
+                                        <span class="nav-icon">📊</span>
+                                        <span class="nav-text">Dashboard</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nav-section">
+                            <h3 class="nav-section-title">Contenido</h3>
+                            <ul class="nav-list">
+                                <li class="nav-item">
+                                    <a href="/admin/menu" class="nav-link">
+                                        <span class="nav-icon">🍽️</span>
+                                        <span class="nav-text">Menú & Carta</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/admin/gallery" class="nav-link">
+                                        <span class="nav-icon">🖼️</span>
+                                        <span class="nav-text">Galería</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/admin/content" class="nav-link">
+                                        <span class="nav-icon">📝</span>
+                                        <span class="nav-text">Contenido Rico</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nav-section">
+                            <h3 class="nav-section-title">Configuración</h3>
+                            <ul class="nav-list">
+                                <li class="nav-item">
+                                    <a href="/admin/contact" class="nav-link">
+                                        <span class="nav-icon">📞</span>
+                                        <span class="nav-text">Contacto</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/admin/users" class="nav-link">
+                                        <span class="nav-icon">👥</span>
+                                        <span class="nav-text">Usuarios</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </aside>
+            )}
+
+            <main class={`admin-content ${showSidebar ? 'with-sidebar' : ''} ${showHeader ? 'with-header' : ''}`}>
+                <slot />
+            </main>
+        </div>
+    </div>
+
+    <style>
+        /* Header Styles */
+        .admin-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .header-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: #f8f9fa;
+        }
+
+        .hamburger {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #495057;
+            position: relative;
+        }
+
+        .hamburger::before,
+        .hamburger::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger::before {
+            top: -6px;
+        }
+
+        .hamburger::after {
+            bottom: -6px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #D4A574;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .user-button:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-avatar {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .user-name {
+            margin-right: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 180px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #495057;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .item-icon {
+            margin-right: 8px;
+        }
+
+        /* Sidebar Styles */
+        .admin-sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            bottom: 0;
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .admin-sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-nav {
+            padding: 24px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            margin: 0 24px 12px 24px;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+            color: #D4A574;
+        }
+
+        .nav-link.active {
+            background-color: rgba(212, 165, 116, 0.1);
+            color: #D4A574;
+            border-right: 3px solid #D4A574;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .nav-text {
+            font-weight: 500;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .header-content {
+                padding: 0 16px;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        // JavaScript para funcionalidad del admin
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar en móvil
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('adminSidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+
+            // Toggle user dropdown
+            const userMenuButton = document.getElementById('userMenuButton');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userMenuButton && userDropdown) {
+                userMenuButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+
+                // Cerrar dropdown al hacer click fuera
+                document.addEventListener('click', function(e) {
+                    if (!userMenuButton.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            // Logout functionality
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    
+                    try {
+                        const response = await fetch('/api/admin/logout', {
+                            method: 'POST'
+                        });
+                        
+                        if (response.ok) {
+                            window.location.href = '/admin';
+                        }
+                    } catch (error) {
+                        console.error('Error en logout:', error);
+                        // Forzar redirect en caso de error
+                        window.location.href = '/admin';
+                    }
+                });
+            }
+
+            // Marcar enlace activo según la URL actual
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

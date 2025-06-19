@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "id": "admin",
+      "username": "admin",
+      "email": "admin@elpalleter.com",
+      "password": "$2b$12$/obw2AMFBFVPKnsxX25ddeT41gPIXFPG55VsjR8/8VQfFODKHu5ZW",
+      "role": "admin",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}

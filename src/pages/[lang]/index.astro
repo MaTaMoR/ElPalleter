@@ -1,9 +1,10 @@
 ---
+import { LOCALES, DEFAULT_LOCALE } from '../../i18n/core';
+
 export async function getStaticPaths() {
-  return [
-    { params: { lang: 'en' } },
-    { params: { lang: 'val' } }
-  ];
+  return LOCALES.filter(locale => locale !== DEFAULT_LOCALE).map(locale => ({
+    params: { lang: locale }
+  }));
 }
 
 const { lang } = Astro.params;
