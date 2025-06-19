@@ -39,6 +39,11 @@ const imagesToShow = ImageService.getGalleryImages('historia');
 </section>
 
 <style>
+    /* =====================================================
+       HISTORIA SECTION - ACTUALIZADO CON DESIGN TOKENS
+       Mantiene exactamente el mismo diseño visual
+       ===================================================== */
+
     /* === SECCIÓN BASE === */
     .historia-section {
         width: 100%;
@@ -57,16 +62,16 @@ const imagesToShow = ImageService.getGalleryImages('historia');
     }
 
     .historia-title {
-        font-size: clamp(2rem, 4vw, 3.5rem);
-        font-weight: 300;
-        color: #f4a261;
+        font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl)); /* Tokens en lugar de clamp(2rem, 4vw, 3.5rem) */
+        font-weight: var(--font-light);                          /* Token en lugar de 300 */
+        color: var(--accent-primary);                            /* Token dinámico en lugar de #f4a261 */
         margin-bottom: var(--gap-mobile);
-        letter-spacing: 2px;
+        letter-spacing: var(--tracking-wide);                    /* Token en lugar de 2px */
     }
 
     .historia-subtitle {
-        font-size: 1.1rem;
-        color: #ccc;
+        font-size: var(--text-lg);                              /* Token en lugar de 1.1rem */
+        color: var(--text-secondary);                           /* Token dinámico en lugar de #ccc */
         opacity: 0.8;
     }
 
@@ -81,7 +86,7 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         overflow: hidden;
     }
 
-    /* === CONTENT SECTIONS === */
+    /* === CONTENT SECTIONS - MANTENIENDO DISEÑO ORIGINAL === */
     .history-content {
         flex: 1.2;
         padding: var(--padding-mobile);
@@ -89,19 +94,18 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         flex-direction: column;
         justify-content: center;
         
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(244, 162, 97, 0.2);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        /* ✨ MANTENER: Exactamente el mismo diseño visual */
+        background: rgba(0, 0, 0, 0.6);                         /* Mantener opacidad original */
+        backdrop-filter: var(--backdrop-blur);                  /* Token en lugar de blur(15px) */
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        border-radius: var(--radius-2xl);                       /* Token en lugar de 20px */
+        border: var(--border-1) solid rgba(244, 162, 97, 0.2);  /* Mantener color original */
+        box-shadow: 0 var(--space-5) var(--space-10) rgba(0, 0, 0, 0.3); /* Tokens en lugar de 20px 40px */
         overflow: hidden;
         height: 100%;
         
         min-height: 0;
         max-height: 100%;
-        
-        /* SISTEMA DE ANIMACIÓN UNIFICADO */
     }
 
     .slider-section {
@@ -110,10 +114,11 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         display: grid;
         place-items: center;
         
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 20px;
-        border: 1px solid rgba(244, 162, 97, 0.15);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        /* ✨ MANTENER: Exactamente el mismo diseño visual */
+        background: rgba(0, 0, 0, 0.4);                         /* Mantener opacidad original */
+        border-radius: var(--radius-2xl);                       /* Token en lugar de 20px */
+        border: var(--border-1) solid rgba(244, 162, 97, 0.15); /* Mantener color original */
+        box-shadow: 0 var(--space-4) var(--space-8) rgba(0, 0, 0, 0.2); /* Tokens en lugar de 15px 35px */
         overflow: hidden;
         backface-visibility: hidden;
         isolation: isolate;
@@ -121,20 +126,9 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         
         min-height: 0;
         max-height: 100%;
-        
-        /* SISTEMA DE ANIMACIÓN UNIFICADO */
     }
 
-    /* === ANIMACIONES ACTIVAS === */
-    .history-content.slide-in-active {
-        opacity: 1;
-    }
-
-    .slider-section.slide-in-active {
-        opacity: 1;
-        transition-delay: 0.2s;
-    }
-
+    /* === RICH TEXT STYLING === */
     .history-content :global(.historia-rich-content) {
         width: 100%;
         max-width: 100%;
@@ -150,10 +144,23 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         overflow-wrap: break-word;
     }
 
-    /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
+    /* === RESPONSIVE - USANDO TOKENS === */
     
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
+        .historia-header {
+            margin-bottom: calc(var(--gap-tablet) * 2);
+        }
+
+        .historia-title {
+            font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
+            margin-bottom: var(--gap-tablet);
+        }
+
+        .historia-subtitle {
+            font-size: var(--text-xl);                          /* Token en lugar de 1.2rem */
+        }
+
         .historia-container {
             gap: var(--gap-tablet);
         }
@@ -170,6 +177,14 @@ const imagesToShow = ImageService.getGalleryImages('historia');
 
     /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
+        .historia-header {
+            margin-bottom: calc(var(--gap-desktop) * 1.33);
+        }
+
+        .historia-title {
+            margin-bottom: var(--gap-desktop);
+        }
+
         .historia-container {
             gap: var(--gap-desktop);
         }
@@ -181,6 +196,14 @@ const imagesToShow = ImageService.getGalleryImages('historia');
 
     /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
+        .historia-header {
+            margin-bottom: var(--gap-desktop-lg);
+        }
+
+        .historia-title {
+            margin-bottom: var(--gap-desktop-lg);
+        }
+
         .historia-container {
             gap: var(--gap-desktop-lg);
         }
@@ -193,6 +216,19 @@ const imagesToShow = ImageService.getGalleryImages('historia');
             max-height: none;
             display: block;
             align-items: unset;
+        }
+        
+        .historia-header {
+            margin-bottom: calc(var(--gap-mobile) * 2);
+        }
+
+        .historia-title {
+            font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+            margin-bottom: calc(var(--gap-mobile) * 0.75);
+        }
+
+        .historia-subtitle {
+            font-size: var(--text-base);                        /* Token en lugar de 1rem */
         }
         
         .historia-container {
@@ -211,16 +247,31 @@ const imagesToShow = ImageService.getGalleryImages('historia');
             order: 1;
             min-height: 40vh;
             height: 40vh;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            border: 1px solid rgba(244, 162, 97, 0.2);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            
+            /* ✨ MANTENER: Diseño móvil original */
+            background: rgba(0, 0, 0, 0.3);                     /* Mantener opacidad original */
+            border-radius: var(--radius-xl);                    /* Token en lugar de 15px */
+            border: var(--border-1) solid rgba(244, 162, 97, 0.2); /* Mantener color original */
+            box-shadow: 0 var(--space-3) var(--space-6) rgba(0, 0, 0, 0.2); /* Tokens en lugar de 10px 25px */
             transform: translate3d(0, 0, 0);
         }
     }
 
     /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
+        .historia-header {
+            margin-bottom: calc(var(--gap-mobile) * 1.5);
+        }
+
+        .historia-title {
+            font-size: clamp(var(--text-xl), 4vw, var(--text-3xl));
+            margin-bottom: calc(var(--gap-mobile) * 0.5);
+        }
+
+        .historia-subtitle {
+            font-size: var(--text-sm);
+        }
+
         .historia-container {
             gap: calc(var(--gap-mobile) * 1.5);
         }
@@ -231,8 +282,55 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
         
         .history-content {
-            border-radius: 15px;
+            border-radius: var(--radius-xl);                     /* Token en lugar de 15px */
         }
+    }
+
+    /* === ANIMACIONES REMOVIDAS === */
+    /* ✨ REMOVIDO: Animaciones de entrada para mantener diseño original */
+
+    /* === ESTADOS DE CARGA === */
+    
+    .historia-section.loading .history-content,
+    .historia-section.loading .slider-section {
+        opacity: 0.7;
+    }
+
+    .historia-section.loaded .history-content,
+    .historia-section.loaded .slider-section {
+        opacity: 1;
+        transition: opacity var(--duration-300) var(--ease-out);
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    /* ✨ REMOVIDO: Focus outline para mantener diseño original */
+
+    /* === PREFERENCIAS DE USUARIO === */
+    
+    /* Respeto por movimiento reducido */
+    @media (prefers-reduced-motion: reduce) {
+        /* Ya no hay animaciones que deshabilitar */
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .history-content {
+            border: var(--border-2) solid rgba(244, 162, 97, 0.5);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .slider-section {
+            border: var(--border-2) solid rgba(244, 162, 97, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+        }
+    }
+
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    
+    /* Contener layout para mejor performance */
+    .historia-container {
+        contain: layout style;
     }
 </style>
 
@@ -244,38 +342,21 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         const sliderSection = document.querySelector('.slider-section');
         const historiaSection = document.querySelector('.historia-section');
         
+        // Inicializar sistema de breakpoints
         const breakpoints = useBreakpoints('historia-component', {
             element: historiaSection
         });
         
+        // ✨ SIMPLIFICADO: Solo cargar sin animaciones
         const initializeWhenReady = () => {
             setTimeout(() => {
                 if (historiaSection) {
                     historiaSection.classList.add('loaded');
                 }
-                
-                const observerOptions = {
-                    threshold: 0.15,
-                    rootMargin: '0px 0px -50px 0px'
-                };
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('slide-in-active');
-                        }
-                    });
-                }, observerOptions);
-
-                if (historyContent) observer.observe(historyContent);
-                if (sliderSection) observer.observe(sliderSection);
-                
-                window.addEventListener('beforeunload', () => {
-                    observer.disconnect();
-                });
             }, 150);
         };
         
+        // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
@@ -287,6 +368,7 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         
         initializeWhenReady();
         
+        // Cleanup del breakpoint manager
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
         });

@@ -36,7 +36,6 @@ import { i18nCore } from '../../i18n/core.js';
                 <div 
                     class={`menu-section ${categoryIndex === 0 ? 'active' : ''}`} 
                     id={category.id}
-                    style={categoryIndex !== 0 ? "visibility: hidden; position: absolute; pointer-events: none;" : ""}
                 >
                     {category.subcategories.map((subcategory) => (
                         <div class="menu-category">
@@ -70,6 +69,11 @@ import { i18nCore } from '../../i18n/core.js';
 </section>
 
 <style>
+    /* =====================================================
+       CARTA SECTION - ACTUALIZADO CON DESIGN TOKENS
+       Mantiene exactamente el mismo diseño visual
+       ===================================================== */
+
     /* === CARTA SECTION SIMPLIFICADA === */
     .carta-section {
         min-height: 90svh;
@@ -81,54 +85,56 @@ import { i18nCore } from '../../i18n/core.js';
         position: relative;
     }
 
-    /* === HEADER === */
+    /* === HEADER USANDO TOKENS === */
     .carta-header {
         text-align: center;
         margin-bottom: calc(var(--gap-mobile) * 3);
     }
 
     .carta-title {
-        font-size: clamp(2rem, 4vw, 3.5rem);
-        font-weight: 300;
-        color: #f4a261;
+        font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl)); /* Tokens en lugar de clamp(2rem, 4vw, 3.5rem) */
+        font-weight: var(--font-light);                          /* Token en lugar de 300 */
+        color: var(--accent-primary);                            /* Token dinámico en lugar de #f4a261 */
         margin-bottom: var(--gap-mobile);
-        letter-spacing: 2px;
+        letter-spacing: var(--tracking-wide);                    /* Token en lugar de 2px */
     }
 
     .carta-subtitle {
-        font-size: 1.1rem;
-        color: #ccc;
+        font-size: var(--text-lg);                              /* Token en lugar de 1.1rem */
+        color: var(--text-secondary);                           /* Token dinámico en lugar de #ccc */
         opacity: 0.8;
     }
 
-    /* === NAVEGACIÓN DE CATEGORÍAS === */
+    /* === NAVEGACIÓN DE CATEGORÍAS - MANTENIENDO DISEÑO ORIGINAL === */
     .menu-nav {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: calc(var(--gap-mobile) * 0.5);
+        gap: calc(var(--gap-mobile) * 0.5);                     /* Token en lugar de gap hardcodeado */
         margin-bottom: calc(var(--gap-mobile) * 2.5);
     }
 
     .menu-nav-btn {
+        /* ✨ MANTENER: Exactamente el mismo diseño visual */
         background: transparent;
-        border: 2px solid rgba(244, 162, 97, 0.3);
-        color: white;
-        padding: calc(var(--padding-mobile) * 0.6) var(--padding-mobile);
-        border-radius: 25px;
+        border: var(--border-2) solid rgba(244, 162, 97, 0.3);  /* Mantener color original */
+        color: var(--text-primary);                             /* Token dinámico */
+        padding: calc(var(--padding-mobile) * 0.6) var(--padding-mobile); /* Tokens en lugar de hardcoded */
+        border-radius: var(--radius-3xl);                       /* Token en lugar de 25px */
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 600;
-        letter-spacing: 1px;
+        transition: var(--transition-base);                     /* Token en lugar de all 0.3s cubic-bezier */
+        font-weight: var(--font-semibold);                      /* Token en lugar de 600 */
+        letter-spacing: var(--tracking-normal);                 /* Token en lugar de 1px */
         text-transform: uppercase;
-        font-size: 0.8rem;
+        font-size: var(--text-sm);                             /* Token en lugar de 0.8rem */
     }
 
     .menu-nav-btn:hover,
     .menu-nav-btn.active {
-        background: #f4a261;
-        color: #141414;
-        border-color: #f4a261;
+        /* ✨ MANTENER: Exactamente los mismos colores originales */
+        background: #f4a261;                                    /* Mantener color exacto */
+        color: #141414;                                          /* Mantener color exacto */
+        border-color: #f4a261;                                  /* Mantener color exacto */
         transform: translateY(-2px);
     }
 
@@ -142,14 +148,16 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .menu-category {
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        border: 1px solid rgba(244, 162, 97, 0.2);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        /* ✨ MANTENER: Exactamente el mismo diseño visual */
+        background: rgba(0, 0, 0, 0.6);                         /* Mantener opacidad original */
+        backdrop-filter: var(--backdrop-blur);                  /* Token en lugar de blur(10px) */
+        border-radius: var(--radius-xl);                        /* Token en lugar de 15px */
+        border: var(--border-1) solid rgba(244, 162, 97, 0.2);  /* Mantener color original */
+        box-shadow: 0 var(--space-3) var(--space-8) rgba(0, 0, 0, 0.3); /* Tokens en lugar de 10px 30px */
         padding: calc(var(--padding-mobile) * 1.5);
         margin-bottom: calc(var(--gap-mobile) * 1.5);
-        animation: fadeInUp 0.6s ease-out;
+        
+        /* ✨ REMOVIDO: Animación fadeInUp para mantener original */
     }
 
     .menu-category:last-child {
@@ -157,11 +165,11 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .category-title {
-        font-size: 1.3rem;
-        color: #f4a261;
-        font-weight: 600;
+        font-size: var(--text-xl);                             /* Token en lugar de 1.3rem */
+        color: var(--accent-primary);                          /* Token dinámico en lugar de #f4a261 */
+        font-weight: var(--font-semibold);                     /* Token en lugar de 600 */
         text-align: center;
-        border-bottom: 2px solid rgba(244, 162, 97, 0.3);
+        border-bottom: var(--border-2) solid rgba(244, 162, 97, 0.3); /* Mantener color original */
         margin-bottom: calc(var(--gap-mobile) * 0.75);
         padding-bottom: calc(var(--padding-mobile) * 0.25);
     }
@@ -171,7 +179,7 @@ import { i18nCore } from '../../i18n/core.js';
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: var(--border-1) solid rgba(255, 255, 255, 0.1); /* Mantener color original */
         margin-bottom: calc(var(--gap-mobile) * 0.6);
         padding-bottom: calc(var(--padding-mobile) * 0.4);
     }
@@ -187,45 +195,33 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .item-name {
-        font-weight: 600;
-        color: white;
+        font-weight: var(--font-semibold);                      /* Token en lugar de 600 */
+        color: var(--text-primary);                            /* Token dinámico */
         margin-bottom: calc(var(--gap-mobile) * 0.15);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);                             /* Token en lugar de 0.9rem */
     }
 
     .item-description {
-        font-size: 0.8rem;
-        color: #ccc;
+        font-size: var(--text-xs);                             /* Token en lugar de 0.8rem */
+        color: var(--text-secondary);                          /* Token dinámico en lugar de #ccc */
         opacity: 0.8;
-        line-height: 1.4;
+        line-height: var(--leading-normal);                    /* Token en lugar de 1.4 */
     }
 
     .item-price {
-        color: #f4a261;
-        font-weight: 700;
-        font-size: 1rem;
+        color: var(--accent-primary);                          /* Token dinámico en lugar de #f4a261 */
+        font-weight: var(--font-bold);                         /* Token en lugar de 700 */
+        font-size: var(--text-base);                           /* Token en lugar de 1rem */
         white-space: nowrap;
     }
 
-    /* === SECCIONES ESPECÍFICAS === */
+    /* === SECCIONES ESPECÍFICAS - ARREGLADO === */
     .menu-section {
         display: none;
     }
 
     .menu-section.active {
         display: grid;
-    }
-
-    /* === ANIMACIONES === */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
@@ -237,12 +233,12 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .carta-title {
-            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
             margin-bottom: var(--gap-tablet);
         }
 
         .carta-subtitle {
-            font-size: 1.2rem;
+            font-size: var(--text-xl);                         /* Token en lugar de 1.2rem */
         }
 
         .menu-nav {
@@ -252,7 +248,7 @@ import { i18nCore } from '../../i18n/core.js';
 
         .menu-nav-btn {
             padding: calc(var(--padding-tablet) * 0.4) calc(var(--padding-tablet) * 0.75);
-            font-size: 0.9rem;
+            font-size: var(--text-base);                       /* Token en lugar de 0.9rem */
         }
 
         .menu-content {
@@ -267,7 +263,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .category-title {
-            font-size: 1.5rem;
+            font-size: var(--text-2xl);                        /* Token en lugar de 1.5rem */
             margin-bottom: var(--gap-tablet);
             padding-bottom: calc(var(--padding-tablet) * 0.25);
         }
@@ -283,15 +279,15 @@ import { i18nCore } from '../../i18n/core.js';
 
         .item-name {
             margin-bottom: calc(var(--gap-tablet) * 0.15);
-            font-size: 1rem;
+            font-size: var(--text-base);                       /* Token en lugar de 1rem */
         }
 
         .item-description {
-            font-size: 0.85rem;
+            font-size: var(--text-sm);                         /* Token en lugar de 0.85rem */
         }
 
         .item-price {
-            font-size: 1.1rem;
+            font-size: var(--text-lg);                         /* Token en lugar de 1.1rem */
         }
     }
 
@@ -346,7 +342,7 @@ import { i18nCore } from '../../i18n/core.js';
     /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .carta-header {
-            margin-bottom: calc(var(--gap-desktop-lg) * 1);
+            margin-bottom: var(--gap-desktop-lg);
         }
 
         .carta-title {
@@ -371,12 +367,12 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .carta-title {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
             margin-bottom: calc(var(--gap-mobile) * 0.75);
         }
 
         .carta-subtitle {
-            font-size: 1rem;
+            font-size: var(--text-base);                       /* Token en lugar de 1rem */
         }
 
         .menu-nav {
@@ -386,7 +382,7 @@ import { i18nCore } from '../../i18n/core.js';
 
         .menu-nav-btn {
             padding: calc(var(--padding-mobile) * 0.5) calc(var(--padding-mobile) * 0.8);
-            font-size: 0.75rem;
+            font-size: var(--text-xs);                         /* Token en lugar de 0.75rem */
         }
 
         .menu-content {
@@ -400,7 +396,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .category-title {
-            font-size: 1.2rem;
+            font-size: var(--text-lg);                         /* Token en lugar de 1.2rem */
             margin-bottom: calc(var(--gap-mobile) * 0.5);
         }
 
@@ -409,16 +405,65 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .item-name {
-            font-size: 0.85rem;
+            font-size: var(--text-sm);                         /* Token en lugar de 0.85rem */
         }
 
         .item-description {
-            font-size: 0.75rem;
+            font-size: var(--text-xs);                         /* Token en lugar de 0.75rem */
         }
 
         .item-price {
-            font-size: 0.95rem;
+            font-size: var(--text-sm);                         /* Token en lugar de 0.95rem */
         }
+    }
+
+    /* === ACCESIBILIDAD MEJORADA === */
+    
+    /* Focus visible para navegación por teclado */
+    .menu-nav-btn:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+
+    /* === PREFERENCIAS DE USUARIO === */
+    
+    /* Respeto por movimiento reducido */
+    @media (prefers-reduced-motion: reduce) {
+        .menu-nav-btn {
+            transition: none;
+        }
+        
+        .menu-nav-btn:hover,
+        .menu-nav-btn.active {
+            transform: none;
+        }
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .menu-nav-btn {
+            border-width: var(--border-4);
+        }
+        
+        .menu-category {
+            border: var(--border-2) solid rgba(244, 162, 97, 0.4);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .category-title {
+            border-bottom-width: var(--border-4);
+        }
+    }
+
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    
+    /* Contener layout para mejor performance */
+    .menu-content {
+        contain: layout style;
+    }
+    
+    .menu-category {
+        contain: layout style paint;
     }
 </style>
 
@@ -430,14 +475,8 @@ import { i18nCore } from '../../i18n/core.js';
         const menuSections = document.querySelectorAll('.menu-section');
         const cartaSection = document.querySelector('.carta-section');
         const menuCategories = document.querySelectorAll('.menu-category');
-        const menuContent = document.querySelector('.menu-content');
         
-        // SOLUCIÓN SIMPLE: Solo quitar el overflow hidden después de cargar
-        setTimeout(() => {
-            //menuContent.classList.add('ready');
-        }, 150); 
-        
-        // Pequeño delay para que se aplique el CSS inicial
+        // Inicializar sistema de breakpoints
         const breakpoints = useBreakpoints('carta-component', {
             element: cartaSection
         });

@@ -15,8 +15,8 @@
   /* Gaps estándar */
   --gap-mobile: 1rem;
   --gap-tablet: 2rem;
-  --gap-desktop: 3rem;
-  --gap-desktop-lg: 4rem;
+  --gap-desktop: 2rem;
+  --gap-desktop-lg: 2rem;
   
   /* Padding estándar */
   --padding-mobile: 1rem;

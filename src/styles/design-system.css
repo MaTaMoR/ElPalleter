@@ -1,0 +1,43 @@
+/* =====================================================
+   DESIGN SYSTEM - EL PALLETER
+   Archivo principal que importa todo el sistema
+   ===================================================== */
+
+/* === ORDEN DE IMPORTACIÓN IMPORTANTE === */
+
+/* 1. Design Tokens (Variables fundamentales) */
+@import './design-system/design-tokens.css';
+
+/* 2. Temas (Usa los tokens) */
+@import './design-system/themes.css';
+
+/* 3. Componentes Base (Usa tokens y temas) */
+@import './design-system/components.css';
+
+/* 4. Componentes del Theme Manager */
+@import './design-system/theme-components.css';
+
+/* 5. Utilidades (Usa todo lo anterior) */
+@import './design-system/utilities.css';
+
+/* === CONFIGURACIÓN GLOBAL === */
+
+/* Auto-aplicar clase de transición para cambios de tema */
+html {
+  transition: background-color var(--duration-300) var(--ease-out),
+              color var(--duration-300) var(--ease-out);
+}
+
+/* Optimizaciones globales */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Scroll suave global */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

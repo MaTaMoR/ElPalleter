@@ -9,7 +9,7 @@ import HeroBackground from './HeroBackground.astro';
 <HeroBackground 
     imageId="hero-main"
     alt="Fondo principal El Palleter"
-    className="hero-main"
+    className="hero-main animate-in"
 >
     <!-- Header: Logo -->
     <div class="hero-header">
@@ -18,18 +18,17 @@ import HeroBackground from './HeroBackground.astro';
     
     <!-- Footer: CTA y scroll indicator -->
     <div class="hero-footer">
-        <a href="#carta" class="cta-btn-carta" data-scroll-to="carta">
+        <a href="#carta" class="hero-cta-original" data-scroll-to="carta">
             <Text key="hero.menu" />
         </a>
-        <div class="scroll-indicator" data-scroll-to="historia">
+        <div class="scroll-indicator-original" data-scroll-to="historia">
             <div class="scroll-arrow">↓</div>
         </div>
     </div>
 </HeroBackground>
 
 <style>
-    /* === LAYOUT HERO === */
-    /* Ya no necesitas definir backgrounds ni media queries para imágenes! */
+    /* === LAYOUT HERO USANDO DESIGN TOKENS === */
     
     .hero-header {
         width: 100%;
@@ -39,7 +38,8 @@ import HeroBackground from './HeroBackground.astro';
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        /* Mobile base usando variables globales */
+        
+        /* Usando tokens de espaciado responsivo */
         padding-top: calc(var(--padding-mobile) * 5);
         padding-left: var(--padding-mobile);
         padding-right: var(--padding-mobile);
@@ -49,45 +49,63 @@ import HeroBackground from './HeroBackground.astro';
         max-width: 650px;
         width: 100%;
         height: auto;
-        margin-bottom: 2rem;
-        filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: var(--space-8);
+        
+        /* Sombra usando tokens */
+        filter: drop-shadow(0 var(--space-1) var(--space-4) rgba(0, 0, 0, 0.8));
+        transition: var(--transition-base);
     }
 
-    /* === BOTONES === */
-    .cta-btn-carta {
+    /* === BOTÓN CTA - DISEÑO ORIGINAL CON TOKENS === */
+    .hero-cta-original {
+        /* ✨ DISEÑO ORIGINAL: Efecto blanco/transparente */
         background: transparent;
-        border: 2px solid white;
-        color: white;
-        padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.5);
-        font-size: 0.85rem;
-        font-weight: 600;
-        letter-spacing: 1px;
+        border: var(--border-2) solid var(--text-primary);  /* Blanco dinámico según tema */
+        color: var(--text-primary);
+        
+        /* Espaciado usando tokens */
+        padding: calc(var(--space-3) + var(--space-1)) calc(var(--space-6) + var(--space-2));
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        letter-spacing: var(--tracking-wide);
         text-transform: uppercase;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: var(--transition-base);
         text-decoration: none;
         display: inline-block;
-        margin-top: 1rem;
-        border-radius: 6px;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        margin-top: var(--space-4);
+        border-radius: var(--radius-md);
+        
+        /* Sombra de texto original */
+        text-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.8);
     }
 
-    .cta-btn-carta:hover {
-        border-color: #ffffff;
-        color: #ffffff;
+    .hero-cta-original:hover {
+        /* ✨ EFECTO ORIGINAL: Brillo blanco, no dorado */
+        border-color: var(--text-primary);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.1);  /* Fondo blanco sutil */
         transform: translateY(-2px);
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 
-                    0 0 0 1px rgba(255, 255, 255, 1);
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        
+        /* ✨ GLOW ORIGINAL: Brillo blanco */
+        box-shadow: 
+            0 0 var(--space-6) rgba(255, 255, 255, 0.8), 
+            0 0 0 var(--border-1) rgba(255, 255, 255, 1);
+        
+        /* Text shadow blanco original */
+        text-shadow: 0 0 var(--space-4) rgba(255, 255, 255, 0.6);
     }
 
-    /* === FOOTER === */
+    .hero-cta-original:active {
+        transform: translateY(-1px);
+    }
+
+    /* === FOOTER DEL HERO === */
     .hero-footer {
         position: absolute;
         bottom: 0;
         text-align: center;
-        z-index: 3; /* 🎯 SOLUCION: Por encima del header */
+        z-index: 3;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -96,20 +114,28 @@ import HeroBackground from './HeroBackground.astro';
         width: 100%;
     }
 
-    .scroll-indicator {
+    /* === SCROLL INDICATOR - DISEÑO ORIGINAL === */
+    .scroll-indicator-original {
+        /* ✨ SIN FONDO: Como el diseño original */
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: var(--transition-base);
         padding: var(--padding-mobile);
+        
+        /* ✨ REMOVIDO: background y backdrop-filter para mantener original */
     }
 
-    .scroll-indicator:hover {
-        transform: translateY(-5px);
+    .scroll-indicator-original:hover {
+        /* ✨ EFECTO ORIGINAL: Solo movimiento, sin fondo */
+        transform: translateY(calc(-1 * var(--space-1)));
+        
+        /* ✨ REMOVIDO: background y box-shadow para mantener original */
     }
 
     .scroll-arrow {
-        font-size: 2rem;
+        font-size: var(--text-3xl);
         animation: bounce 2s infinite;
-        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+        text-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.8);
+        color: var(--text-primary);
     }
 
     @keyframes bounce {
@@ -117,32 +143,43 @@ import HeroBackground from './HeroBackground.astro';
             transform: translateY(0);
         }
         40% {
-            transform: translateY(-10px);
+            transform: translateY(calc(-1 * var(--space-3)));
         }
         60% {
-            transform: translateY(-5px);
+            transform: translateY(calc(-1 * var(--space-1)));
         }
     }
 
-    /* === RESPONSIVE - SOLO PARA LAYOUT, NO PARA IMÁGENES === */
+    /* === RESPONSIVE USANDO TOKENS === */
     
     /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
+        .hero-header {
+            padding-top: calc(var(--padding-desktop) * 2.33);
+            padding-left: var(--padding-desktop);
+            padding-right: var(--padding-desktop);
+        }
+
         .hero-footer {
-            gap: var(--gap-desktop);
+            gap: var(--gap-desktop-lg);
             padding-bottom: var(--padding-desktop);
         }
 
         .hero-logo {
             max-width: 650px;
+            margin-bottom: var(--space-12);
         }
 
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.45) calc(var(--padding-desktop) * 0.9);
-            font-size: 0.85rem;
-            letter-spacing: 0.8px;
-            margin-top: 0.8rem;
+        .hero-cta-original {
+            padding: calc(var(--space-3) + var(--space-1)) calc(var(--space-8));
+            font-size: var(--text-sm);
+            letter-spacing: var(--tracking-wide);
+            margin-top: var(--space-3);
             max-width: 200px;
+        }
+
+        .scroll-arrow {
+            font-size: var(--text-4xl);
         }
     }
 
@@ -154,21 +191,26 @@ import HeroBackground from './HeroBackground.astro';
             padding-right: var(--padding-desktop);
         }
 
-        .cta-btn-carta {
-            padding: calc(var(--padding-desktop) * 0.5) calc(var(--padding-desktop) * 1);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            margin-top: 1rem;
-            border-radius: 6px;
+        .hero-cta-original {
+            padding: calc(var(--space-4)) calc(var(--space-8));
+            font-size: var(--text-base);
+            letter-spacing: var(--tracking-normal);
+            margin-top: var(--space-4);
+            border-radius: var(--radius-md);
         }
 
         .hero-logo {
             max-width: 600px;
+            margin-bottom: var(--space-10);
         }
 
         .hero-footer {
             gap: var(--gap-desktop);
             padding-bottom: var(--padding-desktop);
+        }
+
+        .scroll-arrow {
+            font-size: var(--text-3xl);
         }
     }
 
@@ -182,13 +224,14 @@ import HeroBackground from './HeroBackground.astro';
 
         .hero-logo {
             max-width: 500px;
+            margin-bottom: var(--space-8);
         }
 
-        .cta-btn-carta {
-            padding: calc(var(--padding-tablet) * 0.6) calc(var(--padding-tablet) * 1.2);
-            font-size: 0.95rem;
-            letter-spacing: 1.2px;
-            margin-top: 1.2rem;
+        .hero-cta-original {
+            padding: calc(var(--space-3) + var(--space-1)) calc(var(--space-6));
+            font-size: var(--text-base);
+            letter-spacing: var(--tracking-wide);
+            margin-top: var(--space-5);
         }
 
         .hero-footer {
@@ -197,7 +240,7 @@ import HeroBackground from './HeroBackground.astro';
         }
 
         .scroll-arrow {
-            font-size: 2.5rem;
+            font-size: calc(var(--text-3xl) + var(--space-2));
         }
     }
 
@@ -209,16 +252,95 @@ import HeroBackground from './HeroBackground.astro';
 
         .hero-logo {
             max-width: 420px;
+            margin-bottom: var(--space-6);
         }
 
-        .cta-btn-carta {
-            padding: calc(var(--padding-mobile) * 0.8) calc(var(--padding-mobile) * 1.2);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+        .hero-cta-original {
+            padding: var(--space-3) calc(var(--space-5));
+            font-size: var(--text-sm);
+            letter-spacing: var(--tracking-normal);
         }
 
         .scroll-arrow {
-            font-size: 1.8rem;
+            font-size: var(--text-2xl);
+        }
+    }
+
+    /* MOBILE PEQUEÑO (0-419px) */
+    @media (max-width: 419px) {
+        .hero-header {
+            padding-top: calc(var(--padding-mobile) * 2.5);
+            padding-left: calc(var(--padding-mobile) * 0.75);
+            padding-right: calc(var(--padding-mobile) * 0.75);
+        }
+
+        .hero-logo {
+            max-width: 90%;
+            margin-bottom: var(--space-4);
+        }
+
+        .hero-cta-original {
+            padding: var(--space-2) var(--space-4);
+            font-size: var(--text-xs);
+            letter-spacing: var(--tracking-tight);
+            margin-top: var(--space-3);
+        }
+
+        .hero-footer {
+            gap: calc(var(--gap-mobile) * 0.75);
+            padding-bottom: var(--padding-mobile);
+        }
+
+        .scroll-arrow {
+            font-size: var(--text-xl);
+        }
+    }
+
+    /* === VARIANTES DE TEMA PARA EL DISEÑO ORIGINAL === */
+    
+    /* Tema claro - mantener el efecto blanco */
+    [data-theme="light"] .hero-cta-original {
+        border-color: var(--text-primary);
+        color: var(--text-primary);
+    }
+    
+    [data-theme="light"] .hero-cta-original:hover {
+        /* En tema claro, el efecto sigue siendo blanco */
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 0 var(--space-6) rgba(255, 255, 255, 0.9), 
+            0 0 0 var(--border-1) rgba(255, 255, 255, 1);
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    .hero-cta-original:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+    
+    .scroll-indicator-original:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+
+    /* === PREFERENCIAS DE USUARIO === */
+    
+    @media (prefers-reduced-motion: reduce) {
+        .hero-logo,
+        .hero-cta-original,
+        .scroll-indicator-original {
+            transition: none;
+        }
+        
+        .scroll-arrow {
+            animation: none;
+        }
+    }
+    
+    @media (prefers-contrast: high) {
+        .hero-cta-original {
+            border-width: var(--border-4);
         }
     }
 </style>

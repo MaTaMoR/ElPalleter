@@ -53,6 +53,7 @@ const {
 </div>
 
 <style>
+    /* === HERO BACKGROUND USANDO DESIGN TOKENS === */
     .hero-background {
         position: relative;
         width: 100%;
@@ -62,7 +63,12 @@ const {
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        color: white;
+        color: var(--text-primary);                    /* En lugar de white */
+        
+        /* Optimizaciones de performance usando tokens */
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        contain: layout style;
     }
 
     /* === IMAGEN DE FONDO === */
@@ -75,6 +81,10 @@ const {
         z-index: 0;
         object-fit: cover;
         object-position: center;
+        
+        /* Optimización de GPU usando tokens */
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
     }
 
     /* === FALLBACK PERSONALIZADO PARA HERO === */
@@ -85,20 +95,24 @@ const {
         width: 100%;
         height: 100%;
         z-index: 0;
-        /* Estilo hero para fallback */
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        
+        /* Usando tokens para el fondo de fallback */
+        background: linear-gradient(135deg, 
+            var(--dark-600) 0%, 
+            var(--dark-400) 100%
+        );
         border: none;
         border-radius: 0;
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-secondary);
         min-height: 100vh;
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-icon) {
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--text-muted);                      /* En lugar de rgba hardcodeado */
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-title) {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);                    /* En lugar de rgba hardcodeado */
     }
 
     /* === OVERLAY === */
@@ -110,6 +124,9 @@ const {
         height: 100%;
         z-index: 1;
         pointer-events: none;
+        
+        /* Usando variable de overlay del tema */
+        background: var(--bg-overlay);
     }
 
     /* === CONTENIDO === */
@@ -124,7 +141,7 @@ const {
         align-items: center;
     }
 
-    /* === VARIANTES === */
+    /* === VARIANTES DEL HERO === */
     
     /* Hero con altura personalizada */
     .hero-background.custom-height {
@@ -138,20 +155,21 @@ const {
         will-change: transform;
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
-    .hero-background {
-        /* Mejorar rendering */
-        transform: translate3d(0, 0, 0);
-        backface-visibility: hidden;
-        
-        /* Contener el layout para mejor performance */
-        contain: layout style;
+    /* === VARIANTES DE OVERLAY === */
+    
+    /* Overlay más oscuro */
+    .hero-background.overlay-dark .hero-overlay {
+        background: var(--bg-surface);                 /* Más opaco */
     }
-
-    .hero-background :global(.hero-bg-image) {
-        /* Optimización de GPU */
-        will-change: transform;
-        transform: translate3d(0, 0, 0);
+    
+    /* Overlay más claro */
+    .hero-background.overlay-light .hero-overlay {
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Sin overlay */
+    .hero-background.no-overlay .hero-overlay {
+        display: none;
     }
 
     /* === RESPONSIVE === */
@@ -164,15 +182,127 @@ const {
         }
         
         .hero-background :global(.responsive-image-fallback .fallback-content) {
-            padding: 2rem 1rem;
+            padding: var(--space-8) var(--space-4);    /* En lugar de 2rem 1rem */
         }
     }
 
-    /* Reducir motion para usuarios que lo prefieran */
+    /* Tablet adjustments */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .hero-background :global(.responsive-image-fallback .fallback-content) {
+            padding: var(--space-12) var(--space-6);
+        }
+    }
+
+    /* Desktop optimizations */
+    @media (min-width: 1024px) {
+        .hero-background :global(.responsive-image-fallback .fallback-content) {
+            padding: var(--space-16) var(--space-8);
+        }
+    }
+
+    /* === TEMAS ESPECÍFICOS === */
+    
+    /* Ajustes para tema claro */
+    [data-theme="light"] .hero-background :global(.responsive-image-fallback) {
+        background: linear-gradient(135deg, 
+            var(--gray-100) 0%, 
+            var(--gray-300) 100%
+        );
+        color: var(--text-primary);
+    }
+    
+    [data-theme="light"] .hero-overlay {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* === EFECTOS ESPECIALES === */
+    
+    /* Efecto de cristal en el overlay */
+    .hero-background.glass-overlay .hero-overlay {
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop-blur);
+    }
+    
+    /* Gradiente personalizado con colores del tema */
+    .hero-background.gradient-overlay .hero-overlay {
+        background: linear-gradient(
+            180deg,
+            transparent 0%,
+            var(--bg-overlay) 50%,
+            var(--bg-surface) 100%
+        );
+    }
+
+    /* === ANIMACIONES === */
+    
+    /* Fade in del hero */
+    .hero-background.animate-in {
+        animation: heroFadeIn var(--duration-1000) var(--ease-out);
+    }
+    
+    @keyframes heroFadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Parallax suave */
+    .hero-background.parallax .hero-bg-image {
+        animation: subtleParallax 20s ease-in-out infinite;
+    }
+    
+    @keyframes subtleParallax {
+        0%, 100% {
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+            transform: translate3d(0, -10px, 0) scale(1.02);
+        }
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    /* Respeto por preferencias de movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
         .hero-background.parallax .hero-bg-image {
             transform: none;
             will-change: auto;
+            animation: none;
         }
+        
+        .hero-background.animate-in {
+            animation: none;
+        }
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .hero-overlay {
+            background: rgba(0, 0, 0, 0.7) !important;
+        }
+        
+        [data-theme="light"] .hero-overlay {
+            background: rgba(255, 255, 255, 0.8) !important;
+        }
+    }
+
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    
+    /* Hint al navegador sobre lo que va a cambiar */
+    .hero-background.will-animate {
+        will-change: opacity, transform;
+    }
+    
+    /* Contener el layout para mejor performance */
+    .hero-background {
+        contain: layout style paint;
+    }
+    
+    /* Isolation para efectos de blend */
+    .hero-background.isolated {
+        isolation: isolate;
     }
 </style>

@@ -1,0 +1,231 @@
+/* =====================================================
+   THEMES - EL PALLETER
+   Definición de temas y tokens semánticos
+   ===================================================== */
+
+/* === TEMA PRINCIPAL (OSCURO) === */
+:root,
+[data-theme="dark"] {
+  /* Colores de texto */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-disabled: rgba(255, 255, 255, 0.3);
+  
+  /* Colores de fondo */
+  --bg-primary: var(--dark-700);     /* #141414 */
+  --bg-secondary: var(--dark-600);   /* #1a1a1a */
+  --bg-tertiary: var(--dark-800);    /* #0f0f0f */
+  --bg-surface: rgba(0, 0, 0, 0.6);
+  --bg-surface-hover: rgba(0, 0, 0, 0.8);
+  --bg-overlay: rgba(0, 0, 0, 0.25);
+  
+  /* Colores de borde */
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-accent: var(--brand-primary-strong);
+  
+  /* Colores de acento */
+  --accent-primary: var(--brand-primary);
+  --accent-hover: var(--brand-primary-dark);
+  --accent-active: var(--brand-primary-darker);
+  --accent-light: var(--brand-primary-light);
+  --accent-medium: var(--brand-primary-medium);
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
+  --shadow-accent: 0 4px 20px rgba(244, 162, 97, 0.3);
+  --shadow-accent-lg: 0 8px 25px rgba(244, 162, 97, 0.4);
+  
+  /* Estados interactivos */
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --active-overlay: rgba(255, 255, 255, 0.12);
+  --focus-ring: var(--brand-primary);
+  
+  /* Efectos de cristal/blur */
+  --glass-bg: rgba(0, 0, 0, 0.6);
+  --glass-border: rgba(244, 162, 97, 0.2);
+  --backdrop-blur: blur(15px);
+  --backdrop-blur-strong: blur(20px);
+}
+
+/* === TEMA CLARO === */
+[data-theme="light"] {
+  /* Colores de texto */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-700);
+  --text-tertiary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --text-disabled: var(--gray-400);
+  
+  /* Colores de fondo */
+  --bg-primary: #ffffff;
+  --bg-secondary: var(--gray-50);
+  --bg-tertiary: var(--gray-100);
+  --bg-surface: rgba(255, 255, 255, 0.9);
+  --bg-surface-hover: rgba(255, 255, 255, 0.95);
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+  
+  /* Colores de borde */
+  --border-primary: var(--gray-200);
+  --border-secondary: var(--gray-100);
+  --border-accent: var(--brand-primary-medium);
+  
+  /* Colores de acento - mantienen los mismos valores */
+  --accent-primary: var(--brand-primary);
+  --accent-hover: var(--brand-primary-dark);
+  --accent-active: var(--brand-primary-darker);
+  --accent-light: var(--brand-primary-light);
+  --accent-medium: var(--brand-primary-medium);
+  
+  /* Sombras más suaves para tema claro */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+  --shadow-accent: 0 4px 20px rgba(244, 162, 97, 0.2);
+  --shadow-accent-lg: 0 8px 25px rgba(244, 162, 97, 0.3);
+  
+  /* Estados interactivos */
+  --hover-overlay: rgba(0, 0, 0, 0.04);
+  --active-overlay: rgba(0, 0, 0, 0.08);
+  --focus-ring: var(--brand-primary);
+  
+  /* Efectos de cristal/blur */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: var(--brand-primary-medium);
+  --backdrop-blur: blur(15px);
+  --backdrop-blur-strong: blur(20px);
+}
+
+/* === TEMA DORADO === */
+[data-theme="gold"] {
+  /* Usar base del tema oscuro pero cambiar acentos */
+  --accent-primary: #ffd700;
+  --accent-hover: #ffed4a;
+  --accent-active: #f6d55c;
+  --accent-light: rgba(255, 215, 0, 0.1);
+  --accent-medium: rgba(255, 215, 0, 0.2);
+  
+  /* Actualizar brand colors para coherencia */
+  --brand-primary: #ffd700;
+  --brand-primary-dark: #ffed4a;
+  --brand-primary-darker: #f6d55c;
+  --brand-primary-light: rgba(255, 215, 0, 0.1);
+  --brand-primary-medium: rgba(255, 215, 0, 0.2);
+  --brand-primary-strong: rgba(255, 215, 0, 0.3);
+  
+  /* Ajustar glass border */
+  --glass-border: rgba(255, 215, 0, 0.2);
+  --border-accent: rgba(255, 215, 0, 0.3);
+  
+  /* Sombras doradas */
+  --shadow-accent: 0 4px 20px rgba(255, 215, 0, 0.3);
+  --shadow-accent-lg: 0 8px 25px rgba(255, 215, 0, 0.4);
+  
+  --focus-ring: #ffd700;
+}
+
+/* === TEMA AZUL === */
+[data-theme="blue"] {
+  /* Usar base del tema oscuro pero cambiar acentos */
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-active: #2563eb;
+  --accent-light: rgba(59, 130, 246, 0.1);
+  --accent-medium: rgba(59, 130, 246, 0.2);
+  
+  /* Actualizar brand colors para coherencia */
+  --brand-primary: #3b82f6;
+  --brand-primary-dark: #60a5fa;
+  --brand-primary-darker: #2563eb;
+  --brand-primary-light: rgba(59, 130, 246, 0.1);
+  --brand-primary-medium: rgba(59, 130, 246, 0.2);
+  --brand-primary-strong: rgba(59, 130, 246, 0.3);
+  
+  /* Ajustar glass border */
+  --glass-border: rgba(59, 130, 246, 0.2);
+  --border-accent: rgba(59, 130, 246, 0.3);
+  
+  /* Sombras azules */
+  --shadow-accent: 0 4px 20px rgba(59, 130, 246, 0.3);
+  --shadow-accent-lg: 0 8px 25px rgba(59, 130, 246, 0.4);
+  
+  --focus-ring: #3b82f6;
+}
+
+/* === TEMA RESTAURANTE (CÁLIDO) === */
+[data-theme="restaurant"] {
+  /* Usar base del tema oscuro pero cambiar acentos */
+  --accent-primary: #8B4513;        /* Marrón cálido */
+  --accent-hover: #A0522D;          
+  --accent-active: #654321;         
+  --accent-light: rgba(139, 69, 19, 0.1);
+  --accent-medium: rgba(139, 69, 19, 0.2);
+  
+  /* Actualizar brand colors para coherencia */
+  --brand-primary: #8B4513;
+  --brand-primary-dark: #A0522D;
+  --brand-primary-darker: #654321;
+  --brand-primary-light: rgba(139, 69, 19, 0.1);
+  --brand-primary-medium: rgba(139, 69, 19, 0.2);
+  --brand-primary-strong: rgba(139, 69, 19, 0.3);
+  
+  /* Ajustar colores para mejor contraste */
+  --text-secondary: #E6D3B7;        /* Beige cálido */
+  --glass-border: rgba(139, 69, 19, 0.3);
+  --border-accent: rgba(139, 69, 19, 0.3);
+  
+  /* Sombras marrones */
+  --shadow-accent: 0 4px 20px rgba(139, 69, 19, 0.3);
+  --shadow-accent-lg: 0 8px 25px rgba(139, 69, 19, 0.4);
+  
+  --focus-ring: #8B4513;
+}
+
+/* === PREFERENCIAS DE USUARIO === */
+
+/* Respeto por preferencias de contraste alto */
+@media (prefers-contrast: high) {
+  :root,
+  [data-theme] {
+    --border-primary: rgba(255, 255, 255, 0.3);
+    --border-secondary: rgba(255, 255, 255, 0.2);
+    --text-muted: rgba(255, 255, 255, 0.8);
+  }
+  
+  [data-theme="light"] {
+    --border-primary: var(--gray-400);
+    --border-secondary: var(--gray-300);
+    --text-muted: var(--gray-600);
+  }
+}
+
+/* Respeto por preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-75: 0ms;
+    --duration-100: 0ms;
+    --duration-150: 0ms;
+    --duration-200: 0ms;
+    --duration-300: 0ms;
+    --duration-500: 0ms;
+    --duration-700: 0ms;
+    --duration-1000: 0ms;
+  }
+}
+
+/* === TRANSICIONES SUAVES ENTRE TEMAS === */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color var(--duration-300) var(--ease-out),
+              color var(--duration-300) var(--ease-out),
+              border-color var(--duration-300) var(--ease-out),
+              box-shadow var(--duration-300) var(--ease-out) !important;
+}
