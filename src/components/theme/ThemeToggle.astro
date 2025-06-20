@@ -1,0 +1,373 @@
+---
+export interface Props {
+    size?: "small" | "large";
+}
+const { size = "small" } = Astro.props;
+const sizeClass = `size-${size}`;
+---
+<div class={`day-night-toggle ${sizeClass}`}>
+    <div class="sky-background sky-night"></div>
+    <div class="sky-background sky-day"></div>
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+    </div>
+    <div class="stars">
+        <div class="star star1"></div>
+        <div class="star star2"></div>
+        <div class="star star3 star-bright"></div>
+        <div class="star star4"></div>
+        <div class="star star5"></div>
+        <div class="star star6"></div>
+    </div>
+    <div class="sun"></div>
+    <div class="moon">
+        <div class="moon-surface"></div>
+    </div>
+</div>
+
+<style>
+    /* === TOGGLE PRINCIPAL === */
+    .day-night-toggle {
+        position: relative;
+        width: 125px;
+        height: 60px;
+        border-radius: 35px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* === FONDO DEL CIELO === */
+    .sky-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sky-day {
+        background: linear-gradient(
+            180deg,
+            #87ceeb 0%,
+            #98d8e8 30%,
+            #b0e0e6 70%,
+            #87ceeb 100%
+        );
+        opacity: 0;
+    }
+    .sky-night {
+        background: linear-gradient(
+            180deg,
+            #0f0f23 0%,
+            #1a1a2e 30%,
+            #16213e 70%,
+            #0f0f23 100%
+        );
+        opacity: 1;
+    }
+    .day-night-toggle.day .sky-day {
+        opacity: 1;
+    }
+    .day-night-toggle.day .sky-night {
+        opacity: 0;
+    }
+
+    /* === NUBES === */
+    .clouds {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: all 1s ease;
+    }
+    .day-night-toggle.day .clouds {
+        opacity: 1;
+    }
+    .cloud {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        animation: cloudFloat 8s ease-in-out infinite;
+    }
+    .cloud::before,
+    .cloud::after {
+        content: "";
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+    }
+    .cloud1 {
+        width: 20px;
+        height: 8px;
+        top: 15px;
+        right: 15px;
+        animation-delay: 0s;
+    }
+    .cloud1::before {
+        width: 12px;
+        height: 12px;
+        top: -6px;
+        left: 2px;
+    }
+    .cloud1::after {
+        width: 8px;
+        height: 8px;
+        top: -4px;
+        right: 2px;
+    }
+    .cloud2 {
+        width: 16px;
+        height: 6px;
+        top: 25px;
+        right: 45px;
+        animation-delay: 2s;
+    }
+    .cloud2::before {
+        width: 10px;
+        height: 10px;
+        top: -4px;
+        left: 1px;
+    }
+    .cloud2::after {
+        width: 6px;
+        height: 6px;
+        top: -3px;
+        right: 1px;
+    }
+    @keyframes cloudFloat {
+        0%,
+        100% {
+            transform: translateX(0) translateY(0);
+        }
+        33% {
+            transform: translateX(3px) translateY(-1px);
+        }
+        66% {
+            transform: translateX(-2px) translateY(1px);
+        }
+    }
+
+    /* === ESTRELLAS === */
+    .stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 1;
+        transition: all 1s ease;
+    }
+    .day-night-toggle.day .stars {
+        opacity: 0;
+    }
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 2s ease-in-out infinite;
+    }
+    .star1 {
+        top: 15px;
+        left: 20px;
+        animation-delay: 0s;
+    }
+    .star2 {
+        top: 25px;
+        left: 35px;
+        animation-delay: 0.5s;
+    }
+    .star3 {
+        top: 12px;
+        left: 50px;
+        animation-delay: 1s;
+    }
+    .star4 {
+        top: 30px;
+        left: 15px;
+        animation-delay: 1.5s;
+    }
+    .star5 {
+        top: 20px;
+        left: 70px;
+        animation-delay: 2s;
+    }
+    .star6 {
+        top: 35px;
+        left: 85px;
+        animation-delay: 0.3s;
+    }
+    @keyframes twinkle {
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+    }
+
+    /* === SOL === */
+    .sun {
+        position: absolute;
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+        border-radius: 50%;
+        top: 50%;
+        right: 10px;
+        left: auto;
+        transform: translateY(-50%);
+        /* Transición para left, right y opacity */
+        transition:
+            right 1s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset -3px -3px 6px rgba(255, 200, 0, 0.7);
+        opacity: 0;
+        z-index: 3;
+    }
+    .day-night-toggle.day .sun {
+        opacity: 1;
+        right: calc(100% - 45px);
+    }
+    .sun::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 59px;
+        height: 59px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            circle,
+            rgba(255, 215, 0, 0.6) 0%,
+            rgba(255, 215, 0, 0.3) 50%,
+            transparent 80%
+        );
+        border-radius: 50%;
+    }
+    .sun::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 75px;
+        height: 75px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            circle,
+            rgba(255, 235, 150, 0.4) 0%,
+            rgba(255, 235, 150, 0.2) 40%,
+            transparent 90%
+        );
+        border-radius: 50%;
+    }
+    .moon {
+        position: absolute;
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+        border-radius: 50%;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        transition:
+            right 1s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            inset -3px -3px 6px rgba(0, 0, 0, 0.1),
+            0 0 15px rgba(245, 245, 245, 0.3);
+        opacity: 1;
+        z-index: 3;
+    }
+    .day-night-toggle.day .moon {
+        opacity: 0;
+        right: calc(100% - 45px);
+    }
+    .moon::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 59px;
+        height: 59px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            circle,
+            rgba(245, 245, 245, 0.4) 0%,
+            rgba(245, 245, 245, 0.25) 40%,
+            rgba(245, 245, 245, 0.15) 60%,
+            rgba(245, 245, 245, 0.08) 80%,
+            transparent 90%
+        );
+        border-radius: 50%;
+        animation: moonGlow 5s ease-in-out infinite;
+    }
+    .moon::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 75px;
+        height: 75px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            circle,
+            transparent 0%,
+            rgba(245, 245, 245, 0.2) 25%,
+            rgba(245, 245, 245, 0.12) 45%,
+            rgba(245, 245, 245, 0.08) 65%,
+            rgba(245, 245, 245, 0.04) 85%,
+            transparent 95%
+        );
+        border-radius: 50%;
+        animation: moonGlowReverse 7s ease-in-out infinite reverse;
+    }
+    @keyframes moonGlow {
+        0%,
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.08);
+            opacity: 0.8;
+        }
+    }
+    @keyframes moonGlowReverse {
+        0%,
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.08);
+            opacity: 0.8;
+        }
+    }
+</style>
+
+<script>
+    // Inicializa interacciones
+    document.querySelectorAll(".day-night-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", () => toggle.classList.toggle("day"));
+        toggle.addEventListener(
+            "mouseenter",
+            () => (toggle.style.transform = "scale(1.05)"),
+        );
+        toggle.addEventListener(
+            "mouseleave",
+            () => (toggle.style.transform = "scale(1)"),
+        );
+    });
+</script>

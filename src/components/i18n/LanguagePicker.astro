@@ -2,13 +2,19 @@
 export const prerender = true;
 
 import { i18nCore } from '../../i18n/core.js';
+import ThemeToggle from '../theme/ThemeToggle.astro';
 
 export interface Props {
   variant?: 'desktop' | 'mobile';
   className?: string;
+  includeThemeToggle?: boolean;
 }
 
-const { variant = 'desktop', className = '' } = Astro.props;
+const { 
+  variant = 'desktop', 
+  className = '',
+  includeThemeToggle = true 
+} = Astro.props;
 
 // Obtener datos de idiomas desde el sistema centralizado
 const languages = await i18nCore.getLanguagePickerDataWithAstro(Astro);
@@ -52,6 +58,13 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
         <span class="lang-full-name">{lang.nativeName}</span>
       </a>
     ))}
+    
+    <!-- ✨ NUEVO: Integrar ThemeToggle al final del dropdown -->
+    {includeThemeToggle && (
+      <div class="language-picker-theme">
+        <ThemeToggle size="small" />
+      </div>
+    )}
   </div>
 </div>
 
@@ -60,41 +73,46 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   .language-picker {
     position: relative;
     display: inline-block;
-    font-family: inherit;
-    z-index: 50;
+    font-family: var(--font-primary);                   /* inherit → token */
+    z-index: var(--z-50);                               /* 50 → token */
   }
 
   /* === BOTÓN PRINCIPAL === */
   .lang-current {
     background: transparent;
-    border: 1px solid transparent;
-    color: rgba(255, 255, 255, 0.9);
-    padding: 0.7rem 1rem;
-    border-radius: 8px;
+    border: var(--border-1) solid transparent;          /* 1px → token */
+    color: var(--text-muted);                           /* rgba(255, 255, 255, 0.9) → token */
+    padding: var(--space-3) var(--space-4);             /* 0.7rem 1rem → tokens */
+    border-radius: var(--radius-lg);                    /* 8px → token */
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    font-weight: 500;
+    gap: var(--space-2);                                /* 0.6rem → token */
+    transition: var(--transition-base);                 /* all 0.3s ease → token */
+    font-size: var(--text-sm);                          /* 0.9rem → token */
+    font-weight: var(--font-medium);                    /* 500 → token */
     min-width: 70px;
     justify-content: center;
   }
 
   .lang-current:hover {
-    color: white;
-    transform: translateY(-1px);
+    color: var(--text-primary);                         /* white → token */
+    transform: translateY(calc(-1 * var(--space-1)));   /* -1px → token */
   }
 
   .lang-current:focus {
     outline: none;
-    color: white;
+    color: var(--text-primary);                         /* white → token */
+  }
+
+  .lang-current:focus-visible {
+    outline: var(--border-2) solid var(--focus-ring);   /* Accesibilidad mejorada */
+    outline-offset: var(--space-1);
   }
 
   /* Estado activo solo cuando está abierto el dropdown */
   .language-picker[data-open="true"] .lang-current {
-    color: white;
+    color: var(--text-primary);                         /* white → token */
   }
 
   /* === ELEMENTOS DE BANDERA === */
@@ -107,22 +125,22 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .flag-emoji {
-    font-size: 1.6rem;
+    font-size: var(--text-xl);                          /* 1.6rem → token */
     line-height: 1;
   }
 
   .flag-svg {
     width: 32px;
     height: 21px;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);                    /* 3px → token */
     object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-sm);                       /* 0 2px 4px rgba(0, 0, 0, 0.2) → token */
   }
 
   .lang-arrow {
-    font-size: 0.7rem;
-    transition: transform 0.3s ease;
-    margin-left: 0.1rem;
+    font-size: var(--text-xs);                          /* 0.7rem → token */
+    transition: transform var(--duration-300) var(--ease-out); /* 0.3s ease → tokens */
+    margin-left: var(--space-1);                        /* 0.1rem → token */
   }
 
   .language-picker[data-open="true"] .lang-arrow {
@@ -132,23 +150,22 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   /* === DROPDOWN === */
   .lang-options {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    top: calc(100% + var(--space-2));                   /* 0.5rem → token */
     right: 0;
-    background: rgba(15, 15, 15, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    min-width: 140px;
+    background: var(--glass-bg);                        /* rgba(15, 15, 15, 0.95) → token */
+    backdrop-filter: var(--backdrop-blur-strong);       /* blur(20px) → token */
+    -webkit-backdrop-filter: var(--backdrop-blur-strong);
+    border: var(--border-1) solid var(--border-secondary); /* rgba(255, 255, 255, 0.1) → token */
+    border-radius: var(--radius-xl);                    /* 12px → token */
+    min-width: 180px;                                   /* ✨ Más ancho para acomodar el theme toggle */
     width: max-content;
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-    z-index: 1000;
+    box-shadow: var(--shadow-xl),                       /* 0 10px 30px rgba(0, 0, 0, 0.4) → token */
+                0 0 0 var(--border-1) var(--border-secondary); /* rgba(255, 255, 255, 0.05) → token */
+    z-index: var(--z-modal);                            /* 1000 → token */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(calc(-1 * var(--space-3)));   /* -10px → token */
+    transition: all var(--duration-300) var(--ease-in-out); /* 0.3s cubic-bezier → tokens */
     overflow: hidden;
   }
 
@@ -162,12 +179,12 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   .lang-option {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    padding: 0.8rem 1rem;
-    color: white;
+    gap: var(--space-3);                                /* 0.7rem → token */
+    padding: var(--space-3) var(--space-4);             /* 0.8rem 1rem → tokens */
+    color: var(--text-primary);                         /* white → token */
     text-decoration: none;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all var(--duration-200) var(--ease-out); /* 0.2s ease → tokens */
+    border-bottom: var(--border-1) solid var(--border-secondary); /* rgba(255, 255, 255, 0.05) → token */
     cursor: pointer;
     position: relative;
     white-space: nowrap;
@@ -178,29 +195,29 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: white;
-    transform: translateX(2px);
+    background: var(--hover-overlay);                   /* rgba(255, 255, 255, 0.08) → token */
+    color: var(--text-primary);                         /* white → token */
+    transform: translateX(var(--space-1));              /* 2px → token */
   }
 
   /* Usar focus-visible para mostrar focus solo con teclado */
   .lang-option:focus-visible {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    outline: 1px solid rgba(255, 255, 255, 0.2);
-    outline-offset: -1px;
+    background: var(--active-overlay);                  /* rgba(255, 255, 255, 0.1) → token */
+    color: var(--text-primary);                         /* white → token */
+    outline: var(--border-1) solid var(--border-primary); /* rgba(255, 255, 255, 0.2) → token */
+    outline-offset: calc(-1 * var(--border-1));         /* -1px → token */
   }
 
   /* Asegurar que hover tenga prioridad sobre focus */
   .lang-option:focus:not(:hover) {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: var(--bg-surface);                      /* rgba(255, 255, 255, 0.05) → token */
+    color: var(--text-primary);                         /* white → token */
   }
 
   /* Para mejor accesibilidad en móvil, aumentar área táctil */
   @media (max-width: 768px) {
     .lang-option {
-      padding: 1rem;
+      padding: var(--space-4);                          /* 1rem → token */
       min-height: 44px; /* Área táctil mínima recomendada */
     }
     
@@ -213,8 +230,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     /* Solo mostrar hover/touch en móvil */
     .lang-option:hover,
     .lang-option:active {
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
+      background: var(--hover-overlay);                 /* rgba(255, 255, 255, 0.08) → token */
+      color: var(--text-primary);                       /* white → token */
       transform: none; /* Sin animación de deslizamiento en móvil */
     }
   }
@@ -227,19 +244,19 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option .flag-emoji {
-    font-size: 1.3rem;
+    font-size: var(--text-lg);                          /* 1.3rem → token */
   }
 
   .lang-option .flag-svg {
     width: 26px;
     height: 17px;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);                    /* 2px → token */
   }
 
   .lang-option .lang-full-name {
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.2px;
+    font-size: var(--text-sm);                          /* 0.9rem → token */
+    font-weight: var(--font-medium);                    /* 500 → token */
+    letter-spacing: var(--tracking-normal);             /* 0.2px → token */
   }
 
   /* === VARIANTES === */
@@ -251,8 +268,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   /* Variante Mobile */
   .language-picker.mobile .lang-current {
-    padding: 0.8rem 1.1rem;
-    font-size: 0.85rem;
+    padding: var(--space-3) calc(var(--space-4) + var(--space-1)); /* 0.8rem 1.1rem → tokens */
+    font-size: var(--text-xs);                          /* 0.85rem → token */
     min-width: 75px;
   }
 
@@ -264,7 +281,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .language-picker.mobile .lang-option {
-    padding: 0.9rem 1rem;
+    padding: calc(var(--space-3) + var(--space-1)) var(--space-4); /* 0.9rem 1rem → tokens */
   }
 
   /* === RESPONSIVE === */
@@ -287,26 +304,85 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     left: 0;
     top: 0;
     bottom: 0;
-    width: 2px;
-    background: #ff4444;
+    width: var(--space-1);                              /* 2px → token */
+    background: #ff4444;                                /* Mantener color específico */
     transform: scaleY(0);
-    transition: transform 0.2s ease;
+    transition: transform var(--duration-200) var(--ease-out); /* 0.2s ease → tokens */
   }
 
   .lang-option:hover::before {
     transform: scaleY(1);
   }
 
+  /* === VARIANTES DE TEMA === */
+
+  /* Tema claro */
+  [data-theme="light"] .lang-current {
+    color: var(--text-secondary);                       /* Se adapta al tema */
+  }
+
+  [data-theme="light"] .lang-current:hover,
+  [data-theme="light"] .language-picker[data-open="true"] .lang-current {
+    color: var(--text-primary);
+  }
+
+  [data-theme="light"] .lang-options {
+    background: var(--bg-surface);                      /* Fondo adaptado */
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-lg),
+                0 0 0 var(--border-1) var(--border-primary);
+  }
+
+  [data-theme="light"] .lang-option {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-primary);
+  }
+
+  [data-theme="light"] .lang-option:hover {
+    background: var(--hover-overlay);
+  }
+
   /* === ACCESIBILIDAD === */
   @media (prefers-reduced-motion: reduce) {
     .lang-current,
     .lang-options,
-    .lang-option {
+    .lang-option,
+    .lang-arrow,
+    .lang-option::before {
       transition: none;
+      animation: none;
     }
     
-    .lang-arrow {
-      transition: none;
+    .language-picker[data-open="true"] .lang-arrow {
+      transform: none;
+    }
+    
+    .lang-option:hover {
+      transform: none;
+    }
+  }
+
+  /* Alto contraste */
+  @media (prefers-contrast: high) {
+    .lang-current {
+      border-color: var(--border-primary);
+    }
+    
+    .lang-current:hover,
+    .language-picker[data-open="true"] .lang-current {
+      border-color: var(--accent-primary);
+      background: var(--accent-light);
+    }
+    
+    .lang-options {
+      background: var(--bg-primary);
+      border-color: var(--accent-primary);
+      border-width: var(--border-2);
+    }
+    
+    .lang-option:hover {
+      background: var(--accent-light);
+      border-color: var(--accent-primary);
     }
   }
 
@@ -324,17 +400,17 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   .language-picker.sidebar-language .lang-current {
     width: 100%;
     justify-content: flex-start;
-    background: rgba(244, 162, 97, 0.1);
-    border-color: rgba(244, 162, 97, 0.5);
-    padding: 0.8rem 1.2rem;
-    font-size: 1rem;
+    background: var(--accent-light);                    /* rgba(244, 162, 97, 0.1) → token */
+    border-color: var(--accent-medium);                 /* rgba(244, 162, 97, 0.5) → token */
+    padding: var(--space-3) calc(var(--space-4) + var(--space-1)); /* 0.8rem 1.2rem → tokens */
+    font-size: var(--text-base);                        /* 1rem → token */
   }
 
   .language-picker.sidebar-language .lang-options {
     position: static;
-    background: rgba(244, 162, 97, 0.05);
-    border: 1px solid rgba(244, 162, 97, 0.2);
-    margin-top: 0.5rem;
+    background: var(--accent-light);                    /* rgba(244, 162, 97, 0.05) → token */
+    border: var(--border-1) solid var(--accent-medium); /* rgba(244, 162, 97, 0.2) → token */
+    margin-top: var(--space-2);                         /* 0.5rem → token */
     opacity: 1;
     visibility: visible;
     transform: none;
@@ -343,6 +419,39 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   .language-picker.sidebar-language[data-open="true"] .lang-options {
     display: block;
+  }
+
+  .language-picker-theme {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-3); /* 0.5rem → token */
+  }
+
+  /* === MEJORAS DE RENDIMIENTO === */
+  .language-picker {
+    contain: layout style;
+  }
+  
+  .lang-options {
+    contain: layout style paint;
+    will-change: opacity, transform, visibility;
+  }
+  
+  .lang-option {
+    will-change: background-color, transform;
+  }
+
+  /* === ESTADOS ADICIONALES === */
+  
+  /* Estado hover del contenedor */
+  .language-picker:hover .lang-current {
+    border-color: var(--border-primary);
+  }
+  
+  /* Estado activo del dropdown */
+  .language-picker[data-open="true"] .lang-current {
+    border-color: var(--accent-primary);
+    background: var(--accent-light);
   }
 </style>
 

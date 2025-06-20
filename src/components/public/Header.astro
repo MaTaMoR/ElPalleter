@@ -14,6 +14,94 @@ import MobileSidebar from './MobileSidebar.astro';
 
 <MobileSidebar />
 
+<style>
+    /* === HEADER PRINCIPAL === */
+    header {
+        width: 100%;
+        height: 80px; /* Altura original mantenida */
+        position: fixed;
+        top: 0;
+        z-index: 100; /* Mantengo el valor original por ahora */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        /* Degradado original - mantengo exactamente igual por ahora */
+        background: linear-gradient(135deg, 
+            rgba(10, 10, 10, 0.7) 0%,
+            rgba(21, 21, 21, 0.7) 25%,
+            rgba(26, 18, 18, 0.7) 45%,
+            rgba(31, 31, 31, 0.7) 65%,
+            rgba(20, 20, 20, 0.7) 85%,
+            rgba(0, 0, 0, 0.7) 100%
+        );
+    }
+    
+    /* === OVERLAY CON BLUR === */
+    .header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0); /* Mantengo el original transparente */
+        backdrop-filter: blur(30px) saturate(200%); /* Mantengo el blur original */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Mantengo el borde original */
+        z-index: 1;
+    }
+
+    /* === MEJORAS GRADUALES CON VARIABLES === */
+    
+    /* Solo aplico variables donde es seguro */
+    @media (prefers-reduced-motion: reduce) {
+        header,
+        .header-overlay {
+            transition: none;
+        }
+    }
+    
+    /* Focus mejorado usando variables */
+    header:focus-within .header-overlay {
+        border-bottom-color: var(--accent-primary, #f4a261);
+    }
+
+    /* === VARIANTES DE TEMA (OPCIONALES) === */
+    
+    /* Solo si las variables están disponibles */
+    [data-theme="light"] header {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.8) 0%,
+            rgba(248, 249, 250, 0.8) 25%,
+            rgba(241, 243, 244, 0.8) 45%,
+            rgba(232, 234, 237, 0.8) 65%,
+            rgba(218, 220, 224, 0.8) 85%,
+            rgba(255, 255, 255, 0.9) 100%
+        );
+    }
+    
+    [data-theme="light"] .header-overlay {
+        border-bottom-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* === UTILIDADES === */
+    
+    /* Estados adicionales si son necesarios */
+    header.scrolled {
+        background: rgba(0, 0, 0, 0.9);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    header.transparent {
+        background: transparent;
+    }
+    
+    header.transparent .header-overlay {
+        background: transparent;
+        border-bottom: none;
+        backdrop-filter: none;
+    }
+</style>
+
 <!-- Script del header (solo funcionalidad del sidebar) -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -57,38 +145,3 @@ import MobileSidebar from './MobileSidebar.astro';
         });
     });
 </script>
-
-<style>
-    header {
-        width: 100%;
-        height: 80px;
-        position: fixed;
-        top: 0;
-        z-index: 100;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        
-        /* Degradado más transparente */
-        background: linear-gradient(135deg, 
-            rgba(10, 10, 10, 0.7) 0%,
-            rgba(21, 21, 21, 0.7) 25%,
-            rgba(26, 18, 18, 0.7) 45%,
-            rgba(31, 31, 31, 0.7) 65%,
-            rgba(20, 20, 20, 0.7) 85%,
-            rgba(0, 0, 0, 0.7) 100%
-        );
-    }
-    
-    .header-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0);
-        backdrop-filter: blur(30px) saturate(200%);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        z-index: 1;
-    }
-</style>

@@ -28,27 +28,45 @@ const {
   .main-content {
     width: 100%;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-10);                               /* 1 → token */
     
     /* SOLO centra horizontalmente */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 
-    padding: 2.5rem 0;
+    padding: calc(var(--space-10)) 0;                   /* 2.5rem → token */
+    
+    /* Optimización de rendering */
+    contain: layout style;
   }
 
   /* === BACKGROUNDS (aplicados al container exterior) === */
   .main-content--bg-dark {
-    background: rgb(20, 20, 20);
+    background: var(--dark-500);                        /* rgb(20, 20, 20) → token */
   }
 
   .main-content--bg-darker {
-    background: rgb(15, 15, 15);
+    background: var(--dark-800);                        /* rgb(15, 15, 15) → token */
   }
 
   .main-content--bg-gradient {
-    background: linear-gradient(180deg, rgb(20, 20, 20) 0%, rgb(15, 15, 15) 100%);
+    background: linear-gradient(180deg, var(--dark-500) 0%, var(--dark-800) 100%); /* Usando tokens */
+  }
+
+  /* === VARIANTES DE TEMA PARA BACKGROUNDS === */
+  
+  /* Tema claro */
+  [data-theme="light"] .main-content--bg-dark {
+    background: var(--gray-50);                         /* Fondo claro */
+  }
+
+  [data-theme="light"] .main-content--bg-darker {
+    background: var(--gray-100);                        /* Fondo más claro */
+  }
+
+  [data-theme="light"] .main-content--bg-gradient {
+    background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
   }
 
   /* === EFECTO DE PARTÍCULAS (aplicado al container exterior) === */
@@ -60,11 +78,11 @@ const {
     right: 0;
     bottom: 0;
     background-image: 
-      radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
-      radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
-      radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
-      radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
+      radial-gradient(circle at 25% 25%, var(--accent-primary) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, var(--accent-primary) 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, var(--accent-primary) 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, var(--accent-primary) 1px, transparent 1px),
+      radial-gradient(circle at 15% 60%, var(--accent-primary) 1px, transparent 1px);
     background-size: 
       120px 120px, 
       150px 150px, 
@@ -72,7 +90,8 @@ const {
       180px 180px, 
       90px 90px;
     opacity: 0.15;
-    animation: float 25s ease-in-out infinite;
+    animation: float var(--duration-1000) var(--ease-in-out) infinite; /* 25s → múltiples tokens */
+    animation-duration: calc(var(--duration-1000) * 25);  /* 25000ms total */
     z-index: -1;
     pointer-events: none;
   }
@@ -82,13 +101,13 @@ const {
       transform: translateY(0px) translateX(0px); 
     }
     25% { 
-      transform: translateY(-15px) translateX(5px); 
+      transform: translateY(calc(-1 * var(--space-4))) translateX(var(--space-1)); /* -15px, 5px → tokens */
     }
     50% { 
-      transform: translateY(-25px) translateX(-10px); 
+      transform: translateY(calc(-1 * var(--space-6))) translateX(calc(-1 * var(--space-3))); /* -25px, -10px → tokens */
     }
     75% { 
-      transform: translateY(-10px) translateX(8px); 
+      transform: translateY(calc(-1 * var(--space-3))) translateX(var(--space-2)); /* -10px, 8px → tokens */
     }
   }
 
@@ -100,13 +119,13 @@ const {
     max-width: 1200px;
     width: 100%;
     position: relative;
-    z-index: 2;
+    z-index: var(--z-20);                               /* 2 → token */
     
     /* ESTE container maneja el layout y gaps */
     display: flex;
     flex-direction: column;
     
-    /* Padding responsivo */
+    /* Padding responsivo usando tokens */
     padding: 0 var(--padding-mobile);
   }
 
@@ -127,29 +146,29 @@ const {
   /* === GAPS (aplicados al container interior) === */
   /* ======================================= */
 
-  /* Mobile gaps */
+  /* Mobile gaps usando nuevos tokens de espaciado */
   .main-content-container--gap-none {
     gap: 0;
   }
 
   .main-content-container--gap-tiny {
-    gap: calc(var(--padding-mobile) * 0.25); /* 0.25rem */
+    gap: var(--space-1);                                /* Muy pequeño: 4px */
   }
 
   .main-content-container--gap-small {
-    gap: calc(var(--padding-mobile) * 0.5); /* 0.5rem */
+    gap: var(--space-2);                                /* Pequeño: 8px */
   }
 
   .main-content-container--gap-medium {
-    gap: calc(var(--padding-mobile) * 1); /* 1rem */
+    gap: var(--space-4);                                /* Medio: 16px */
   }
 
   .main-content-container--gap-large {
-    gap: calc(var(--padding-mobile) * 1.5); /* 1.5rem */
+    gap: var(--space-6);                                /* Grande: 24px */
   }
 
   .main-content-container--gap-xl {
-    gap: calc(var(--padding-mobile) * 2.5); /* 2.5rem */
+    gap: var(--space-10);                               /* Extra grande: 40px */
   }
 
   /* === RESPONSIVE GAPS (aplicados al container interior) === */
@@ -161,23 +180,23 @@ const {
     }
 
     .main-content-container--gap-tiny {
-      gap: calc(var(--padding-tablet) * 0.25); /* 0.5rem */
+      gap: var(--space-2);                              /* 8px */
     }
 
     .main-content-container--gap-small {
-      gap: calc(var(--padding-tablet) * 0.5); /* 1rem */
+      gap: var(--space-4);                              /* 16px */
     }
 
     .main-content-container--gap-medium {
-      gap: calc(var(--padding-tablet) * 0.75); /* 1.5rem */
+      gap: var(--space-6);                              /* 24px */
     }
 
     .main-content-container--gap-large {
-      gap: calc(var(--padding-tablet) * 1); /* 2rem */
+      gap: var(--space-8);                              /* 32px */
     }
 
     .main-content-container--gap-xl {
-      gap: calc(var(--padding-tablet) * 1.5); /* 3rem */
+      gap: var(--space-12);                             /* 48px */
     }
   }
 
@@ -188,23 +207,23 @@ const {
     }
 
     .main-content-container--gap-tiny {
-      gap: calc(var(--padding-desktop) * 0.17); /* 0.5rem */
+      gap: var(--space-2);                              /* 8px */
     }
 
     .main-content-container--gap-small {
-      gap: calc(var(--padding-desktop) * 0.33); /* 1rem */
+      gap: var(--space-4);                              /* 16px */
     }
 
     .main-content-container--gap-medium {
-      gap: calc(var(--padding-desktop) * 0.5); /* 1.5rem */
+      gap: var(--space-6);                              /* 24px */
     }
 
     .main-content-container--gap-large {
-      gap: calc(var(--padding-desktop) * 0.67); /* 2rem */
+      gap: var(--space-8);                              /* 32px */
     }
 
     .main-content-container--gap-xl {
-      gap: calc(var(--padding-desktop) * 1); /* 3rem */
+      gap: var(--space-12);                             /* 48px */
     }
   }
 
@@ -214,9 +233,9 @@ const {
   
   .main-content-container > :global(section) {
     position: relative;
-    z-index: 2;
+    z-index: var(--z-20);                               /* 2 → token */
     
-    /* Padding vertical para las secciones */
+    /* Padding vertical para las secciones usando tokens */
     padding: calc(var(--padding-mobile) * 1.5) 0;
     
     /* Eliminar backgrounds duplicados */
@@ -257,11 +276,11 @@ const {
   
   /* Secciones como tarjetas */
   .main-content-container > :global(.section-card) {
-    background: rgba(0, 0, 0, 0.6) !important;
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    border: 1px solid rgba(244, 162, 97, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    background: var(--glass-bg) !important;             /* rgba(0, 0, 0, 0.6) → token */
+    backdrop-filter: var(--backdrop-blur) !important;   /* blur(15px) → token */
+    border-radius: var(--radius-3xl);                   /* 20px → token */
+    border: var(--border-1) solid var(--glass-border);  /* rgba(244, 162, 97, 0.2) → token */
+    box-shadow: var(--shadow-xl);                       /* 0 20px 40px rgba(0, 0, 0, 0.3) → token */
     padding: calc(var(--padding-mobile) * 2);
   }
 
@@ -275,5 +294,107 @@ const {
     .main-content-container > :global(.section-card) {
       padding: calc(var(--padding-desktop) * 1.5);
     }
+  }
+
+  /* === VARIANTES DE TEMA PARA TARJETAS === */
+  
+  /* Tema claro */
+  [data-theme="light"] .main-content-container > :global(.section-card) {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* === ACCESIBILIDAD === */
+  
+  /* Reducir movimiento si el usuario lo prefiere */
+  @media (prefers-reduced-motion: reduce) {
+    .main-content--particles::before {
+      animation: none;
+    }
+    
+    @keyframes float {
+      0%, 100% { 
+        transform: translateY(0px) translateX(0px); 
+      }
+    }
+  }
+
+  /* === MEJORAS DE RENDIMIENTO === */
+  
+  .main-content--particles::before {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  /* === ESTADOS ADICIONALES === */
+  
+  /* Estado de carga */
+  .main-content.loading {
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  
+  .main-content.loading .main-content-container {
+    filter: blur(1px);
+  }
+
+  /* === UTILIDADES ESPECÍFICAS === */
+  
+  /* Variante sin partículas explícita */
+  .main-content--no-particles::before {
+    display: none;
+  }
+  
+  /* Variante con partículas más intensas */
+  .main-content--particles-intense::before {
+    opacity: 0.25;
+    background-size: 
+      80px 80px, 
+      100px 100px, 
+      60px 60px, 
+      120px 120px, 
+      50px 50px;
+  }
+
+  /* === SOPORTE PARA DISPOSITIVOS CON NOTCH === */
+  
+  .main-content {
+    padding-top: calc(var(--space-10) + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* === MODO PRINT === */
+  
+  @media print {
+    .main-content--particles::before {
+      display: none;
+    }
+    
+    .main-content {
+      background: white !important;
+      padding: 0;
+    }
+    
+    .main-content-container > :global(.section-card) {
+      background: white !important;
+      box-shadow: none !important;
+      border: var(--border-1) solid #ccc !important;
+    }
+  }
+
+  /* === DEBUGGING EN DESARROLLO === */
+  
+  [data-debug="true"] .main-content {
+    outline: 2px dashed red;
+  }
+  
+  [data-debug="true"] .main-content-container {
+    outline: 2px dashed blue;
+  }
+  
+  [data-debug="true"] .main-content-container > :global(section) {
+    outline: 1px dashed green;
   }
 </style>

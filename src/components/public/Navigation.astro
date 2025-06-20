@@ -27,7 +27,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
         <!-- Language Picker para Desktop -->
         <li class="language-item">
-            <LanguagePicker variant="desktop" />
+            <LanguagePicker variant="desktop" includeThemeToggle={true} />
         </li>
     </ul>
     
@@ -40,72 +40,109 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     
     <!-- Language Picker para Mobile (solo visible en móvil) -->
     <div class="language-mobile">
-        <LanguagePicker variant="mobile" />
+        <LanguagePicker variant="mobile" includeThemeToggle={true} />
     </div>
 </nav>
 
 <style>
+    /* === NAV PRINCIPAL === */
     nav {
         max-width: 1200px;
         width: 100%;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family: var(--font-primary);               /* En lugar de hardcoded */
         position: relative;
         display: flex;
         align-items: center;
-        z-index: 2;
+        z-index: var(--z-20);                           /* En lugar de 2 */
+        
+        /* Optimización de rendering */
+        contain: layout style;
     }
     
-    /* Hamburger (oculto en desktop) */
+    /* === HAMBURGER BUTTON === */
     .hamburger {
         display: none;
         flex-direction: column;
         background: none;
         border: none;
         cursor: pointer;
-        padding: 10px;
+        padding: var(--space-3);                        /* 10px → var(--space-3) */
         position: absolute;
-        left: 1rem;
+        left: var(--space-4);                           /* 1rem → var(--space-4) */
         z-index: 103;
+        transition: var(--transition-fast);             /* Añadido para suavidad */
+    }
+
+    .hamburger:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+        border-radius: var(--radius-sm);
     }
     
     .hamburger span {
         width: 25px;
-        height: 3px;
-        background: white;
-        margin: 3px 0;
-        border-radius: 2px;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+        height: var(--space-1);                         /* 3px → var(--space-1) */
+        background: var(--text-primary);                /* white → dinámico */
+        margin: var(--space-1) 0;                       /* 3px → var(--space-1) */
+        border-radius: var(--radius-sm);                /* 2px → var(--radius-sm) */
+        filter: drop-shadow(0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.4));
+        transition: var(--transition-fast);
+    }
+
+    .hamburger:hover span {
+        background: var(--accent-primary);              /* Efecto hover */
     }
     
-    /* Logo móvil (oculto en desktop) */
+    /* === LOGO MÓVIL === */
     .logo-mobile {
-        display: none;
+        display: none;                                   /* Se controla por responsive */
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         z-index: 102;
+        /* ✅ CRÍTICO: Reservar espacio fijo para evitar layout shift */
+        width: 120px;                                    /* Más ancho */
+        height: 90px;                                    /* Más alto */
+        align-items: center;
+        justify-content: center;
+        /* ✅ CRÍTICO: Ocultar texto alt durante la carga */
+        overflow: hidden;
+        color: transparent;                              /* Oculta el alt text */
+        font-size: 0;                                    /* Oculta el alt text */
     }
     
     .logo-mobile img {
-        height: 80px;
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) 
-                drop-shadow(0 0 16px rgba(0, 0, 0, 0.3));
-        transition: all 0.3s ease;
+        height: 85px;                                    /* ✅ Altura restaurada */
+        width: auto;                                     /* ✅ Ancho automático para proporción */
+        max-width: 120px;                                /* Máximo ancho */
+        object-fit: contain;                             /* ✅ CRÍTICO: Mantiene proporción */
+        filter: drop-shadow(0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.4)) 
+                drop-shadow(0 0 var(--space-16) rgba(0, 0, 0, 0.3));
+        /* ✅ CRÍTICO: Prevenir layout shift */
+        display: block;
+        /* ✅ CRÍTICO: Ocultar hasta que carga completamente */
+        opacity: 0;
+        transition: opacity var(--duration-300) var(--ease-out), transform var(--duration-300) var(--ease-out);
+    }
+
+    /* ✅ CRÍTICO: Mostrar imagen móvil cuando carga */
+    .logo-mobile img[src]:not([src=""]) {
+        opacity: 1;
     }
     
     .logo-mobile img:hover {
         transform: scale(1.03);
     }
     
-    /* 🔥 NUEVO: Language Picker Mobile */
+    /* === LANGUAGE PICKER MOBILE === */
     .language-mobile {
         display: none;
         position: absolute;
-        right: 1rem;
+        right: var(--space-4);                          /* 1rem → var(--space-4) */
         z-index: 102;
     }
     
-    /* Nav Desktop */
+    /* === NAVEGACIÓN DESKTOP === */
     .nav-desktop {
         position: relative;
         display: flex;
@@ -113,22 +150,29 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         align-items: center;
         list-style: none;
         padding: 0;
-        margin: 0;
+        margin: 0;                                      /* ✅ CRÍTICO: Reset del margin global */
         width: 100%;
-        gap: 5rem;
+        gap: calc(var(--space-20));                     /* 5rem → equivalente con tokens */
+    }
+
+    /* ✅ CRÍTICO: Reset específico para li - elimina margin-bottom global */
+    .nav-desktop li {
+        margin: 0;                                      /* Elimina TODOS los márgenes */
+        padding: 0;                                     /* Elimina TODOS los paddings */
+        list-style: none;                               /* Asegura que no hay bullets */
     }
     
-    /* Estilo para items de navegación normales */
+    /* === ENLACES DE NAVEGACIÓN === */
     .nav-desktop li:not(.logo-item):not(.language-item) a {
         text-decoration: none;
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 10px 12px;
-        color: white;
-        letter-spacing: 0.3px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        font-size: var(--text-base);                    /* 1rem → var(--text-base) */
+        font-weight: var(--font-semibold);              /* 600 → var(--font-semibold) */
+        padding: var(--space-3) var(--space-3);         /* 10px 12px → tokens */
+        color: var(--text-primary);                     /* white → dinámico */
+        letter-spacing: var(--tracking-normal);         /* 0.3px → var(--tracking-normal) */
+        border-radius: var(--radius-lg);                /* 8px → var(--radius-lg) */
+        transition: var(--transition-base);              /* all 0.3s ease → token */
+        text-shadow: 0 var(--space-1) var(--space-1) rgba(0, 0, 0, 0.6);
         display: block;
         text-align: center;
         white-space: nowrap;
@@ -138,44 +182,80 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     }
     
     .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-1px);
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        background: var(--hover-overlay);               /* rgba(255, 255, 255, 0.08) → token */
+        transform: translateY(calc(-1 * var(--space-1))); /* -1px → token */
+        text-shadow: 0 var(--space-2) var(--space-4) rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-desktop li:not(.logo-item):not(.language-item) a:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
     }
     
-    /* Indicador de sección activa */
+    /* === INDICADOR DE SECCIÓN ACTIVA === */
     .nav-desktop li:not(.logo-item):not(.language-item) a.active {
-        background: rgba(244, 162, 97, 0.2);
-        color: #f4a261;
+        background: var(--accent-light);                /* rgba(244, 162, 97, 0.2) → token */
+        color: var(--accent-primary);                   /* #f4a261 → token */
     }
     
-    /* Estilo específico para el item del logo */
+    /* === LOGO ITEM === */
     .logo-item {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 0.5rem;
+        margin: 0 var(--space-2);                       /* 0 0.5rem → var(--space-2) */
+        /* ✅ CRÍTICO: Reservar espacio fijo para evitar layout shift */
+        min-width: 120px;                               /* Más ancho para logo más grande */
+        width: 120px;                                    /* Ancho fijo para reservar espacio */
     }
     
     .logo-item a {
         display: block;
         padding: 0;
         border-radius: 0;
-        transition: all 0.3s ease;
+        transition: var(--transition-base);
+        /* ✅ CRÍTICO: Dimensiones fijas para el contenedor del logo */
+        width: 120px;                                    /* Más ancho */
+        height: 90px;                                    /* Más alto para acomodar mejor */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* ✅ CRÍTICO: Ocultar texto alt durante la carga */
+        overflow: hidden;
+        color: transparent;                              /* Oculta el alt text */
+        font-size: 0;                                    /* Oculta el alt text */
+    }
+
+    .logo-item a:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-2);
+        border-radius: var(--radius-lg);
     }
     
     .logo-item img {
-        height: 80px;
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) 
-                drop-shadow(0 0 16px rgba(0, 0, 0, 0.3));
-        transition: all 0.3s ease;
+        height: 85px;                                    /* ✅ Altura restaurada y un poco más */
+        width: auto;                                     /* ✅ Ancho automático para mantener proporción */
+        max-width: 120px;                                /* Máximo ancho para contener */
+        object-fit: contain;                             /* ✅ CRÍTICO: Mantiene proporción */
+        filter: drop-shadow(0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.4)) 
+                drop-shadow(0 0 var(--space-16) rgba(0, 0, 0, 0.3));
+        /* ✅ CRÍTICO: Prevenir layout shift durante la carga */
+        display: block;
+        /* ✅ CRÍTICO: Ocultar hasta que carga completamente */
+        opacity: 0;
+        transition: opacity var(--duration-300) var(--ease-out), transform var(--duration-300) var(--ease-out);
+    }
+
+    /* ✅ CRÍTICO: Mostrar imagen cuando carga */
+    .logo-item img[src]:not([src=""]) {
+        opacity: 1;
     }
     
     .logo-item a:hover img {
         transform: scale(1.03);
     }
     
-    /* 🔥 NUEVO: Estilo para el item del language picker */
+    /* === LANGUAGE ITEM === */
     .language-item {
         position: absolute;
         right: 0;
@@ -186,36 +266,39 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         justify-content: center;
     }
     
-    /* Responsive para pantallas medias - usando sistema de breakpoints */
+    /* === RESPONSIVE USANDO BREAKPOINTS DEL SISTEMA === */
+    
+    /* Pantallas medias (hasta 1399px) */
     @media (max-width: 1399px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
-            font-size: 0.95rem;
-            padding: 8px 10px;
-            letter-spacing: 0.2px;
+            font-size: var(--text-sm);                  /* 0.95rem → var(--text-sm) */
+            padding: var(--space-2) var(--space-3);     /* 8px 10px → tokens */
+            letter-spacing: var(--tracking-tight);      /* 0.2px → var(--tracking-tight) */
         }
         
         .nav-desktop {
-            gap: 5rem;
+            gap: calc(var(--space-20));                 /* Mantiene 5rem */
         }
     }
     
+    /* Tablet (hasta 1023px) */
     @media (max-width: 1023px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
-            font-size: 0.9rem;
-            padding: 8px 8px;
-            letter-spacing: 0.1px;
+            font-size: var(--text-sm);                  /* 0.9rem → var(--text-sm) */
+            padding: var(--space-2) var(--space-2);     /* 8px 8px → tokens */
+            letter-spacing: var(--tracking-tight);      /* 0.1px → var(--tracking-tight) */
         }
         
         .nav-desktop {
-            gap: 2.5rem;
+            gap: calc(var(--space-10));                 /* 2.5rem → equivalente */
         }
         
         .logo-item {
-            margin: 0 0.3rem;
+            margin: 0 var(--space-1);                   /* 0 0.3rem → var(--space-1) */
         }
     }
     
-    /* Mobile breakpoint - sistema unificado */
+    /* === MOBILE BREAKPOINT === */
     @media (max-width: 767px) {
         .hamburger {
             display: flex;
@@ -226,27 +309,109 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
         
         .logo-mobile {
-            display: block;
+            display: flex;                               /* ✅ Ahora usa flex al mostrarse */
         }
         
-        /* 🔥 NUEVO: Mostrar language picker mobile */
         .language-mobile {
-            display: block;
+            display: flex;
+            justify-content: center;
         }
         
         nav {
-            padding: 0 1rem;
+            padding: 0 var(--space-4);                  /* 0 1rem → var(--space-4) */
         }
     }
     
+    /* Mobile pequeño */
     @media (max-width: 420px) {
-        .logo-mobile {
+        .logo-mobile img {
             height: 80px;
         }
         
-        /* Ajustar posición en pantallas muy pequeñas */
         .language-mobile {
-            right: 0.5rem;
+            right: var(--space-2);                      /* 0.5rem → var(--space-2) */
         }
+        
+        .hamburger {
+            left: var(--space-2);                       /* Ajuste para pantallas pequeñas */
+        }
+    }
+
+    /* === VARIANTES DE TEMA === */
+    
+    /* Tema claro */
+    [data-theme="light"] .hamburger span {
+        background: var(--text-primary);                /* Se adapta automáticamente */
+    }
+    
+    [data-theme="light"] .nav-desktop li:not(.logo-item):not(.language-item) a {
+        color: var(--text-primary);
+        text-shadow: 0 var(--space-1) var(--space-1) rgba(255, 255, 255, 0.8);
+    }
+    
+    [data-theme="light"] .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
+        background: var(--hover-overlay);               /* Se adapta al tema */
+        text-shadow: 0 var(--space-2) var(--space-4) rgba(255, 255, 255, 0.9);
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    /* Reducir movimiento si el usuario lo prefiere */
+    @media (prefers-reduced-motion: reduce) {
+        .hamburger,
+        .hamburger span,
+        .logo-mobile img,
+        .logo-item img,
+        .nav-desktop li a {
+            transition: none;
+        }
+        
+        .nav-desktop li:not(.logo-item):not(.language-item) a:hover,
+        .logo-item a:hover img,
+        .logo-mobile img:hover {
+            transform: none;
+        }
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .hamburger span {
+            background: var(--text-primary);
+            height: var(--space-1);
+        }
+        
+        .nav-desktop li:not(.logo-item):not(.language-item) a {
+            border: var(--border-1) solid transparent;
+        }
+        
+        .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
+            border-color: var(--accent-primary);
+            background: var(--accent-light);
+        }
+    }
+
+    /* === MEJORAS DE RENDIMIENTO === */
+    
+    .logo-item img,
+    .logo-mobile img {
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    
+    .nav-desktop li:not(.logo-item):not(.language-item) a {
+        will-change: background-color, transform;
+    }
+
+    /* === ESTADOS ADICIONALES === */
+    
+    /* Estado de carga */
+    nav.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    
+    /* Estado de navegación activa */
+    nav.nav-active .hamburger span {
+        background: var(--accent-primary);
     }
 </style>

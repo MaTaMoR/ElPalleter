@@ -8,55 +8,78 @@ export const prerender = true;
 </button>
 
 <style>
+    /* === BOTÓN PRINCIPAL === */
     .scroll-to-top {
         position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        width: 3.5rem;
-        height: 3.5rem;
-        background: linear-gradient(45deg, #d4853d, #f4a261);
+        bottom: var(--space-8);                         /* 2rem */
+        right: var(--space-8);                          /* 2rem */
+        width: calc(var(--space-8) + var(--space-6));   /* 3.5rem */
+        height: calc(var(--space-8) + var(--space-6));  /* 3.5rem */
+        
+        /* Gradiente usando variables de acento */
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
         border: none;
-        border-radius: 50%;
-        color: white;
+        border-radius: var(--radius-full);              /* 50% */
+        color: var(--text-primary);
         cursor: pointer;
-        z-index: 1000;
+        z-index: var(--z-toast);                        /* 1030 */
+        
+        /* Estados de visibilidad */
         opacity: 0;
         visibility: hidden;
-        transform: translateY(20px);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 20px rgba(212, 133, 61, 0.3);
+        transform: translateY(var(--space-5));          /* 20px */
+        transition: var(--transition-base);             /* all 0.3s ease-out */
+        
+        /* Sombra con color de acento */
+        box-shadow: var(--shadow-accent);               /* 0 4px 20px rgba(accent, 0.3) */
+        
+        /* Centrado del contenido */
         display: flex;
         align-items: center;
         justify-content: center;
+        
+        /* Optimización de rendering */
+        contain: layout style paint;
+        will-change: transform, opacity, box-shadow;
     }
 
+    /* === ESTADO VISIBLE === */
     .scroll-to-top.visible {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
     }
 
+    /* === ESTADOS INTERACTIVOS === */
     .scroll-to-top:hover {
-        background: linear-gradient(45deg, #c47533, #e8956b);
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(212, 133, 61, 0.4);
+        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
+        transform: translateY(calc(-1 * var(--space-1))); /* -3px */
+        box-shadow: var(--shadow-accent-lg);             /* Sombra más pronunciada */
     }
 
     .scroll-to-top:active {
-        transform: translateY(-1px);
+        transform: translateY(calc(-1 * var(--space-1) / 3)); /* -1px */
+        transition: var(--transition-fast);              /* Transición más rápida en active */
     }
 
+    .scroll-to-top:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+
+    /* === ICONO SVG === */
     .scroll-to-top svg {
-        width: 1.5rem;
-        height: 1.5rem;
-        transition: transform 0.3s ease;
+        width: var(--space-6);                          /* 1.5rem */
+        height: var(--space-6);                         /* 1.5rem */
+        transition: var(--transition-transform);        /* transform 0.3s ease-out */
+        flex-shrink: 0;
     }
 
     .scroll-to-top:hover svg {
-        transform: translateY(-2px);
+        transform: translateY(calc(-1 * var(--space-1))); /* -2px */
     }
 
-    /* Animación de pulso sutil */
+    /* === ANIMACIÓN DE PULSO === */
     .scroll-to-top::before {
         content: '';
         position: absolute;
@@ -64,11 +87,12 @@ export const prerender = true;
         left: 0;
         width: 100%;
         height: 100%;
-        border-radius: 50%;
-        background: linear-gradient(45deg, #d4853d, #f4a261);
+        border-radius: var(--radius-full);
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
         opacity: 0;
         transform: scale(1);
-        animation: pulse 2s ease-in-out infinite;
+        animation: pulse var(--duration-1000) var(--ease-in-out) infinite;
+        z-index: -1;
     }
 
     @keyframes pulse {
@@ -86,33 +110,180 @@ export const prerender = true;
         }
     }
 
-    /* Responsive */
+    /* === VARIANTES DE TEMA === */
+    
+    /* Tema claro */
+    [data-theme="light"] .scroll-to-top {
+        color: var(--bg-primary);                       /* Texto oscuro en fondo claro */
+        box-shadow: var(--shadow-md);                   /* Sombra más sutil */
+    }
+    
+    [data-theme="light"] .scroll-to-top:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Tema dorado */
+    [data-theme="gold"] .scroll-to-top {
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
+    }
+    
+    [data-theme="gold"] .scroll-to-top:hover {
+        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
+    }
+
+    /* Tema azul */
+    [data-theme="blue"] .scroll-to-top {
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
+    }
+    
+    [data-theme="blue"] .scroll-to-top:hover {
+        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
+    }
+
+    /* Tema restaurante */
+    [data-theme="restaurant"] .scroll-to-top {
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
+        color: var(--text-primary);                     /* Asegurar contraste en tema cálido */
+    }
+    
+    [data-theme="restaurant"] .scroll-to-top:hover {
+        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
+    }
+
+    /* === RESPONSIVE === */
+    
+    /* Tablet */
     @media (max-width: 768px) {
         .scroll-to-top {
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 3rem;
-            height: 3rem;
+            bottom: var(--space-6);                     /* 1.5rem */
+            right: var(--space-6);                      /* 1.5rem */
+            width: var(--space-12);                     /* 3rem */
+            height: var(--space-12);                    /* 3rem */
         }
         
         .scroll-to-top svg {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: var(--space-5);                      /* 1.25rem */
+            height: var(--space-5);                     /* 1.25rem */
         }
     }
 
+    /* Mobile */
     @media (max-width: 420px) {
         .scroll-to-top {
-            bottom: 1rem;
-            right: 1rem;
-            width: 2.5rem;
-            height: 2.5rem;
+            bottom: var(--space-4);                     /* 1rem */
+            right: var(--space-4);                      /* 1rem */
+            width: var(--space-10);                     /* 2.5rem */
+            height: var(--space-10);                    /* 2.5rem */
         }
         
         .scroll-to-top svg {
-            width: 1rem;
-            height: 1rem;
+            width: var(--space-4);                      /* 1rem */
+            height: var(--space-4);                     /* 1rem */
         }
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    /* Reducir movimiento si el usuario lo prefiere */
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-to-top,
+        .scroll-to-top svg,
+        .scroll-to-top::before {
+            transition: none;
+            animation: none;
+        }
+        
+        .scroll-to-top:hover {
+            transform: none;
+        }
+        
+        .scroll-to-top:hover svg {
+            transform: none;
+        }
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .scroll-to-top {
+            background: var(--accent-primary) !important;
+            border: var(--border-2) solid var(--text-primary);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .scroll-to-top:hover {
+            background: var(--accent-hover) !important;
+            border-color: var(--accent-primary);
+        }
+    }
+
+    /* === MEJORAS DE RENDIMIENTO === */
+    
+    /* Optimización de GPU para animaciones suaves */
+    .scroll-to-top {
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    /* === VARIANTES ADICIONALES === */
+    
+    /* Variante compacta */
+    .scroll-to-top.compact {
+        width: var(--space-10);                         /* 2.5rem */
+        height: var(--space-10);                        /* 2.5rem */
+        bottom: var(--space-4);                         /* 1rem */
+        right: var(--space-4);                          /* 1rem */
+    }
+    
+    .scroll-to-top.compact svg {
+        width: var(--space-4);                          /* 1rem */
+        height: var(--space-4);                         /* 1rem */
+    }
+
+    /* Variante con texto */
+    .scroll-to-top.with-text {
+        width: auto;
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-full);
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        white-space: nowrap;
+    }
+
+    /* === SOPORTE PARA DISPOSITIVOS CON NOTCH === */
+    
+    .scroll-to-top {
+        bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+        right: calc(var(--space-8) + env(safe-area-inset-right));
+    }
+    
+    @media (max-width: 768px) {
+        .scroll-to-top {
+            bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+            right: calc(var(--space-6) + env(safe-area-inset-right));
+        }
+    }
+    
+    @media (max-width: 420px) {
+        .scroll-to-top {
+            bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+            right: calc(var(--space-4) + env(safe-area-inset-right));
+        }
+    }
+
+    /* === ESTADO DE CARGA/DISABLED === */
+    
+    .scroll-to-top:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        animation: none;
+    }
+    
+    .scroll-to-top:disabled:hover {
+        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
+        transform: none;
+        box-shadow: var(--shadow-accent);
     }
 </style>
 
@@ -127,7 +298,7 @@ export const prerender = true;
             const scrolled = window.pageYOffset;
             const windowHeight = window.innerHeight;
             
-            // Mostrar después de hacer scroll más de una pantalla
+            // Mostrar después de hacer scroll más de media pantalla
             if (scrolled > windowHeight * 0.5) {
                 scrollToTopBtn.classList.add('visible');
             } else {
@@ -143,10 +314,6 @@ export const prerender = true;
             });
         };
 
-        // Event listeners
-        window.addEventListener('scroll', toggleVisibility);
-        scrollToTopBtn.addEventListener('click', scrollToTop);
-
         // Throttle del scroll para mejor performance
         let ticking = false;
         const throttledToggleVisibility = () => {
@@ -159,7 +326,19 @@ export const prerender = true;
             }
         };
 
-        window.removeEventListener('scroll', toggleVisibility);
-        window.addEventListener('scroll', throttledToggleVisibility);
+        // Event listeners
+        window.addEventListener('scroll', throttledToggleVisibility, { passive: true });
+        scrollToTopBtn.addEventListener('click', scrollToTop);
+
+        // Manejar teclas de accesibilidad
+        scrollToTopBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                scrollToTop();
+            }
+        });
+
+        // Verificación inicial
+        toggleVisibility();
     });
 </script>

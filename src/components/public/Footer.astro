@@ -22,17 +22,17 @@ export const prerender = true;
     
     .footer {
         width: 100%;
-        background: rgb(15, 15, 15);
-        border-top: 1px solid rgba(244, 162, 97, 0.2);
+        background: var(--dark-800);                    /* rgb(15, 15, 15) */
+        border-top: var(--border-1) solid var(--glass-border); /* rgba(244, 162, 97, 0.2) */
         position: relative;
-        z-index: 1;
+        z-index: var(--z-10);
         
         /* SOLO centra horizontalmente */
         display: flex;
         justify-content: center;
         align-items: center;
         
-        /* Padding vertical mínimo */
+        /* Padding vertical usando tokens */
         padding: calc(var(--padding-mobile) * 1.5) 0;
     }
 
@@ -44,9 +44,9 @@ export const prerender = true;
         max-width: 1200px;
         width: 100%;
         position: relative;
-        z-index: 2;
+        z-index: var(--z-20);
         
-        /* Padding responsivo */
+        /* Padding responsivo usando tokens */
         padding: 0 var(--padding-mobile);
     }
 
@@ -78,30 +78,40 @@ export const prerender = true;
     /* Copyright a la izquierda */
     .footer-copyright {
         margin: 0;
-        font-size: 0.9rem;
-        color: #999;
+        font-size: var(--text-sm);                      /* 0.9rem */
+        color: var(--text-tertiary);                    /* #999 equivalent */
         flex: 1;
+        font-family: var(--font-primary);
+        line-height: var(--leading-normal);
     }
 
     /* Crédito del desarrollador a la derecha */
     .footer-credit {
         margin: 0;
-        font-size: 0.9rem;
-        color: #999;
+        font-size: var(--text-sm);                      /* 0.9rem */
+        color: var(--text-tertiary);                    /* #999 equivalent */
         text-align: right;
         flex: 1;
+        font-family: var(--font-primary);
+        line-height: var(--leading-normal);
     }
 
     .developer-link {
-        color: #f4a261;
-        font-weight: 500;
+        color: var(--accent-primary);                   /* #f4a261 */
+        font-weight: var(--font-medium);                /* 500 */
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: var(--transition-colors);           /* Transición optimizada */
     }
 
     .developer-link:hover {
-        color: #fff;
+        color: var(--text-primary);                     /* #fff */
         text-decoration: underline;
+    }
+
+    .developer-link:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+        border-radius: var(--radius-sm);
     }
 
     /* === RESPONSIVE === */
@@ -145,7 +155,7 @@ export const prerender = true;
 
         .footer-copyright,
         .footer-credit {
-            font-size: 1rem;
+            font-size: var(--text-base);               /* 1rem */
         }
     }
 
@@ -168,7 +178,69 @@ export const prerender = true;
 
         .footer-copyright,
         .footer-credit {
-            font-size: 0.85rem;
+            font-size: var(--text-xs);                 /* 0.85rem equivalent */
         }
+    }
+
+    /* === VARIANTES DE TEMA === */
+    
+    /* Tema claro */
+    [data-theme="light"] .footer {
+        background: var(--gray-100);                    /* Fondo claro para tema light */
+        border-top-color: var(--border-primary);
+    }
+
+    [data-theme="light"] .footer-copyright,
+    [data-theme="light"] .footer-credit {
+        color: var(--text-secondary);                   /* Texto más oscuro en tema claro */
+    }
+
+    [data-theme="light"] .developer-link:hover {
+        color: var(--text-primary);                     /* Texto principal en hover */
+    }
+
+    /* === ACCESIBILIDAD === */
+    
+    /* Preferencias de movimiento reducido */
+    @media (prefers-reduced-motion: reduce) {
+        .developer-link {
+            transition: none;
+        }
+    }
+    
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .footer {
+            border-top-width: var(--border-2);
+        }
+        
+        .footer-copyright,
+        .footer-credit {
+            color: var(--text-primary);
+        }
+        
+        .developer-link {
+            text-decoration: underline;
+        }
+    }
+
+    /* === MEJORAS DE RENDIMIENTO === */
+    
+    .footer {
+        contain: layout style paint;
+    }
+
+    /* === VARIANTES TEMÁTICAS ADICIONALES === */
+    
+    [data-theme="gold"] .developer-link {
+        color: var(--accent-primary);                   /* Dorado en tema gold */
+    }
+    
+    [data-theme="blue"] .developer-link {
+        color: var(--accent-primary);                   /* Azul en tema blue */
+    }
+    
+    [data-theme="restaurant"] .developer-link {
+        color: var(--accent-primary);                   /* Marrón en tema restaurant */
     }
 </style>
