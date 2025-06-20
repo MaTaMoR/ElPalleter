@@ -1,5 +1,5 @@
 ---
-// Navigation.astro - Actualizado con cambio dinámico de logo
+// Navigation.astro - Migrado al Design System
 export const prerender = true;
 
 import lightLogo from '../../assets/mini-logo-light.svg'; // Logo para tema oscuro
@@ -26,14 +26,14 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
                 <img 
                     src={lightLogo.src} 
                     alt="El Palleter Logo"
-                    class="logo-dark"
+                    class="logo-dark logo-transition"
                     data-logo="dark"
                 />
                 <!-- Logo para tema claro -->
                 <img 
                     src={darkLogo.src} 
                     alt="El Palleter Logo"
-                    class="logo-light"
+                    class="logo-light logo-transition"
                     data-logo="light"
                 />
             </a>
@@ -53,14 +53,14 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
             <img 
                 src={lightLogo.src} 
                 alt="El Palleter Logo"
-                class="logo-dark"
+                class="logo-dark logo-transition"
                 data-logo="dark"
             />
             <!-- Logo para tema claro -->
             <img 
                 src={darkLogo.src} 
                 alt="El Palleter Logo"
-                class="logo-light"
+                class="logo-light logo-transition"
                 data-logo="light"
             />
         </a>
@@ -73,7 +73,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
 </nav>
 
 <style>
-    /* === NAV PRINCIPAL === */
+    /* === NAV PRINCIPAL - USANDO DESIGN SYSTEM === */
     nav {
         max-width: 1200px;
         width: 100%;
@@ -85,7 +85,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         contain: layout style;
     }
     
-    /* === HAMBURGER BUTTON === */
+    /* === HAMBURGER BUTTON - USANDO TOKENS === */
     .hamburger {
         display: none;
         flex-direction: column;
@@ -111,7 +111,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         background: var(--text-primary);
         margin: var(--space-1) 0;
         border-radius: var(--radius-sm);
-        filter: drop-shadow(0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.4));
+        filter: drop-shadow(0 var(--space-1) var(--space-2) var(--text-shadow-color));
         transition: var(--transition-fast);
     }
 
@@ -119,7 +119,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         background: var(--accent-primary);
     }
     
-    /* === LOGO MÓVIL === */
+    /* === LOGO MÓVIL - USANDO TOKENS === */
     .logo-mobile {
         display: none;
         position: absolute;
@@ -135,7 +135,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         font-size: 0;
     }
     
-    /* === NAVEGACIÓN DESKTOP === */
+    /* === NAVEGACIÓN DESKTOP - MIGRADA === */
     .nav-desktop {
         position: relative;
         display: flex;
@@ -145,7 +145,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         padding: 0;
         margin: 0;
         width: 100%;
-        gap: calc(var(--space-20));
+        gap: var(--space-20);
     }
 
     .nav-desktop li {
@@ -154,12 +154,12 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         list-style: none;
     }
     
-    /* === ENLACES DE NAVEGACIÓN === */
+    /* === ENLACES DE NAVEGACIÓN - USANDO SYSTEM === */
     .nav-desktop li:not(.logo-item):not(.language-item) a {
         text-decoration: none;
         font-size: var(--text-base);
         font-weight: var(--font-semibold);
-        padding: var(--space-3) var(--space-3);
+        padding: var(--space-3);
         color: var(--text-primary);
         letter-spacing: var(--tracking-normal);
         border-radius: var(--radius-lg);
@@ -171,14 +171,14 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         cursor: pointer;
         text-transform: uppercase;
         
-        /* Text shadow adaptativo */
-        text-shadow: 0 var(--space-1) var(--space-1) var(--text-shadow-color, rgba(0, 0, 0, 0.6));
+        /* Text shadow adaptativo del sistema */
+        text-shadow: 0 var(--space-1) var(--space-1) var(--text-shadow-color);
     }
     
     .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
         background: var(--hover-overlay);
         transform: translateY(calc(-1 * var(--space-1)));
-        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-hover-color, rgba(0, 0, 0, 0.7));
+        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-hover-color);
     }
 
     .nav-desktop li:not(.logo-item):not(.language-item) a:focus-visible {
@@ -192,7 +192,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         color: var(--accent-primary);
     }
     
-    /* === LOGO ITEM === */
+    /* === LOGO ITEM - SIMPLIFICADO === */
     .logo-item {
         display: flex;
         align-items: center;
@@ -223,7 +223,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         border-radius: var(--radius-lg);
     }
     
-    /* === LOGOS - SISTEMA DE CAMBIO DINÁMICO === */
+    /* === LOGOS - SISTEMA DE CAMBIO DINÁMICO DEL DESIGN SYSTEM === */
     .logo-item img,
     .logo-mobile img {
         height: 85px;
@@ -236,7 +236,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         left: 50%;
         transform: translate(-50%, -50%);
         opacity: 0;
-        transition: opacity var(--duration-300) var(--ease-out), transform var(--duration-300) var(--ease-out);
+        /* Usando la clase del sistema */
     }
 
     /* Por defecto mostrar logo oscuro (tema dark) */
@@ -259,7 +259,7 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         opacity: 1;
     }
 
-    /* Hover effect */
+    /* Hover effect usando tokens */
     .logo-item a:hover img,
     .logo-mobile a:hover img {
         transform: translate(-50%, -50%) scale(1.03);
@@ -275,20 +275,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         align-items: center;
         justify-content: center;
     }
-
-    /* === VARIABLES DE TEMA PARA TEXT SHADOW === */
-    :root {
-        --text-shadow-color: rgba(0, 0, 0, 0.6);
-        --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
-    }
-
-    :root[data-theme="light"],
-    html[data-theme="light"] {
-        --text-shadow-color: rgba(255, 255, 255, 0.8);
-        --text-shadow-hover-color: rgba(255, 255, 255, 0.9);
-    }
     
-    /* === RESPONSIVE === */
+    /* === RESPONSIVE USANDO BREAKPOINTS DEL SISTEMA === */
     @media (max-width: 1399px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
             font-size: var(--text-sm);
@@ -297,19 +285,19 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
         
         .nav-desktop {
-            gap: calc(var(--space-20));
+            gap: var(--space-20);
         }
     }
     
     @media (max-width: 1023px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
             font-size: var(--text-sm);
-            padding: var(--space-2) var(--space-2);
+            padding: var(--space-2);
             letter-spacing: var(--tracking-tight);
         }
         
         .nav-desktop {
-            gap: calc(var(--space-10));
+            gap: var(--space-10);
         }
         
         .logo-item {
@@ -360,7 +348,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         .hamburger span,
         .logo-mobile img,
         .logo-item img,
-        .nav-desktop li a {
+        .nav-desktop li a,
+        .logo-transition {
             transition: none;
         }
         

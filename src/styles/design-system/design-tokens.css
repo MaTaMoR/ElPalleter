@@ -124,9 +124,9 @@
   
   /* Anchos de borde */
   --border-0: 0;
-  --border-1: 1px;
-  --border-2: 2px;
-  --border-4: 4px;
+  --border-1: 2px;
+  --border-2: 3px;
+  --border-4: 5px;
 }
 
 /* === TRANSICIONES === */

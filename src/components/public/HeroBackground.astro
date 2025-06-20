@@ -10,7 +10,7 @@ interface Props {
     overlayColor?: string;
     overlayOpacity?: number;
     fallbackImage?: string;
-    adaptiveOverlay?: boolean; // Nueva prop para habilitar overlay adaptativo
+    adaptiveOverlay?: boolean;
 }
 
 const {
@@ -19,10 +19,10 @@ const {
     className = '',
     overlayColor = 'rgba(0, 0, 0, 0.25)',
     overlayOpacity = 1,
-    adaptiveOverlay = true // Por defecto habilitado
+    adaptiveOverlay = true
 } = Astro.props;
 
-// Clases dinámicas
+// Clases dinámicas usando design system
 const heroClasses = [
     'hero-background',
     adaptiveOverlay && 'adaptive-overlay',
@@ -46,9 +46,9 @@ const heroClasses = [
         fallbackIcon="picture"
     />
     
-    <!-- Overlay adaptativo por tema -->
+    <!-- Overlay optimizado para elementos blancos -->
     {adaptiveOverlay && (
-        <div class="hero-overlay-adaptive"></div>
+        <div class="hero-overlay-white-optimized"></div>
     )}
     
     <!-- Slot para contenido del hero -->
@@ -68,12 +68,13 @@ const heroClasses = [
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        color: var(--text-primary);
+        color: #ffffff; /* Siempre blanco para elementos del hero */
         
-        /* Optimizaciones de performance usando tokens */
+        /* Optimizaciones de performance */
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
-        contain: layout style;
+        contain: layout style paint;
+        will-change: transform;
     }
 
     /* === IMAGEN DE FONDO === */
@@ -87,15 +88,15 @@ const heroClasses = [
         object-fit: cover;
         object-position: center;
         
-        /* Optimización de GPU usando tokens */
+        /* Optimización de GPU */
         will-change: transform;
         transform: translate3d(0, 0, 0);
         
-        /* Transición suave para filtros si se necesitan */
+        /* Transición suave para filtros */
         transition: filter var(--duration-300) var(--ease-out);
     }
 
-    /* === OVERLAY ORIGINAL === */
+    /* === OVERLAY BASE === */
     .hero-overlay {
         position: absolute;
         top: 0;
@@ -105,10 +106,11 @@ const heroClasses = [
         z-index: 1;
         pointer-events: none;
         background: var(--bg-overlay);
+        transition: background var(--duration-300) var(--ease-out);
     }
 
-    /* === OVERLAY ADAPTATIVO POR TEMA === */
-    .hero-overlay-adaptive {
+    /* === OVERLAY OPTIMIZADO PARA ELEMENTOS BLANCOS === */
+    .hero-overlay-white-optimized {
         position: absolute;
         top: 0;
         left: 0;
@@ -119,25 +121,59 @@ const heroClasses = [
         transition: background var(--duration-300) var(--ease-out),
                     opacity var(--duration-300) var(--ease-out);
         
-        /* Por defecto (tema oscuro) - overlay muy sutil */
-        background: rgba(0, 0, 0, 0.1);
+        /* Overlay muy sutil por defecto - elementos blancos necesitan poco contraste en imágenes oscuras */
+        background: rgba(0, 0, 0, 0.05);
         opacity: 1;
     }
 
-    /* Overlay para tema claro - sutil pero efectivo */
-    :root[data-theme="light"] .hero-overlay-adaptive,
-    html[data-theme="light"] .hero-overlay-adaptive {
+    /* Overlay adaptativo para tema claro - más fuerte para mantener contraste con elementos blancos */
+    :root[data-theme="light"] .hero-overlay-white-optimized,
+    html[data-theme="light"] .hero-overlay-white-optimized {
+        /* Gradiente más fuerte en tema claro para que el blanco destaque */
         background: linear-gradient(
-            rgba(255, 255, 255, 0.35) 0%,
-            rgba(248, 249, 250, 0.4) 25%,
-            rgba(241, 243, 244, 0.45) 50%,
-            rgba(255, 255, 255, 0.5) 100%
+            rgba(0, 0, 0, 0.4) 0%,
+            rgba(0, 0, 0, 0.45) 25%,
+            rgba(0, 0, 0, 0.5) 50%,
+            rgba(0, 0, 0, 0.55) 100%
         );
     }
 
-    /* === VARIANTE: Sin overlay base cuando se usa adaptativo === */
+    /* === OPTIMIZACIÓN PARA TEMA DORADO === */
+    :root[data-theme="gold"] .hero-overlay-white-optimized,
+    html[data-theme="gold"] .hero-overlay-white-optimized {
+        /* Overlay más cálido para complementar el tema dorado */
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(20, 10, 0, 0.35) 50%,
+            rgba(0, 0, 0, 0.4) 100%
+        );
+    }
+
+    /* === OPTIMIZACIÓN PARA TEMA AZUL === */
+    :root[data-theme="blue"] .hero-overlay-white-optimized,
+    html[data-theme="blue"] .hero-overlay-white-optimized {
+        /* Overlay más frío para complementar el tema azul */
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 10, 20, 0.35) 50%,
+            rgba(0, 0, 0, 0.4) 100%
+        );
+    }
+
+    /* === OPTIMIZACIÓN PARA TEMA RESTAURANTE === */
+    :root[data-theme="restaurant"] .hero-overlay-white-optimized,
+    html[data-theme="restaurant"] .hero-overlay-white-optimized {
+        /* Overlay más cálido y terroso */
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(20, 15, 10, 0.35) 50%,
+            rgba(0, 0, 0, 0.4) 100%
+        );
+    }
+
+    /* === REDUCIR OVERLAY BASE CUANDO SE USA OVERLAY OPTIMIZADO === */
     .hero-background.adaptive-overlay .hero-overlay {
-        opacity: 0.3; /* Reducir overlay base cuando se usa adaptativo */
+        opacity: 0.2; /* Muy sutil ya que el overlay optimizado hace el trabajo principal */
     }
 
     /* === FALLBACK PERSONALIZADO PARA HERO === */
@@ -165,7 +201,7 @@ const heroClasses = [
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-title) {
-        color: var(--text-primary);
+        color: #ffffff; /* Siempre blanco para consistencia */
     }
 
     /* === CONTENIDO === */
@@ -182,90 +218,88 @@ const heroClasses = [
 
     /* === VARIANTES ADICIONALES DEL OVERLAY === */
     
-    /* Overlay adaptativo suave (menos contraste) */
-    .hero-background.adaptive-soft .hero-overlay-adaptive {
-        background: rgba(0, 0, 0, 0.05);
+    /* Overlay suave (menos contraste) */
+    .hero-background.adaptive-soft .hero-overlay-white-optimized {
+        background: rgba(0, 0, 0, 0.02);
     }
     
-    :root[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-adaptive,
-    html[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-adaptive {
+    :root[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-white-optimized,
+    html[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-white-optimized {
         background: linear-gradient(
-            rgba(255, 255, 255, 0.25) 0%,
-            rgba(248, 249, 250, 0.3) 50%,
-            rgba(255, 255, 255, 0.35) 100%
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.35) 50%,
+            rgba(0, 0, 0, 0.4) 100%
         );
     }
 
-    /* Overlay adaptativo fuerte (más contraste) */
-    .hero-background.adaptive-strong .hero-overlay-adaptive {
-        background: rgba(0, 0, 0, 0.2);
+    /* Overlay fuerte (más contraste) */
+    .hero-background.adaptive-strong .hero-overlay-white-optimized {
+        background: rgba(0, 0, 0, 0.15);
     }
     
-    :root[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-adaptive,
-    html[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-adaptive {
+    :root[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-white-optimized,
+    html[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-white-optimized {
         background: linear-gradient(
-            rgba(255, 255, 255, 0.6) 0%,
-            rgba(248, 249, 250, 0.65) 25%,
-            rgba(241, 243, 244, 0.7) 75%,
-            rgba(255, 255, 255, 0.75) 100%
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0.65) 25%,
+            rgba(0, 0, 0, 0.7) 75%,
+            rgba(0, 0, 0, 0.75) 100%
         );
     }
 
-    /* === VARIANTES ESPECIALES === */
+    /* === OVERLAY CON EFECTO CRISTAL === */
+    .hero-background.glass-adaptive .hero-overlay-white-optimized {
+        backdrop-filter: var(--backdrop-blur-subtle);
+        background: rgba(0, 0, 0, 0.1);
+    }
     
-    /* Overlay con efecto cristal */
-    .hero-background.glass-adaptive .hero-overlay-adaptive {
+    :root[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-white-optimized,
+    html[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-white-optimized {
+        background: rgba(0, 0, 0, 0.4);
         backdrop-filter: var(--backdrop-blur);
-        background: var(--glass-bg);
-    }
-    
-    :root[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-adaptive,
-    html[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-adaptive {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(20px) saturate(180%);
     }
 
-    /* Gradiente vertical adaptativo */
-    .hero-background.gradient-adaptive .hero-overlay-adaptive {
+    /* === GRADIENTE VERTICAL OPTIMIZADO === */
+    .hero-background.gradient-adaptive .hero-overlay-white-optimized {
         background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(0, 0, 0, 0.1) 30%,
-            rgba(0, 0, 0, 0.3) 70%,
-            rgba(0, 0, 0, 0.5) 100%
+            rgba(0, 0, 0, 0.05) 30%,
+            rgba(0, 0, 0, 0.15) 70%,
+            rgba(0, 0, 0, 0.25) 100%
         );
     }
     
-    :root[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-adaptive,
-    html[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-adaptive {
+    :root[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-white-optimized,
+    html[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-white-optimized {
         background: linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.6) 0%,
-            rgba(255, 255, 255, 0.7) 30%,
-            rgba(248, 249, 250, 0.8) 70%,
-            rgba(255, 255, 255, 0.9) 100%
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.4) 30%,
+            rgba(0, 0, 0, 0.55) 70%,
+            rgba(0, 0, 0, 0.7) 100%
         );
     }
 
     /* === RESPONSIVE === */
     
-    /* Mobile optimizations */
+    /* Mobile optimizations - usando tokens */
     @media (max-width: 768px) {
         .hero-background {
-            height: 100svh;
+            height: 100svh; /* Safe viewport height */
         }
         
-        /* Overlay más fuerte en móvil para mejor legibilidad */
-        .hero-overlay-adaptive {
-            background: rgba(0, 0, 0, 0.15);
+        /* Overlay ligeramente más fuerte en móvil para mejor legibilidad */
+        .hero-overlay-white-optimized {
+            background: rgba(0, 0, 0, 0.08);
         }
         
-        :root[data-theme="light"] .hero-overlay-adaptive,
-        html[data-theme="light"] .hero-overlay-adaptive {
+        :root[data-theme="light"] .hero-overlay-white-optimized,
+        html[data-theme="light"] .hero-overlay-white-optimized {
             background: linear-gradient(
-                rgba(255, 255, 255, 0.45) 0%,
-                rgba(248, 249, 250, 0.5) 50%,
-                rgba(255, 255, 255, 0.55) 100%
+                rgba(0, 0, 0, 0.45) 0%,
+                rgba(0, 0, 0, 0.5) 50%,
+                rgba(0, 0, 0, 0.55) 100%
             );
         }
         
@@ -289,18 +323,15 @@ const heroClasses = [
     }
 
     /* === TEMAS ESPECÍFICOS PARA FALLBACK === */
-    
     [data-theme="light"] .hero-background :global(.responsive-image-fallback) {
         background: linear-gradient(135deg, 
-            var(--gray-100) 0%, 
-            var(--gray-300) 100%
+            var(--dark-600) 0%, 
+            var(--dark-400) 100%
         );
-        color: var(--text-primary);
+        color: #ffffff; /* Mantener blanco incluso en tema claro */
     }
 
     /* === ANIMACIONES === */
-    
-    /* Fade in del hero */
     .hero-background.animate-in {
         animation: heroFadeIn var(--duration-1000) var(--ease-out);
     }
@@ -316,21 +347,28 @@ const heroClasses = [
 
     /* === ACCESIBILIDAD === */
     
-    /* Alto contraste */
+    /* Alto contraste - overlay más fuerte para mejorar legibilidad */
     @media (prefers-contrast: high) {
-        .hero-overlay-adaptive {
+        .hero-overlay-white-optimized {
             background: rgba(0, 0, 0, 0.7) !important;
         }
         
-        :root[data-theme="light"] .hero-overlay-adaptive,
-        html[data-theme="light"] .hero-overlay-adaptive {
-            background: rgba(255, 255, 255, 0.9) !important;
+        /* En alto contraste, todos los temas usan overlay oscuro fuerte */
+        :root[data-theme="light"] .hero-overlay-white-optimized,
+        html[data-theme="light"] .hero-overlay-white-optimized,
+        :root[data-theme="gold"] .hero-overlay-white-optimized,
+        html[data-theme="gold"] .hero-overlay-white-optimized,
+        :root[data-theme="blue"] .hero-overlay-white-optimized,
+        html[data-theme="blue"] .hero-overlay-white-optimized,
+        :root[data-theme="restaurant"] .hero-overlay-white-optimized,
+        html[data-theme="restaurant"] .hero-overlay-white-optimized {
+            background: rgba(0, 0, 0, 0.8) !important;
         }
     }
 
     /* Movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
-        .hero-overlay-adaptive {
+        .hero-overlay-white-optimized {
             transition: none;
         }
         
@@ -340,7 +378,6 @@ const heroClasses = [
     }
 
     /* === OPTIMIZACIONES DE PERFORMANCE === */
-    
     .hero-background {
         contain: layout style paint;
     }
@@ -349,16 +386,38 @@ const heroClasses = [
         isolation: isolate;
     }
 
+    .hero-overlay-white-optimized {
+        will-change: background, opacity;
+        backface-visibility: hidden;
+    }
+
     /* === UTILIDADES DE DEBUG === */
-    
-    /* Para desarrollo - mostrar límites de overlays */
     .hero-background.debug-overlays .hero-overlay {
         border: 2px solid red;
         opacity: 0.5;
     }
     
-    .hero-background.debug-overlays .hero-overlay-adaptive {
+    .hero-background.debug-overlays .hero-overlay-white-optimized {
         border: 2px solid blue;
         opacity: 0.5;
+    }
+
+    /* === ESTADOS ADICIONALES === */
+    .hero-background.loading {
+        pointer-events: none;
+    }
+
+    .hero-background.loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

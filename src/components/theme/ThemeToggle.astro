@@ -27,7 +27,7 @@ const sizeClass = `size-${size}`;
 </div>
 
 <style>
-    /* === TOGGLE PRINCIPAL === */
+    /* === TOGGLE PRINCIPAL - OPTIMIZADO === */
     .day-night-toggle {
         position: relative;
         width: 125px;
@@ -35,10 +35,32 @@ const sizeClass = `size-${size}`;
         border-radius: 35px;
         cursor: pointer;
         overflow: hidden;
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.8s var(--ease-out);
+        box-shadow: var(--shadow-lg),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        contain: layout style paint;
+        will-change: transform;
+    }
+
+    .day-night-toggle:hover {
+        transform: scale(1.05);
+        transition: transform var(--duration-200) var(--ease-out);
+    }
+
+    .day-night-toggle:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+
+    /* === VARIANTES DE TAMAÑO === */
+    .day-night-toggle.size-small {
+        width: 125px;
+        height: 50px;
+    }
+
+    .day-night-toggle.size-large {
+        width: 150px;
+        height: 60px;
     }
 
     /* === FONDO DEL CIELO === */
@@ -48,8 +70,9 @@ const sizeClass = `size-${size}`;
         left: 0;
         width: 100%;
         height: 100%;
-        transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 1.2s var(--ease-out);
     }
+    
     .sky-day {
         background: linear-gradient(
             180deg,
@@ -60,6 +83,7 @@ const sizeClass = `size-${size}`;
         );
         opacity: 0;
     }
+    
     .sky-night {
         background: linear-gradient(
             180deg,
@@ -70,9 +94,11 @@ const sizeClass = `size-${size}`;
         );
         opacity: 1;
     }
+    
     .day-night-toggle.day .sky-day {
         opacity: 1;
     }
+    
     .day-night-toggle.day .sky-night {
         opacity: 0;
     }
@@ -85,24 +111,28 @@ const sizeClass = `size-${size}`;
         width: 100%;
         height: 100%;
         opacity: 0;
-        transition: all 1s ease;
+        transition: all var(--duration-1000) var(--ease-out);
     }
+    
     .day-night-toggle.day .clouds {
         opacity: 1;
     }
+    
     .cloud {
         position: absolute;
         background: rgba(255, 255, 255, 0.8);
         border-radius: 20px;
-        animation: cloudFloat 8s ease-in-out infinite;
+        animation: cloudFloat 8s var(--ease-in-out) infinite;
     }
+    
     .cloud::before,
     .cloud::after {
         content: "";
         position: absolute;
         background: rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
+    
     .cloud1 {
         width: 20px;
         height: 8px;
@@ -110,18 +140,21 @@ const sizeClass = `size-${size}`;
         right: 15px;
         animation-delay: 0s;
     }
+    
     .cloud1::before {
         width: 12px;
         height: 12px;
         top: -6px;
         left: 2px;
     }
+    
     .cloud1::after {
         width: 8px;
         height: 8px;
         top: -4px;
         right: 2px;
     }
+    
     .cloud2 {
         width: 16px;
         height: 6px;
@@ -129,21 +162,23 @@ const sizeClass = `size-${size}`;
         right: 45px;
         animation-delay: 2s;
     }
+    
     .cloud2::before {
         width: 10px;
         height: 10px;
         top: -4px;
         left: 1px;
     }
+    
     .cloud2::after {
         width: 6px;
         height: 6px;
         top: -3px;
         right: 1px;
     }
+
     @keyframes cloudFloat {
-        0%,
-        100% {
+        0%, 100% {
             transform: translateX(0) translateY(0);
         }
         33% {
@@ -162,52 +197,60 @@ const sizeClass = `size-${size}`;
         width: 100%;
         height: 100%;
         opacity: 1;
-        transition: all 1s ease;
+        transition: all var(--duration-1000) var(--ease-out);
     }
+    
     .day-night-toggle.day .stars {
         opacity: 0;
     }
+    
     .star {
         position: absolute;
         width: 2px;
         height: 2px;
         background: white;
-        border-radius: 50%;
-        animation: twinkle 2s ease-in-out infinite;
+        border-radius: var(--radius-full);
+        animation: twinkle 2s var(--ease-in-out) infinite;
     }
+    
     .star1 {
         top: 15px;
         left: 20px;
         animation-delay: 0s;
     }
+    
     .star2 {
         top: 25px;
         left: 35px;
-        animation-delay: 0.5s;
+        animation-delay: var(--duration-500);
     }
+    
     .star3 {
         top: 12px;
         left: 50px;
-        animation-delay: 1s;
+        animation-delay: var(--duration-1000);
     }
+    
     .star4 {
         top: 30px;
         left: 15px;
         animation-delay: 1.5s;
     }
+    
     .star5 {
         top: 20px;
         left: 70px;
         animation-delay: 2s;
     }
+    
     .star6 {
         top: 35px;
         left: 85px;
-        animation-delay: 0.3s;
+        animation-delay: var(--duration-300);
     }
+
     @keyframes twinkle {
-        0%,
-        100% {
+        0%, 100% {
             opacity: 1;
             transform: scale(1);
         }
@@ -223,23 +266,24 @@ const sizeClass = `size-${size}`;
         width: 35px;
         height: 35px;
         background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         top: 50%;
         right: 10px;
         left: auto;
         transform: translateY(-50%);
-        /* Transición para left, right y opacity */
-        transition:
-            right 1s cubic-bezier(0.4, 0, 0.2, 1),
-            opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: right var(--duration-1000) var(--ease-out),
+                    opacity var(--duration-1000) var(--ease-out);
         box-shadow: inset -3px -3px 6px rgba(255, 200, 0, 0.7);
         opacity: 0;
         z-index: 3;
+        will-change: right, opacity;
     }
+    
     .day-night-toggle.day .sun {
         opacity: 1;
         right: calc(100% - 45px);
     }
+    
     .sun::before {
         content: "";
         position: absolute;
@@ -254,8 +298,9 @@ const sizeClass = `size-${size}`;
             rgba(255, 215, 0, 0.3) 50%,
             transparent 80%
         );
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
+    
     .sun::after {
         content: "";
         position: absolute;
@@ -270,30 +315,33 @@ const sizeClass = `size-${size}`;
             rgba(255, 235, 150, 0.2) 40%,
             transparent 90%
         );
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
+
+    /* === LUNA === */
     .moon {
         position: absolute;
         width: 35px;
         height: 35px;
         background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         top: 50%;
         right: 10px;
         transform: translateY(-50%);
-        transition:
-            right 1s cubic-bezier(0.4, 0, 0.2, 1),
-            opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow:
-            inset -3px -3px 6px rgba(0, 0, 0, 0.1),
-            0 0 15px rgba(245, 245, 245, 0.3);
+        transition: right var(--duration-1000) var(--ease-out),
+                    opacity var(--duration-1000) var(--ease-out);
+        box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.1),
+                    0 0 15px rgba(245, 245, 245, 0.3);
         opacity: 1;
         z-index: 3;
+        will-change: right, opacity;
     }
+    
     .day-night-toggle.day .moon {
         opacity: 0;
         right: calc(100% - 45px);
     }
+    
     .moon::before {
         content: "";
         position: absolute;
@@ -310,9 +358,10 @@ const sizeClass = `size-${size}`;
             rgba(245, 245, 245, 0.08) 80%,
             transparent 90%
         );
-        border-radius: 50%;
-        animation: moonGlow 5s ease-in-out infinite;
+        border-radius: var(--radius-full);
+        animation: moonGlow 5s var(--ease-in-out) infinite;
     }
+    
     .moon::after {
         content: "";
         position: absolute;
@@ -330,12 +379,12 @@ const sizeClass = `size-${size}`;
             rgba(245, 245, 245, 0.04) 85%,
             transparent 95%
         );
-        border-radius: 50%;
-        animation: moonGlowReverse 7s ease-in-out infinite reverse;
+        border-radius: var(--radius-full);
+        animation: moonGlowReverse 7s var(--ease-in-out) infinite reverse;
     }
+
     @keyframes moonGlow {
-        0%,
-        100% {
+        0%, 100% {
             transform: translate(-50%, -50%) scale(1);
             opacity: 1;
         }
@@ -344,9 +393,9 @@ const sizeClass = `size-${size}`;
             opacity: 0.8;
         }
     }
+    
     @keyframes moonGlowReverse {
-        0%,
-        100% {
+        0%, 100% {
             transform: translate(-50%, -50%) scale(1);
             opacity: 1;
         }
@@ -354,6 +403,70 @@ const sizeClass = `size-${size}`;
             transform: translate(-50%, -50%) scale(1.08);
             opacity: 0.8;
         }
+    }
+
+    /* === ACCESIBILIDAD === */
+    @media (prefers-reduced-motion: reduce) {
+        .day-night-toggle,
+        .sky-background,
+        .clouds,
+        .stars,
+        .sun,
+        .moon {
+            transition: none;
+            animation: none;
+        }
+        
+        .day-night-toggle:hover {
+            transform: none;
+        }
+        
+        .cloud,
+        .star,
+        .moon::before,
+        .moon::after {
+            animation: none;
+        }
+    }
+
+    @media (prefers-contrast: high) {
+        .day-night-toggle {
+            border: var(--border-2) solid var(--accent-primary);
+        }
+        
+        .day-night-toggle:hover {
+            border-color: var(--accent-hover);
+            box-shadow: var(--shadow-accent);
+        }
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+        .day-night-toggle.size-large {
+            width: 125px;
+            height: 50px;
+        }
+    }
+
+    /* === ESTADOS ADICIONALES === */
+    .day-night-toggle.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .day-night-toggle:active {
+        transform: scale(0.98);
+        transition: transform var(--duration-100) var(--ease-out);
+    }
+
+    /* === OPTIMIZACIONES DE PERFORMANCE === */
+    .day-night-toggle {
+        backface-visibility: hidden;
+    }
+    
+    .sun,
+    .moon {
+        backface-visibility: hidden;
     }
 </style>
 
@@ -396,6 +509,25 @@ const sizeClass = `size-${size}`;
                         toggle.style.transform = "scale(1)";
                     }
                 });
+
+                // Mejorar accesibilidad con teclado
+                toggle.addEventListener("keydown", (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        if (!this.isTransitioning) {
+                            this.handleClick(toggle);
+                        }
+                    }
+                });
+
+                // Hacer el toggle focusable
+                if (!toggle.hasAttribute('tabindex')) {
+                    toggle.setAttribute('tabindex', '0');
+                }
+                
+                // Añadir ARIA labels
+                toggle.setAttribute('role', 'button');
+                toggle.setAttribute('aria-label', 'Cambiar tema');
             });
         }
 
@@ -406,6 +538,10 @@ const sizeClass = `size-${size}`;
             // Animar toggle inmediatamente
             const newTheme = toggle.classList.contains("day") ? "dark" : "light";
             toggle.classList.toggle("day", newTheme === "light");
+
+            // Actualizar ARIA label
+            const isDay = newTheme === "light";
+            toggle.setAttribute('aria-label', `Cambiar a tema ${isDay ? 'oscuro' : 'claro'}`);
 
             // Cambiar tema después de la animación
             setTimeout(() => {
@@ -430,7 +566,9 @@ const sizeClass = `size-${size}`;
         syncToCurrentTheme(theme = null) {
             const currentTheme = theme || ThemeService.getCurrentTheme();
             document.querySelectorAll(".day-night-toggle").forEach((toggle) => {
-                toggle.classList.toggle("day", currentTheme === "light");
+                const isDay = currentTheme === "light";
+                toggle.classList.toggle("day", isDay);
+                toggle.setAttribute('aria-label', `Cambiar a tema ${isDay ? 'oscuro' : 'claro'}`);
             });
         }
     }

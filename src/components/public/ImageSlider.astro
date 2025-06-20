@@ -54,10 +54,7 @@ const { images } = Astro.props;
 </div>
 
 <style>
-    /* =====================================================
-       IMAGE SLIDER - ACTUALIZADO CON DESIGN TOKENS
-       Adaptado para temas claro y oscuro
-       ===================================================== */
+    /* === IMAGE SLIDER - MIGRADO AL DESIGN SYSTEM === */
     
     .slider-container {
         position: relative;
@@ -65,10 +62,10 @@ const { images } = Astro.props;
         overflow: hidden;
         background: var(--dark-900);
         width: 100%;
-        min-height: inherit; /* Hereda el min-height del contenedor padre */
-        height: 100%; /* Toma toda la altura disponible del contenedor */
+        min-height: inherit;
+        height: 100%;
         
-        /* Optimizaciones usando utilidades del sistema */
+        /* Optimizaciones del sistema */
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         isolation: isolate;
@@ -107,7 +104,7 @@ const { images } = Astro.props;
         z-index: 0;
     }
     
-    /* === CONTROLES DEL SLIDER === */
+    /* === CONTROLES DEL SLIDER - USANDO SISTEMA === */
     .slider-nav {
         position: absolute;
         bottom: var(--space-8);
@@ -129,23 +126,32 @@ const { images } = Astro.props;
     }
     
     .nav-dot.active {
-        background: #f4a261;
-        border-color: #f4a261;
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
         transform: scale(1.2);
     }
     
     .nav-dot:hover {
         background: rgba(255, 255, 255, 0.8);
     }
+
+    .nav-dot:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
     
-    /* === FLECHAS DEL SLIDER - TEMA OSCURO === */
+    /* === FLECHAS DEL SLIDER - USANDO CLASES DEL SISTEMA === */
     .slider-arrow {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.6);
+        
+        /* Usando las clases glass del sistema */
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop-blur);
+        border: var(--border-1) solid var(--glass-border);
         color: var(--text-primary);
-        border: var(--border-1) solid rgba(255, 255, 255, 0.2);
+        
         width: var(--space-12);
         height: var(--space-12);
         border-radius: var(--radius-full);
@@ -153,25 +159,23 @@ const { images } = Astro.props;
         font-size: var(--text-2xl);
         transition: var(--transition-base);
         z-index: 10;
-        backdrop-filter: var(--backdrop-blur);
         
         /* Centrar el contenido */
         display: flex;
         align-items: center;
         justify-content: center;
-        
-        /* Transiciones suaves para cambio de tema */
-        transition: background-color var(--duration-100) var(--ease-out),
-                    border-color var(--duration-100) var(--ease-out),
-                    color var(--duration-100) var(--ease-out),
-                    transform var(--duration-100) var(--ease-out);
     }
     
     .slider-arrow:hover {
-        background: rgba(244, 162, 97, 0.8);
-        border-color: rgba(244, 162, 97, 0.8);
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
         color: #ffffff;
         transform: translateY(-50%) scale(1.1);
+    }
+
+    .slider-arrow:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
     }
     
     .slider-arrow.prev {
@@ -181,25 +185,8 @@ const { images } = Astro.props;
     .slider-arrow.next {
         right: var(--space-8);
     }
-
-    /* === TEMA CLARO - FLECHAS CON MEJOR CONTRASTE === */
-    :root[data-theme="light"] .slider-arrow,
-    html[data-theme="light"] .slider-arrow {
-        background: rgba(255, 255, 255, 0.65);
-        color: var(--text-primary);
-        border: var(--border-1) solid var(--gray-400);
-        backdrop-filter: blur(10px) saturate(150%);
-    }
-
-    :root[data-theme="light"] .slider-arrow:hover,
-    html[data-theme="light"] .slider-arrow:hover {
-        background: var(--accent-primary);
-        border-color: var(--accent-primary);
-        color: #ffffff;
-        transform: translateY(-50%) scale(1.1);
-    }
     
-    /* === CAPTION CON EFECTO PILL === */
+    /* === CAPTION CON EFECTO PILL - USANDO SISTEMA === */
     .slide-caption {
         position: absolute;
         bottom: var(--space-16);
@@ -210,42 +197,29 @@ const { images } = Astro.props;
         font-size: var(--text-lg);
         font-weight: var(--font-semibold);
         
-        /* Sombra de texto para tema oscuro */
-        text-shadow: 
-            0 0 var(--space-2) rgba(0, 0, 0, 0.8),
-            1px 1px var(--space-1) rgba(0, 0, 0, 0.65);
+        /* Sombra de texto adaptativa */
+        text-shadow: 0 0 var(--space-2) var(--text-shadow-color),
+                     1px 1px var(--space-1) var(--text-shadow-color);
         
-        background: rgba(0, 0, 0, 0.65);
+        /* Usando glass del sistema */
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop-blur-subtle);
         padding: var(--space-2) var(--space-4);
         border-radius: var(--radius-2xl);
-        backdrop-filter: blur(8px);
         display: inline-block;
         width: max-content;
         max-width: 85%;
         line-height: var(--leading-tight);
         opacity: 0;
-        transition: opacity var(--duration-100) var(--ease-out),
-                    background-color var(--duration-100) var(--ease-out),
-                    color var(--duration-100) var(--ease-out);
-    }
-
-    /* === TEMA CLARO - CAPTION CON MEJOR CONTRASTE === */
-    :root[data-theme="light"] .slide-caption,
-    html[data-theme="light"] .slide-caption {
-        background: rgba(255, 255, 255, 0.65);
-        color: var(--text-primary);
-        text-shadow: 
-            0 0 var(--space-1) rgba(255, 255, 255, 0.8),
-            1px 1px var(--space-1) rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(10px) saturate(150%);
-        border: var(--border-1) solid rgba(0, 0, 0, 0.1);
+        transition: var(--transition-base);
+        border: var(--border-1) solid var(--glass-border);
     }
     
     .slide.active .slide-caption {
         opacity: 1;
     }
     
-    /* === RESPONSIVE - USANDO TOKENS === */
+    /* === RESPONSIVE - USANDO BREAKPOINTS DEL SISTEMA === */
     
     /* MÓVIL - BORDER-RADIUS MENOR */
     @media (max-width: 767px) {
@@ -309,21 +283,7 @@ const { images } = Astro.props;
         }
     }
 
-    /* === ACCESIBILIDAD MEJORADA === */
-    
-    /* Focus visible para navegación por teclado */
-    .slider-arrow:focus-visible {
-        outline: var(--border-2) solid var(--focus-ring);
-        outline-offset: var(--space-1);
-    }
-    
-    .nav-dot:focus-visible {
-        outline: var(--border-2) solid var(--focus-ring);
-        outline-offset: var(--space-1);
-    }
-
     /* === ESTADOS DE CARGA === */
-    
     .slider-container.loading {
         opacity: 0.7;
     }
@@ -333,9 +293,7 @@ const { images } = Astro.props;
         opacity: 0.5;
     }
 
-    /* === PREFERENCIAS DE USUARIO === */
-    
-    /* Respeto por movimiento reducido */
+    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         .slider-wrapper,
         .slide-caption,
@@ -353,7 +311,6 @@ const { images } = Astro.props;
         }
     }
     
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .nav-dot {
             border-width: var(--border-4);
@@ -361,31 +318,17 @@ const { images } = Astro.props;
         }
         
         .slider-arrow {
-            background: rgba(0, 0, 0, 0.8);
-            border: var(--border-2) solid rgba(255, 255, 255, 0.8);
+            background: var(--bg-primary);
+            border: var(--border-2) solid var(--accent-primary);
         }
         
         .slide-caption {
-            background: rgba(0, 0, 0, 0.8);
-            border: var(--border-1) solid rgba(255, 255, 255, 0.3);
-        }
-
-        :root[data-theme="light"] .slider-arrow,
-        html[data-theme="light"] .slider-arrow {
-            background: rgba(255, 255, 255, 0.95);
-            border: var(--border-2) solid var(--gray-600);
-        }
-        
-        :root[data-theme="light"] .slide-caption,
-        html[data-theme="light"] .slide-caption {
-            background: rgba(255, 255, 255, 0.95);
-            border: var(--border-2) solid var(--gray-400);
+            background: var(--bg-primary);
+            border: var(--border-2) solid var(--accent-primary);
         }
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
-    
-    /* Hints de performance */
+    /* === MEJORAS DE RENDIMIENTO === */
     .slider-wrapper {
         will-change: transform;
     }
@@ -394,9 +337,19 @@ const { images } = Astro.props;
         will-change: opacity;
     }
     
-    /* Contener layout para mejor performance */
     .slider-container {
         contain: layout style paint;
+    }
+
+    /* === UTILIDADES ADICIONALES DEL SISTEMA === */
+    .slider-arrow.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .slider-container.fullscreen {
+        border-radius: 0;
     }
 </style>
 
@@ -428,7 +381,7 @@ const { images } = Astro.props;
         }
         
         init() {
-            // Event listeners para las flechas (solo de este slider)
+            // Event listeners para las flechas
             if (this.prevBtn) {
                 this.prevBtn.addEventListener('click', () => {
                     if (!this.isTransitioning) {
@@ -449,7 +402,7 @@ const { images } = Astro.props;
                 });
             }
             
-            // Event listeners para los dots (solo de este slider)
+            // Event listeners para los dots
             this.dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
                     if (!this.isTransitioning) {
@@ -460,7 +413,7 @@ const { images } = Astro.props;
                 });
             });
             
-            // Pausar autoplay en hover (solo de este slider)
+            // Pausar autoplay en hover
             if (this.sliderWrapper) {
                 this.sliderWrapper.addEventListener('mouseenter', () => this.clearAutoPlay());
                 this.sliderWrapper.addEventListener('mouseleave', () => this.startAutoPlay());
@@ -519,13 +472,13 @@ const { images } = Astro.props;
             const translateX = -this.currentSlide * 100;
             this.sliderWrapper.style.transform = `translateX(${translateX}%)`;
             
-            // Actualizar dots (solo de este slider)
+            // Actualizar dots
             this.dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === this.currentSlide);
                 dot.setAttribute('aria-pressed', index === this.currentSlide);
             });
             
-            // Actualizar slides activos (solo de este slider)
+            // Actualizar slides activos
             this.slides.forEach((slide, index) => {
                 slide.classList.toggle('active', index === this.currentSlide);
             });
@@ -534,7 +487,7 @@ const { images } = Astro.props;
             const currentSlideInfo = `Imagen ${this.currentSlide + 1} de ${this.totalSlides}`;
             this.container.setAttribute('aria-label', `Galería de imágenes - ${currentSlideInfo}`);
             
-            // Desbloquear después de la transición (0.5s)
+            // Desbloquear después de la transición
             setTimeout(() => {
                 this.isTransitioning = false;
             }, 500);
@@ -558,7 +511,7 @@ const { images } = Astro.props;
         }
         
         startAutoPlay() {
-            if (true) return; // Evitar múltiples instancias
+            if (true) return; // Autoplay deshabilitado por defecto
             this.clearAutoPlay();
             if (this.totalSlides > 1) {
                 this.autoPlayInterval = setInterval(() => {
@@ -578,13 +531,11 @@ const { images } = Astro.props;
         
         destroy() {
             this.clearAutoPlay();
-            // Remover event listeners específicos si es necesario
         }
     }
     
     // Inicializar sliders cuando se carga la página
     document.addEventListener('DOMContentLoaded', () => {
-        // Buscar todos los contenedores de slider
         const sliderContainers = document.querySelectorAll('[data-slider]');
         const sliders = [];
         

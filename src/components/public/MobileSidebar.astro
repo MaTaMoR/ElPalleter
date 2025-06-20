@@ -24,14 +24,14 @@ import Text from '../i18n/Text.astro';
                         <img 
                             src={lightLogo.src} 
                             alt="El Palleter Logo" 
-                            class="mini-logo logo-dark"
+                            class="mini-logo logo-dark logo-transition"
                             data-logo="dark"
                         />
                         <!-- Logo para tema claro -->
                         <img 
                             src={darkLogo.src} 
                             alt="El Palleter Logo" 
-                            class="mini-logo logo-light"
+                            class="mini-logo logo-light logo-transition"
                             data-logo="light"
                         />
                     </div>
@@ -52,7 +52,7 @@ import Text from '../i18n/Text.astro';
 </div>
 
 <style>
-    /* === FULLSCREEN MENU OVERLAY === */
+    /* === FULLSCREEN MENU OVERLAY - MIGRADO === */
     .fullscreen-menu {
         position: fixed;
         top: 0;
@@ -65,6 +65,7 @@ import Text from '../i18n/Text.astro';
         opacity: 0;
         visibility: hidden;
         transition: all var(--duration-500) var(--ease-in-out);
+        contain: layout style paint;
     }
     
     .fullscreen-menu.active {
@@ -78,7 +79,7 @@ import Text from '../i18n/Text.astro';
         height: 100%;
     }
     
-    /* === BOTÓN DE CERRAR === */
+    /* === BOTÓN DE CERRAR - USANDO TOKENS === */
     .close-btn {
         position: absolute;
         top: var(--space-8);
@@ -90,7 +91,7 @@ import Text from '../i18n/Text.astro';
         cursor: pointer;
         padding: var(--space-3);
         border-radius: var(--radius-full);
-        transition: all var(--duration-200) var(--ease-out);
+        transition: var(--transition-base);
         width: 50px;
         height: 50px;
         display: flex;
@@ -104,12 +105,12 @@ import Text from '../i18n/Text.astro';
     .fullscreen-menu.active .close-btn {
         opacity: 1;
         transform: translateX(0);
-        transition: all var(--duration-300) var(--ease-out) calc(var(--duration-300));
+        transition: all var(--duration-300) var(--ease-out) var(--duration-300);
     }
     
     .close-btn:hover {
         background: var(--hover-overlay);
-        box-shadow: 0 0 var(--space-4) var(--accent-primary);
+        box-shadow: 0 0 var(--space-4) var(--glow-color);
         color: var(--accent-primary);
     }
 
@@ -117,7 +118,7 @@ import Text from '../i18n/Text.astro';
     .fullscreen-menu.active .close-btn:hover {
         transform: rotate(90deg) scale(1.1);
         background: var(--hover-overlay);
-        box-shadow: 0 0 var(--space-4) var(--accent-primary);
+        box-shadow: 0 0 var(--space-4) var(--glow-color);
         color: var(--accent-primary);
     }
 
@@ -132,35 +133,35 @@ import Text from '../i18n/Text.astro';
         outline-offset: var(--space-1);
     }
     
-    /* === CONTAINER IZQUIERDO === */
+    /* === CONTAINER IZQUIERDO - USANDO TOKENS === */
     .left-content {
         position: absolute;
-        top: var(--space-5);                             /* 1.25rem → var(--space-5) */
-        left: var(--space-12);                           /* 3rem → var(--space-12) */
+        top: var(--space-5);
+        left: var(--space-12);
         display: flex;
         flex-direction: column;
         align-items: flex-start;
     }
     
-    /* === LOGO DUAL EN EL OVERLAY === */
+    /* === LOGO DUAL EN EL OVERLAY - MIGRADO === */
     .overlay-logo {
         margin-bottom: var(--space-12);
         opacity: 0;
         transform: translateX(calc(-1 * var(--space-8)));
         transition: all var(--duration-500) var(--ease-out);
         margin-top: var(--space-2);
-        overflow: hidden; /* Prevenir overflow del logo */
+        overflow: hidden;
     }
     
     .fullscreen-menu.active .overlay-logo {
         opacity: 1;
         transform: translateX(0);
-        transition-delay: var(--duration-200);           /* 0.2s → token */
+        transition-delay: var(--duration-200);
     }
     
     .overlay-logo a {
         display: block;
-        transition: all var(--duration-100) var(--ease-out); /* ✅ Mucho más rápido: 100ms */
+        transition: var(--transition-fast);
     }
 
     .overlay-logo a:focus-visible {
@@ -169,7 +170,7 @@ import Text from '../i18n/Text.astro';
         border-radius: var(--radius-lg);
     }
 
-    /* === CONTENEDOR DE MINI-LOGOS === */
+    /* === CONTENEDOR DE MINI-LOGOS - USANDO SISTEMA === */
     .logo-container {
         position: relative;
         height: 100px;
@@ -177,8 +178,8 @@ import Text from '../i18n/Text.astro';
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden; /* Prevenir que el scale cause overflow */
-        border-radius: var(--radius-lg); /* Para suavizar cualquier clip */
+        overflow: hidden;
+        border-radius: var(--radius-lg);
     }
     
     .mini-logo {
@@ -190,9 +191,8 @@ import Text from '../i18n/Text.astro';
         width: auto;
         max-width: 150px;
         object-fit: contain;
-        filter: drop-shadow(0 var(--space-4) var(--space-12) rgba(0, 0, 0, 0.3));
-        transition: opacity var(--duration-300) var(--ease-out), 
-                    transform var(--duration-100) var(--ease-out);
+        filter: drop-shadow(0 var(--space-4) var(--space-12) var(--text-shadow-color));
+        /* Usando la clase del sistema */
     }
 
     /* Por defecto mostrar logo light (para tema oscuro) */
@@ -214,54 +214,46 @@ import Text from '../i18n/Text.astro';
     html[data-theme="light"] .logo-light {
         opacity: 1;
     }
-
-    /* Sombras adaptativas por tema */
-    .logo-dark {
-        filter: drop-shadow(0 var(--space-4) var(--space-12) rgba(0, 0, 0, 0.3));
-    }
-
-    .logo-light {
-        filter: drop-shadow(0 var(--space-4) var(--space-12) rgba(255, 255, 255, 0.3));
-    }
     
     .overlay-logo a:hover .mini-logo {
         transform: translate(-50%, -50%) scale(1.05);
     }
     
-    /* === NAVEGACIÓN DEL OVERLAY === */
+    /* === NAVEGACIÓN DEL OVERLAY - MIGRADA === */
     .overlay-nav ul {
         list-style: none;
         padding: 0;
-        margin: 0;                                       /* ✅ CRÍTICO: Reset margin global */
+        margin: 0;
         text-align: left;
     }
     
     .overlay-nav li {
-        margin: var(--space-6) 0;                        /* 1.5rem 0 → var(--space-6) */
-        margin-bottom: 0;                                /* ✅ CRÍTICO: Override global li margin */
-        padding: 0;                                      /* ✅ CRÍTICO: Reset padding */
+        margin: var(--space-6) 0;
+        margin-bottom: 0;
+        padding: 0;
     }
 
-    /* ✅ CRÍTICO: Espaciado manual para li */
+    /* Espaciado manual para li */
     .overlay-nav li:not(:last-child) {
-        margin-bottom: var(--space-6);                   /* 1.5rem → var(--space-6) */
+        margin-bottom: var(--space-6);
     }
     
     .overlay-nav a {
         display: block;
-        color: var(--text-primary);                      /* white → dinámico */
+        color: var(--text-primary);
         text-decoration: none;
-        font-size: var(--text-xl);                       /* 1.8rem → var(--text-xl) (ajustado) */
-        font-weight: var(--font-semibold);               /* 600 → var(--font-semibold) */
-        letter-spacing: var(--tracking-wide);            /* 1px → var(--tracking-wide) */
-        font-family: var(--font-primary);                /* -apple-system... → token */
-        transition: all var(--duration-100) var(--ease-out); /* ✅ Mucho más rápido: 100ms */
-        padding: var(--space-3) var(--space-6);          /* 0.8rem 1.5rem → tokens */
-        border-radius: var(--radius-lg);                 /* 8px → var(--radius-lg) */
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+        letter-spacing: var(--tracking-wide);
+        font-family: var(--font-primary);
+        transition: var(--transition-fast);
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-lg);
         text-transform: uppercase;
-        border-left: var(--space-1) solid transparent;   /* 3px → var(--space-1) */
+        border-left: var(--space-1) solid transparent;
         opacity: 0;
         transform: translateX(50px);
+        text-shadow: 0 var(--space-1) var(--space-2) var(--text-shadow-color);
     }
 
     .overlay-nav a:focus-visible {
@@ -273,79 +265,68 @@ import Text from '../i18n/Text.astro';
     .fullscreen-menu.active .overlay-nav a {
         opacity: 1;
         transform: translateX(0);
-        transition: all var(--duration-500) var(--ease-in-out); /* 0.6s cubic-bezier → tokens */
+        transition: all var(--duration-500) var(--ease-in-out);
     }
     
     /* Delays escalonados para cada elemento */
     .fullscreen-menu.active .overlay-nav a[data-delay="0"] {
-        transition-delay: var(--duration-300);           /* 0.4s → var(--duration-300) + offset */
+        transition-delay: var(--duration-300);
     }
     
     .fullscreen-menu.active .overlay-nav a[data-delay="100"] {
-        transition-delay: var(--duration-500);           /* 0.5s → var(--duration-500) */
+        transition-delay: var(--duration-500);
     }
     
     .fullscreen-menu.active .overlay-nav a[data-delay="200"] {
-        transition-delay: calc(var(--duration-500) + var(--duration-100)); /* 0.6s */
+        transition-delay: calc(var(--duration-500) + var(--duration-100));
     }
     
     .fullscreen-menu.active .overlay-nav a[data-delay="300"] {
-        transition-delay: calc(var(--duration-500) + var(--duration-200)); /* 0.7s */
+        transition-delay: calc(var(--duration-500) + var(--duration-200));
     }
     
     .overlay-nav a:hover {
-        background: var(--hover-overlay);                /* rgba(255, 255, 255, 0.08) → token */
-        transform: translateY(calc(-1 * var(--space-1))); /* -1px → token */
-        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-color, rgba(0, 0, 0, 0.7));
-        color: var(--text-primary);                      /* white → dinámico */
+        background: var(--hover-overlay);
+        transform: translateY(calc(-1 * var(--space-1)));
+        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-hover-color);
+        color: var(--text-primary);
         border-left-color: transparent;
-        /* ✅ Sin transición específica en hover - usa la del elemento base */
     }
     
-    /* === SECCIÓN DE IDIOMAS EN MOBILE === */
+    /* === SECCIÓN DE IDIOMAS EN MOBILE - USANDO TOKENS === */
     .mobile-language-section {
-        margin-top: var(--space-8);                      /* 2rem → var(--space-8) */
-        padding-top: var(--space-8);                     /* 2rem → var(--space-8) */
-        border-top: var(--border-1) solid var(--glass-border); /* rgba(244, 162, 97, 0.3) → token */
+        margin-top: var(--space-8);
+        padding-top: var(--space-8);
+        border-top: var(--border-1) solid var(--glass-border);
         opacity: 0;
-        transform: translateY(var(--space-5));           /* 20px → var(--space-5) */
-        transition: all var(--duration-500) var(--ease-out); /* 0.6s ease → tokens */
+        transform: translateY(var(--space-5));
+        transition: all var(--duration-500) var(--ease-out);
     }
     
     .fullscreen-menu.active .mobile-language-section {
         opacity: 1;
         transform: translateY(0);
-        transition-delay: calc(var(--duration-500) + var(--duration-300)); /* 0.8s */
+        transition-delay: calc(var(--duration-500) + var(--duration-300));
     }
     
     .mobile-language-title {
-        color: var(--accent-primary);                    /* rgba(244, 162, 97, 0.9) → token */
-        font-size: var(--text-base);                     /* 1rem → var(--text-base) */
-        font-weight: var(--font-semibold);               /* 600 → var(--font-semibold) */
-        margin-bottom: var(--space-4);                   /* 1rem → var(--space-4) */
+        color: var(--accent-primary);
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
+        margin-bottom: var(--space-4);
         text-transform: uppercase;
-        letter-spacing: var(--tracking-wide);            /* 1px → var(--tracking-wide) */
-    }
-
-    /* === VARIABLES DE TEMA === */
-    :root {
-        --text-shadow-color: rgba(0, 0, 0, 0.7);
-    }
-
-    :root[data-theme="light"],
-    html[data-theme="light"] {
-        --text-shadow-color: rgba(255, 255, 255, 0.7);
+        letter-spacing: var(--tracking-wide);
     }
     
-    /* === RESPONSIVE === */
+    /* === RESPONSIVE - USANDO BREAKPOINTS DEL SISTEMA === */
     @media (max-width: 768px) {
         .left-content {
-            top: var(--space-4);                         /* 1rem → var(--space-4) */
-            left: var(--space-8);                        /* 2rem → var(--space-8) */
+            top: var(--space-4);
+            left: var(--space-8);
         }
         
         .overlay-logo {
-            margin-top: var(--space-1);                  /* 0.25rem → var(--space-1) */
+            margin-top: var(--space-1);
         }
         
         .logo-container {
@@ -359,28 +340,28 @@ import Text from '../i18n/Text.astro';
         }
         
         .overlay-nav a {
-            font-size: var(--text-lg);                   /* 1.4rem → var(--text-lg) */
-            letter-spacing: var(--tracking-normal);      /* 0.5px → var(--tracking-normal) */
+            font-size: var(--text-lg);
+            letter-spacing: var(--tracking-normal);
         }
         
         .close-btn {
-            font-size: var(--text-3xl);                  /* 3rem → var(--text-3xl) */
+            font-size: var(--text-3xl);
             width: 40px;
             height: 40px;
-            top: var(--space-6);                         /* 1.5rem → var(--space-6) */
-            right: var(--space-6);                       /* 1.5rem → var(--space-6) */
+            top: var(--space-6);
+            right: var(--space-6);
         }
     }
     
     @media (max-width: 420px) {
         .overlay-nav a {
-            font-size: var(--text-base);                 /* 1.2rem → var(--text-base) */
-            padding: var(--space-2) var(--space-4);      /* 0.6rem 1rem → tokens */
+            font-size: var(--text-base);
+            padding: var(--space-2) var(--space-4);
         }
         
         .overlay-logo {
-            margin-bottom: var(--space-8);               /* 2rem → var(--space-8) */
-            margin-top: var(--space-1);                  /* 0.25rem → var(--space-1) */
+            margin-bottom: var(--space-8);
+            margin-top: var(--space-1);
         }
         
         .logo-container {
@@ -394,42 +375,20 @@ import Text from '../i18n/Text.astro';
         }
         
         .left-content {
-            top: var(--space-3);                         /* 0.75rem → var(--space-3) */
-            left: var(--space-6);                        /* 1.5rem → var(--space-6) */
+            top: var(--space-3);
+            left: var(--space-6);
         }
     }
 
-    /* === VARIANTES DE TEMA === */
-    
-    /* Tema claro - overlay más sutil para ver el fondo */
-    :root[data-theme="light"] .fullscreen-menu,
-    html[data-theme="light"] .fullscreen-menu {
-        background: rgba(255, 255, 255, 0.45);
-        backdrop-filter: blur(25px) saturate(180%);
-    }
-    
-    :root[data-theme="light"] .overlay-nav a,
-    html[data-theme="light"] .overlay-nav a {
-        color: var(--text-primary);
-        text-shadow: 0 var(--space-1) var(--space-2) rgba(255, 255, 255, 0.9);
-    }
-    
-    :root[data-theme="light"] .overlay-nav a:hover,
-    html[data-theme="light"] .overlay-nav a:hover {
-        background: var(--hover-overlay);
-        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-color);
-    }
-
     /* === ACCESIBILIDAD === */
-    
-    /* Reducir movimiento si el usuario lo prefiere */
     @media (prefers-reduced-motion: reduce) {
         .fullscreen-menu,
         .close-btn,
         .overlay-logo,
         .overlay-nav a,
         .mobile-language-section,
-        .mini-logo {
+        .mini-logo,
+        .logo-transition {
             transition: none;
             animation: none;
         }
@@ -448,10 +407,9 @@ import Text from '../i18n/Text.astro';
         }
     }
     
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .fullscreen-menu {
-            background: var(--bg-primary);               /* Fondo sólido */
+            background: var(--bg-primary);
             backdrop-filter: none;
         }
         
@@ -469,19 +427,13 @@ import Text from '../i18n/Text.astro';
             border: var(--border-1) solid var(--accent-primary);
         }
 
-        .logo-dark {
+        .mini-logo {
             filter: drop-shadow(0 var(--space-4) var(--space-12) rgba(0, 0, 0, 1));
-        }
-        
-        .logo-light {
-            filter: drop-shadow(0 var(--space-4) var(--space-12) rgba(255, 255, 255, 1));
         }
     }
 
     /* === MEJORAS DE RENDIMIENTO === */
-    
     .fullscreen-menu {
-        contain: layout style paint;
         will-change: opacity, visibility;
     }
     
@@ -492,8 +444,6 @@ import Text from '../i18n/Text.astro';
     }
 
     /* === ESTADOS ADICIONALES === */
-    
-    /* Estado de carga */
     .fullscreen-menu.loading {
         pointer-events: none;
     }

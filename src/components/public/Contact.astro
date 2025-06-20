@@ -204,11 +204,11 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 
     .contact-title {
         font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-        font-weight: var(--font-light);
         color: var(--accent-primary);
         margin-bottom: var(--gap-mobile);
         letter-spacing: var(--tracking-wide);
         transition: color var(--duration-300) var(--ease-out);
+        font-weight: var(--font-bold);
     }
 
     .contact-subtitle {
@@ -216,6 +216,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         color: var(--text-secondary);
         opacity: 0.8;
         transition: color var(--duration-300) var(--ease-out);
+        font-weight: var(--font-semibold);
     }
 
     .contact-container {
@@ -230,13 +231,11 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         border-radius: var(--radius-2xl);
         overflow: hidden;
         border: var(--border-1) solid var(--glass-border);
-        box-shadow: var(--shadow-lg);
         max-width: 1200px;
         margin: 0 auto;
         transition:
             background-color var(--duration-300) var(--ease-out),
-            border-color var(--duration-300) var(--ease-out),
-            box-shadow var(--duration-300) var(--ease-out);
+            border-color var(--duration-300) var(--ease-out);
     }
 
     /* === CABECERA CON STATUS === */

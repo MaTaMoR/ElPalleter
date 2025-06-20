@@ -103,7 +103,7 @@
   --focus-ring: var(--brand-primary);
   
   /* Efectos de cristal/blur */
-  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-bg: rgba(255, 255, 255, 0.75);
   --glass-border: var(--brand-primary-medium);
   
   /* Text shadows adaptativos */

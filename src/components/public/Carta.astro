@@ -93,11 +93,11 @@ import { i18nCore } from '../../i18n/core.js';
 
     .carta-title {
         font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-        font-weight: var(--font-light);
         color: var(--accent-primary);
         margin-bottom: var(--gap-mobile);
         letter-spacing: var(--tracking-wide);
         transition: color var(--duration-300) var(--ease-out);
+        font-weight: var(--font-bold);
     }
 
     .carta-subtitle {
@@ -105,6 +105,7 @@ import { i18nCore } from '../../i18n/core.js';
         color: var(--text-secondary);
         opacity: 0.8;
         transition: color var(--duration-300) var(--ease-out);
+        font-weight: var(--font-semibold);
     }
 
     /* === NAVEGACIÓN DE CATEGORÍAS === */
@@ -152,7 +153,6 @@ import { i18nCore } from '../../i18n/core.js';
         backdrop-filter: var(--backdrop-blur);
         border-radius: var(--radius-xl);
         border: var(--border-1) solid var(--glass-border);
-        box-shadow: var(--shadow-lg);
         padding: calc(var(--padding-mobile) * 1.5);
         margin-bottom: calc(var(--gap-mobile) * 1.5);
         transition: background-color var(--duration-300) var(--ease-out),
@@ -169,8 +169,7 @@ import { i18nCore } from '../../i18n/core.js';
     html[data-theme="light"] .menu-category {
         background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(20px) saturate(150%);
-        border: var(--border-1) solid var(--gray-400);
-        box-shadow: var(--shadow-lg);
+        border: var(--border-1) solid var(--glass-border);
     }
 
     .category-title {

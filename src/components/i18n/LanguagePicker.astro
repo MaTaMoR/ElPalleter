@@ -59,7 +59,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       </a>
     ))}
     
-    <!-- ✨ NUEVO: Integrar ThemeToggle al final del dropdown -->
+    <!-- Integrar ThemeToggle al final del dropdown -->
     {includeThemeToggle && (
       <div class="language-picker-theme">
         <ThemeToggle size="small" />
@@ -69,50 +69,54 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 </div>
 
 <style>
-  /* === BASE COMPONENT === */
+  /* === BASE COMPONENT - USANDO DESIGN SYSTEM === */
   .language-picker {
     position: relative;
     display: inline-block;
-    font-family: var(--font-primary);                   /* inherit → token */
-    z-index: var(--z-50);                               /* 50 → token */
+    font-family: var(--font-primary);
+    z-index: var(--z-50);
+    contain: layout style;
   }
 
-  /* === BOTÓN PRINCIPAL === */
+  /* === BOTÓN PRINCIPAL - COMPLETAMENTE MIGRADO === */
   .lang-current {
     background: transparent;
-    border: var(--border-1) solid transparent;          /* 1px → token */
-    color: var(--text-muted);                           /* rgba(255, 255, 255, 0.9) → token */
-    padding: var(--space-3) var(--space-4);             /* 0.7rem 1rem → tokens */
-    border-radius: var(--radius-lg);                    /* 8px → token */
+    border: var(--border-1) solid transparent;
+    color: var(--text-muted);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: var(--space-2);                                /* 0.6rem → token */
-    transition: var(--transition-base);                 /* all 0.3s ease → token */
-    font-size: var(--text-sm);                          /* 0.9rem → token */
-    font-weight: var(--font-medium);                    /* 500 → token */
+    gap: var(--space-2);
+    transition: var(--transition-base);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     min-width: 70px;
     justify-content: center;
   }
 
   .lang-current:hover {
-    color: var(--text-primary);                         /* white → token */
-    transform: translateY(calc(-1 * var(--space-1)));   /* -1px → token */
+    color: var(--text-primary);
+    transform: translateY(calc(-1 * var(--space-1)));
+    border-color: var(--border-primary);
   }
 
   .lang-current:focus {
     outline: none;
-    color: var(--text-primary);                         /* white → token */
+    color: var(--text-primary);
   }
 
   .lang-current:focus-visible {
-    outline: var(--border-2) solid var(--focus-ring);   /* Accesibilidad mejorada */
+    outline: var(--border-2) solid var(--focus-ring);
     outline-offset: var(--space-1);
   }
 
   /* Estado activo solo cuando está abierto el dropdown */
   .language-picker[data-open="true"] .lang-current {
-    color: var(--text-primary);                         /* white → token */
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    background: var(--accent-light);
   }
 
   /* === ELEMENTOS DE BANDERA === */
@@ -125,48 +129,49 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .flag-emoji {
-    font-size: var(--text-xl);                          /* 1.6rem → token */
+    font-size: var(--text-xl);
     line-height: 1;
   }
 
   .flag-svg {
     width: 32px;
     height: 21px;
-    border-radius: var(--radius-sm);                    /* 3px → token */
+    border-radius: var(--radius-sm);
     object-fit: cover;
-    box-shadow: var(--shadow-sm);                       /* 0 2px 4px rgba(0, 0, 0, 0.2) → token */
+    box-shadow: var(--shadow-sm);
   }
 
   .lang-arrow {
-    font-size: var(--text-xs);                          /* 0.7rem → token */
-    transition: transform var(--duration-300) var(--ease-out); /* 0.3s ease → tokens */
-    margin-left: var(--space-1);                        /* 0.1rem → token */
+    font-size: var(--text-xs);
+    transition: transform var(--duration-300) var(--ease-out);
+    margin-left: var(--space-1);
   }
 
   .language-picker[data-open="true"] .lang-arrow {
     transform: rotate(180deg);
   }
 
-  /* === DROPDOWN === */
+  /* === DROPDOWN - USANDO SISTEMA === */
   .lang-options {
     position: absolute;
-    top: calc(100% + var(--space-2));                   /* 0.5rem → token */
+    top: calc(100% + var(--space-2));
     right: 0;
-    background: var(--glass-bg);                        /* rgba(15, 15, 15, 0.95) → token */
-    backdrop-filter: var(--backdrop-blur-strong);       /* blur(20px) → token */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur-strong);
     -webkit-backdrop-filter: var(--backdrop-blur-strong);
-    border: var(--border-1) solid var(--border-secondary); /* rgba(255, 255, 255, 0.1) → token */
-    border-radius: var(--radius-xl);                    /* 12px → token */
-    min-width: 180px;                                   /* ✨ Más ancho para acomodar el theme toggle */
+    border: var(--border-1) solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    min-width: 180px;
     width: max-content;
-    box-shadow: var(--shadow-xl),                       /* 0 10px 30px rgba(0, 0, 0, 0.4) → token */
-                0 0 0 var(--border-1) var(--border-secondary); /* rgba(255, 255, 255, 0.05) → token */
-    z-index: var(--z-modal);                            /* 1000 → token */
+    box-shadow: var(--shadow-xl);
+    z-index: var(--z-modal);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(calc(-1 * var(--space-3)));   /* -10px → token */
-    transition: all var(--duration-300) var(--ease-in-out); /* 0.3s cubic-bezier → tokens */
+    transform: translateY(calc(-1 * var(--space-3)));
+    transition: all var(--duration-300) var(--ease-in-out);
     overflow: hidden;
+    contain: layout style paint;
+    will-change: opacity, transform, visibility;
   }
 
   .language-picker[data-open="true"] .lang-options {
@@ -175,19 +180,20 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     transform: translateY(0);
   }
 
-  /* === OPCIONES DEL DROPDOWN === */
+  /* === OPCIONES DEL DROPDOWN - MIGRADAS === */
   .lang-option {
     display: flex;
     align-items: center;
-    gap: var(--space-3);                                /* 0.7rem → token */
-    padding: var(--space-3) var(--space-4);             /* 0.8rem 1rem → tokens */
-    color: var(--text-primary);                         /* white → token */
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-primary);
     text-decoration: none;
-    transition: all var(--duration-200) var(--ease-out); /* 0.2s ease → tokens */
-    border-bottom: var(--border-1) solid var(--border-secondary); /* rgba(255, 255, 255, 0.05) → token */
+    transition: var(--transition-base);
+    border-bottom: var(--border-1) solid var(--border-secondary);
     cursor: pointer;
     position: relative;
     white-space: nowrap;
+    will-change: background-color, transform;
   }
 
   .lang-option:last-child {
@@ -195,48 +201,44 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option:hover {
-    background: var(--hover-overlay);                   /* rgba(255, 255, 255, 0.08) → token */
-    color: var(--text-primary);                         /* white → token */
-    transform: translateX(var(--space-1));              /* 2px → token */
+    background: var(--hover-overlay);
+    color: var(--text-primary);
+    transform: translateX(var(--space-1));
   }
 
-  /* Usar focus-visible para mostrar focus solo con teclado */
   .lang-option:focus-visible {
-    background: var(--active-overlay);                  /* rgba(255, 255, 255, 0.1) → token */
-    color: var(--text-primary);                         /* white → token */
-    outline: var(--border-1) solid var(--border-primary); /* rgba(255, 255, 255, 0.2) → token */
-    outline-offset: calc(-1 * var(--border-1));         /* -1px → token */
+    background: var(--active-overlay);
+    color: var(--text-primary);
+    outline: var(--border-1) solid var(--border-primary);
+    outline-offset: calc(-1 * var(--border-1));
   }
 
-  /* Asegurar que hover tenga prioridad sobre focus */
   .lang-option:focus:not(:hover) {
-    background: var(--bg-surface);                      /* rgba(255, 255, 255, 0.05) → token */
-    color: var(--text-primary);                         /* white → token */
+    background: var(--bg-surface);
+    color: var(--text-primary);
   }
 
-  /* Para mejor accesibilidad en móvil, aumentar área táctil */
+  /* === RESPONSIVE - MEJORAS TÁCTILES === */
   @media (max-width: 768px) {
     .lang-option {
-      padding: var(--space-4);                          /* 1rem → token */
+      padding: var(--space-4);
       min-height: 44px; /* Área táctil mínima recomendada */
     }
     
-    /* En móvil, no mostrar efectos de focus ya que no hay teclado */
     .lang-option:focus {
       background: transparent;
       color: inherit;
     }
     
-    /* Solo mostrar hover/touch en móvil */
     .lang-option:hover,
     .lang-option:active {
-      background: var(--hover-overlay);                 /* rgba(255, 255, 255, 0.08) → token */
-      color: var(--text-primary);                       /* white → token */
+      background: var(--hover-overlay);
+      color: var(--text-primary);
       transform: none; /* Sin animación de deslizamiento en móvil */
     }
   }
 
-  /* Bandera en opciones del dropdown */
+  /* === BANDERA EN OPCIONES === */
   .lang-option .lang-flag {
     flex-shrink: 0;
     width: 26px;
@@ -244,19 +246,19 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .lang-option .flag-emoji {
-    font-size: var(--text-lg);                          /* 1.3rem → token */
+    font-size: var(--text-lg);
   }
 
   .lang-option .flag-svg {
     width: 26px;
     height: 17px;
-    border-radius: var(--radius-sm);                    /* 2px → token */
+    border-radius: var(--radius-sm);
   }
 
   .lang-option .lang-full-name {
-    font-size: var(--text-sm);                          /* 0.9rem → token */
-    font-weight: var(--font-medium);                    /* 500 → token */
-    letter-spacing: var(--tracking-normal);             /* 0.2px → token */
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    letter-spacing: var(--tracking-normal);
   }
 
   /* === VARIANTES === */
@@ -268,8 +270,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 
   /* Variante Mobile */
   .language-picker.mobile .lang-current {
-    padding: var(--space-3) calc(var(--space-4) + var(--space-1)); /* 0.8rem 1.1rem → tokens */
-    font-size: var(--text-xs);                          /* 0.85rem → token */
+    padding: var(--space-3) calc(var(--space-4) + var(--space-1));
+    font-size: var(--text-xs);
     min-width: 75px;
   }
 
@@ -281,10 +283,10 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
 
   .language-picker.mobile .lang-option {
-    padding: calc(var(--space-3) + var(--space-1)) var(--space-4); /* 0.9rem 1rem → tokens */
+    padding: calc(var(--space-3) + var(--space-1)) var(--space-4);
   }
 
-  /* === RESPONSIVE === */
+  /* === RESPONSIVE BREAKPOINTS === */
   @media (max-width: 768px) {
     .language-picker.desktop {
       display: none;
@@ -304,42 +306,14 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     left: 0;
     top: 0;
     bottom: 0;
-    width: var(--space-1);                              /* 2px → token */
-    background: #ff4444;                                /* Mantener color específico */
+    width: var(--space-1);
+    background: var(--accent-primary);
     transform: scaleY(0);
-    transition: transform var(--duration-200) var(--ease-out); /* 0.2s ease → tokens */
+    transition: transform var(--duration-200) var(--ease-out);
   }
 
   .lang-option:hover::before {
     transform: scaleY(1);
-  }
-
-  /* === VARIANTES DE TEMA === */
-
-  /* Tema claro */
-  [data-theme="light"] .lang-current {
-    color: var(--text-secondary);                       /* Se adapta al tema */
-  }
-
-  [data-theme="light"] .lang-current:hover,
-  [data-theme="light"] .language-picker[data-open="true"] .lang-current {
-    color: var(--text-primary);
-  }
-
-  [data-theme="light"] .lang-options {
-    background: var(--bg-surface);                      /* Fondo adaptado */
-    border-color: var(--border-primary);
-    box-shadow: var(--shadow-lg),
-                0 0 0 var(--border-1) var(--border-primary);
-  }
-
-  [data-theme="light"] .lang-option {
-    color: var(--text-primary);
-    border-bottom-color: var(--border-primary);
-  }
-
-  [data-theme="light"] .lang-option:hover {
-    background: var(--hover-overlay);
   }
 
   /* === ACCESIBILIDAD === */
@@ -362,7 +336,6 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     }
   }
 
-  /* Alto contraste */
   @media (prefers-contrast: high) {
     .lang-current {
       border-color: var(--border-primary);
@@ -400,17 +373,17 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   .language-picker.sidebar-language .lang-current {
     width: 100%;
     justify-content: flex-start;
-    background: var(--accent-light);                    /* rgba(244, 162, 97, 0.1) → token */
-    border-color: var(--accent-medium);                 /* rgba(244, 162, 97, 0.5) → token */
-    padding: var(--space-3) calc(var(--space-4) + var(--space-1)); /* 0.8rem 1.2rem → tokens */
-    font-size: var(--text-base);                        /* 1rem → token */
+    background: var(--accent-light);
+    border-color: var(--accent-medium);
+    padding: var(--space-3) calc(var(--space-4) + var(--space-1));
+    font-size: var(--text-base);
   }
 
   .language-picker.sidebar-language .lang-options {
     position: static;
-    background: var(--accent-light);                    /* rgba(244, 162, 97, 0.05) → token */
-    border: var(--border-1) solid var(--accent-medium); /* rgba(244, 162, 97, 0.2) → token */
-    margin-top: var(--space-2);                         /* 0.5rem → token */
+    background: var(--accent-light);
+    border: var(--border-1) solid var(--accent-medium);
+    margin-top: var(--space-2);
     opacity: 1;
     visibility: visible;
     transform: none;
@@ -421,37 +394,17 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     display: block;
   }
 
+  /* === THEME TOGGLE INTEGRATION === */
   .language-picker-theme {
     display: flex;
     justify-content: center;
-    padding: var(--space-3); /* 0.5rem → token */
-  }
-
-  /* === MEJORAS DE RENDIMIENTO === */
-  .language-picker {
-    contain: layout style;
-  }
-  
-  .lang-options {
-    contain: layout style paint;
-    will-change: opacity, transform, visibility;
-  }
-  
-  .lang-option {
-    will-change: background-color, transform;
+    padding: var(--space-3);
+    margin-top: var(--space-1);
   }
 
   /* === ESTADOS ADICIONALES === */
-  
-  /* Estado hover del contenedor */
   .language-picker:hover .lang-current {
     border-color: var(--border-primary);
-  }
-  
-  /* Estado activo del dropdown */
-  .language-picker[data-open="true"] .lang-current {
-    border-color: var(--accent-primary);
-    background: var(--accent-light);
   }
 </style>
 
