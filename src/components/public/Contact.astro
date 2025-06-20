@@ -15,13 +15,12 @@ const contactServiceData = ContactService.getContactDataWithTranslations(
     locale,
 );
 const currentStatus = contactServiceData.status;
-const fullAddress = contactServiceData.fullAddress;
 const socialNetworks = contactServiceData.socials;
 const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: horarios agrupados
 ---
 
 <!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
-<section class="contact-section" id="contacto">
+<section class="contact-section container" id="contacto">
     <div class="contact-header">
         <h2 class="contact-title">
             <Text key="contact.title" fallback="Contacto" />
@@ -33,7 +32,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             />
         </p>
     </div>
-    <div class="contact-container container">
+    <div class="contact-container">
         <!-- Componente de Contacto -->
         <div class="contact-component">
             <!-- Cabecera con Status -->

@@ -9,7 +9,7 @@ import { ImageService } from '../../services/ImageService.js';
 const imagesToShow = ImageService.getGalleryImages('historia');
 ---
 
-<section class="historia-section" id="historia">
+<section class="historia-section container" id="historia">
     <div class="historia-header">
         <h2 class="historia-title">
             <Text key="story.title" fallback="Historia" />
@@ -18,7 +18,7 @@ const imagesToShow = ImageService.getGalleryImages('historia');
             <Text key="story.subtitle" fallback="Desde 1985 en el corazón de Benissa con mucho orgullo" />
         </p>
     </div>
-    <div class="historia-container container">
+    <div class="historia-container">
         <!-- Historia a la izquierda -->
         <div class="history-content">
             <RichText 
@@ -251,7 +251,7 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         
         .slider-section {
             order: 1;
-            min-height: 40vh;
+            min-height: 50vh;
             height: auto;
             border-radius: var(--radius-xl);
             transform: translate3d(0, 0, 0);
