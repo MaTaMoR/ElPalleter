@@ -31,7 +31,7 @@ const sizeClass = `size-${size}`;
     .day-night-toggle {
         position: relative;
         width: 125px;
-        height: 60px;
+        height: 50px;
         border-radius: 35px;
         cursor: pointer;
         overflow: hidden;
@@ -358,16 +358,83 @@ const sizeClass = `size-${size}`;
 </style>
 
 <script>
-    // Inicializa interacciones
-    document.querySelectorAll(".day-night-toggle").forEach((toggle) => {
-        toggle.addEventListener("click", () => toggle.classList.toggle("day"));
-        toggle.addEventListener(
-            "mouseenter",
-            () => (toggle.style.transform = "scale(1.05)"),
-        );
-        toggle.addEventListener(
-            "mouseleave",
-            () => (toggle.style.transform = "scale(1)"),
-        );
-    });
+    import ThemeService from "../../services/ThemeService";
+
+    class SimpleThemeToggle {
+        constructor() {
+            this.isTransitioning = false;
+            this.themeChangeFromToggle = false;
+            this.init();
+        }
+
+        init() {
+            setTimeout(() => {
+                this.setupToggles();
+                this.setupThemeListener();
+                this.syncToCurrentTheme();
+            }, 100);
+        }
+
+        setupToggles() {
+            document.querySelectorAll(".day-night-toggle").forEach((toggle) => {
+                toggle.addEventListener("click", (event) => {
+                    if (this.isTransitioning) {
+                        event.stopPropagation();
+                        return;
+                    }
+                    this.handleClick(toggle);
+                });
+
+                toggle.addEventListener("mouseenter", () => {
+                    if (!this.isTransitioning) {
+                        toggle.style.transform = "scale(1.05)";
+                    }
+                });
+
+                toggle.addEventListener("mouseleave", () => {
+                    if (!this.isTransitioning) {
+                        toggle.style.transform = "scale(1)";
+                    }
+                });
+            });
+        }
+
+        handleClick(toggle) {
+            this.isTransitioning = true;
+            this.themeChangeFromToggle = true;
+
+            // Animar toggle inmediatamente
+            const newTheme = toggle.classList.contains("day") ? "dark" : "light";
+            toggle.classList.toggle("day", newTheme === "light");
+
+            // Cambiar tema después de la animación
+            setTimeout(() => {
+                ThemeService.setTheme(newTheme);
+                
+                // Limpiar flags
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                    this.themeChangeFromToggle = false;
+                }, 200);
+            }, 1000);
+        }
+
+        setupThemeListener() {
+            ThemeService.onThemeChange((event) => {
+                if (!this.themeChangeFromToggle) {
+                    this.syncToCurrentTheme(event.theme);
+                }
+            });
+        }
+
+        syncToCurrentTheme(theme = null) {
+            const currentTheme = theme || ThemeService.getCurrentTheme();
+            document.querySelectorAll(".day-night-toggle").forEach((toggle) => {
+                toggle.classList.toggle("day", currentTheme === "light");
+            });
+        }
+    }
+
+    // Inicializar
+    new SimpleThemeToggle();
 </script>

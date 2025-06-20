@@ -10,6 +10,7 @@ interface Props {
     overlayColor?: string;
     overlayOpacity?: number;
     fallbackImage?: string;
+    adaptiveOverlay?: boolean; // Nueva prop para habilitar overlay adaptativo
 }
 
 const {
@@ -17,11 +18,19 @@ const {
     alt = "Fondo Hero",
     className = '',
     overlayColor = 'rgba(0, 0, 0, 0.25)',
-    overlayOpacity = 1
+    overlayOpacity = 1,
+    adaptiveOverlay = true // Por defecto habilitado
 } = Astro.props;
+
+// Clases dinámicas
+const heroClasses = [
+    'hero-background',
+    adaptiveOverlay && 'adaptive-overlay',
+    className
+].filter(Boolean).join(' ');
 ---
 
-<div class={`hero-background ${className}`} id="hero">
+<div class={heroClasses} id="hero">
     <!-- Imagen de fondo responsiva -->
     <ResponsiveImage
         imageId={imageId}
@@ -37,14 +46,10 @@ const {
         fallbackIcon="picture"
     />
     
-    <!-- Overlay con gradiente personalizable -->
-    <div 
-        class="hero-overlay" 
-        style={`
-            background: linear-gradient(${overlayColor}, ${overlayColor});
-            opacity: ${overlayOpacity};
-        `}
-    ></div>
+    <!-- Overlay adaptativo por tema -->
+    {adaptiveOverlay && (
+        <div class="hero-overlay-adaptive"></div>
+    )}
     
     <!-- Slot para contenido del hero -->
     <div class="hero-content">
@@ -63,7 +68,7 @@ const {
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        color: var(--text-primary);                    /* En lugar de white */
+        color: var(--text-primary);
         
         /* Optimizaciones de performance usando tokens */
         transform: translate3d(0, 0, 0);
@@ -85,6 +90,54 @@ const {
         /* Optimización de GPU usando tokens */
         will-change: transform;
         transform: translate3d(0, 0, 0);
+        
+        /* Transición suave para filtros si se necesitan */
+        transition: filter var(--duration-300) var(--ease-out);
+    }
+
+    /* === OVERLAY ORIGINAL === */
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+        background: var(--bg-overlay);
+    }
+
+    /* === OVERLAY ADAPTATIVO POR TEMA === */
+    .hero-overlay-adaptive {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        transition: background var(--duration-300) var(--ease-out),
+                    opacity var(--duration-300) var(--ease-out);
+        
+        /* Por defecto (tema oscuro) - overlay muy sutil */
+        background: rgba(0, 0, 0, 0.1);
+        opacity: 1;
+    }
+
+    /* Overlay para tema claro - sutil pero efectivo */
+    :root[data-theme="light"] .hero-overlay-adaptive,
+    html[data-theme="light"] .hero-overlay-adaptive {
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.35) 0%,
+            rgba(248, 249, 250, 0.4) 25%,
+            rgba(241, 243, 244, 0.45) 50%,
+            rgba(255, 255, 255, 0.5) 100%
+        );
+    }
+
+    /* === VARIANTE: Sin overlay base cuando se usa adaptativo === */
+    .hero-background.adaptive-overlay .hero-overlay {
+        opacity: 0.3; /* Reducir overlay base cuando se usa adaptativo */
     }
 
     /* === FALLBACK PERSONALIZADO PARA HERO === */
@@ -108,31 +161,17 @@ const {
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-icon) {
-        color: var(--text-muted);                      /* En lugar de rgba hardcodeado */
+        color: var(--text-muted);
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-title) {
-        color: var(--text-primary);                    /* En lugar de rgba hardcodeado */
-    }
-
-    /* === OVERLAY === */
-    .hero-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        pointer-events: none;
-        
-        /* Usando variable de overlay del tema */
-        background: var(--bg-overlay);
+        color: var(--text-primary);
     }
 
     /* === CONTENIDO === */
     .hero-content {
         position: relative;
-        z-index: 2;
+        z-index: 3; /* Por encima de ambos overlays */
         width: 100%;
         height: 100%;
         display: flex;
@@ -141,35 +180,71 @@ const {
         align-items: center;
     }
 
-    /* === VARIANTES DEL HERO === */
+    /* === VARIANTES ADICIONALES DEL OVERLAY === */
     
-    /* Hero con altura personalizada */
-    .hero-background.custom-height {
-        height: auto;
-        min-height: 60vh;
+    /* Overlay adaptativo suave (menos contraste) */
+    .hero-background.adaptive-soft .hero-overlay-adaptive {
+        background: rgba(0, 0, 0, 0.05);
+    }
+    
+    :root[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-adaptive,
+    html[data-theme="light"] .hero-background.adaptive-soft .hero-overlay-adaptive {
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.25) 0%,
+            rgba(248, 249, 250, 0.3) 50%,
+            rgba(255, 255, 255, 0.35) 100%
+        );
     }
 
-    /* Hero con parallax (opcional) */
-    .hero-background.parallax .hero-bg-image {
-        transform: translate3d(0, 0, 0);
-        will-change: transform;
+    /* Overlay adaptativo fuerte (más contraste) */
+    .hero-background.adaptive-strong .hero-overlay-adaptive {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    :root[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-adaptive,
+    html[data-theme="light"] .hero-background.adaptive-strong .hero-overlay-adaptive {
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.6) 0%,
+            rgba(248, 249, 250, 0.65) 25%,
+            rgba(241, 243, 244, 0.7) 75%,
+            rgba(255, 255, 255, 0.75) 100%
+        );
     }
 
-    /* === VARIANTES DE OVERLAY === */
+    /* === VARIANTES ESPECIALES === */
     
-    /* Overlay más oscuro */
-    .hero-background.overlay-dark .hero-overlay {
-        background: var(--bg-surface);                 /* Más opaco */
+    /* Overlay con efecto cristal */
+    .hero-background.glass-adaptive .hero-overlay-adaptive {
+        backdrop-filter: var(--backdrop-blur);
+        background: var(--glass-bg);
     }
     
-    /* Overlay más claro */
-    .hero-background.overlay-light .hero-overlay {
-        background: rgba(0, 0, 0, 0.1);
+    :root[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-adaptive,
+    html[data-theme="light"] .hero-background.glass-adaptive .hero-overlay-adaptive {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(20px) saturate(180%);
+    }
+
+    /* Gradiente vertical adaptativo */
+    .hero-background.gradient-adaptive .hero-overlay-adaptive {
+        background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.1) 30%,
+            rgba(0, 0, 0, 0.3) 70%,
+            rgba(0, 0, 0, 0.5) 100%
+        );
     }
     
-    /* Sin overlay */
-    .hero-background.no-overlay .hero-overlay {
-        display: none;
+    :root[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-adaptive,
+    html[data-theme="light"] .hero-background.gradient-adaptive .hero-overlay-adaptive {
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.6) 0%,
+            rgba(255, 255, 255, 0.7) 30%,
+            rgba(248, 249, 250, 0.8) 70%,
+            rgba(255, 255, 255, 0.9) 100%
+        );
     }
 
     /* === RESPONSIVE === */
@@ -177,12 +252,25 @@ const {
     /* Mobile optimizations */
     @media (max-width: 768px) {
         .hero-background {
-            /* En móvil, usar viewport units más estables */
             height: 100svh;
         }
         
+        /* Overlay más fuerte en móvil para mejor legibilidad */
+        .hero-overlay-adaptive {
+            background: rgba(0, 0, 0, 0.15);
+        }
+        
+        :root[data-theme="light"] .hero-overlay-adaptive,
+        html[data-theme="light"] .hero-overlay-adaptive {
+            background: linear-gradient(
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(248, 249, 250, 0.5) 50%,
+                rgba(255, 255, 255, 0.55) 100%
+            );
+        }
+        
         .hero-background :global(.responsive-image-fallback .fallback-content) {
-            padding: var(--space-8) var(--space-4);    /* En lugar de 2rem 1rem */
+            padding: var(--space-8) var(--space-4);
         }
     }
 
@@ -200,37 +288,14 @@ const {
         }
     }
 
-    /* === TEMAS ESPECÍFICOS === */
+    /* === TEMAS ESPECÍFICOS PARA FALLBACK === */
     
-    /* Ajustes para tema claro */
     [data-theme="light"] .hero-background :global(.responsive-image-fallback) {
         background: linear-gradient(135deg, 
             var(--gray-100) 0%, 
             var(--gray-300) 100%
         );
         color: var(--text-primary);
-    }
-    
-    [data-theme="light"] .hero-overlay {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* === EFECTOS ESPECIALES === */
-    
-    /* Efecto de cristal en el overlay */
-    .hero-background.glass-overlay .hero-overlay {
-        background: var(--glass-bg);
-        backdrop-filter: var(--backdrop-blur);
-    }
-    
-    /* Gradiente personalizado con colores del tema */
-    .hero-background.gradient-overlay .hero-overlay {
-        background: linear-gradient(
-            180deg,
-            transparent 0%,
-            var(--bg-overlay) 50%,
-            var(--bg-surface) 100%
-        );
     }
 
     /* === ANIMACIONES === */
@@ -248,61 +313,52 @@ const {
             opacity: 1;
         }
     }
-    
-    /* Parallax suave */
-    .hero-background.parallax .hero-bg-image {
-        animation: subtleParallax 20s ease-in-out infinite;
-    }
-    
-    @keyframes subtleParallax {
-        0%, 100% {
-            transform: translate3d(0, 0, 0) scale(1);
-        }
-        50% {
-            transform: translate3d(0, -10px, 0) scale(1.02);
-        }
-    }
 
     /* === ACCESIBILIDAD === */
     
-    /* Respeto por preferencias de movimiento reducido */
+    /* Alto contraste */
+    @media (prefers-contrast: high) {
+        .hero-overlay-adaptive {
+            background: rgba(0, 0, 0, 0.7) !important;
+        }
+        
+        :root[data-theme="light"] .hero-overlay-adaptive,
+        html[data-theme="light"] .hero-overlay-adaptive {
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+    }
+
+    /* Movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
-        .hero-background.parallax .hero-bg-image {
-            transform: none;
-            will-change: auto;
-            animation: none;
+        .hero-overlay-adaptive {
+            transition: none;
         }
         
         .hero-background.animate-in {
             animation: none;
         }
     }
-    
-    /* Alto contraste */
-    @media (prefers-contrast: high) {
-        .hero-overlay {
-            background: rgba(0, 0, 0, 0.7) !important;
-        }
-        
-        [data-theme="light"] .hero-overlay {
-            background: rgba(255, 255, 255, 0.8) !important;
-        }
-    }
 
     /* === OPTIMIZACIONES DE PERFORMANCE === */
     
-    /* Hint al navegador sobre lo que va a cambiar */
-    .hero-background.will-animate {
-        will-change: opacity, transform;
-    }
-    
-    /* Contener el layout para mejor performance */
     .hero-background {
         contain: layout style paint;
     }
     
-    /* Isolation para efectos de blend */
     .hero-background.isolated {
         isolation: isolate;
+    }
+
+    /* === UTILIDADES DE DEBUG === */
+    
+    /* Para desarrollo - mostrar límites de overlays */
+    .hero-background.debug-overlays .hero-overlay {
+        border: 2px solid red;
+        opacity: 0.5;
+    }
+    
+    .hero-background.debug-overlays .hero-overlay-adaptive {
+        border: 2px solid blue;
+        opacity: 0.5;
     }
 </style>

@@ -28,14 +28,14 @@ const {
   .main-content {
     width: 100%;
     position: relative;
-    z-index: var(--z-10);                               /* 1 → token */
+    z-index: var(--z-10);
     
     /* SOLO centra horizontalmente */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 
-    padding: calc(var(--space-10)) 0;                   /* 2.5rem → token */
+    padding: calc(var(--space-10)) 0;
     
     /* Optimización de rendering */
     contain: layout style;
@@ -43,33 +43,36 @@ const {
 
   /* === BACKGROUNDS (aplicados al container exterior) === */
   .main-content--bg-dark {
-    background: var(--dark-500);                        /* rgb(20, 20, 20) → token */
+    background: var(--dark-500);
   }
 
   .main-content--bg-darker {
-    background: var(--dark-800);                        /* rgb(15, 15, 15) → token */
+    background: var(--dark-800);
   }
 
   .main-content--bg-gradient {
-    background: linear-gradient(180deg, var(--dark-500) 0%, var(--dark-800) 100%); /* Usando tokens */
+    background: linear-gradient(180deg, var(--dark-500) 0%, var(--dark-800) 100%);
   }
 
   /* === VARIANTES DE TEMA PARA BACKGROUNDS === */
   
-  /* Tema claro */
-  [data-theme="light"] .main-content--bg-dark {
-    background: var(--gray-50);                         /* Fondo claro */
+  /* Tema claro - fondo menos blanco */
+  :root[data-theme="light"] .main-content--bg-dark,
+  html[data-theme="light"] .main-content--bg-dark {
+    background: var(--gray-100); /* Menos blanco que gray-50 */
   }
 
-  [data-theme="light"] .main-content--bg-darker {
-    background: var(--gray-100);                        /* Fondo más claro */
+  :root[data-theme="light"] .main-content--bg-darker,
+  html[data-theme="light"] .main-content--bg-darker {
+    background: var(--gray-200); /* Un poco más oscuro */
   }
 
-  [data-theme="light"] .main-content--bg-gradient {
-    background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
+  :root[data-theme="light"] .main-content--bg-gradient,
+  html[data-theme="light"] .main-content--bg-gradient {
+    background: linear-gradient(180deg, var(--gray-100) 0%, var(--gray-200) 100%);
   }
 
-  /* === EFECTO DE PARTÍCULAS (aplicado al container exterior) === */
+  /* === EFECTO DE PARTÍCULAS BASE === */
   .main-content--particles::before {
     content: '';
     position: absolute;
@@ -78,22 +81,45 @@ const {
     right: 0;
     bottom: 0;
     background-image: 
-      radial-gradient(circle at 25% 25%, var(--accent-primary) 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, var(--accent-primary) 1px, transparent 1px),
-      radial-gradient(circle at 40% 80%, var(--accent-primary) 1px, transparent 1px),
-      radial-gradient(circle at 80% 20%, var(--accent-primary) 1px, transparent 1px),
-      radial-gradient(circle at 15% 60%, var(--accent-primary) 1px, transparent 1px);
+      radial-gradient(circle at 25% 25%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, #f4a261 1px, transparent 1px),
+      radial-gradient(circle at 15% 60%, #f4a261 1px, transparent 1px);
     background-size: 
       120px 120px, 
       150px 150px, 
       100px 100px, 
       180px 180px, 
       90px 90px;
-    opacity: 0.15;
-    animation: float var(--duration-1000) var(--ease-in-out) infinite; /* 25s → múltiples tokens */
-    animation-duration: calc(var(--duration-1000) * 25);  /* 25000ms total */
+    opacity: 0.4;
+    animation: float var(--duration-1000) var(--ease-in-out) infinite;
+    animation-duration: calc(var(--duration-1000) * 25);
     z-index: -1;
     pointer-events: none;
+    transition: opacity var(--duration-300) var(--ease-out);
+  }
+
+  /* === PARTÍCULAS PARA TEMA CLARO === */
+  :root[data-theme="light"] .main-content--particles::before,
+  html[data-theme="light"] .main-content--particles::before {
+    background-image: 
+      radial-gradient(circle at 25% 25%, #d97706 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, #d97706 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, #d97706 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, #d97706 1px, transparent 1px),
+      radial-gradient(circle at 15% 60%, #d97706 1px, transparent 1px),
+      radial-gradient(circle at 60% 40%, #374151 0.8px, transparent 0.8px),
+      radial-gradient(circle at 35% 65%, #4b5563 0.8px, transparent 0.8px);
+    background-size: 
+      120px 120px, 
+      150px 150px, 
+      100px 100px, 
+      180px 180px, 
+      90px 90px,
+      140px 140px,
+      110px 110px;
+    opacity: 0.6;
   }
 
   @keyframes float {
@@ -101,13 +127,13 @@ const {
       transform: translateY(0px) translateX(0px); 
     }
     25% { 
-      transform: translateY(calc(-1 * var(--space-4))) translateX(var(--space-1)); /* -15px, 5px → tokens */
+      transform: translateY(calc(-1 * var(--space-4))) translateX(var(--space-1));
     }
     50% { 
-      transform: translateY(calc(-1 * var(--space-6))) translateX(calc(-1 * var(--space-3))); /* -25px, -10px → tokens */
+      transform: translateY(calc(-1 * var(--space-6))) translateX(calc(-1 * var(--space-3)));
     }
     75% { 
-      transform: translateY(calc(-1 * var(--space-3))) translateX(var(--space-2)); /* -10px, 8px → tokens */
+      transform: translateY(calc(-1 * var(--space-3))) translateX(var(--space-2));
     }
   }
 
@@ -119,7 +145,7 @@ const {
     max-width: 1200px;
     width: 100%;
     position: relative;
-    z-index: var(--z-20);                               /* 2 → token */
+    z-index: var(--z-20);
     
     /* ESTE container maneja el layout y gaps */
     display: flex;
@@ -152,23 +178,23 @@ const {
   }
 
   .main-content-container--gap-tiny {
-    gap: var(--space-1);                                /* Muy pequeño: 4px */
+    gap: var(--space-1);
   }
 
   .main-content-container--gap-small {
-    gap: var(--space-2);                                /* Pequeño: 8px */
+    gap: var(--space-2);
   }
 
   .main-content-container--gap-medium {
-    gap: var(--space-4);                                /* Medio: 16px */
+    gap: var(--space-4);
   }
 
   .main-content-container--gap-large {
-    gap: var(--space-6);                                /* Grande: 24px */
+    gap: var(--space-6);
   }
 
   .main-content-container--gap-xl {
-    gap: var(--space-10);                               /* Extra grande: 40px */
+    gap: var(--space-10);
   }
 
   /* === RESPONSIVE GAPS (aplicados al container interior) === */
@@ -180,23 +206,23 @@ const {
     }
 
     .main-content-container--gap-tiny {
-      gap: var(--space-2);                              /* 8px */
+      gap: var(--space-2);
     }
 
     .main-content-container--gap-small {
-      gap: var(--space-4);                              /* 16px */
+      gap: var(--space-4);
     }
 
     .main-content-container--gap-medium {
-      gap: var(--space-6);                              /* 24px */
+      gap: var(--space-6);
     }
 
     .main-content-container--gap-large {
-      gap: var(--space-8);                              /* 32px */
+      gap: var(--space-8);
     }
 
     .main-content-container--gap-xl {
-      gap: var(--space-12);                             /* 48px */
+      gap: var(--space-12);
     }
   }
 
@@ -207,23 +233,23 @@ const {
     }
 
     .main-content-container--gap-tiny {
-      gap: var(--space-2);                              /* 8px */
+      gap: var(--space-2);
     }
 
     .main-content-container--gap-small {
-      gap: var(--space-4);                              /* 16px */
+      gap: var(--space-4);
     }
 
     .main-content-container--gap-medium {
-      gap: var(--space-6);                              /* 24px */
+      gap: var(--space-6);
     }
 
     .main-content-container--gap-large {
-      gap: var(--space-8);                              /* 32px */
+      gap: var(--space-8);
     }
 
     .main-content-container--gap-xl {
-      gap: var(--space-12);                             /* 48px */
+      gap: var(--space-12);
     }
   }
 
@@ -233,18 +259,18 @@ const {
   
   .main-content-container > :global(section) {
     position: relative;
-    z-index: var(--z-20);                               /* 2 → token */
+    z-index: var(--z-20);
     
     /* Padding vertical para las secciones usando tokens */
     padding: calc(var(--padding-mobile) * 1.5) 0;
     
     /* Eliminar backgrounds duplicados */
-    background: transparent !important;
+    background: transparent;
   }
 
   .main-content-container > :global(section)::before {
     /* Eliminar efectos de partículas duplicados */
-    display: none !important;
+    display: none;
   }
 
   /* === RESPONSIVE PADDING PARA SECCIONES === */
@@ -276,11 +302,11 @@ const {
   
   /* Secciones como tarjetas */
   .main-content-container > :global(.section-card) {
-    background: var(--glass-bg) !important;             /* rgba(0, 0, 0, 0.6) → token */
-    backdrop-filter: var(--backdrop-blur) !important;   /* blur(15px) → token */
-    border-radius: var(--radius-3xl);                   /* 20px → token */
-    border: var(--border-1) solid var(--glass-border);  /* rgba(244, 162, 97, 0.2) → token */
-    box-shadow: var(--shadow-xl);                       /* 0 20px 40px rgba(0, 0, 0, 0.3) → token */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--radius-3xl);
+    border: var(--border-1) solid var(--glass-border);
+    box-shadow: var(--shadow-xl);
     padding: calc(var(--padding-mobile) * 2);
   }
 
@@ -299,10 +325,51 @@ const {
   /* === VARIANTES DE TEMA PARA TARJETAS === */
   
   /* Tema claro */
-  [data-theme="light"] .main-content-container > :global(.section-card) {
-    background: var(--bg-surface) !important;
+  :root[data-theme="light"] .main-content-container > :global(.section-card),
+  html[data-theme="light"] .main-content-container > :global(.section-card) {
+    background: var(--bg-surface);
     border-color: var(--border-primary);
     box-shadow: var(--shadow-lg);
+  }
+
+  /* === VARIANTES DE PARTÍCULAS ADICIONALES === */
+  
+  /* Variante sin partículas explícita */
+  .main-content--no-particles::before {
+    display: none;
+  }
+  
+  /* Variante con partículas más intensas */
+  .main-content--particles-intense::before {
+    opacity: 0.5; /* Más intenso */
+    background-size: 
+      80px 80px, 
+      100px 100px, 
+      60px 60px, 
+      120px 120px, 
+      50px 50px;
+  }
+
+  /* Tema claro - partículas intensas */
+  :root[data-theme="light"] .main-content--particles-intense::before,
+  html[data-theme="light"] .main-content--particles-intense::before {
+    background-image: 
+      radial-gradient(circle at 25% 25%, #d97706 1.2px, transparent 1.2px),
+      radial-gradient(circle at 75% 75%, #d97706 1.2px, transparent 1.2px),
+      radial-gradient(circle at 40% 80%, #374151 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, #4b5563 1px, transparent 1px),
+      radial-gradient(circle at 15% 60%, #d97706 1.2px, transparent 1.2px),
+      radial-gradient(circle at 60% 40%, #6b7280 0.8px, transparent 0.8px),
+      radial-gradient(circle at 35% 65%, #374151 0.8px, transparent 0.8px);
+    background-size: 
+      70px 70px, 
+      90px 90px, 
+      50px 50px, 
+      110px 110px, 
+      40px 40px,
+      130px 130px,
+      80px 80px;
+    opacity: 0.7;
   }
 
   /* === ACCESIBILIDAD === */
@@ -340,24 +407,6 @@ const {
     filter: blur(1px);
   }
 
-  /* === UTILIDADES ESPECÍFICAS === */
-  
-  /* Variante sin partículas explícita */
-  .main-content--no-particles::before {
-    display: none;
-  }
-  
-  /* Variante con partículas más intensas */
-  .main-content--particles-intense::before {
-    opacity: 0.25;
-    background-size: 
-      80px 80px, 
-      100px 100px, 
-      60px 60px, 
-      120px 120px, 
-      50px 50px;
-  }
-
   /* === SOPORTE PARA DISPOSITIVOS CON NOTCH === */
   
   .main-content {
@@ -373,14 +422,14 @@ const {
     }
     
     .main-content {
-      background: white !important;
+      background: white;
       padding: 0;
     }
     
     .main-content-container > :global(.section-card) {
-      background: white !important;
-      box-shadow: none !important;
-      border: var(--border-1) solid #ccc !important;
+      background: white;
+      box-shadow: none;
+      border: var(--border-1) solid #ccc;
     }
   }
 

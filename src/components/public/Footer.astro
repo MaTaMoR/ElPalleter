@@ -22,8 +22,8 @@ export const prerender = true;
     
     .footer {
         width: 100%;
-        background: var(--dark-800);                    /* rgb(15, 15, 15) */
-        border-top: var(--border-1) solid var(--glass-border); /* rgba(244, 162, 97, 0.2) */
+        background: var(--dark-800);
+        border-top: var(--border-1) solid var(--glass-border);
         position: relative;
         z-index: var(--z-10);
         
@@ -34,6 +34,10 @@ export const prerender = true;
         
         /* Padding vertical usando tokens */
         padding: calc(var(--padding-mobile) * 1.5) 0;
+        
+        /* Transición suave para cambios de tema */
+        transition: background-color var(--duration-300) var(--ease-out),
+                    border-color var(--duration-300) var(--ease-out);
     }
 
     /* ============================================== */
@@ -78,33 +82,35 @@ export const prerender = true;
     /* Copyright a la izquierda */
     .footer-copyright {
         margin: 0;
-        font-size: var(--text-sm);                      /* 0.9rem */
-        color: var(--text-tertiary);                    /* #999 equivalent */
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
         flex: 1;
         font-family: var(--font-primary);
         line-height: var(--leading-normal);
+        transition: color var(--duration-300) var(--ease-out);
     }
 
     /* Crédito del desarrollador a la derecha */
     .footer-credit {
         margin: 0;
-        font-size: var(--text-sm);                      /* 0.9rem */
-        color: var(--text-tertiary);                    /* #999 equivalent */
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
         text-align: right;
         flex: 1;
         font-family: var(--font-primary);
         line-height: var(--leading-normal);
+        transition: color var(--duration-300) var(--ease-out);
     }
 
     .developer-link {
-        color: var(--accent-primary);                   /* #f4a261 */
-        font-weight: var(--font-medium);                /* 500 */
+        color: var(--accent-primary);
+        font-weight: var(--font-medium);
         text-decoration: none;
-        transition: var(--transition-colors);           /* Transición optimizada */
+        transition: var(--transition-colors);
     }
 
     .developer-link:hover {
-        color: var(--text-primary);                     /* #fff */
+        color: var(--text-primary);
         text-decoration: underline;
     }
 
@@ -112,6 +118,27 @@ export const prerender = true;
         outline: var(--border-2) solid var(--focus-ring);
         outline-offset: var(--space-1);
         border-radius: var(--radius-sm);
+    }
+
+    /* === VARIANTES DE TEMA === */
+    
+    /* Tema claro - footer más oscuro para contrastar con MainContent */
+    :root[data-theme="light"] .footer,
+    html[data-theme="light"] .footer {
+        background: var(--gray-300); /* Más oscuro que el gray-100 del MainContent */
+        border-top-color: var(--gray-500); /* Border más visible en tema claro */
+    }
+
+    :root[data-theme="light"] .footer-copyright,
+    html[data-theme="light"] .footer-copyright,
+    :root[data-theme="light"] .footer-credit,
+    html[data-theme="light"] .footer-credit {
+        color: var(--text-primary); /* Texto más oscuro para mejor contraste */
+    }
+
+    :root[data-theme="light"] .developer-link:hover,
+    html[data-theme="light"] .developer-link:hover {
+        color: var(--text-primary);
     }
 
     /* === RESPONSIVE === */
@@ -155,7 +182,7 @@ export const prerender = true;
 
         .footer-copyright,
         .footer-credit {
-            font-size: var(--text-base);               /* 1rem */
+            font-size: var(--text-base);
         }
     }
 
@@ -178,31 +205,17 @@ export const prerender = true;
 
         .footer-copyright,
         .footer-credit {
-            font-size: var(--text-xs);                 /* 0.85rem equivalent */
+            font-size: var(--text-xs);
         }
-    }
-
-    /* === VARIANTES DE TEMA === */
-    
-    /* Tema claro */
-    [data-theme="light"] .footer {
-        background: var(--gray-100);                    /* Fondo claro para tema light */
-        border-top-color: var(--border-primary);
-    }
-
-    [data-theme="light"] .footer-copyright,
-    [data-theme="light"] .footer-credit {
-        color: var(--text-secondary);                   /* Texto más oscuro en tema claro */
-    }
-
-    [data-theme="light"] .developer-link:hover {
-        color: var(--text-primary);                     /* Texto principal en hover */
     }
 
     /* === ACCESIBILIDAD === */
     
     /* Preferencias de movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
+        .footer,
+        .footer-copyright,
+        .footer-credit,
         .developer-link {
             transition: none;
         }
@@ -230,17 +243,45 @@ export const prerender = true;
         contain: layout style paint;
     }
 
-    /* === VARIANTES TEMÁTICAS ADICIONALES === */
+    /* === ESTADOS ADICIONALES === */
     
-    [data-theme="gold"] .developer-link {
-        color: var(--accent-primary);                   /* Dorado en tema gold */
+    /* Estado de carga */
+    .footer.loading {
+        opacity: 0.8;
+        pointer-events: none;
+    }
+
+    /* === MODO PRINT === */
+    
+    @media print {
+        .footer {
+            background: white;
+            border-top: var(--border-1) solid #ccc;
+            color: black;
+        }
+        
+        .footer-copyright,
+        .footer-credit {
+            color: black;
+        }
+        
+        .developer-link {
+            color: black;
+            text-decoration: underline;
+        }
+    }
+
+    /* === DEBUGGING EN DESARROLLO === */
+    
+    [data-debug="true"] .footer {
+        outline: 2px dashed red;
     }
     
-    [data-theme="blue"] .developer-link {
-        color: var(--accent-primary);                   /* Azul en tema blue */
+    [data-debug="true"] .footer-container {
+        outline: 2px dashed blue;
     }
     
-    [data-theme="restaurant"] .developer-link {
-        color: var(--accent-primary);                   /* Marrón en tema restaurant */
+    [data-debug="true"] .footer-content {
+        outline: 1px dashed green;
     }
 </style>

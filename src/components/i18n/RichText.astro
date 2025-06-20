@@ -11,7 +11,7 @@ export interface Props {
   sanitize?: boolean;
   maxLength?: number;
   tag?: keyof HTMLElementTagNameMap;
-  theme?: 'light' | 'dark' | 'gold' | 'custom';
+  theme?: 'light' | 'dark' | 'gold' | 'adaptive' | 'custom';
   [key: string]: any;
 }
 
@@ -22,7 +22,7 @@ const {
   sanitize = false,
   maxLength,
   tag = 'div',
-  theme = 'gold',  // Mantener gold como default para Historia
+  theme = 'adaptive',
   ...restProps 
 } = Astro.props;
 
@@ -72,7 +72,6 @@ const Element = tag;
 <style>
   /* =====================================================
      RICH TEXT EDITOR - ACTUALIZADO CON DESIGN TOKENS
-     Mantiene el diseño original pero usa el sistema
      ===================================================== */
 
   /* === SISTEMA DE TEMAS CON TOKENS === */
@@ -107,7 +106,6 @@ const Element = tag;
   
   /* Tema Gold - MANTENIENDO EXACTAMENTE EL DISEÑO ORIGINAL */
   .richtext-editor.gold-theme {
-    /* ✨ MANTENER: Exactamente los mismos colores visuales */
     --rt-primary-color: #ffffff;           /* Texto blanco como original */
     --rt-secondary-color: #f4a261;         /* Dorado original */
     --rt-accent-color: #f39c12;            /* Acento original */
@@ -115,10 +113,38 @@ const Element = tag;
     --rt-background-color: transparent;    /* Fondo transparente original */
     --rt-border-color: #f4a261;           /* Borde dorado original */
     
-    /* ✨ USAR TOKENS: Para tipografía y espaciado */
     --rt-font-family: var(--font-primary);
     --rt-heading-font: var(--font-heading);
     --rt-mono-font: var(--font-mono);
+  }
+
+  /* Tema Adaptive - SE ADAPTA AL TEMA GLOBAL */
+  .richtext-editor.adaptive-theme {
+    /* Por defecto (tema oscuro) usa colores del tema gold */
+    --rt-primary-color: #ffffff;
+    --rt-secondary-color: #f4a261;
+    --rt-accent-color: #f39c12;
+    --rt-highlight-color: #f4a261;
+    --rt-background-color: transparent;
+    --rt-border-color: #f4a261;
+    
+    --rt-font-family: var(--font-primary);
+    --rt-heading-font: var(--font-heading);
+    --rt-mono-font: var(--font-mono);
+    
+    /* Transiciones suaves */
+    transition: color var(--duration-300) var(--ease-out);
+  }
+
+  /* Tema adaptive en modo claro */
+  :root[data-theme="light"] .richtext-editor.adaptive-theme,
+  html[data-theme="light"] .richtext-editor.adaptive-theme {
+    --rt-primary-color: var(--text-primary);     /* Texto oscuro dinámico */
+    --rt-secondary-color: var(--accent-primary); /* Accent dinámico */
+    --rt-accent-color: var(--accent-primary);    /* Accent dinámico */
+    --rt-highlight-color: var(--accent-primary); /* Accent dinámico */
+    --rt-background-color: transparent;
+    --rt-border-color: var(--accent-primary);
   }
   
   /* Tema Custom - permite override completo */
@@ -141,7 +167,7 @@ const Element = tag;
     font-family: var(--rt-font-family);
     color: var(--rt-primary-color);
     background-color: var(--rt-background-color);
-    line-height: var(--leading-normal);    /* Token en lugar de 1.6 */
+    line-height: var(--leading-normal);
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -156,12 +182,13 @@ const Element = tag;
   /* Títulos usando tokens de tamaño responsivo */
   .richtext-editor :global(.rt-h1) {
     font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));  /* Tokens en lugar de rem */
+    font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
     font-weight: var(--font-bold);
     line-height: var(--leading-tight);
     color: var(--rt-primary-color);
-    margin: 0 0 var(--space-6) 0;        /* Tokens en lugar de 1.5rem */
+    margin: 0 0 var(--space-6) 0;
     letter-spacing: var(--tracking-tight);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-h2) {
@@ -172,6 +199,7 @@ const Element = tag;
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-5) 0;
     letter-spacing: var(--tracking-tight);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-h3) {
@@ -181,6 +209,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-4) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-h4) {
@@ -190,6 +219,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-3) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-h5) {
@@ -199,6 +229,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-3) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-h6) {
@@ -208,6 +239,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-secondary-color);
     margin: 0 0 var(--space-3) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   /* Textos de Cuerpo usando tokens */
@@ -218,6 +250,7 @@ const Element = tag;
     line-height: var(--leading-relaxed);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-5) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-body) {
@@ -227,6 +260,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-4) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-body-small) {
@@ -236,6 +270,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-secondary-color);
     margin: 0 0 var(--space-3) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   /* Subtítulos y elementos especiales */
@@ -247,6 +282,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-secondary-color);
     margin: 0 0 var(--space-2) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-lead) {
@@ -256,36 +292,42 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin: 0 0 var(--space-6) 0;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   /* === ELEMENTOS INLINE === */
   
-  /* Destacados y énfasis - MANTENIENDO EXACTAMENTE LOS COLORES ORIGINALES */
+  /* Destacados y énfasis */
   .richtext-editor :global(.rt-highlight) {
-    color: var(--rt-highlight-color);      /* Mantiene #f4a261 en tema gold */
+    color: var(--rt-highlight-color);
     font-weight: var(--font-semibold);
     background: none;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-accent) {
-    color: var(--rt-accent-color);         /* Mantiene #f39c12 en tema gold */
+    color: var(--rt-accent-color);
     font-weight: var(--font-medium);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-strong) {
     font-weight: var(--font-bold);
     color: var(--rt-primary-color);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-emphasis) {
     font-style: italic;
     color: var(--rt-primary-color);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-underline) {
     text-decoration: underline;
     text-decoration-color: var(--rt-accent-color);
-    text-underline-offset: var(--space-1);  /* Token en lugar de 2px */
+    text-underline-offset: var(--space-1);
+    transition: text-decoration-color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-code) {
@@ -295,6 +337,8 @@ const Element = tag;
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
     color: var(--rt-primary-color);
+    transition: background-color var(--duration-300) var(--ease-out),
+                color var(--duration-300) var(--ease-out);
   }
   
   /* === ELEMENTOS DE BLOQUE === */
@@ -306,23 +350,27 @@ const Element = tag;
     font-style: italic;
     line-height: var(--leading-normal);
     color: var(--rt-secondary-color);
-    margin: var(--space-8) 0;             /* Tokens en lugar de 2rem 0 */
-    padding: var(--space-6) var(--space-8); /* Tokens en lugar de 1.5rem 2rem */
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
     border-left: var(--border-4) solid var(--rt-accent-color);
     background-color: var(--rt-border-color);
     position: relative;
+    transition: color var(--duration-300) var(--ease-out),
+                background-color var(--duration-300) var(--ease-out),
+                border-color var(--duration-300) var(--ease-out);
   }
   
   .richtext-editor :global(.rt-quote::before) {
     content: '"';
     font-family: var(--rt-heading-font);
-    font-size: var(--text-5xl);           /* Token en lugar de 4rem */
+    font-size: var(--text-5xl);
     color: var(--rt-accent-color);
     position: absolute;
-    left: var(--space-2);                 /* Token en lugar de 0.5rem */
+    left: var(--space-2);
     top: 0;
     line-height: 1;
     opacity: 0.3;
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   /* Listas usando tokens para espaciado */
@@ -337,6 +385,7 @@ const Element = tag;
     line-height: var(--leading-normal);
     color: var(--rt-primary-color);
     margin-bottom: var(--space-2);
+    transition: color var(--duration-300) var(--ease-out);
   }
   
   /* Enlaces */

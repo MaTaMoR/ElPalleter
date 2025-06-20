@@ -1,0 +1,22 @@
+<svg id="logo-split-letters" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 55" width="80" height="55">
+  <defs>
+    <!-- Máscara para la parte superior -->
+    <clipPath id="topHalf">
+      <rect x="0" y="0" width="80" height="27"/>
+    </clipPath>
+    
+    <!-- Máscara para la parte inferior -->
+    <clipPath id="bottomHalf">
+      <rect x="0" y="33" width="80" height="24"/>
+    </clipPath>
+  </defs>
+  
+  <!-- Letras perfectamente centradas en el viewBox -->
+  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#topHalf)">E</text>
+  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#topHalf)">P</text>
+  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#bottomHalf)">E</text>
+  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#bottomHalf)">P</text>
+  
+  <!-- Línea blanca que parte las letras por la mitad - extendida en ambos lados -->
+  <line x1="0" y1="30" x2="80" y2="30" stroke="#FF4500" stroke-width="1"/>
+</svg>

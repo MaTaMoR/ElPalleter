@@ -51,6 +51,9 @@
   --glass-border: rgba(244, 162, 97, 0.2);
   --backdrop-blur: blur(15px);
   --backdrop-blur-strong: blur(20px);
+
+  --selection-bg: rgba(244, 162, 97, 0.2);
+  --selection-text: #ffffff;
 }
 
 /* === TEMA CLARO === */
@@ -100,6 +103,9 @@
   --glass-border: var(--brand-primary-medium);
   --backdrop-blur: blur(15px);
   --backdrop-blur-strong: blur(20px);
+
+  --selection-bg: rgba(59, 130, 246, 0.15);
+  --selection-text: #1f2937;
 }
 
 /* === TEMA DORADO === */

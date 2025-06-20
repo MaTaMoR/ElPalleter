@@ -1,7 +1,9 @@
 ---
+// Navigation.astro - Actualizado con cambio dinámico de logo
 export const prerender = true;
 
-import epLogo from '../../assets/mini-logo.svg';
+import lightLogo from '../../assets/mini-logo-light.svg'; // Logo para tema oscuro
+import darkLogo from '../../assets/mini-logo-dark.svg';      // Logo para tema claro
 import Text from '../i18n/Text.astro';
 import LanguagePicker from '../i18n/LanguagePicker.astro';
 ---
@@ -20,7 +22,20 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         <li><a data-scroll-to="historia"><Text key="nav.story"></a></li>
         <li class="logo-item">
             <a href="#hero" aria-label="Ir a inicio - El Palleter">
-                <img src={epLogo.src} alt="El Palleter Logo" />
+                <!-- Logo para tema oscuro -->
+                <img 
+                    src={lightLogo.src} 
+                    alt="El Palleter Logo"
+                    class="logo-dark"
+                    data-logo="dark"
+                />
+                <!-- Logo para tema claro -->
+                <img 
+                    src={darkLogo.src} 
+                    alt="El Palleter Logo"
+                    class="logo-light"
+                    data-logo="light"
+                />
             </a>
         </li>
         <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
@@ -34,11 +49,24 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     <!-- Logo solo para móvil -->
     <div class="logo-mobile">
         <a href="#hero" aria-label="Ir a inicio - El Palleter">
-            <img src={epLogo.src} alt="El Palleter Logo" />
+            <!-- Logo para tema oscuro -->
+            <img 
+                src={lightLogo.src} 
+                alt="El Palleter Logo"
+                class="logo-dark"
+                data-logo="dark"
+            />
+            <!-- Logo para tema claro -->
+            <img 
+                src={darkLogo.src} 
+                alt="El Palleter Logo"
+                class="logo-light"
+                data-logo="light"
+            />
         </a>
     </div>
     
-    <!-- Language Picker para Mobile (solo visible en móvil) -->
+    <!-- Language Picker para Mobile -->
     <div class="language-mobile">
         <LanguagePicker variant="mobile" includeThemeToggle={true} />
     </div>
@@ -49,13 +77,11 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     nav {
         max-width: 1200px;
         width: 100%;
-        font-family: var(--font-primary);               /* En lugar de hardcoded */
+        font-family: var(--font-primary);
         position: relative;
         display: flex;
         align-items: center;
-        z-index: var(--z-20);                           /* En lugar de 2 */
-        
-        /* Optimización de rendering */
+        z-index: var(--z-20);
         contain: layout style;
     }
     
@@ -66,11 +92,11 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         background: none;
         border: none;
         cursor: pointer;
-        padding: var(--space-3);                        /* 10px → var(--space-3) */
+        padding: var(--space-3);
         position: absolute;
-        left: var(--space-4);                           /* 1rem → var(--space-4) */
+        left: var(--space-4);
         z-index: 103;
-        transition: var(--transition-fast);             /* Añadido para suavidad */
+        transition: var(--transition-fast);
     }
 
     .hamburger:focus-visible {
@@ -81,65 +107,32 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     
     .hamburger span {
         width: 25px;
-        height: var(--space-1);                         /* 3px → var(--space-1) */
-        background: var(--text-primary);                /* white → dinámico */
-        margin: var(--space-1) 0;                       /* 3px → var(--space-1) */
-        border-radius: var(--radius-sm);                /* 2px → var(--radius-sm) */
+        height: var(--space-1);
+        background: var(--text-primary);
+        margin: var(--space-1) 0;
+        border-radius: var(--radius-sm);
         filter: drop-shadow(0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.4));
         transition: var(--transition-fast);
     }
 
     .hamburger:hover span {
-        background: var(--accent-primary);              /* Efecto hover */
+        background: var(--accent-primary);
     }
     
     /* === LOGO MÓVIL === */
     .logo-mobile {
-        display: none;                                   /* Se controla por responsive */
+        display: none;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         z-index: 102;
-        /* ✅ CRÍTICO: Reservar espacio fijo para evitar layout shift */
-        width: 120px;                                    /* Más ancho */
-        height: 90px;                                    /* Más alto */
+        width: 120px;
+        height: 90px;
         align-items: center;
         justify-content: center;
-        /* ✅ CRÍTICO: Ocultar texto alt durante la carga */
         overflow: hidden;
-        color: transparent;                              /* Oculta el alt text */
-        font-size: 0;                                    /* Oculta el alt text */
-    }
-    
-    .logo-mobile img {
-        height: 85px;                                    /* ✅ Altura restaurada */
-        width: auto;                                     /* ✅ Ancho automático para proporción */
-        max-width: 120px;                                /* Máximo ancho */
-        object-fit: contain;                             /* ✅ CRÍTICO: Mantiene proporción */
-        filter: drop-shadow(0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.4)) 
-                drop-shadow(0 0 var(--space-16) rgba(0, 0, 0, 0.3));
-        /* ✅ CRÍTICO: Prevenir layout shift */
-        display: block;
-        /* ✅ CRÍTICO: Ocultar hasta que carga completamente */
-        opacity: 0;
-        transition: opacity var(--duration-300) var(--ease-out), transform var(--duration-300) var(--ease-out);
-    }
-
-    /* ✅ CRÍTICO: Mostrar imagen móvil cuando carga */
-    .logo-mobile img[src]:not([src=""]) {
-        opacity: 1;
-    }
-    
-    .logo-mobile img:hover {
-        transform: scale(1.03);
-    }
-    
-    /* === LANGUAGE PICKER MOBILE === */
-    .language-mobile {
-        display: none;
-        position: absolute;
-        right: var(--space-4);                          /* 1rem → var(--space-4) */
-        z-index: 102;
+        color: transparent;
+        font-size: 0;
     }
     
     /* === NAVEGACIÓN DESKTOP === */
@@ -150,41 +143,42 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         align-items: center;
         list-style: none;
         padding: 0;
-        margin: 0;                                      /* ✅ CRÍTICO: Reset del margin global */
+        margin: 0;
         width: 100%;
-        gap: calc(var(--space-20));                     /* 5rem → equivalente con tokens */
+        gap: calc(var(--space-20));
     }
 
-    /* ✅ CRÍTICO: Reset específico para li - elimina margin-bottom global */
     .nav-desktop li {
-        margin: 0;                                      /* Elimina TODOS los márgenes */
-        padding: 0;                                     /* Elimina TODOS los paddings */
-        list-style: none;                               /* Asegura que no hay bullets */
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
     
     /* === ENLACES DE NAVEGACIÓN === */
     .nav-desktop li:not(.logo-item):not(.language-item) a {
         text-decoration: none;
-        font-size: var(--text-base);                    /* 1rem → var(--text-base) */
-        font-weight: var(--font-semibold);              /* 600 → var(--font-semibold) */
-        padding: var(--space-3) var(--space-3);         /* 10px 12px → tokens */
-        color: var(--text-primary);                     /* white → dinámico */
-        letter-spacing: var(--tracking-normal);         /* 0.3px → var(--tracking-normal) */
-        border-radius: var(--radius-lg);                /* 8px → var(--radius-lg) */
-        transition: var(--transition-base);              /* all 0.3s ease → token */
-        text-shadow: 0 var(--space-1) var(--space-1) rgba(0, 0, 0, 0.6);
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
+        padding: var(--space-3) var(--space-3);
+        color: var(--text-primary);
+        letter-spacing: var(--tracking-normal);
+        border-radius: var(--radius-lg);
+        transition: var(--transition-base);
         display: block;
         text-align: center;
         white-space: nowrap;
         position: relative;
         cursor: pointer;
         text-transform: uppercase;
+        
+        /* Text shadow adaptativo */
+        text-shadow: 0 var(--space-1) var(--space-1) var(--text-shadow-color, rgba(0, 0, 0, 0.6));
     }
     
     .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
-        background: var(--hover-overlay);               /* rgba(255, 255, 255, 0.08) → token */
-        transform: translateY(calc(-1 * var(--space-1))); /* -1px → token */
-        text-shadow: 0 var(--space-2) var(--space-4) rgba(0, 0, 0, 0.7);
+        background: var(--hover-overlay);
+        transform: translateY(calc(-1 * var(--space-1)));
+        text-shadow: 0 var(--space-2) var(--space-4) var(--text-shadow-hover-color, rgba(0, 0, 0, 0.7));
     }
 
     .nav-desktop li:not(.logo-item):not(.language-item) a:focus-visible {
@@ -194,8 +188,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     
     /* === INDICADOR DE SECCIÓN ACTIVA === */
     .nav-desktop li:not(.logo-item):not(.language-item) a.active {
-        background: var(--accent-light);                /* rgba(244, 162, 97, 0.2) → token */
-        color: var(--accent-primary);                   /* #f4a261 → token */
+        background: var(--accent-light);
+        color: var(--accent-primary);
     }
     
     /* === LOGO ITEM === */
@@ -203,27 +197,24 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 var(--space-2);                       /* 0 0.5rem → var(--space-2) */
-        /* ✅ CRÍTICO: Reservar espacio fijo para evitar layout shift */
-        min-width: 120px;                               /* Más ancho para logo más grande */
-        width: 120px;                                    /* Ancho fijo para reservar espacio */
+        margin: 0 var(--space-2);
+        min-width: 120px;
+        width: 120px;
     }
     
     .logo-item a {
-        display: block;
-        padding: 0;
-        border-radius: 0;
-        transition: var(--transition-base);
-        /* ✅ CRÍTICO: Dimensiones fijas para el contenedor del logo */
-        width: 120px;                                    /* Más ancho */
-        height: 90px;                                    /* Más alto para acomodar mejor */
         display: flex;
         align-items: center;
         justify-content: center;
-        /* ✅ CRÍTICO: Ocultar texto alt durante la carga */
+        padding: 0;
+        border-radius: 0;
+        transition: var(--transition-base);
+        width: 120px;
+        height: 90px;
         overflow: hidden;
-        color: transparent;                              /* Oculta el alt text */
-        font-size: 0;                                    /* Oculta el alt text */
+        color: transparent;
+        font-size: 0;
+        position: relative;
     }
 
     .logo-item a:focus-visible {
@@ -232,27 +223,46 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         border-radius: var(--radius-lg);
     }
     
-    .logo-item img {
-        height: 85px;                                    /* ✅ Altura restaurada y un poco más */
-        width: auto;                                     /* ✅ Ancho automático para mantener proporción */
-        max-width: 120px;                                /* Máximo ancho para contener */
-        object-fit: contain;                             /* ✅ CRÍTICO: Mantiene proporción */
-        filter: drop-shadow(0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.4)) 
-                drop-shadow(0 0 var(--space-16) rgba(0, 0, 0, 0.3));
-        /* ✅ CRÍTICO: Prevenir layout shift durante la carga */
+    /* === LOGOS - SISTEMA DE CAMBIO DINÁMICO === */
+    .logo-item img,
+    .logo-mobile img {
+        height: 85px;
+        width: auto;
+        max-width: 120px;
+        object-fit: contain;
         display: block;
-        /* ✅ CRÍTICO: Ocultar hasta que carga completamente */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         opacity: 0;
         transition: opacity var(--duration-300) var(--ease-out), transform var(--duration-300) var(--ease-out);
     }
 
-    /* ✅ CRÍTICO: Mostrar imagen cuando carga */
-    .logo-item img[src]:not([src=""]) {
+    /* Por defecto mostrar logo oscuro (tema dark) */
+    .logo-dark {
         opacity: 1;
     }
-    
-    .logo-item a:hover img {
-        transform: scale(1.03);
+
+    .logo-light {
+        opacity: 0;
+    }
+
+    /* En tema claro, mostrar logo claro */
+    :root[data-theme="light"] .logo-dark,
+    html[data-theme="light"] .logo-dark {
+        opacity: 0;
+    }
+
+    :root[data-theme="light"] .logo-light,
+    html[data-theme="light"] .logo-light {
+        opacity: 1;
+    }
+
+    /* Hover effect */
+    .logo-item a:hover img,
+    .logo-mobile a:hover img {
+        transform: translate(-50%, -50%) scale(1.03);
     }
     
     /* === LANGUAGE ITEM === */
@@ -265,36 +275,45 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         align-items: center;
         justify-content: center;
     }
+
+    /* === VARIABLES DE TEMA PARA TEXT SHADOW === */
+    :root {
+        --text-shadow-color: rgba(0, 0, 0, 0.6);
+        --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
+    }
+
+    :root[data-theme="light"],
+    html[data-theme="light"] {
+        --text-shadow-color: rgba(255, 255, 255, 0.8);
+        --text-shadow-hover-color: rgba(255, 255, 255, 0.9);
+    }
     
-    /* === RESPONSIVE USANDO BREAKPOINTS DEL SISTEMA === */
-    
-    /* Pantallas medias (hasta 1399px) */
+    /* === RESPONSIVE === */
     @media (max-width: 1399px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
-            font-size: var(--text-sm);                  /* 0.95rem → var(--text-sm) */
-            padding: var(--space-2) var(--space-3);     /* 8px 10px → tokens */
-            letter-spacing: var(--tracking-tight);      /* 0.2px → var(--tracking-tight) */
+            font-size: var(--text-sm);
+            padding: var(--space-2) var(--space-3);
+            letter-spacing: var(--tracking-tight);
         }
         
         .nav-desktop {
-            gap: calc(var(--space-20));                 /* Mantiene 5rem */
+            gap: calc(var(--space-20));
         }
     }
     
-    /* Tablet (hasta 1023px) */
     @media (max-width: 1023px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
-            font-size: var(--text-sm);                  /* 0.9rem → var(--text-sm) */
-            padding: var(--space-2) var(--space-2);     /* 8px 8px → tokens */
-            letter-spacing: var(--tracking-tight);      /* 0.1px → var(--tracking-tight) */
+            font-size: var(--text-sm);
+            padding: var(--space-2) var(--space-2);
+            letter-spacing: var(--tracking-tight);
         }
         
         .nav-desktop {
-            gap: calc(var(--space-10));                 /* 2.5rem → equivalente */
+            gap: calc(var(--space-10));
         }
         
         .logo-item {
-            margin: 0 var(--space-1);                   /* 0 0.3rem → var(--space-1) */
+            margin: 0 var(--space-1);
         }
     }
     
@@ -309,54 +328,33 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
         
         .logo-mobile {
-            display: flex;                               /* ✅ Ahora usa flex al mostrarse */
+            display: flex;
         }
         
         .language-mobile {
             display: flex;
+            align-items: center;
             justify-content: center;
+            position: absolute;
+            right: var(--space-2);
         }
         
         nav {
-            padding: 0 var(--space-4);                  /* 0 1rem → var(--space-4) */
+            padding: 0 var(--space-4);
         }
     }
     
-    /* Mobile pequeño */
     @media (max-width: 420px) {
         .logo-mobile img {
             height: 80px;
         }
         
-        .language-mobile {
-            right: var(--space-2);                      /* 0.5rem → var(--space-2) */
-        }
-        
         .hamburger {
-            left: var(--space-2);                       /* Ajuste para pantallas pequeñas */
+            left: var(--space-2);
         }
-    }
-
-    /* === VARIANTES DE TEMA === */
-    
-    /* Tema claro */
-    [data-theme="light"] .hamburger span {
-        background: var(--text-primary);                /* Se adapta automáticamente */
-    }
-    
-    [data-theme="light"] .nav-desktop li:not(.logo-item):not(.language-item) a {
-        color: var(--text-primary);
-        text-shadow: 0 var(--space-1) var(--space-1) rgba(255, 255, 255, 0.8);
-    }
-    
-    [data-theme="light"] .nav-desktop li:not(.logo-item):not(.language-item) a:hover {
-        background: var(--hover-overlay);               /* Se adapta al tema */
-        text-shadow: 0 var(--space-2) var(--space-4) rgba(255, 255, 255, 0.9);
     }
 
     /* === ACCESIBILIDAD === */
-    
-    /* Reducir movimiento si el usuario lo prefiere */
     @media (prefers-reduced-motion: reduce) {
         .hamburger,
         .hamburger span,
@@ -368,12 +366,16 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         
         .nav-desktop li:not(.logo-item):not(.language-item) a:hover,
         .logo-item a:hover img,
-        .logo-mobile img:hover {
+        .logo-mobile a:hover img {
             transform: none;
+        }
+        
+        .logo-item a:hover img,
+        .logo-mobile a:hover img {
+            transform: translate(-50%, -50%);
         }
     }
     
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .hamburger span {
             background: var(--text-primary);
@@ -391,10 +393,9 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     }
 
     /* === MEJORAS DE RENDIMIENTO === */
-    
     .logo-item img,
     .logo-mobile img {
-        will-change: transform;
+        will-change: transform, opacity;
         backface-visibility: hidden;
     }
     
@@ -403,15 +404,52 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     }
 
     /* === ESTADOS ADICIONALES === */
-    
-    /* Estado de carga */
     nav.loading {
         pointer-events: none;
         opacity: 0.7;
     }
     
-    /* Estado de navegación activa */
     nav.nav-active .hamburger span {
         background: var(--accent-primary);
     }
 </style>
+
+<script>
+    import ThemeService from '../../services/ThemeService.js';
+
+    // Función para actualizar los logos según el tema
+    function updateLogosForTheme(theme) {
+        const logosDark = document.querySelectorAll('[data-logo="dark"]');
+        const logosLight = document.querySelectorAll('[data-logo="light"]');
+        
+        if (theme === 'light') {
+            logosDark.forEach(logo => logo.style.opacity = '0');
+            logosLight.forEach(logo => logo.style.opacity = '1');
+        } else {
+            logosDark.forEach(logo => logo.style.opacity = '1');
+            logosLight.forEach(logo => logo.style.opacity = '0');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar ThemeService si no está inicializado
+        if (!ThemeService.currentTheme) {
+            ThemeService.initialize();
+        }
+
+        // Actualizar logos al cargar
+        updateLogosForTheme(ThemeService.getCurrentTheme());
+
+        // Suscribirse a cambios de tema
+        ThemeService.onThemeChange((event) => {
+            updateLogosForTheme(event.theme);
+        });
+    });
+
+    // Para navegación SPA en Astro
+    document.addEventListener('astro:page-load', () => {
+        if (ThemeService.currentTheme) {
+            updateLogosForTheme(ThemeService.getCurrentTheme());
+        }
+    });
+</script>

@@ -315,12 +315,12 @@ li {
 
 /* === SELECCIÓN DE TEXTO === */
 ::selection {
-  background-color: var(--accent-light);
+  background-color: var(--selection-bg);
   color: var(--accent-primary);
 }
 
 ::-moz-selection {
-  background-color: var(--accent-light);
+  background-color: var(--selection-bg);
   color: var(--accent-primary);
 }
 
