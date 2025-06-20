@@ -12,10 +12,10 @@
   </defs>
   
   <!-- Letras perfectamente centradas en el viewBox -->
-  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="white" clip-path="url(#topHalf)">E</text>
-  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="white" clip-path="url(#topHalf)">P</text>
-  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="white" clip-path="url(#bottomHalf)">E</text>
-  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="white" clip-path="url(#bottomHalf)">P</text>
+  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#topHalf)">E</text>
+  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#topHalf)">P</text>
+  <text x="20" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#bottomHalf)">E</text>
+  <text x="60" y="45" text-anchor="middle" font-family="serif" font-size="50" font-weight="900" fill="black" clip-path="url(#bottomHalf)">P</text>
   
   <!-- Línea blanca que parte las letras por la mitad - extendida en ambos lados -->
   <line x1="0" y1="30" x2="80" y2="30" stroke="#FF4500" stroke-width="1"/>
