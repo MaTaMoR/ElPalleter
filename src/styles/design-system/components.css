@@ -352,18 +352,18 @@
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 var(--padding-mobile);
+  padding: var(--padding-mobile) var(--padding-mobile);
 }
 
 @media (min-width: 768px) {
   .container {
-    padding: 0 var(--padding-tablet);
+    padding: var(--padding-tablet) var(--padding-tablet);
   }
 }
 
 @media (min-width: 1024px) {
   .container {
-    padding: 0 var(--padding-desktop);
+    padding: var(--padding-desktop) var(--padding-desktop);
   }
 }
 
