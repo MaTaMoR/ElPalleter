@@ -185,7 +185,7 @@ const { images } = Astro.props;
     /* === TEMA CLARO - FLECHAS CON MEJOR CONTRASTE === */
     :root[data-theme="light"] .slider-arrow,
     html[data-theme="light"] .slider-arrow {
-        background: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.65);
         color: var(--text-primary);
         border: var(--border-1) solid var(--gray-400);
         backdrop-filter: blur(10px) saturate(150%);
@@ -213,9 +213,9 @@ const { images } = Astro.props;
         /* Sombra de texto para tema oscuro */
         text-shadow: 
             0 0 var(--space-2) rgba(0, 0, 0, 0.8),
-            1px 1px var(--space-1) rgba(0, 0, 0, 0.35);
+            1px 1px var(--space-1) rgba(0, 0, 0, 0.65);
         
-        background: rgba(0, 0, 0, 0.35);
+        background: rgba(0, 0, 0, 0.65);
         padding: var(--space-2) var(--space-4);
         border-radius: var(--radius-2xl);
         backdrop-filter: blur(8px);
@@ -232,7 +232,7 @@ const { images } = Astro.props;
     /* === TEMA CLARO - CAPTION CON MEJOR CONTRASTE === */
     :root[data-theme="light"] .slide-caption,
     html[data-theme="light"] .slide-caption {
-        background: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.65);
         color: var(--text-primary);
         text-shadow: 
             0 0 var(--space-1) rgba(255, 255, 255, 0.8),

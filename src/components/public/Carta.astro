@@ -70,9 +70,9 @@ import { i18nCore } from '../../i18n/core.js';
 
 <style>
     /* =====================================================
-       CARTA SECTION - ACTUALIZADO CON DESIGN TOKENS
-       Mantiene exactamente el mismo diseño visual
-       ===================================================== */
+    CARTA SECTION - ACTUALIZADO CON DESIGN TOKENS Y TEMAS
+    Mantiene exactamente el mismo diseño visual con soporte completo para temas
+    ===================================================== */
 
     /* === CARTA SECTION SIMPLIFICADA === */
     .carta-section {
@@ -92,49 +92,49 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .carta-title {
-        font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl)); /* Tokens en lugar de clamp(2rem, 4vw, 3.5rem) */
-        font-weight: var(--font-light);                          /* Token en lugar de 300 */
-        color: var(--accent-primary);                            /* Token dinámico en lugar de #f4a261 */
+        font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+        font-weight: var(--font-light);
+        color: var(--accent-primary);
         margin-bottom: var(--gap-mobile);
-        letter-spacing: var(--tracking-wide);                    /* Token en lugar de 2px */
+        letter-spacing: var(--tracking-wide);
+        transition: color var(--duration-300) var(--ease-out);
     }
 
     .carta-subtitle {
-        font-size: var(--text-lg);                              /* Token en lugar de 1.1rem */
-        color: var(--text-secondary);                           /* Token dinámico en lugar de #ccc */
+        font-size: var(--text-lg);
+        color: var(--text-secondary);
         opacity: 0.8;
+        transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* === NAVEGACIÓN DE CATEGORÍAS - MANTENIENDO DISEÑO ORIGINAL === */
+    /* === NAVEGACIÓN DE CATEGORÍAS === */
     .menu-nav {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: calc(var(--gap-mobile) * 0.5);                     /* Token en lugar de gap hardcodeado */
+        gap: calc(var(--gap-mobile) * 0.5);
         margin-bottom: calc(var(--gap-mobile) * 2.5);
     }
 
     .menu-nav-btn {
-        /* ✨ MANTENER: Exactamente el mismo diseño visual */
         background: transparent;
-        border: var(--border-2) solid rgba(244, 162, 97, 0.3);  /* Mantener color original */
-        color: var(--text-primary);                             /* Token dinámico */
-        padding: calc(var(--padding-mobile) * 0.6) var(--padding-mobile); /* Tokens en lugar de hardcoded */
-        border-radius: var(--radius-3xl);                       /* Token en lugar de 25px */
+        border: var(--border-2) solid var(--accent-medium);
+        color: var(--text-primary);
+        padding: calc(var(--padding-mobile) * 0.6) var(--padding-mobile);
+        border-radius: var(--radius-3xl);
         cursor: pointer;
-        transition: var(--transition-base);                     /* Token en lugar de all 0.3s cubic-bezier */
-        font-weight: var(--font-semibold);                      /* Token en lugar de 600 */
-        letter-spacing: var(--tracking-normal);                 /* Token en lugar de 1px */
+        transition: var(--transition-base);
+        font-weight: var(--font-semibold);
+        letter-spacing: var(--tracking-normal);
         text-transform: uppercase;
-        font-size: var(--text-sm);                             /* Token en lugar de 0.8rem */
+        font-size: var(--text-sm);
     }
 
     .menu-nav-btn:hover,
     .menu-nav-btn.active {
-        /* ✨ MANTENER: Exactamente los mismos colores originales */
-        background: #f4a261;                                    /* Mantener color exacto */
-        color: #141414;                                          /* Mantener color exacto */
-        border-color: #f4a261;                                  /* Mantener color exacto */
+        background: var(--accent-primary);
+        color: var(--bg-primary);
+        border-color: var(--accent-primary);
         transform: translateY(-2px);
     }
 
@@ -148,30 +148,41 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .menu-category {
-        /* ✨ MANTENER: Exactamente el mismo diseño visual */
-        background: rgba(0, 0, 0, 0.6);                         /* Mantener opacidad original */
-        backdrop-filter: var(--backdrop-blur);                  /* Token en lugar de blur(10px) */
-        border-radius: var(--radius-xl);                        /* Token en lugar de 15px */
-        border: var(--border-1) solid rgba(244, 162, 97, 0.2);  /* Mantener color original */
-        box-shadow: 0 var(--space-3) var(--space-8) rgba(0, 0, 0, 0.3); /* Tokens en lugar de 10px 30px */
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop-blur);
+        border-radius: var(--radius-xl);
+        border: var(--border-1) solid var(--glass-border);
+        box-shadow: var(--shadow-lg);
         padding: calc(var(--padding-mobile) * 1.5);
         margin-bottom: calc(var(--gap-mobile) * 1.5);
-        
-        /* ✨ REMOVIDO: Animación fadeInUp para mantener original */
+        transition: background-color var(--duration-300) var(--ease-out),
+                    border-color var(--duration-300) var(--ease-out),
+                    box-shadow var(--duration-300) var(--ease-out);
     }
 
     .menu-category:last-child {
         margin-bottom: 0;
     }
 
+    /* === TEMA CLARO - CONTAINERS QUE RESALTAN === */
+    :root[data-theme="light"] .menu-category,
+    html[data-theme="light"] .menu-category {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px) saturate(150%);
+        border: var(--border-1) solid var(--gray-400);
+        box-shadow: var(--shadow-lg);
+    }
+
     .category-title {
-        font-size: var(--text-xl);                             /* Token en lugar de 1.3rem */
-        color: var(--accent-primary);                          /* Token dinámico en lugar de #f4a261 */
-        font-weight: var(--font-semibold);                     /* Token en lugar de 600 */
+        font-size: var(--text-xl);
+        color: var(--accent-primary);
+        font-weight: var(--font-semibold);
         text-align: center;
-        border-bottom: var(--border-2) solid rgba(244, 162, 97, 0.3); /* Mantener color original */
+        border-bottom: var(--border-2) solid var(--accent-medium);
         margin-bottom: calc(var(--gap-mobile) * 0.75);
         padding-bottom: calc(var(--padding-mobile) * 0.25);
+        transition: color var(--duration-300) var(--ease-out),
+                    border-color var(--duration-300) var(--ease-out);
     }
 
     /* === ITEMS DEL MENÚ === */
@@ -179,9 +190,10 @@ import { i18nCore } from '../../i18n/core.js';
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        border-bottom: var(--border-1) solid rgba(255, 255, 255, 0.1); /* Mantener color original */
+        border-bottom: var(--border-1) solid var(--border-primary);
         margin-bottom: calc(var(--gap-mobile) * 0.6);
         padding-bottom: calc(var(--padding-mobile) * 0.4);
+        transition: border-color var(--duration-300) var(--ease-out);
     }
 
     .menu-item:last-child {
@@ -195,27 +207,30 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     .item-name {
-        font-weight: var(--font-semibold);                      /* Token en lugar de 600 */
-        color: var(--text-primary);                            /* Token dinámico */
+        font-weight: var(--font-semibold);
+        color: var(--text-primary);
         margin-bottom: calc(var(--gap-mobile) * 0.15);
-        font-size: var(--text-sm);                             /* Token en lugar de 0.9rem */
+        font-size: var(--text-sm);
+        transition: color var(--duration-300) var(--ease-out);
     }
 
     .item-description {
-        font-size: var(--text-xs);                             /* Token en lugar de 0.8rem */
-        color: var(--text-secondary);                          /* Token dinámico en lugar de #ccc */
+        font-size: var(--text-xs);
+        color: var(--text-secondary);
         opacity: 0.8;
-        line-height: var(--leading-normal);                    /* Token en lugar de 1.4 */
+        line-height: var(--leading-normal);
+        transition: color var(--duration-300) var(--ease-out);
     }
 
     .item-price {
-        color: var(--accent-primary);                          /* Token dinámico en lugar de #f4a261 */
-        font-weight: var(--font-bold);                         /* Token en lugar de 700 */
-        font-size: var(--text-base);                           /* Token en lugar de 1rem */
+        color: var(--accent-primary);
+        font-weight: var(--font-bold);
+        font-size: var(--text-base);
         white-space: nowrap;
+        transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* === SECCIONES ESPECÍFICAS - ARREGLADO === */
+    /* === SECCIONES ESPECÍFICAS === */
     .menu-section {
         display: none;
     }
@@ -224,8 +239,8 @@ import { i18nCore } from '../../i18n/core.js';
         display: grid;
     }
 
-    /* === RESPONSIVE - ENFOCADO EN LAYOUT INTERNO === */
-    
+    /* === RESPONSIVE === */
+
     /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .carta-header {
@@ -238,7 +253,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .carta-subtitle {
-            font-size: var(--text-xl);                         /* Token en lugar de 1.2rem */
+            font-size: var(--text-xl);
         }
 
         .menu-nav {
@@ -248,7 +263,7 @@ import { i18nCore } from '../../i18n/core.js';
 
         .menu-nav-btn {
             padding: calc(var(--padding-tablet) * 0.4) calc(var(--padding-tablet) * 0.75);
-            font-size: var(--text-base);                       /* Token en lugar de 0.9rem */
+            font-size: var(--text-base);
         }
 
         .menu-content {
@@ -263,7 +278,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .category-title {
-            font-size: var(--text-2xl);                        /* Token en lugar de 1.5rem */
+            font-size: var(--text-2xl);
             margin-bottom: var(--gap-tablet);
             padding-bottom: calc(var(--padding-tablet) * 0.25);
         }
@@ -279,15 +294,15 @@ import { i18nCore } from '../../i18n/core.js';
 
         .item-name {
             margin-bottom: calc(var(--gap-tablet) * 0.15);
-            font-size: var(--text-base);                       /* Token en lugar de 1rem */
+            font-size: var(--text-base);
         }
 
         .item-description {
-            font-size: var(--text-sm);                         /* Token en lugar de 0.85rem */
+            font-size: var(--text-sm);
         }
 
         .item-price {
-            font-size: var(--text-lg);                         /* Token en lugar de 1.1rem */
+            font-size: var(--text-lg);
         }
     }
 
@@ -372,7 +387,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .carta-subtitle {
-            font-size: var(--text-base);                       /* Token en lugar de 1rem */
+            font-size: var(--text-base);
         }
 
         .menu-nav {
@@ -382,7 +397,7 @@ import { i18nCore } from '../../i18n/core.js';
 
         .menu-nav-btn {
             padding: calc(var(--padding-mobile) * 0.5) calc(var(--padding-mobile) * 0.8);
-            font-size: var(--text-xs);                         /* Token en lugar de 0.75rem */
+            font-size: var(--text-xs);
         }
 
         .menu-content {
@@ -396,7 +411,7 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .category-title {
-            font-size: var(--text-lg);                         /* Token en lugar de 1.2rem */
+            font-size: var(--text-lg);
             margin-bottom: calc(var(--gap-mobile) * 0.5);
         }
 
@@ -405,20 +420,20 @@ import { i18nCore } from '../../i18n/core.js';
         }
 
         .item-name {
-            font-size: var(--text-sm);                         /* Token en lugar de 0.85rem */
+            font-size: var(--text-sm);
         }
 
         .item-description {
-            font-size: var(--text-xs);                         /* Token en lugar de 0.75rem */
+            font-size: var(--text-xs);
         }
 
         .item-price {
-            font-size: var(--text-sm);                         /* Token en lugar de 0.95rem */
+            font-size: var(--text-sm);
         }
     }
 
-    /* === ACCESIBILIDAD MEJORADA === */
-    
+    /* === ACCESIBILIDAD === */
+
     /* Focus visible para navegación por teclado */
     .menu-nav-btn:focus-visible {
         outline: var(--border-2) solid var(--focus-ring);
@@ -426,10 +441,18 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     /* === PREFERENCIAS DE USUARIO === */
-    
+
     /* Respeto por movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
-        .menu-nav-btn {
+        .menu-nav-btn,
+        .menu-category,
+        .carta-title,
+        .carta-subtitle,
+        .category-title,
+        .item-name,
+        .item-description,
+        .item-price,
+        .menu-item {
             transition: none;
         }
         
@@ -438,7 +461,7 @@ import { i18nCore } from '../../i18n/core.js';
             transform: none;
         }
     }
-    
+
     /* Alto contraste */
     @media (prefers-contrast: high) {
         .menu-nav-btn {
@@ -446,8 +469,14 @@ import { i18nCore } from '../../i18n/core.js';
         }
         
         .menu-category {
-            border: var(--border-2) solid rgba(244, 162, 97, 0.4);
-            background: rgba(0, 0, 0, 0.8);
+            border: var(--border-2) solid var(--accent-medium);
+            background: var(--bg-surface);
+        }
+        
+        :root[data-theme="light"] .menu-category,
+        html[data-theme="light"] .menu-category {
+            border: var(--border-2) solid var(--gray-600);
+            background: rgba(255, 255, 255, 0.95);
         }
         
         .category-title {
@@ -456,12 +485,12 @@ import { i18nCore } from '../../i18n/core.js';
     }
 
     /* === OPTIMIZACIONES DE PERFORMANCE === */
-    
+
     /* Contener layout para mejor performance */
     .menu-content {
         contain: layout style;
     }
-    
+
     .menu-category {
         contain: layout style paint;
     }
