@@ -14,9 +14,9 @@
   --text-disabled: rgba(255, 255, 255, 0.3);
   
   /* Colores de fondo */
-  --bg-primary: var(--dark-700);     /* #141414 */
-  --bg-secondary: var(--dark-600);   /* #1a1a1a */
-  --bg-tertiary: var(--dark-800);    /* #0f0f0f */
+  --bg-primary: var(--dark-700);
+  --bg-secondary: var(--dark-600);
+  --bg-tertiary: var(--dark-800);
   --bg-surface: rgba(0, 0, 0, 0.6);
   --bg-surface-hover: rgba(0, 0, 0, 0.8);
   --bg-overlay: rgba(0, 0, 0, 0.25);
@@ -49,9 +49,13 @@
   /* Efectos de cristal/blur */
   --glass-bg: rgba(0, 0, 0, 0.6);
   --glass-border: rgba(244, 162, 97, 0.2);
-  --backdrop-blur: blur(15px);
-  --backdrop-blur-strong: blur(20px);
-
+  
+  /* Text shadows adaptativos */
+  --text-shadow-color: rgba(0, 0, 0, 0.8);
+  --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
+  --glow-color: rgba(255, 255, 255, 0.8);
+  
+  /* Variables específicas para componentes */
   --selection-bg: rgba(244, 162, 97, 0.2);
   --selection-text: #ffffff;
 }
@@ -78,7 +82,7 @@
   --border-secondary: var(--gray-100);
   --border-accent: var(--brand-primary-medium);
   
-  /* Colores de acento - mantienen los mismos valores */
+  /* Colores de acento */
   --accent-primary: var(--brand-primary);
   --accent-hover: var(--brand-primary-dark);
   --accent-active: var(--brand-primary-darker);
@@ -101,23 +105,44 @@
   /* Efectos de cristal/blur */
   --glass-bg: rgba(255, 255, 255, 0.9);
   --glass-border: var(--brand-primary-medium);
-  --backdrop-blur: blur(15px);
-  --backdrop-blur-strong: blur(20px);
-
+  
+  /* Text shadows adaptativos */
+  --text-shadow-color: rgba(255, 255, 255, 0.8);
+  --text-shadow-hover-color: rgba(255, 255, 255, 0.9);
+  --glow-color: rgba(0, 0, 0, 0.6);
+  
+  /* Variables específicas para componentes */
   --selection-bg: rgba(59, 130, 246, 0.15);
   --selection-text: #1f2937;
 }
 
 /* === TEMA DORADO === */
 [data-theme="gold"] {
-  /* Usar base del tema oscuro pero cambiar acentos */
+  /* Heredar del tema oscuro */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-disabled: rgba(255, 255, 255, 0.3);
+  
+  --bg-primary: var(--dark-700);
+  --bg-secondary: var(--dark-600);
+  --bg-tertiary: var(--dark-800);
+  --bg-surface: rgba(0, 0, 0, 0.6);
+  --bg-surface-hover: rgba(0, 0, 0, 0.8);
+  --bg-overlay: rgba(0, 0, 0, 0.25);
+  
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  
+  /* Cambiar acentos */
   --accent-primary: #ffd700;
   --accent-hover: #ffed4a;
   --accent-active: #f6d55c;
   --accent-light: rgba(255, 215, 0, 0.1);
   --accent-medium: rgba(255, 215, 0, 0.2);
   
-  /* Actualizar brand colors para coherencia */
+  /* Actualizar brand colors */
   --brand-primary: #ffd700;
   --brand-primary-dark: #ffed4a;
   --brand-primary-darker: #f6d55c;
@@ -125,27 +150,63 @@
   --brand-primary-medium: rgba(255, 215, 0, 0.2);
   --brand-primary-strong: rgba(255, 215, 0, 0.3);
   
-  /* Ajustar glass border */
+  /* Ajustar glass y borders */
   --glass-border: rgba(255, 215, 0, 0.2);
   --border-accent: rgba(255, 215, 0, 0.3);
   
   /* Sombras doradas */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
   --shadow-accent: 0 4px 20px rgba(255, 215, 0, 0.3);
   --shadow-accent-lg: 0 8px 25px rgba(255, 215, 0, 0.4);
   
+  /* Estados interactivos */
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --active-overlay: rgba(255, 255, 255, 0.12);
   --focus-ring: #ffd700;
+  
+  /* Efectos de cristal */
+  --glass-bg: rgba(0, 0, 0, 0.6);
+  
+  /* Text shadows */
+  --text-shadow-color: rgba(0, 0, 0, 0.8);
+  --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
+  --glow-color: rgba(255, 215, 0, 0.8);
+  
+  /* Variables específicas */
+  --selection-bg: rgba(255, 215, 0, 0.2);
+  --selection-text: #ffffff;
 }
 
 /* === TEMA AZUL === */
 [data-theme="blue"] {
-  /* Usar base del tema oscuro pero cambiar acentos */
+  /* Heredar del tema oscuro */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-disabled: rgba(255, 255, 255, 0.3);
+  
+  --bg-primary: var(--dark-700);
+  --bg-secondary: var(--dark-600);
+  --bg-tertiary: var(--dark-800);
+  --bg-surface: rgba(0, 0, 0, 0.6);
+  --bg-surface-hover: rgba(0, 0, 0, 0.8);
+  --bg-overlay: rgba(0, 0, 0, 0.25);
+  
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  
+  /* Cambiar acentos */
   --accent-primary: #3b82f6;
   --accent-hover: #60a5fa;
   --accent-active: #2563eb;
   --accent-light: rgba(59, 130, 246, 0.1);
   --accent-medium: rgba(59, 130, 246, 0.2);
   
-  /* Actualizar brand colors para coherencia */
+  /* Actualizar brand colors */
   --brand-primary: #3b82f6;
   --brand-primary-dark: #60a5fa;
   --brand-primary-darker: #2563eb;
@@ -153,27 +214,63 @@
   --brand-primary-medium: rgba(59, 130, 246, 0.2);
   --brand-primary-strong: rgba(59, 130, 246, 0.3);
   
-  /* Ajustar glass border */
+  /* Ajustar glass y borders */
   --glass-border: rgba(59, 130, 246, 0.2);
   --border-accent: rgba(59, 130, 246, 0.3);
   
   /* Sombras azules */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
   --shadow-accent: 0 4px 20px rgba(59, 130, 246, 0.3);
   --shadow-accent-lg: 0 8px 25px rgba(59, 130, 246, 0.4);
   
+  /* Estados interactivos */
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --active-overlay: rgba(255, 255, 255, 0.12);
   --focus-ring: #3b82f6;
+  
+  /* Efectos de cristal */
+  --glass-bg: rgba(0, 0, 0, 0.6);
+  
+  /* Text shadows */
+  --text-shadow-color: rgba(0, 0, 0, 0.8);
+  --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
+  --glow-color: rgba(59, 130, 246, 0.8);
+  
+  /* Variables específicas */
+  --selection-bg: rgba(59, 130, 246, 0.2);
+  --selection-text: #ffffff;
 }
 
 /* === TEMA RESTAURANTE (CÁLIDO) === */
 [data-theme="restaurant"] {
-  /* Usar base del tema oscuro pero cambiar acentos */
-  --accent-primary: #8B4513;        /* Marrón cálido */
-  --accent-hover: #A0522D;          
-  --accent-active: #654321;         
+  /* Heredar del tema oscuro */
+  --text-primary: #ffffff;
+  --text-secondary: #E6D3B7;
+  --text-tertiary: #999999;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-disabled: rgba(255, 255, 255, 0.3);
+  
+  --bg-primary: var(--dark-700);
+  --bg-secondary: var(--dark-600);
+  --bg-tertiary: var(--dark-800);
+  --bg-surface: rgba(0, 0, 0, 0.6);
+  --bg-surface-hover: rgba(0, 0, 0, 0.8);
+  --bg-overlay: rgba(0, 0, 0, 0.25);
+  
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  
+  /* Cambiar acentos */
+  --accent-primary: #8B4513;
+  --accent-hover: #A0522D;
+  --accent-active: #654321;
   --accent-light: rgba(139, 69, 19, 0.1);
   --accent-medium: rgba(139, 69, 19, 0.2);
   
-  /* Actualizar brand colors para coherencia */
+  /* Actualizar brand colors */
   --brand-primary: #8B4513;
   --brand-primary-dark: #A0522D;
   --brand-primary-darker: #654321;
@@ -181,16 +278,34 @@
   --brand-primary-medium: rgba(139, 69, 19, 0.2);
   --brand-primary-strong: rgba(139, 69, 19, 0.3);
   
-  /* Ajustar colores para mejor contraste */
-  --text-secondary: #E6D3B7;        /* Beige cálido */
+  /* Ajustar glass y borders */
   --glass-border: rgba(139, 69, 19, 0.3);
   --border-accent: rgba(139, 69, 19, 0.3);
   
   /* Sombras marrones */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
   --shadow-accent: 0 4px 20px rgba(139, 69, 19, 0.3);
   --shadow-accent-lg: 0 8px 25px rgba(139, 69, 19, 0.4);
   
+  /* Estados interactivos */
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --active-overlay: rgba(255, 255, 255, 0.12);
   --focus-ring: #8B4513;
+  
+  /* Efectos de cristal */
+  --glass-bg: rgba(0, 0, 0, 0.6);
+  
+  /* Text shadows */
+  --text-shadow-color: rgba(0, 0, 0, 0.8);
+  --text-shadow-hover-color: rgba(0, 0, 0, 0.7);
+  --glow-color: rgba(139, 69, 19, 0.8);
+  
+  /* Variables específicas */
+  --selection-bg: rgba(139, 69, 19, 0.2);
+  --selection-text: #ffffff;
 }
 
 /* === PREFERENCIAS DE USUARIO === */

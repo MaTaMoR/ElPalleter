@@ -5,7 +5,6 @@
 
 /* === SUPERFICIES === */
 
-/* Superficie básica con efecto cristal */
 .surface {
   background: var(--glass-bg);
   backdrop-filter: var(--backdrop-blur);
@@ -14,7 +13,6 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Superficie interactiva */
 .surface-interactive {
   transition: var(--transition-base);
   cursor: pointer;
@@ -27,7 +25,6 @@
   box-shadow: var(--shadow-xl);
 }
 
-/* Superficie sólida (sin transparencia) */
 .surface-solid {
   background: var(--bg-secondary);
   border: var(--border-1) solid var(--border-primary);
@@ -37,7 +34,6 @@
 
 /* === BOTONES === */
 
-/* Base para todos los botones */
 .btn {
   font-family: var(--font-primary);
   font-weight: var(--font-medium);
@@ -60,7 +56,6 @@
   outline-offset: var(--space-1);
 }
 
-/* Botón primario */
 .btn-primary {
   background: var(--accent-primary);
   color: var(--text-primary);
@@ -80,7 +75,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Botón secundario */
 .btn-secondary {
   background: transparent;
   color: var(--text-primary);
@@ -99,7 +93,6 @@
   transform: translateY(0);
 }
 
-/* Botón fantasma */
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -113,7 +106,6 @@
   border-color: var(--border-primary);
 }
 
-/* Tamaños de botones */
 .btn-sm {
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-sm);
@@ -124,12 +116,10 @@
   font-size: var(--text-lg);
 }
 
-/* Botón de ancho completo */
 .btn-full {
   width: 100%;
 }
 
-/* Estado deshabilitado */
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -143,7 +133,6 @@
 
 /* === ELEMENTOS INTERACTIVOS === */
 
-/* Clase base para elementos interactivos */
 .interactive {
   transition: var(--transition-base);
   cursor: pointer;
@@ -166,7 +155,6 @@
 
 /* === TIPOGRAFÍA === */
 
-/* Títulos */
 .title {
   font-family: var(--font-heading);
   font-weight: var(--font-light);
@@ -196,7 +184,6 @@
   margin-bottom: var(--space-3);
 }
 
-/* Subtítulos */
 .subtitle {
   font-family: var(--font-primary);
   font-weight: var(--font-normal);
@@ -216,7 +203,6 @@
   margin-bottom: var(--space-3);
 }
 
-/* Texto con acento */
 .text-accent {
   color: var(--accent-primary);
   font-weight: var(--font-medium);
@@ -228,7 +214,6 @@
   background: none;
 }
 
-/* Texto destacado con fondo */
 .text-highlight-bg {
   background: var(--accent-light);
   color: var(--accent-primary);
@@ -367,6 +352,85 @@
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 var(--padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--padding-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--padding-desktop);
+  }
+}
+
+/* === HERO CTA BUTTON === */
+
+.hero-cta {
+  background: transparent;
+  border: var(--border-2) solid var(--text-primary);
+  color: var(--text-primary);
+  padding: calc(var(--space-3) + var(--space-1)) calc(var(--space-6) + var(--space-2));
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-md);
+  text-shadow: 0 var(--space-1) var(--space-2) var(--text-shadow-color);
+}
+
+.hero-cta:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background: var(--hover-overlay);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 var(--space-6) var(--glow-color), 
+    0 0 0 var(--border-1) var(--glow-color);
+  text-shadow: 0 0 var(--space-4) var(--glow-color);
+}
+
+.hero-cta:active {
+  transform: translateY(-1px);
+}
+
+/* === SCROLL INDICATOR === */
+
+.scroll-indicator {
+  cursor: pointer;
+  transition: var(--transition-base);
+  padding: var(--padding-mobile);
+}
+
+.scroll-indicator:hover {
+  transform: translateY(calc(-1 * var(--space-1)));
+}
+
+.scroll-arrow {
+  font-size: var(--text-3xl);
+  animation: bounce 2s infinite;
+  text-shadow: 0 var(--space-1) var(--space-2) var(--text-shadow-color);
+  color: var(--text-primary);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(calc(-1 * var(--space-3)));
+  }
+  60% {
+    transform: translateY(calc(-1 * var(--space-1)));
+  }
 }
 
 /* === GRID SYSTEM === */
@@ -471,7 +535,6 @@
 
 /* === UTILIDADES DE ESPACIADO === */
 
-/* Margins */
 .m-0 { margin: 0; }
 .m-1 { margin: var(--space-1); }
 .m-2 { margin: var(--space-2); }
@@ -496,7 +559,6 @@
 .mb-6 { margin-bottom: var(--space-6); }
 .mb-8 { margin-bottom: var(--space-8); }
 
-/* Paddings */
 .p-0 { padding: 0; }
 .p-1 { padding: var(--space-1); }
 .p-2 { padding: var(--space-2); }
@@ -512,7 +574,6 @@
 .inline { display: inline; }
 .inline-block { display: inline-block; }
 
-/* Responsive display */
 .mobile-only { display: block; }
 .tablet-up { display: none; }
 .desktop-up { display: none; }
@@ -589,4 +650,30 @@
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* === ACCESIBILIDAD === */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta,
+  .scroll-indicator,
+  .scroll-arrow {
+    transition: none;
+  }
+  
+  .scroll-arrow {
+    animation: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .hero-cta {
+    border-width: var(--border-4);
+  }
+}
+
+/* === OPTIMIZACIONES DE PERFORMANCE === */
+
+.container {
+  contain: layout style;
 }
