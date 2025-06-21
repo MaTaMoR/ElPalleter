@@ -1,27 +1,21 @@
-/* =====================================================
-   BREAKPOINTS - EL PALLETER
-   Sistema de breakpoints integrado con design tokens
-   ===================================================== */
-
 :root {
-  /* Valores de breakpoints usando los mismos tokens */
+
   --bp-mobile-sm: 420px;
   --bp-mobile: 767px;
   --bp-tablet: 768px;
   --bp-desktop: 1024px;
   --bp-desktop-lg: 1400px;
-  
-  /* Containers max-width por breakpoint */
+
+
   --container-mobile: 100%;
   --container-tablet: 768px;
   --container-desktop: 1024px;
   --container-desktop-lg: 1400px;
-  
-  /* Variables de breakpoint activo para debugging */
+
+
   --current-breakpoint: "mobile";
 }
 
-/* === ACTUALIZACIÓN DE BREAKPOINT ACTIVO === */
 @media (min-width: 420px) {
   :root {
     --current-breakpoint: "mobile-lg";
@@ -46,7 +40,6 @@
   }
 }
 
-/* === CLASES PARA MOSTRAR/OCULTAR POR BREAKPOINT === */
 .mobile-only {
   display: block;
 }
@@ -67,39 +60,34 @@
   display: none;
 }
 
-/* === MOBILE LARGE (420px+) === */
 @media (min-width: 420px) {
   .mobile-lg-up {
     display: block;
   }
 }
 
-/* === TABLET (768px+) === */
 @media (min-width: 768px) {
   .mobile-only {
     display: none;
   }
-  
+
   .tablet-up {
     display: block;
   }
 }
 
-/* === DESKTOP (1024px+) === */
 @media (min-width: 1024px) {
   .desktop-up {
     display: block;
   }
 }
 
-/* === DESKTOP LARGE (1400px+) === */
 @media (min-width: 1400px) {
   .desktop-lg-up {
     display: block;
   }
 }
 
-/* === CLASES PARA OCULTAR EN BREAKPOINTS ESPECÍFICOS === */
 .hidden-mobile {
   display: none;
 }
@@ -120,7 +108,7 @@
   .hidden-mobile {
     display: block;
   }
-  
+
   .hidden-tablet {
     display: none;
   }
@@ -138,7 +126,6 @@
   }
 }
 
-/* === CONTENEDORES RESPONSIVOS === */
 .container-responsive {
   max-width: var(--container-mobile);
   width: 100%;
@@ -166,7 +153,6 @@
   }
 }
 
-/* === GAPS RESPONSIVOS === */
 .gap-responsive {
   gap: var(--gap-mobile);
 }
@@ -189,7 +175,6 @@
   }
 }
 
-/* === PADDING RESPONSIVO === */
 .padding-responsive {
   padding: var(--padding-mobile);
 }
@@ -206,37 +191,33 @@
   }
 }
 
-/* === CLASES ESPECÍFICAS POR BREAKPOINT === */
-
-/* Solo en móvil */
 @media (max-width: 767px) {
   .mobile-stack {
     flex-direction: column;
   }
-  
+
   .mobile-full-width {
     width: 100%;
   }
-  
+
   .mobile-text-center {
     text-align: center;
   }
-  
+
   .mobile-order-first {
     order: -1;
   }
-  
+
   .mobile-order-last {
     order: 999;
   }
 }
 
-/* Solo en tablet */
 @media (min-width: 768px) and (max-width: 1023px) {
   .tablet-stack {
     flex-direction: column;
   }
-  
+
   .tablet-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -244,35 +225,33 @@
   }
 }
 
-/* Solo en desktop */
 @media (min-width: 1024px) {
   .desktop-grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap-desktop);
   }
-  
+
   .desktop-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--gap-desktop);
   }
-  
+
   .desktop-sidebar {
     display: flex;
     gap: var(--gap-desktop);
   }
-  
+
   .desktop-sidebar .sidebar {
     flex: 0 0 300px;
   }
-  
+
   .desktop-sidebar .main {
     flex: 1;
   }
 }
 
-/* === TIPOGRAFÍA RESPONSIVA === */
 .text-responsive {
   font-size: var(--text-sm);
 }
@@ -305,9 +284,6 @@
   }
 }
 
-/* === ESPACIADO RESPONSIVO === */
-
-/* Margins responsivos */
 .mb-responsive {
   margin-bottom: var(--space-4);
 }
@@ -340,7 +316,6 @@
   }
 }
 
-/* === ALTURA DE VIEWPORT RESPONSIVA === */
 .h-screen-responsive {
   height: 100vh;
   height: 100svh;
@@ -353,12 +328,11 @@
   }
 }
 
-/* === UTILIDADES DE ORIENTACIÓN === */
 @media (orientation: portrait) {
   .portrait-only {
     display: block;
   }
-  
+
   .landscape-only {
     display: none;
   }
@@ -368,13 +342,12 @@
   .portrait-only {
     display: none;
   }
-  
+
   .landscape-only {
     display: block;
   }
 }
 
-/* === UTILIDADES DE ASPECT RATIO === */
 @media (min-aspect-ratio: 16/9) {
   .wide-screen {
     display: block;
@@ -387,7 +360,6 @@
   }
 }
 
-/* === DEBUGGING DE BREAKPOINTS === */
 body[data-debug-breakpoints="true"]::before {
   content: var(--current-breakpoint);
   position: fixed;
@@ -405,38 +377,36 @@ body[data-debug-breakpoints="true"]::before {
   backdrop-filter: var(--backdrop-blur);
 }
 
-/* === PRINT BREAKPOINTS === */
 @media print {
   .print-hidden {
     display: none !important;
   }
-  
+
   .print-visible {
     display: block !important;
   }
-  
-  /* Ocultar elementos interactivos en impresión */
+
+
   .mobile-only,
   .tablet-up,
   .desktop-up,
   .desktop-lg-up {
     display: none !important;
   }
-  
-  /* Mostrar todo el contenido en print */
+
+
   .container-responsive {
     max-width: none;
     padding: 0;
   }
-  
+
   .gap-responsive {
     gap: var(--space-4);
   }
 }
 
-/* === PREFERS QUERIES === */
 @media (prefers-reduced-motion: reduce) {
-  /* Deshabilitar transiciones en breakpoints si se prefiere menos movimiento */
+
   .container-responsive,
   .gap-responsive,
   .padding-responsive {
@@ -445,7 +415,7 @@ body[data-debug-breakpoints="true"]::before {
 }
 
 @media (prefers-color-scheme: dark) {
-  /* Los temas ya manejan esto, pero podemos añadir específicos de breakpoint */
+
   body[data-debug-breakpoints="true"]::before {
     background: rgba(0, 0, 0, 0.8);
     border-color: var(--accent-primary);
@@ -460,7 +430,6 @@ body[data-debug-breakpoints="true"]::before {
   }
 }
 
-/* === ACCESSIBILITY BREAKPOINTS === */
 @media (prefers-contrast: high) {
   body[data-debug-breakpoints="true"]::before {
     border-width: var(--border-2);
@@ -468,12 +437,11 @@ body[data-debug-breakpoints="true"]::before {
   }
 }
 
-/* === HOVER CAPABILITY === */
 @media (hover: hover) {
   .hover-enabled {
     display: block;
   }
-  
+
   .hover-disabled {
     display: none;
   }
@@ -483,15 +451,14 @@ body[data-debug-breakpoints="true"]::before {
   .hover-enabled {
     display: none;
   }
-  
+
   .hover-disabled {
     display: block;
   }
 }
 
-/* === POINTER TYPE === */
 @media (pointer: coarse) {
-  /* Para touch devices */
+
   .touch-friendly {
     min-height: 44px;
     min-width: 44px;
@@ -499,7 +466,7 @@ body[data-debug-breakpoints="true"]::before {
 }
 
 @media (pointer: fine) {
-  /* Para mouse/trackpad */
+
   .precise-pointer {
     cursor: pointer;
   }

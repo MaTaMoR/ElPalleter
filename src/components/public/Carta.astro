@@ -6,7 +6,6 @@ import cartaData from '../../data/carta-data.json';
 import { i18nCore } from '../../i18n/core.js';
 ---
 
-<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="carta-section container" id="carta">
     <div class="carta-container">
         <div class="carta-header">
@@ -18,7 +17,6 @@ import { i18nCore } from '../../i18n/core.js';
             </p>
         </div>
 
-        <!-- Navegación de categorías -->
         <div class="menu-nav">
             {cartaData.categories.map((category, index) => (
                 <button 
@@ -30,7 +28,6 @@ import { i18nCore } from '../../i18n/core.js';
             ))}
         </div>
 
-        <!-- Contenido del menú -->
         <div class="menu-content">
             {cartaData.categories.map((category, categoryIndex) => (
                 <div 
@@ -69,12 +66,6 @@ import { i18nCore } from '../../i18n/core.js';
 </section>
 
 <style>
-    /* =====================================================
-    CARTA SECTION - MIGRADO CONSERVADORAMENTE AL DESIGN SYSTEM
-    Mantiene exactamente el mismo diseño visual, solo usa tokens
-    ===================================================== */
-
-    /* === CARTA SECTION SIMPLIFICADA === */
     .carta-section {
         min-height: 90svh;
         position: relative;
@@ -85,7 +76,6 @@ import { i18nCore } from '../../i18n/core.js';
         position: relative;
     }
 
-    /* === HEADER USANDO TOKENS === */
     .carta-header {
         text-align: center;
         margin-bottom: calc(var(--gap-mobile) * 3);
@@ -108,7 +98,6 @@ import { i18nCore } from '../../i18n/core.js';
         font-weight: var(--font-semibold);
     }
 
-    /* === NAVEGACIÓN DE CATEGORÍAS - DISEÑO ORIGINAL === */
     .menu-nav {
         display: flex;
         justify-content: center;
@@ -144,7 +133,6 @@ import { i18nCore } from '../../i18n/core.js';
         outline-offset: var(--space-1);
     }
 
-    /* === CONTENEDOR DE MENÚ === */
     .menu-content {
         display: grid;
         grid-template-columns: 1fr;
@@ -178,7 +166,6 @@ import { i18nCore } from '../../i18n/core.js';
         transition: var(--transition-colors);
     }
 
-    /* === ITEMS DEL MENÚ === */
     .menu-item {
         display: flex;
         justify-content: space-between;
@@ -223,7 +210,6 @@ import { i18nCore } from '../../i18n/core.js';
         transition: var(--transition-colors);
     }
 
-    /* === SECCIONES ESPECÍFICAS === */
     .menu-section {
         display: none;
     }
@@ -232,9 +218,6 @@ import { i18nCore } from '../../i18n/core.js';
         display: grid;
     }
 
-    /* === RESPONSIVE === */
-
-    /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .carta-header {
             margin-bottom: calc(var(--gap-tablet) * 2);
@@ -299,7 +282,6 @@ import { i18nCore } from '../../i18n/core.js';
         }
     }
 
-    /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .carta-header {
             margin-bottom: calc(var(--gap-desktop) * 1.33);
@@ -347,7 +329,6 @@ import { i18nCore } from '../../i18n/core.js';
         }
     }
 
-    /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .carta-header {
             margin-bottom: var(--gap-desktop-lg);
@@ -368,7 +349,6 @@ import { i18nCore } from '../../i18n/core.js';
         }
     }
 
-    /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
         .carta-header {
             margin-bottom: calc(var(--gap-mobile) * 2);
@@ -425,7 +405,6 @@ import { i18nCore } from '../../i18n/core.js';
         }
     }
 
-    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         .menu-nav-btn,
         .menu-category,
@@ -460,7 +439,6 @@ import { i18nCore } from '../../i18n/core.js';
         }
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
     .menu-content {
         contain: layout style;
     }
@@ -479,33 +457,26 @@ import { i18nCore } from '../../i18n/core.js';
         const cartaSection = document.querySelector('.carta-section');
         const menuCategories = document.querySelectorAll('.menu-category');
         
-        // Inicializar sistema de breakpoints
         const breakpoints = useBreakpoints('carta-component', {
             element: cartaSection
         });
         
-        // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
-                // Deshabilitar transiciones durante el cambio para evitar glitches
                 const elementsToAdjust = [...menuCategories];
                 disableTransitionsDuringResize(elementsToAdjust);
             }
         });
 
-        // Funcionalidad original de navegación de categorías
         navButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Quitar active de todos los botones
                 navButtons.forEach(b => b.classList.remove('active'));
-                // Añadir active al botón clickeado
                 btn.classList.add('active');
 
-                // Ocultar todas las secciones
                 menuSections.forEach(section => section.classList.remove('active'));
-                // Mostrar la sección correspondiente
+
                 const targetCategory = btn.getAttribute('data-category');
                 const targetSection = document.getElementById(targetCategory);
                 if (targetSection) {
@@ -514,7 +485,6 @@ import { i18nCore } from '../../i18n/core.js';
             });
         });
         
-        // Cleanup al descargar la página
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
         });

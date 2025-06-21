@@ -19,7 +19,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         </p>
     </div>
     <div class="historia-container">
-        <!-- Historia a la izquierda -->
         <div class="history-content">
             <RichText 
                 key="historia_content" 
@@ -29,7 +28,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
             />
         </div>
     
-        <!-- Slider de fotos a la derecha -->
         <div class="slider-section">
             <ImageSlider 
                 images={imagesToShow}
@@ -39,9 +37,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
 </section>
 
 <style>
-    /* === HISTORIA SECTION - MIGRADO AL DESIGN SYSTEM === */
-
-    /* === SECCIÓN BASE === */
     .historia-section {
         width: 100%;
         height: fit-content;
@@ -98,7 +93,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         flex-direction: column;
         justify-content: center;
         
-        /* Usando las clases del sistema */
         background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur);
         -webkit-backdrop-filter: var(--backdrop-blur);
@@ -107,7 +101,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         overflow: hidden;
         min-height: 0;
         
-        /* Transiciones del sistema */
         transition: var(--transition-base);
     }
 
@@ -118,23 +111,19 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         display: grid;
         place-items: center;
         
-        /* Usando el sistema glass pero más sutil */
         background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur-subtle);
         border-radius: var(--radius-2xl);
         border: var(--border-1) solid var(--glass-border);
         overflow: hidden;
         
-        /* Optimizaciones del sistema */
         backface-visibility: hidden;
         isolation: isolate;
         contain: layout style;
         
-        /* Transiciones del sistema */
         transition: var(--transition-base);
     }
 
-    /* === RICH TEXT STYLING === */
     .history-content :global(.historia-rich-content) {
         width: 100%;
         max-width: 100%;
@@ -150,9 +139,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         overflow-wrap: break-word;
     }
 
-    /* === RESPONSIVE - USANDO BREAKPOINTS DEL SISTEMA === */
-    
-    /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .historia-header {
             margin-bottom: calc(var(--gap-tablet) * 2);
@@ -181,7 +167,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .historia-header {
             margin-bottom: calc(var(--gap-desktop) * 1.33);
@@ -200,7 +185,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .historia-header {
             margin-bottom: var(--gap-desktop-lg);
@@ -215,7 +199,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* MOBILE (0-767px) */
     @media (max-width: 767px) {
         .historia-section {
             min-height: auto;
@@ -258,7 +241,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* MOBILE PEQUEÑO (0-420px) */
     @media (max-width: 420px) {
         .historia-header {
             margin-bottom: calc(var(--gap-mobile) * 1.5);
@@ -287,7 +269,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* === ESTADOS DE CARGA === */
     .historia-section.loading .history-content,
     .historia-section.loading .slider-section {
         opacity: 0.7;
@@ -298,8 +279,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         opacity: 1;
         transition: var(--transition-opacity);
     }
-
-    /* === ACCESIBILIDAD === */
     @media (prefers-contrast: high) {
         .history-content,
         .slider-section {
@@ -317,7 +296,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
     .historia-container {
         contain: layout style;
     }
@@ -336,12 +314,10 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         const sliderSection = document.querySelector('.slider-section');
         const historiaSection = document.querySelector('.historia-section');
         
-        // Inicializar sistema de breakpoints
         const breakpoints = useBreakpoints('historia-component', {
             element: historiaSection
         });
         
-        // Inicialización simplificada
         const initializeWhenReady = () => {
             setTimeout(() => {
                 if (historiaSection) {
@@ -350,7 +326,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
             }, 150);
         };
         
-        // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
@@ -362,7 +337,6 @@ const imagesToShow = ImageService.getGalleryImages('historia');
         
         initializeWhenReady();
         
-        // Cleanup del breakpoint manager
         window.addEventListener('beforeunload', () => {
             breakpoints.unsubscribe();
         });

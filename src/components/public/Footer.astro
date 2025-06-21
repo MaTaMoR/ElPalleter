@@ -16,10 +16,6 @@ export const prerender = true;
 </footer>
 
 <style>
-    /* =========================================== */
-    /* === CONTAINER EXTERIOR (footer) === */
-    /* =========================================== */
-    
     .footer {
         width: 100%;
         background: var(--dark-800);
@@ -27,22 +23,15 @@ export const prerender = true;
         position: relative;
         z-index: var(--z-10);
         
-        /* SOLO centra horizontalmente */
         display: flex;
         justify-content: center;
         align-items: center;
         
-        /* Padding vertical usando tokens */
         padding: calc(var(--padding-mobile) * 1.5) 0;
         
-        /* Transición suave para cambios de tema */
         transition: background-color var(--duration-300) var(--ease-out),
                     border-color var(--duration-300) var(--ease-out);
     }
-
-    /* ============================================== */
-    /* === CONTAINER INTERIOR (footer-container) === */
-    /* ============================================== */
     
     .footer-container {
         max-width: 1200px;
@@ -50,11 +39,9 @@ export const prerender = true;
         position: relative;
         z-index: var(--z-20);
         
-        /* Padding responsivo usando tokens */
         padding: 0 var(--padding-mobile);
     }
 
-    /* === RESPONSIVE PADDING DEL CONTAINER INTERIOR === */
     @media (min-width: 768px) {
         .footer-container {
             padding: 0 var(--padding-tablet);
@@ -67,10 +54,6 @@ export const prerender = true;
         }
     }
 
-    /* ======================================= */
-    /* === CONTENIDO DEL FOOTER === */
-    /* ======================================= */
-    
     .footer-content {
         display: flex;
         justify-content: space-between;
@@ -79,7 +62,6 @@ export const prerender = true;
         gap: var(--gap-mobile);
     }
 
-    /* Copyright a la izquierda */
     .footer-copyright {
         margin: 0;
         font-size: var(--text-sm);
@@ -90,7 +72,6 @@ export const prerender = true;
         transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* Crédito del desarrollador a la derecha */
     .footer-credit {
         margin: 0;
         font-size: var(--text-sm);
@@ -120,12 +101,9 @@ export const prerender = true;
         border-radius: var(--radius-sm);
     }
 
-    /* === VARIANTES DE TEMA === */
-    
-    /* Tema claro - footer más oscuro para contrastar con MainContent */
     :root[data-theme="light"] .footer,
     html[data-theme="light"] .footer {
-        background: var(--glass-bg); /* Más oscuro que el gray-100 del MainContent */
+        background: var(--glass-bg);
         border-top-color: var(--glass-border);
     }
 
@@ -133,7 +111,7 @@ export const prerender = true;
     html[data-theme="light"] .footer-copyright,
     :root[data-theme="light"] .footer-credit,
     html[data-theme="light"] .footer-credit {
-        color: var(--text-primary); /* Texto más oscuro para mejor contraste */
+        color: var(--text-primary);
     }
 
     :root[data-theme="light"] .developer-link:hover,
@@ -141,9 +119,6 @@ export const prerender = true;
         color: var(--text-primary);
     }
 
-    /* === RESPONSIVE === */
-    
-    /* MOBILE (hasta 767px) - Layout en columna */
     @media (max-width: 767px) {
         .footer {
             padding: calc(var(--padding-mobile) * 2) 0;
@@ -170,7 +145,6 @@ export const prerender = true;
         }
     }
 
-    /* TABLET (768px+) */
     @media (min-width: 768px) {
         .footer {
             padding: calc(var(--padding-tablet) * 1.25) 0;
@@ -186,7 +160,6 @@ export const prerender = true;
         }
     }
 
-    /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .footer {
             padding: calc(var(--padding-desktop) * 1) 0;
@@ -197,7 +170,6 @@ export const prerender = true;
         }
     }
 
-    /* MOBILE PEQUEÑO (hasta 420px) */
     @media (max-width: 420px) {
         .footer {
             padding: calc(var(--padding-mobile) * 1.5) 0;
@@ -209,9 +181,6 @@ export const prerender = true;
         }
     }
 
-    /* === ACCESIBILIDAD === */
-    
-    /* Preferencias de movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
         .footer,
         .footer-copyright,
@@ -221,7 +190,6 @@ export const prerender = true;
         }
     }
     
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .footer {
             border-top-width: var(--border-2);
@@ -236,22 +204,15 @@ export const prerender = true;
             text-decoration: underline;
         }
     }
-
-    /* === MEJORAS DE RENDIMIENTO === */
     
     .footer {
         contain: layout style paint;
     }
 
-    /* === ESTADOS ADICIONALES === */
-    
-    /* Estado de carga */
     .footer.loading {
         opacity: 0.8;
         pointer-events: none;
     }
-
-    /* === MODO PRINT === */
     
     @media print {
         .footer {
@@ -269,19 +230,5 @@ export const prerender = true;
             color: black;
             text-decoration: underline;
         }
-    }
-
-    /* === DEBUGGING EN DESARROLLO === */
-    
-    [data-debug="true"] .footer {
-        outline: 2px dashed red;
-    }
-    
-    [data-debug="true"] .footer-container {
-        outline: 2px dashed blue;
-    }
-    
-    [data-debug="true"] .footer-content {
-        outline: 1px dashed green;
     }
 </style>

@@ -1,15 +1,9 @@
-/* =====================================================
-   ANIMATIONS - EL PALLETER
-   Sistema de animaciones usando design tokens
-   ===================================================== */
-
-/* === ANIMACIONES BASE === */
-
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(var(--space-5));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -21,6 +15,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(calc(-1 * var(--space-5)));
@@ -32,6 +27,7 @@
     opacity: 0;
     transform: translateX(calc(-1 * var(--space-8)));
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -43,6 +39,7 @@
     opacity: 0;
     transform: translateX(var(--space-8));
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -54,6 +51,7 @@
     opacity: 0;
     transform: translateY(calc(-1 * var(--space-8)));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -65,6 +63,7 @@
     opacity: 0;
     transform: translateY(var(--space-8));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -76,6 +75,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -87,6 +87,7 @@
     opacity: 1;
     transform: scale(1);
   }
+
   to {
     opacity: 0;
     transform: scale(0.9);
@@ -94,12 +95,19 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(calc(-1 * var(--space-3)));
   }
+
   60% {
     transform: translateY(calc(-1 * var(--space-1)));
   }
@@ -109,9 +117,11 @@
   0% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
+
   100% {
     opacity: 1;
   }
@@ -127,27 +137,30 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 @keyframes glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 var(--space-4) var(--accent-primary);
   }
+
   50% {
     box-shadow: 0 0 var(--space-8) var(--accent-primary);
   }
 }
-
-/* === ANIMACIONES ESPECÍFICAS PARA COMPONENTES === */
 
 @keyframes menuSlideIn {
   from {
     opacity: 0;
     transform: translateX(calc(-1 * var(--space-8)));
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -159,6 +172,7 @@
     opacity: 0;
     transform: translateY(calc(-1 * var(--space-2))) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -170,6 +184,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -181,6 +196,7 @@
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -191,6 +207,7 @@
   from {
     transform: translateY(0);
   }
+
   to {
     transform: translateY(calc(-1 * var(--space-1)));
   }
@@ -200,23 +217,24 @@
   from {
     transform: scale(1);
   }
+
   to {
     transform: scale(1.05);
   }
 }
 
 @keyframes textGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow: 0 0 var(--space-2) var(--glow-color);
   }
+
   50% {
     text-shadow: 0 0 var(--space-4) var(--glow-color);
   }
 }
 
-/* === CLASES DE ANIMACIÓN === */
-
-/* Animaciones de entrada */
 .animate-fade-in {
   animation: fadeIn var(--duration-500) var(--ease-out);
 }
@@ -241,7 +259,6 @@
   animation: scaleIn var(--duration-300) var(--ease-out);
 }
 
-/* Animaciones de salida */
 .animate-fade-out {
   animation: fadeOut var(--duration-300) var(--ease-in);
 }
@@ -250,7 +267,6 @@
   animation: scaleOut var(--duration-300) var(--ease-in);
 }
 
-/* Animaciones continuas */
 .animate-bounce {
   animation: bounce 2s infinite;
 }
@@ -271,7 +287,6 @@
   animation: textGlow 3s ease-in-out infinite;
 }
 
-/* Animaciones con delay */
 .animate-delay-100 {
   animation-delay: var(--duration-100);
 }
@@ -287,8 +302,6 @@
 .animate-delay-500 {
   animation-delay: var(--duration-500);
 }
-
-/* === TRANSICIONES ESPECÍFICAS === */
 
 .transition-all {
   transition: all var(--duration-300) var(--ease-out);
@@ -313,8 +326,6 @@
 .transition-slow {
   transition: all var(--duration-700) var(--ease-out);
 }
-
-/* === HOVER ANIMATIONS === */
 
 .hover-scale:hover {
   transform: scale(1.05);
@@ -351,8 +362,6 @@
   transition: filter var(--duration-200) var(--ease-out);
 }
 
-/* === LOADING ANIMATIONS === */
-
 .loading-shimmer {
   position: relative;
   overflow: hidden;
@@ -365,12 +374,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    var(--accent-light) 0%,
-    var(--accent-medium) 50%,
-    var(--accent-light) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--accent-light) 0%,
+      var(--accent-medium) 50%,
+      var(--accent-light) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: inherit;
@@ -410,21 +417,34 @@
   animation-delay: 0.5s;
 }
 
-/* === STAGGERED ANIMATIONS === */
-
-.stagger-children > * {
+.stagger-children>* {
   opacity: 0;
   animation: fadeIn var(--duration-500) var(--ease-out) forwards;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-children > *:nth-child(2) { animation-delay: 100ms; }
-.stagger-children > *:nth-child(3) { animation-delay: 200ms; }
-.stagger-children > *:nth-child(4) { animation-delay: 300ms; }
-.stagger-children > *:nth-child(5) { animation-delay: 400ms; }
-.stagger-children > *:nth-child(6) { animation-delay: 500ms; }
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0ms;
+}
 
-/* === ENTRANCE EFFECTS PARA COMPONENTES === */
+.stagger-children>*:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 300ms;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 400ms;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 500ms;
+}
 
 .menu-item-enter {
   animation: menuSlideIn var(--duration-500) var(--ease-out);
@@ -450,20 +470,15 @@
   animation: logoScale var(--duration-200) var(--ease-out) forwards;
 }
 
-/* === ANIMACIONES CONDICIONALES === */
-
-/* Solo animar si el usuario permite movimiento */
 @media (prefers-reduced-motion: no-preference) {
   .animate-on-scroll {
     animation: fadeIn var(--duration-500) var(--ease-out);
   }
-  
+
   .animate-on-hover:hover {
     animation: bounce 0.5s var(--ease-out);
   }
 }
-
-/* === PERFORMANCE OPTIMIZATIONS === */
 
 .will-animate {
   will-change: transform, opacity;
@@ -477,14 +492,12 @@
   will-change: opacity;
 }
 
-/* Reset will-change después de la animación */
 .animation-complete {
   will-change: auto;
 }
 
-/* === REDUCED MOTION === */
-
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -492,7 +505,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .animate-bounce,
   .animate-pulse,
   .animate-spin,
@@ -500,11 +513,11 @@
   .animate-text-glow {
     animation: none;
   }
-  
+
   .loading-shimmer::before {
     animation: none;
   }
-  
+
   .hover-scale:hover,
   .hover-scale-sm:hover,
   .hover-scale-lg:hover,
@@ -514,9 +527,6 @@
   }
 }
 
-/* === THEME-AWARE ANIMATIONS === */
-
-/* Animaciones específicas para tema claro */
 :root[data-theme="light"] .animate-glow,
 html[data-theme="light"] .animate-glow {
   animation: glow 2s ease-in-out infinite;
@@ -527,26 +537,20 @@ html[data-theme="light"] .animate-text-glow {
   animation: textGlow 3s ease-in-out infinite;
 }
 
-/* === UTILITY COMBINATIONS === */
-
 .fade-slide-in {
   animation: fadeIn var(--duration-500) var(--ease-out),
-             slideInFromBottom var(--duration-500) var(--ease-out);
+    slideInFromBottom var(--duration-500) var(--ease-out);
 }
 
 .scale-fade-in {
   animation: scaleIn var(--duration-300) var(--ease-out),
-             fadeIn var(--duration-300) var(--ease-out);
+    fadeIn var(--duration-300) var(--ease-out);
 }
-
-/* === DEBUGGING ANIMATIONS === */
 
 .debug-animation {
   outline: 2px dashed red;
   animation: pulse 1s infinite;
 }
-
-/* === EASING VARIATIONS === */
 
 .ease-bounce {
   transition-timing-function: var(--ease-bounce);

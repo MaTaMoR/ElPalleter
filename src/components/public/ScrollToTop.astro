@@ -8,58 +8,50 @@ export const prerender = true;
 </button>
 
 <style>
-    /* === BOTÓN PRINCIPAL === */
     .scroll-to-top {
         position: fixed;
-        bottom: var(--space-8);                         /* 2rem */
-        right: var(--space-8);                          /* 2rem */
-        width: calc(var(--space-8) + var(--space-6));   /* 3.5rem */
-        height: calc(var(--space-8) + var(--space-6));  /* 3.5rem */
+        bottom: var(--space-8);
+        right: var(--space-8);
+        width: calc(var(--space-8) + var(--space-6));
+        height: calc(var(--space-8) + var(--space-6));
         
-        /* Gradiente usando variables de acento */
         background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
         border: none;
-        border-radius: var(--radius-full);              /* 50% */
+        border-radius: var(--radius-full);
         color: var(--text-primary);
         cursor: pointer;
-        z-index: var(--z-toast);                        /* 1030 */
+        z-index: var(--z-toast);
         
-        /* Estados de visibilidad */
         opacity: 0;
         visibility: hidden;
-        transform: translateY(var(--space-5));          /* 20px */
-        transition: var(--transition-base);             /* all 0.3s ease-out */
+        transform: translateY(var(--space-5));
+        transition: var(--transition-base);
         
-        /* Sombra con color de acento */
-        box-shadow: var(--shadow-accent);               /* 0 4px 20px rgba(accent, 0.3) */
+        box-shadow: var(--shadow-accent);
         
-        /* Centrado del contenido */
         display: flex;
         align-items: center;
         justify-content: center;
         
-        /* Optimización de rendering */
         contain: layout style paint;
         will-change: transform, opacity, box-shadow;
     }
 
-    /* === ESTADO VISIBLE === */
     .scroll-to-top.visible {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
     }
 
-    /* === ESTADOS INTERACTIVOS === */
     .scroll-to-top:hover {
         background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
-        transform: translateY(calc(-1 * var(--space-1))); /* -3px */
-        box-shadow: var(--shadow-accent-lg);             /* Sombra más pronunciada */
+        transform: translateY(calc(-1 * var(--space-1)));
+        box-shadow: var(--shadow-accent-lg);
     }
 
     .scroll-to-top:active {
-        transform: translateY(calc(-1 * var(--space-1) / 3)); /* -1px */
-        transition: var(--transition-fast);              /* Transición más rápida en active */
+        transform: translateY(calc(-1 * var(--space-1) / 3));
+        transition: var(--transition-fast);
     }
 
     .scroll-to-top:focus-visible {
@@ -67,19 +59,17 @@ export const prerender = true;
         outline-offset: var(--space-1);
     }
 
-    /* === ICONO SVG === */
     .scroll-to-top svg {
-        width: var(--space-6);                          /* 1.5rem */
-        height: var(--space-6);                         /* 1.5rem */
-        transition: var(--transition-transform);        /* transform 0.3s ease-out */
+        width: var(--space-6);
+        height: var(--space-6);
+        transition: var(--transition-transform);
         flex-shrink: 0;
     }
 
     .scroll-to-top:hover svg {
-        transform: translateY(calc(-1 * var(--space-1))); /* -2px */
+        transform: translateY(calc(-1 * var(--space-1)));
     }
 
-    /* === ANIMACIÓN DE PULSO === */
     .scroll-to-top::before {
         content: '';
         position: absolute;
@@ -110,81 +100,43 @@ export const prerender = true;
         }
     }
 
-    /* === VARIANTES DE TEMA === */
-    
-    /* Tema claro */
-    [data-theme="light"] .scroll-to-top {
-        color: var(--bg-primary);                       /* Texto oscuro en fondo claro */
-        box-shadow: var(--shadow-md);                   /* Sombra más sutil */
+    html[data-theme="light"] .scroll-to-top {
+        color: var(--bg-primary);
+        box-shadow: var(--shadow-md);
     }
     
-    [data-theme="light"] .scroll-to-top:hover {
+    html[data-theme="light"] .scroll-to-top:hover {
         box-shadow: var(--shadow-lg);
     }
 
-    /* Tema dorado */
-    [data-theme="gold"] .scroll-to-top {
-        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
-    }
-    
-    [data-theme="gold"] .scroll-to-top:hover {
-        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
-    }
-
-    /* Tema azul */
-    [data-theme="blue"] .scroll-to-top {
-        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
-    }
-    
-    [data-theme="blue"] .scroll-to-top:hover {
-        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
-    }
-
-    /* Tema restaurante */
-    [data-theme="restaurant"] .scroll-to-top {
-        background: linear-gradient(45deg, var(--accent-active), var(--accent-primary));
-        color: var(--text-primary);                     /* Asegurar contraste en tema cálido */
-    }
-    
-    [data-theme="restaurant"] .scroll-to-top:hover {
-        background: linear-gradient(45deg, var(--accent-hover), var(--accent-active));
-    }
-
-    /* === RESPONSIVE === */
-    
-    /* Tablet */
     @media (max-width: 768px) {
         .scroll-to-top {
-            bottom: var(--space-6);                     /* 1.5rem */
-            right: var(--space-6);                      /* 1.5rem */
-            width: var(--space-12);                     /* 3rem */
-            height: var(--space-12);                    /* 3rem */
+            bottom: var(--space-6);
+            right: var(--space-6);
+            width: var(--space-12);
+            height: var(--space-12);
         }
         
         .scroll-to-top svg {
-            width: var(--space-5);                      /* 1.25rem */
-            height: var(--space-5);                     /* 1.25rem */
+            width: var(--space-5);
+            height: var(--space-5);
         }
     }
 
-    /* Mobile */
     @media (max-width: 420px) {
         .scroll-to-top {
-            bottom: var(--space-4);                     /* 1rem */
-            right: var(--space-4);                      /* 1rem */
-            width: var(--space-10);                     /* 2.5rem */
-            height: var(--space-10);                    /* 2.5rem */
+            bottom: var(--space-4);
+            right: var(--space-4);
+            width: var(--space-10);
+            height: var(--space-10);
         }
         
         .scroll-to-top svg {
-            width: var(--space-4);                      /* 1rem */
-            height: var(--space-4);                     /* 1rem */
+            width: var(--space-4);
+            height: var(--space-4);
         }
     }
 
-    /* === ACCESIBILIDAD === */
-    
-    /* Reducir movimiento si el usuario lo prefiere */
     @media (prefers-reduced-motion: reduce) {
         .scroll-to-top,
         .scroll-to-top svg,
@@ -202,7 +154,6 @@ export const prerender = true;
         }
     }
     
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .scroll-to-top {
             background: var(--accent-primary) !important;
@@ -216,30 +167,23 @@ export const prerender = true;
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
-    
-    /* Optimización de GPU para animaciones suaves */
     .scroll-to-top {
         backface-visibility: hidden;
         transform-style: preserve-3d;
     }
 
-    /* === VARIANTES ADICIONALES === */
-    
-    /* Variante compacta */
     .scroll-to-top.compact {
-        width: var(--space-10);                         /* 2.5rem */
-        height: var(--space-10);                        /* 2.5rem */
-        bottom: var(--space-4);                         /* 1rem */
-        right: var(--space-4);                          /* 1rem */
+        width: var(--space-10);
+        height: var(--space-10);
+        bottom: var(--space-4);
+        right: var(--space-4);
     }
     
     .scroll-to-top.compact svg {
-        width: var(--space-4);                          /* 1rem */
-        height: var(--space-4);                         /* 1rem */
+        width: var(--space-4);
+        height: var(--space-4)
     }
 
-    /* Variante con texto */
     .scroll-to-top.with-text {
         width: auto;
         padding: var(--space-3) var(--space-4);
@@ -249,8 +193,6 @@ export const prerender = true;
         font-weight: var(--font-medium);
         white-space: nowrap;
     }
-
-    /* === SOPORTE PARA DISPOSITIVOS CON NOTCH === */
     
     .scroll-to-top {
         bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
@@ -270,8 +212,6 @@ export const prerender = true;
             right: calc(var(--space-4) + env(safe-area-inset-right));
         }
     }
-
-    /* === ESTADO DE CARGA/DISABLED === */
     
     .scroll-to-top:disabled {
         opacity: 0.5;
@@ -293,12 +233,10 @@ export const prerender = true;
         
         if (!scrollToTopBtn) return;
 
-        // Mostrar/ocultar botón según el scroll
         const toggleVisibility = () => {
             const scrolled = window.pageYOffset;
             const windowHeight = window.innerHeight;
             
-            // Mostrar después de hacer scroll más de media pantalla
             if (scrolled > windowHeight * 0.5) {
                 scrollToTopBtn.classList.add('visible');
             } else {
@@ -306,7 +244,6 @@ export const prerender = true;
             }
         };
 
-        // Scroll suave hacia arriba
         const scrollToTop = () => {
             window.scrollTo({
                 top: 0,
@@ -314,7 +251,6 @@ export const prerender = true;
             });
         };
 
-        // Throttle del scroll para mejor performance
         let ticking = false;
         const throttledToggleVisibility = () => {
             if (!ticking) {
@@ -326,11 +262,9 @@ export const prerender = true;
             }
         };
 
-        // Event listeners
         window.addEventListener('scroll', throttledToggleVisibility, { passive: true });
         scrollToTopBtn.addEventListener('click', scrollToTop);
 
-        // Manejar teclas de accesibilidad
         scrollToTopBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -338,7 +272,6 @@ export const prerender = true;
             }
         });
 
-        // Verificación inicial
         toggleVisibility();
     });
 </script>

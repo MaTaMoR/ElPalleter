@@ -1,35 +1,30 @@
 ---
-// Navigation.astro - Migrado al Design System
 export const prerender = true;
 
-import lightLogo from '../../assets/mini-logo-light.svg'; // Logo para tema oscuro
-import darkLogo from '../../assets/mini-logo-dark.svg';      // Logo para tema claro
+import lightLogo from '../../assets/mini-logo-light.svg';
+import darkLogo from '../../assets/mini-logo-dark.svg';
 import Text from '../i18n/Text.astro';
 import LanguagePicker from '../i18n/LanguagePicker.astro';
 ---
 
 <nav>
-    <!-- Hamburger button (solo visible en móvil) -->
     <button class="hamburger" id="hamburger" aria-label="Menu">
         <span></span>
         <span></span>
         <span></span>
     </button>
     
-    <!-- Nav items (desktop) con logo integrado -->
     <ul class="nav-desktop">
         <li><a data-scroll-to="inicio"><Text key="nav.home"/></a></li>
         <li><a data-scroll-to="historia"><Text key="nav.story"></a></li>
         <li class="logo-item">
             <a href="#hero" aria-label="Ir a inicio - El Palleter">
-                <!-- Logo para tema oscuro -->
                 <img 
                     src={lightLogo.src} 
                     alt="El Palleter Logo"
                     class="logo-dark logo-transition"
                     data-logo="dark"
                 />
-                <!-- Logo para tema claro -->
                 <img 
                     src={darkLogo.src} 
                     alt="El Palleter Logo"
@@ -40,23 +35,19 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         </li>
         <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
         <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
-        <!-- Language Picker para Desktop -->
         <li class="language-item">
             <LanguagePicker variant="desktop" includeThemeToggle={true} />
         </li>
     </ul>
     
-    <!-- Logo solo para móvil -->
     <div class="logo-mobile">
         <a href="#hero" aria-label="Ir a inicio - El Palleter">
-            <!-- Logo para tema oscuro -->
             <img 
                 src={lightLogo.src} 
                 alt="El Palleter Logo"
                 class="logo-dark logo-transition"
                 data-logo="dark"
             />
-            <!-- Logo para tema claro -->
             <img 
                 src={darkLogo.src} 
                 alt="El Palleter Logo"
@@ -66,14 +57,12 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         </a>
     </div>
     
-    <!-- Language Picker para Mobile -->
     <div class="language-mobile">
         <LanguagePicker variant="mobile" includeThemeToggle={true} />
     </div>
 </nav>
 
 <style>
-    /* === NAV PRINCIPAL - USANDO DESIGN SYSTEM === */
     nav {
         max-width: 1200px;
         width: 100%;
@@ -85,7 +74,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         contain: layout style;
     }
     
-    /* === HAMBURGER BUTTON - USANDO TOKENS === */
     .hamburger {
         display: none;
         flex-direction: column;
@@ -119,7 +107,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         background: var(--accent-primary);
     }
     
-    /* === LOGO MÓVIL - USANDO TOKENS === */
     .logo-mobile {
         display: none;
         position: absolute;
@@ -135,7 +122,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         font-size: 0;
     }
     
-    /* === NAVEGACIÓN DESKTOP - MIGRADA === */
     .nav-desktop {
         position: relative;
         display: flex;
@@ -154,7 +140,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         list-style: none;
     }
     
-    /* === ENLACES DE NAVEGACIÓN - USANDO SYSTEM === */
     .nav-desktop li:not(.logo-item):not(.language-item) a {
         text-decoration: none;
         font-size: var(--text-base);
@@ -171,7 +156,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         cursor: pointer;
         text-transform: uppercase;
         
-        /* Text shadow adaptativo del sistema */
         text-shadow: 0 var(--space-1) var(--space-1) var(--text-shadow-color);
     }
     
@@ -186,13 +170,11 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         outline-offset: var(--space-1);
     }
     
-    /* === INDICADOR DE SECCIÓN ACTIVA === */
     .nav-desktop li:not(.logo-item):not(.language-item) a.active {
         background: var(--accent-light);
         color: var(--accent-primary);
     }
     
-    /* === LOGO ITEM - SIMPLIFICADO === */
     .logo-item {
         display: flex;
         align-items: center;
@@ -223,7 +205,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         border-radius: var(--radius-lg);
     }
     
-    /* === LOGOS - SISTEMA DE CAMBIO DINÁMICO DEL DESIGN SYSTEM === */
     .logo-item img,
     .logo-mobile img {
         height: 85px;
@@ -236,10 +217,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         left: 50%;
         transform: translate(-50%, -50%);
         opacity: 0;
-        /* Usando la clase del sistema */
     }
 
-    /* Por defecto mostrar logo oscuro (tema dark) */
     .logo-dark {
         opacity: 1;
     }
@@ -248,24 +227,27 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         opacity: 0;
     }
 
-    /* En tema claro, mostrar logo claro */
-    :root[data-theme="light"] .logo-dark,
     html[data-theme="light"] .logo-dark {
         opacity: 0;
     }
 
-    :root[data-theme="light"] .logo-light,
     html[data-theme="light"] .logo-light {
         opacity: 1;
     }
 
-    /* Hover effect usando tokens */
+    html[data-theme="dark"] .logo-dark {
+        opacity: 01;
+    }
+
+    html[data-theme="dark"] .logo-light {
+        opacity: 0;
+    }
+
     .logo-item a:hover img,
     .logo-mobile a:hover img {
         transform: translate(-50%, -50%) scale(1.03);
     }
     
-    /* === LANGUAGE ITEM === */
     .language-item {
         position: absolute;
         right: 0;
@@ -276,7 +258,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         justify-content: center;
     }
     
-    /* === RESPONSIVE USANDO BREAKPOINTS DEL SISTEMA === */
     @media (max-width: 1399px) {
         .nav-desktop li:not(.logo-item):not(.language-item) a {
             font-size: var(--text-sm);
@@ -305,7 +286,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
     }
     
-    /* === MOBILE BREAKPOINT === */
     @media (max-width: 767px) {
         .hamburger {
             display: flex;
@@ -342,7 +322,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
     }
 
-    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         .hamburger,
         .hamburger span,
@@ -381,7 +360,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
     .logo-item img,
     .logo-mobile img {
         will-change: transform, opacity;
@@ -392,7 +370,6 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         will-change: background-color, transform;
     }
 
-    /* === ESTADOS ADICIONALES === */
     nav.loading {
         pointer-events: none;
         opacity: 0.7;
@@ -402,43 +379,3 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
         background: var(--accent-primary);
     }
 </style>
-
-<script>
-    import ThemeService from '../../services/ThemeService.js';
-
-    // Función para actualizar los logos según el tema
-    function updateLogosForTheme(theme) {
-        const logosDark = document.querySelectorAll('[data-logo="dark"]');
-        const logosLight = document.querySelectorAll('[data-logo="light"]');
-        
-        if (theme === 'light') {
-            logosDark.forEach(logo => logo.style.opacity = '0');
-            logosLight.forEach(logo => logo.style.opacity = '1');
-        } else {
-            logosDark.forEach(logo => logo.style.opacity = '1');
-            logosLight.forEach(logo => logo.style.opacity = '0');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Inicializar ThemeService si no está inicializado
-        if (!ThemeService.currentTheme) {
-            ThemeService.initialize();
-        }
-
-        // Actualizar logos al cargar
-        updateLogosForTheme(ThemeService.getCurrentTheme());
-
-        // Suscribirse a cambios de tema
-        ThemeService.onThemeChange((event) => {
-            updateLogosForTheme(event.theme);
-        });
-    });
-
-    // Para navegación SPA en Astro
-    document.addEventListener('astro:page-load', () => {
-        if (ThemeService.currentTheme) {
-            updateLogosForTheme(ThemeService.getCurrentTheme());
-        }
-    });
-</script>

@@ -1,8 +1,3 @@
-/* =====================================================
-   THEME COMPONENTS - ESTILOS PARA SELECTORES DE TEMA
-   ===================================================== */
-
-/* === DROPDOWN DE TEMAS === */
 .theme-dropdown {
   position: relative;
   display: inline-block;
@@ -52,7 +47,6 @@
   transform: rotate(180deg);
 }
 
-/* Menu desplegable */
 .theme-dropdown-menu {
   position: absolute;
   top: calc(100% + var(--space-2));
@@ -118,7 +112,6 @@
   flex: 1;
 }
 
-/* === BOTÓN DE CICLO === */
 .theme-cycle-btn {
   display: flex;
   align-items: center;
@@ -146,7 +139,6 @@
   transform: translateY(0);
 }
 
-/* === GRUPO DE BOTONES === */
 .theme-button-group {
   display: flex;
   gap: var(--space-2);
@@ -191,7 +183,6 @@
   height: 12px;
 }
 
-/* === VARIANTES COMPACTAS === */
 .theme-dropdown.compact .theme-dropdown-trigger {
   padding: var(--space-2) var(--space-3);
   min-width: auto;
@@ -223,10 +214,7 @@
   display: none;
 }
 
-/* === VARIANTES PARA HEADER === */
-.theme-toggle.header-variant {
-  /* Específico para uso en header */
-}
+.theme-toggle.header-variant {}
 
 .theme-toggle.header-variant .theme-dropdown-trigger,
 .theme-toggle.header-variant .theme-cycle-btn {
@@ -242,7 +230,6 @@
   color: white;
 }
 
-/* === VARIANTES PARA SIDEBAR === */
 .theme-toggle.sidebar-variant {
   width: 100%;
 }
@@ -261,30 +248,29 @@
   width: 100%;
 }
 
-/* === RESPONSIVE === */
 @media (max-width: 768px) {
   .theme-dropdown-menu {
     left: auto;
     right: 0;
     min-width: 180px;
   }
-  
+
   .theme-button-group {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .theme-btn {
     justify-content: flex-start;
     min-width: auto;
     width: 100%;
   }
-  
-  /* Ocultar etiquetas en móvil para el grupo de botones */
+
+
   .theme-button-group .theme-name {
     display: none;
   }
-  
+
   .theme-button-group .theme-btn {
     min-width: 48px;
     justify-content: center;
@@ -295,26 +281,27 @@
   .theme-dropdown-trigger .theme-label {
     display: none;
   }
-  
+
   .theme-cycle-btn .theme-label {
     display: none;
   }
-  
+
   .theme-dropdown-menu {
     min-width: 160px;
   }
 }
 
-/* === ANIMACIONES === */
 @keyframes themeChange {
   0% {
     opacity: 0.8;
     transform: scale(0.98);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.01);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -325,7 +312,6 @@
   animation: themeChange var(--duration-300) var(--ease-out);
 }
 
-/* === INDICADOR DE TEMA ACTIVO === */
 .theme-indicator {
   position: fixed;
   top: var(--space-4);
@@ -366,7 +352,6 @@
   margin-left: var(--space-4);
 }
 
-/* === ACCESIBILIDAD === */
 .theme-dropdown-trigger:focus-visible,
 .theme-cycle-btn:focus-visible,
 .theme-btn:focus-visible {
@@ -379,7 +364,6 @@
   outline: none;
 }
 
-/* Indicadores de estado para lectores de pantalla */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -392,8 +376,8 @@
   border: 0;
 }
 
-/* === PREFERENCIAS DE USUARIO === */
 @media (prefers-reduced-motion: reduce) {
+
   .theme-dropdown-menu,
   .theme-dropdown-trigger,
   .theme-cycle-btn,
@@ -403,14 +387,14 @@
   .dropdown-arrow {
     transition: none;
   }
-  
+
   .theme-changing {
     animation: none;
   }
 }
 
-/* Para usuarios con preferencia de alto contraste */
 @media (prefers-contrast: high) {
+
   .theme-dropdown-trigger,
   .theme-cycle-btn,
   .theme-button-group,
@@ -418,7 +402,7 @@
     border-width: var(--border-2);
     border-color: var(--text-primary);
   }
-  
+
   .theme-option:hover,
   .theme-btn:hover {
     background: var(--text-primary);

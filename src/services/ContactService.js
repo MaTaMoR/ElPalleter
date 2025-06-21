@@ -29,12 +29,11 @@ export class ContactService {
      */
     static getRestaurantStatus() {
         const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes(); // minutos desde medianoche
-        const currentDay = now.getDay(); // 0 = domingo, 1 = lunes, etc.
+        const currentTime = now.getHours() * 60 + now.getMinutes(); 
+        const currentDay = now.getDay(); 
         
         const todaySchedule = contactData.hours.schedule[DAY_NAMES[currentDay]];
         
-        // Si el restaurante está cerrado hoy
         if (!todaySchedule || !todaySchedule.open || !todaySchedule.ranges || todaySchedule.ranges.length === 0) {
             const nextOpening = this.getNextOpeningData();
             return {
@@ -46,7 +45,6 @@ export class ContactService {
             };
         }
 
-        // Verificar si está abierto en alguno de los rangos
         let isCurrentlyOpen = false;
         let closingSoonRange = null;
         let minutesUntilClose = null;
@@ -60,7 +58,6 @@ export class ContactService {
                 isCurrentlyOpen = true;
                 currentRange = range;
                 
-                // Verificar si está cerrando pronto (30 minutos antes del cierre)
                 const minutesLeft = rangeEnd - currentTime;
                 if (minutesLeft <= 30) {
                     closingSoonRange = range;
@@ -92,7 +89,6 @@ export class ContactService {
             };
         }
 
-        // Verificar si abre pronto (1 hora antes de cualquier rango)
         for (const range of todaySchedule.ranges) {
             const rangeStart = this.timeToMinutes(range.start);
             
@@ -108,7 +104,6 @@ export class ContactService {
             }
         }
 
-        // Cerrado - obtener próxima apertura
         const nextOpening = this.getNextOpeningData();
         
         return {
@@ -150,7 +145,6 @@ export class ContactService {
         const currentDay = now.getDay();
         const currentTime = now.getHours() * 60 + now.getMinutes();
         
-        // Buscar en los próximos 7 días
         for (let i = 0; i < 7; i++) {
             const checkDay = (currentDay + i) % 7;
             const daySchedule = contactData.hours.schedule[DAY_NAMES[checkDay]];
@@ -159,7 +153,6 @@ export class ContactService {
                 continue;
             }
             
-            // Si es hoy, verificar si aún no han pasado los horarios
             if (i === 0) {
                 for (const range of daySchedule.ranges) {
                     const rangeStart = this.timeToMinutes(range.start);
@@ -174,7 +167,6 @@ export class ContactService {
                     }
                 }
             } else {
-                // Para otros días, tomar el primer rango disponible
                 if (daySchedule.ranges.length > 0) {
                     const firstRange = daySchedule.ranges[0];
                     return {
@@ -191,7 +183,6 @@ export class ContactService {
             }
         }
         
-        // No hay próxima apertura encontrada
         return {
             messageKey: null,
             messageParams: {},
@@ -206,18 +197,15 @@ export class ContactService {
      * @returns {Array} - Array de grupos con días y horarios
      */
     static getGroupedSchedule(locale) {
-        // Crear mapa de horarios únicos
         const scheduleGroups = new Map();
         
         DAY_NAMES.forEach((dayName, index) => {
             const daySchedule = contactData.hours.schedule[dayName];
             
-            // Crear clave única para este horario
             let scheduleKey;
             if (!daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0) {
                 scheduleKey = 'CLOSED';
             } else {
-                // Crear clave basada en los rangos (ordenados)
                 const sortedRanges = [...daySchedule.ranges].sort((a, b) => 
                     this.timeToMinutes(a.start) - this.timeToMinutes(b.start)
                 );
@@ -226,7 +214,6 @@ export class ContactService {
                 ).join('|');
             }
             
-            // Añadir día al grupo correspondiente
             if (!scheduleGroups.has(scheduleKey)) {
                 scheduleGroups.set(scheduleKey, {
                     days: [],
@@ -240,15 +227,12 @@ export class ContactService {
             scheduleGroups.get(scheduleKey).dayIndexes.push(index);
         });
         
-        // Convertir a array y formatear nombres de días
         const result = Array.from(scheduleGroups.values()).map(group => ({
             ...group,
             daysDisplay: this.formatDaysRange(group.days, group.dayIndexes, locale),
-            firstDayIndex: Math.min(...group.dayIndexes) // Para ordenar por primer día de la semana
+            firstDayIndex: Math.min(...group.dayIndexes) 
         }));
         
-        // Ordenar grupos por día de la semana (lunes=1, martes=2, etc.)
-        // Convertir domingo (0) a 7 para que aparezca al final
         return result.sort((a, b) => {
             const firstDayA = a.firstDayIndex === 0 ? 7 : a.firstDayIndex;
             const firstDayB = b.firstDayIndex === 0 ? 7 : b.firstDayIndex;
@@ -286,17 +270,14 @@ export class ContactService {
         if (days.length === 0) return '';
         if (days.length === 1) return days[0];
         
-        // Ordenar por día de la semana (lunes primero)
-        // Convertir domingo (0) a 7 para que aparezca al final
         const sortedPairs = days.map((day, i) => ({ 
             day, 
-            index: dayIndexes[i] === 0 ? 7 : dayIndexes[i] // domingo al final
+            index: dayIndexes[i] === 0 ? 7 : dayIndexes[i] 
         })).sort((a, b) => a.index - b.index);
         
         const sortedDays = sortedPairs.map(pair => pair.day);
         const sortedIndexes = sortedPairs.map(pair => pair.index);
         
-        // Verificar si es un rango continuo
         let isContinuous = true;
         for (let i = 1; i < sortedIndexes.length; i++) {
             if (sortedIndexes[i] !== sortedIndexes[i-1] + 1) {
@@ -309,7 +290,6 @@ export class ContactService {
             return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
         }
         
-        // Si no es continuo o son pocos días, mostrar lista
         if (sortedDays.length === 2) {
             return sortedDays.join(` ${i18nCore.getTranslation('contact.status.and', locale) || 'y'} `);
         }
@@ -535,30 +515,24 @@ export class ContactService {
         const weekSchedule = this.getWeekSchedule(locale);
         const groupedSchedule = this.getGroupedScheduleWithTranslations(i18nInstance, locale);
         
-        // 🔥 NUEVO SISTEMA: Status y mensaje separados
         let statusText = 'No Disponible';
         let messageText = '';
         let fullMessage = 'No Disponible';
         
         try {
-            // Obtener texto del status
             statusText = i18nInstance.getTranslation(statusData.statusKey, locale, 'No Disponible');
             
-            // Obtener mensaje adicional si existe
             if (statusData.messageKey) {
                 let processedParams = { ...statusData.messageParams };
                 
-                // Traducir parámetros que son claves (como días)
                 if (processedParams.day && processedParams.day.startsWith('contact.days.')) {
                     processedParams.day = i18nInstance.getTranslation(processedParams.day, locale, processedParams.day);
                 }
                 
                 messageText = i18nInstance.getTranslation(statusData.messageKey, locale, processedParams);
                 
-                // Combinar status + mensaje
                 fullMessage = messageText !== statusData.messageKey ? `${statusText}: ${messageText}` : statusText;
             } else {
-                // Solo status, sin mensaje adicional
                 fullMessage = statusText;
             }
             
@@ -575,9 +549,9 @@ export class ContactService {
             groupedSchedule,
             status: {
                 ...statusData,
-                statusText,      // "Abierto", "Cerrado", etc.
-                messageText,     // "Hasta las 23:30", "Abre el Lunes...", etc.
-                fullMessage      // "Abierto: Hasta las 23:30"
+                statusText,
+                messageText,
+                fullMessage
             },
             socials,
             actionLinks,
@@ -586,8 +560,6 @@ export class ContactService {
         };
     }
 }
-
-// === CLASES AUXILIARES ===
 
 export class ContactStatusManager {
     constructor() {

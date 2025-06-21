@@ -16,10 +16,9 @@ const contactServiceData = ContactService.getContactDataWithTranslations(
 );
 const currentStatus = contactServiceData.status;
 const socialNetworks = contactServiceData.socials;
-const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: horarios agrupados
+const groupedSchedule = ContactService.getGroupedSchedule(locale);
 ---
 
-<!-- 🎯 SIMPLIFICADO: Solo la sección sin padding externo ni background -->
 <section class="contact-section container" id="contacto">
     <div class="contact-header">
         <h2 class="contact-title">
@@ -33,9 +32,7 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         </p>
     </div>
     <div class="contact-container">
-        <!-- Componente de Contacto -->
         <div class="contact-component">
-            <!-- Cabecera con Status -->
             <div class="top-bar">
                 <div
                     class={`status status-${currentStatus.status}`}
@@ -48,10 +45,8 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                 </div>
             </div>
 
-            <!-- Contenido de Contacto -->
             <div class="contact-content">
                 <div class="contact-grid">
-                    <!-- Sección de Dirección -->
                     <div class="contact-info-section">
                         <h4>
                             <Text
@@ -71,7 +66,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                         </p>
                     </div>
 
-                    <!-- Sección de Contacto -->
                     <div class="contact-info-section">
                         <h4>
                             <Text
@@ -103,7 +97,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
                         </p>
                     </div>
 
-                    <!-- Sección de Horarios -->
                     <div class="contact-info-section">
                         <h4>
                             <Text
@@ -184,18 +177,11 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
 </section>
 
 <style>
-    /* =====================================================
-   CONTACT SECTION - ACTUALIZADO CON DESIGN TOKENS Y TEMAS
-   Mantiene exactamente el mismo diseño visual con soporte completo para temas
-   ===================================================== */
-
-    /* === CONTACT SECTION SIMPLIFICADA === */
     .contact-section {
         width: 100%;
         position: relative;
     }
 
-    /* === HEADER USANDO TOKENS === */
     .contact-header {
         text-align: center;
         margin-bottom: calc(var(--gap-mobile) * 3);
@@ -223,7 +209,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         z-index: 2;
     }
 
-    /* === COMPONENTE PRINCIPAL === */
     .contact-component {
         background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur);
@@ -237,7 +222,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             border-color var(--duration-300) var(--ease-out);
     }
 
-    /* === CABECERA CON STATUS === */
     .top-bar {
         display: flex;
         justify-content: center;
@@ -278,7 +262,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* === STATUS INDICATOR === */
     .status {
         background: var(--success-light);
         color: var(--success);
@@ -314,7 +297,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* Estados del status */
     .status.status-closed {
         background: var(--error-light);
         color: var(--error);
@@ -335,7 +317,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         background: var(--warning);
     }
 
-    /* === CONTENIDO DE CONTACTO === */
     .contact-content {
         padding: calc(var(--padding-mobile) * 1.5);
     }
@@ -346,7 +327,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         gap: calc(var(--gap-mobile) * 1.5);
     }
 
-    /* === SECCIONES DE INFORMACIÓN === */
     .contact-info-section {
         padding: calc(var(--padding-mobile) * 1);
         border: var(--border-1) solid transparent;
@@ -389,7 +369,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* Enlaces */
     .contact-info-section a {
         color: var(--accent-primary);
         text-decoration: none;
@@ -401,7 +380,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         text-decoration: underline;
     }
 
-    /* === HORARIOS === */
     .schedule-group {
         margin-bottom: calc(var(--gap-mobile) * 0.6);
     }
@@ -443,7 +421,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         transition: color var(--duration-300) var(--ease-out);
     }
 
-    /* === REDES SOCIALES === */
     .social-links {
         display: flex;
         gap: calc(var(--gap-mobile) * 0.5);
@@ -472,9 +449,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         border-color: var(--accent-primary);
     }
 
-    /* === RESPONSIVE === */
-
-    /* MOBILE (hasta 767px) */
     @media (max-width: 767px) {
         .contact-header {
             margin-bottom: calc(var(--gap-mobile) * 2);
@@ -519,7 +493,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* MOBILE PEQUEÑO (hasta 420px) */
     @media (max-width: 420px) {
         .contact-header {
             margin-bottom: calc(var(--gap-mobile) * 1.5);
@@ -567,7 +540,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* TABLET Y SUPERIOR (768px+) */
     @media (min-width: 768px) {
         .contact-header {
             margin-bottom: calc(var(--gap-tablet) * 2);
@@ -627,7 +599,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* DESKTOP (1024px+) */
     @media (min-width: 1024px) {
         .contact-header {
             margin-bottom: calc(var(--gap-desktop) * 1.33);
@@ -682,7 +653,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .contact-header {
             margin-bottom: var(--gap-desktop-lg);
@@ -705,17 +675,11 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* === ACCESIBILIDAD === */
-
-    /* Focus visible para navegación por teclado */
     .social-links a:focus-visible {
         outline: var(--border-2) solid var(--focus-ring);
         outline-offset: var(--space-1);
     }
 
-    /* === PREFERENCIAS DE USUARIO === */
-
-    /* Respeto por movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
         .contact-component,
         .top-bar,
@@ -741,7 +705,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* Alto contraste */
     @media (prefers-contrast: high) {
         .contact-component {
             border: var(--border-2) solid var(--accent-medium);
@@ -758,9 +721,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
         }
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
-
-    /* Contener layout para mejor performance */
     .contact-grid {
         contain: layout style;
     }
@@ -782,32 +742,27 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             ".contact-info-section",
         );
 
-        // Inicializar sistema de breakpoints
         const breakpoints = useBreakpoints("contact-component", {
             element: contactSection,
         });
 
-        // Suscribirse a cambios de breakpoint
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.log(
                     `Contact: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`,
                 );
 
-                // Deshabilitar transiciones durante el cambio
                 const elementsToAdjust = [...contactSections];
                 disableTransitionsDuringResize(elementsToAdjust);
             },
         });
 
-        // Formatear mensajes de estado para hacer bold la parte del estado
         function formatStatusMessage() {
             const statusTextElement = document.getElementById("statusText");
             if (!statusTextElement) return;
 
             const message = statusTextElement.textContent.trim();
 
-            // Verificar si el mensaje tiene formato "Estado: Mensaje"
             if (message.includes(":")) {
                 const [statusPart, ...messageParts] = message.split(":");
                 const messageRest = messageParts.join(":").trim();
@@ -817,14 +772,11 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             }
         }
 
-        // Ejecutar formateo inicial
         formatStatusMessage();
 
-        // Observer para detectar cambios en el texto del status (para actualizaciones dinámicas)
         const statusTextElement = document.getElementById("statusText");
         if (statusTextElement) {
             const observer = new MutationObserver(() => {
-                // Pequeño delay para evitar formatear mientras se está actualizando
                 setTimeout(formatStatusMessage, 10);
             });
 
@@ -835,7 +787,6 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale); // NUEVO: hor
             });
         }
 
-        // Cleanup
         window.addEventListener("beforeunload", () => {
             breakpoints.unsubscribe();
         });

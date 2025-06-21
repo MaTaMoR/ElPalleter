@@ -16,7 +16,7 @@ export class ImageService {
     }
 
     /**
-     * 🎯 MÉTODO PRINCIPAL: Genera datos para imágenes responsivas
+     * MÉTODO PRINCIPAL: Genera datos para imágenes responsivas
      * @param {string} imageId - ID de la imagen
      * @returns {Object|null} - Datos listos para srcset
      */
@@ -42,7 +42,7 @@ export class ImageService {
     }
 
     /**
-     * 🎯 VALIDACIÓN: Verifica si una imagen existe y es válida
+     * VALIDACIÓN: Verifica si una imagen existe y es válida
      * @param {string} imageId - ID de la imagen
      * @returns {boolean} - true si la imagen existe y es válida
      */
@@ -52,23 +52,20 @@ export class ImageService {
     }
 
     /**
-     * 🎯 GALERÍA: Obtiene info básica de una galería - SIN MAPEO RESPONSIVE
+     * GALERÍA: Obtiene info básica de una galería - SIN MAPEO RESPONSIVE
      * @param {string} galleryId - ID de la galería
      * @returns {Array} - Array de objetos básicos para componentes
      */
     static getGalleryImages(galleryId) {
-        // Buscar en galleries.json con tu estructura actual
         const gallery = galleriesData.galleries?.[galleryId];
         if (!gallery?.images) {
             console.warn(`⚠️  Galería '${galleryId}' no encontrada`);
             return [];
         }
 
-        // Ordenar por el campo "order" si existe y devolver info básica
         return gallery.images
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map((imageObj) => ({
-                // Info básica para que ResponsiveImage se encargue del resto
                 imageId: imageObj.image,
                 name: imageObj.name || `Imagen ${imageObj.image}`,
                 order: imageObj.order || 0
@@ -76,7 +73,7 @@ export class ImageService {
     }
 
     /**
-     * 🎯 DEBUG: Información básica de una imagen
+     * DEBUG: Información básica de una imagen
      * @param {string} imageId - ID de la imagen
      * @returns {Object} - Información de debug
      */
@@ -94,7 +91,7 @@ export class ImageService {
     }
 
     /**
-     * 🎯 HELPER: Obtiene todas las galerías disponibles
+     * HELPER: Obtiene todas las galerías disponibles
      * @returns {Array} - Lista de IDs de galerías
      */
     static getAvailableGalleries() {
@@ -102,5 +99,4 @@ export class ImageService {
     }
 }
 
-// Export por defecto para compatibilidad
 export default ImageService;

@@ -1,11 +1,4 @@
-/* =====================================================
-   DESIGN TOKENS - EL PALLETER
-   Variables fundamentales del sistema de diseño
-   ===================================================== */
-
-/* === PALETA DE COLORES BASE === */
 :root {
-  /* Colores primarios del brand */
   --brand-primary: #f4a261;
   --brand-primary-dark: #e8956b;
   --brand-primary-darker: #d4853d;
@@ -13,7 +6,6 @@
   --brand-primary-medium: rgba(244, 162, 97, 0.2);
   --brand-primary-strong: rgba(244, 162, 97, 0.3);
   
-  /* Escala de grises */
   --gray-50: #f8f9fa;
   --gray-100: #f1f3f4;
   --gray-200: #e8eaed;
@@ -25,15 +17,13 @@
   --gray-800: #3c4043;
   --gray-900: #202124;
   
-  /* Colores de fondo oscuros */
   --dark-900: #0a0a0a;
   --dark-800: #0f0f0f;
   --dark-700: #141414;
   --dark-600: #1a1a1a;
   --dark-500: #202020;
   --dark-400: #2d2d2d;
-  
-  /* Colores semánticos */
+ 
   --success: #4caf50;
   --success-light: rgba(76, 175, 80, 0.2);
   --warning: #ffc107;
@@ -44,14 +34,12 @@
   --info-light: rgba(33, 150, 243, 0.2);
 }
 
-/* === TIPOGRAFÍA === */
 :root {
-  /* Familias de fuentes */
+ 
   --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Monaco', 'Menlo', monospace;
   
-  /* Tamaños de fuente */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -62,28 +50,25 @@
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
   
-  /* Pesos de fuente */
   --font-light: 300;
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
   
-  /* Alturas de línea */
   --leading-tight: 1.2;
   --leading-normal: 1.6;
   --leading-relaxed: 1.8;
   
-  /* Espaciado de letras */
+
   --tracking-tight: -0.02em;
   --tracking-normal: 0;
   --tracking-wide: 0.025em;
   --tracking-wider: 0.1em;
 }
 
-/* === ESPACIADO === */
 :root {
-  /* Sistema de espaciado base 4px */
+ 
   --space-0: 0;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -97,8 +82,7 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
-  
-  /* Espaciado responsivo */
+ 
   --padding-mobile: 1rem;
   --padding-tablet: 2rem;
   --padding-desktop: 3rem;
@@ -109,9 +93,8 @@
   --gap-desktop-lg: 2rem;
 }
 
-/* === BORDES Y RADIOS === */
 :root {
-  /* Radios de borde */
+ 
   --radius-none: 0;
   --radius-sm: 0.125rem;
   --radius-base: 0.25rem;
@@ -121,17 +104,15 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
   --radius-full: 9999px;
-  
-  /* Anchos de borde */
+ 
   --border-0: 0;
   --border-1: 2px;
   --border-2: 3px;
   --border-4: 5px;
 }
 
-/* === TRANSICIONES === */
 :root {
-  /* Duraciones */
+ 
   --duration-75: 75ms;
   --duration-100: 100ms;
   --duration-150: 150ms;
@@ -140,15 +121,13 @@
   --duration-500: 500ms;
   --duration-700: 700ms;
   --duration-1000: 1000ms;
-  
-  /* Easing functions */
+ 
   --ease-linear: linear;
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  
-  /* Transiciones comunes */
+ 
   --transition-fast: all var(--duration-150) var(--ease-out);
   --transition-base: all var(--duration-300) var(--ease-out);
   --transition-slow: all var(--duration-500) var(--ease-out);
@@ -159,7 +138,6 @@
   --transition-opacity: opacity var(--duration-300) var(--ease-out);
 }
 
-/* === Z-INDEX === */
 :root {
   --z-auto: auto;
   --z-0: 0;
@@ -177,14 +155,12 @@
   --z-toast: 1030;
 }
 
-/* === EFECTOS DE BLUR Y BACKDROP === */
 :root {
   --backdrop-blur: blur(15px);
   --backdrop-blur-strong: blur(20px);
   --backdrop-blur-subtle: blur(10px);
 }
 
-/* === VARIABLES DE OVERLAY === */
 :root {
   --bg-overlay: rgba(0, 0, 0, 0.25);
   --hover-overlay-base: rgba(255, 255, 255, 0.08);

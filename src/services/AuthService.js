@@ -21,7 +21,7 @@ export class AuthService {
       return null;
     }
 
-    // Return user without password
+    
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
@@ -52,7 +52,7 @@ export class AuthService {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24, 
       path: '/admin'
     });
   }

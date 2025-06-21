@@ -1,21 +1,20 @@
 ---
 export const prerender = true;
 
-import Navigation from './Navigation.astro';
-import MobileSidebar from './MobileSidebar.astro';
+import Navigation from "./Navigation.astro";
+import MobileSidebar from "./MobileSidebar.astro";
 ---
 
 <header id="header">
     <!-- Overlay para la opacidad -->
     <div class="header-overlay"></div>
-    
+
     <Navigation />
 </header>
 
 <MobileSidebar />
 
 <style>
-    /* === HEADER PRINCIPAL - MIGRADO AL DESIGN SYSTEM === */
     header {
         width: 100%;
         height: 80px;
@@ -25,13 +24,11 @@ import MobileSidebar from './MobileSidebar.astro';
         display: flex;
         justify-content: center;
         align-items: center;
-        
-        /* Background usando variables del sistema */
+
         background: var(--glass-bg);
         transition: var(--transition-base);
     }
-    
-    /* === OVERLAY CON BLUR - USANDO TOKENS === */
+
     .header-overlay {
         position: absolute;
         top: 0;
@@ -45,104 +42,93 @@ import MobileSidebar from './MobileSidebar.astro';
         transition: var(--transition-base);
     }
 
-    /* === ESTADOS ADICIONALES === */
     header.scrolled {
         background: var(--bg-surface);
         box-shadow: var(--shadow-lg);
     }
-    
+
     header.transparent {
         background: transparent;
     }
-    
+
     header.transparent .header-overlay {
         background: transparent;
         border-bottom: none;
         backdrop-filter: none;
     }
 
-    /* === MEJORAS DE ACCESIBILIDAD === */
     header:focus-within .header-overlay {
         border-bottom-color: var(--accent-primary);
     }
 
-    /* === RESPONSIVE === */
     @media (max-width: 767px) {
         header {
             height: 70px;
         }
     }
 
-    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         header,
         .header-overlay {
             transition: none;
         }
     }
-    
+
     @media (prefers-contrast: high) {
         .header-overlay {
             border-bottom-width: var(--border-2);
         }
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
     header {
         contain: layout style;
         will-change: background-color, box-shadow;
     }
-    
+
     .header-overlay {
         will-change: backdrop-filter, border-color;
     }
 </style>
-
-<!-- Script del header con inicialización del ThemeService -->
 <script>
-    import ThemeService from '../../services/ThemeService.js';
+    import ThemeService from "../../services/ThemeService.js";
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Inicializar ThemeService si no está inicializado
+    document.addEventListener("DOMContentLoaded", () => {
         if (!ThemeService.currentTheme) {
             ThemeService.initialize();
         }
 
-        // Funcionalidad del sidebar móvil
-        const hamburger = document.getElementById('hamburger');
-        const fullscreenMenu = document.getElementById('fullscreenMenu');
-        const closeMenu = document.getElementById('closeMenu');
-        
-        // Abrir fullscreen menu
-        hamburger?.addEventListener('click', (e) => {
+        const hamburger = document.getElementById("hamburger");
+        const fullscreenMenu = document.getElementById("fullscreenMenu");
+        const closeMenu = document.getElementById("closeMenu");
+
+        hamburger?.addEventListener("click", (e) => {
             e.stopPropagation();
-            fullscreenMenu?.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            fullscreenMenu?.classList.add("active");
+            document.body.style.overflow = "hidden";
         });
-        
-        // Cerrar fullscreen menu
+
         const closeMenuFunction = () => {
-            fullscreenMenu?.classList.remove('active');
-            document.body.style.overflow = '';
+            fullscreenMenu?.classList.remove("active");
+            document.body.style.overflow = "";
         };
-        
-        closeMenu?.addEventListener('click', closeMenuFunction);
-        
-        // Cerrar menu al hacer click en un link
-        const menuLinks = fullscreenMenu?.querySelectorAll('a');
-        menuLinks?.forEach(link => {
-            link.addEventListener('click', closeMenuFunction);
+
+        closeMenu?.addEventListener("click", closeMenuFunction);
+
+        const menuLinks = fullscreenMenu?.querySelectorAll("a");
+        menuLinks?.forEach((link) => {
+            link.addEventListener("click", closeMenuFunction);
         });
-        
-        // Cerrar con tecla Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && fullscreenMenu?.classList.contains('active')) {
+
+        document.addEventListener("keydown", (e) => {
+            if (
+                e.key === "Escape" &&
+                fullscreenMenu?.classList.contains("active")
+            ) {
                 closeMenuFunction();
             }
         });
-        
-        // Cerrar al hacer click en el fondo
-        fullscreenMenu?.addEventListener('click', (e) => {
+
+        fullscreenMenu?.addEventListener("click", (e) => {
             if (e.target === fullscreenMenu) {
                 closeMenuFunction();
             }

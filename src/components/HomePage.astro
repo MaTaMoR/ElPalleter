@@ -7,15 +7,12 @@ export interface Props {
 
 const { locale } = Astro.props;
 
-// Configurar Astro.locals según el idioma recibido
 Astro.locals.locale = locale;
 Astro.locals.cleanPath = '/';
 Astro.locals.isDefaultLocale = locale === 'es';
 
-// Cargar traducciones
 import { i18nCore } from '../i18n/core.js';
 
-// Componentes
 import Layout from '../layouts/Layout.astro';
 import Header from './public/Header.astro';
 import Hero from './public/Hero.astro';
@@ -27,19 +24,14 @@ import Contact from './public/Contact.astro';
 import ScrollToTop from './public/ScrollToTop.astro';
 import Footer from './public/Footer.astro';
 
-// Obtener información de i18n
 const { locale: currentLocale } = i18nCore.getI18nInfo(Astro);
 
-// Obtener metadatos SEO multiidioma
 const seoData = i18nCore.getSEOMetadata({
   title: i18nCore.safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
   description: i18nCore.safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
 }, Astro);
 
-// Obtener URLs alternativas para hreflang
 const alternateUrls = i18nCore.getAlternateUrlsWithAstro(Astro);
-
-// Dirección del texto
 const textDirection = i18nCore.getTextDirectionWithAstro(Astro);
 ---
 
@@ -49,7 +41,6 @@ const textDirection = i18nCore.getTextDirectionWithAstro(Astro);
   lang={currentLocale}
   dir={textDirection}
 >
-  <!-- SEO mejorado con hreflang y multiidioma -->
   <Fragment slot="head">
     <link rel="canonical" href={seoData.canonical} />
     

@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import lightBanner from '../../assets/banner-light.svg'; // Siempre usar este (blanco)
+import lightBanner from '../../assets/banner-light.svg';
 import Text from '../i18n/Text.astro';
 import HeroBackground from './HeroBackground.astro';
 ---
@@ -12,10 +12,8 @@ import HeroBackground from './HeroBackground.astro';
     className="hero-main animate-in"
     adaptiveOverlay={false}
 >
-    <!-- Header: Logo siempre blanco -->
     <div class="hero-header">
         <div class="hero-logo-container">
-            <!-- Solo logo blanco - sin cambio de tema -->
             <img 
                 src={lightBanner.src} 
                 alt="El Palleter Logo" 
@@ -23,8 +21,6 @@ import HeroBackground from './HeroBackground.astro';
             />
         </div>
     </div>
-    
-    <!-- Footer: CTA y scroll indicator siempre blancos -->
     <div class="hero-footer">
         <a href="#carta" class="hero-cta" data-scroll-to="carta">
             <Text key="hero.menu" />
@@ -36,8 +32,6 @@ import HeroBackground from './HeroBackground.astro';
 </HeroBackground>
 
 <style>
-    /* === LAYOUT HERO USANDO DESIGN TOKENS === */
-    
     .hero-header {
         width: 100%;
         text-align: center;
@@ -51,7 +45,6 @@ import HeroBackground from './HeroBackground.astro';
         padding-right: var(--padding-mobile);
     }
 
-    /* === CONTENEDOR DE LOGO === */
     .hero-logo-container {
         position: relative;
         max-width: 650px;
@@ -66,14 +59,12 @@ import HeroBackground from './HeroBackground.astro';
         overflow: hidden;
     }
 
-    /* === LOGO FIJO EN BLANCO - SIN CAMBIO DE TEMA === */
     .hero-logo-fixed {
         width: 100%;
         height: 100%;
         object-fit: contain;
         object-position: center;
         
-        /* Sombra siempre oscura para contraste con logo blanco */
         filter: drop-shadow(0 var(--space-1) var(--space-4) rgba(0, 0, 0, 0.8));
         transition: transform var(--duration-300) var(--ease-out);
         will-change: transform;
@@ -84,9 +75,7 @@ import HeroBackground from './HeroBackground.astro';
         transform: scale(1.02);
     }
 
-    /* === BOTÓN CTA - SIEMPRE BLANCO === */
     .hero-cta {
-        /* Siempre blanco, sin cambio de tema */
         background: transparent;
         border: var(--border-2) solid #ffffff;
         color: #ffffff;
@@ -103,7 +92,6 @@ import HeroBackground from './HeroBackground.astro';
         margin-top: var(--space-4);
         border-radius: var(--radius-md);
         
-        /* Sombra siempre oscura para el texto blanco */
         text-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.8);
     }
 
@@ -113,12 +101,10 @@ import HeroBackground from './HeroBackground.astro';
         background: rgba(255, 255, 255, 0.1);
         transform: translateY(-2px);
         
-        /* Efecto glow blanco */
         box-shadow: 
             0 0 var(--space-6) rgba(255, 255, 255, 0.8), 
             0 0 0 var(--border-1) rgba(255, 255, 255, 1);
         
-        /* Text shadow con glow blanco */
         text-shadow: 0 0 var(--space-4) rgba(255, 255, 255, 0.6);
     }
 
@@ -131,7 +117,6 @@ import HeroBackground from './HeroBackground.astro';
         outline-offset: var(--space-1);
     }
 
-    /* === FOOTER DEL HERO === */
     .hero-footer {
         position: absolute;
         bottom: 0;
@@ -145,7 +130,6 @@ import HeroBackground from './HeroBackground.astro';
         width: 100%;
     }
 
-    /* === SCROLL INDICATOR - SIEMPRE BLANCO === */
     .scroll-indicator {
         cursor: pointer;
         transition: var(--transition-base);
@@ -165,7 +149,7 @@ import HeroBackground from './HeroBackground.astro';
     .scroll-arrow {
         font-size: var(--text-3xl);
         animation: bounce 2s infinite;
-        /* Siempre blanco con sombra oscura */
+
         color: #ffffff;
         text-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.8);
     }
@@ -182,9 +166,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* === RESPONSIVE USANDO TOKENS === */
-    
-    /* DESKTOP LARGE (1400px+) */
     @media (min-width: 1400px) {
         .hero-header {
             padding-top: calc(var(--padding-desktop) * 2.33);
@@ -215,7 +196,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* DESKTOP (1024px+) */
     @media (min-width: 1024px) and (max-width: 1399px) {
         .hero-header {
             padding-top: calc(var(--padding-desktop) * 3.5);
@@ -246,7 +226,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* TABLET (768px+) */
     @media (min-width: 768px) and (max-width: 1023px) {
         .hero-header {
             padding-top: calc(var(--padding-tablet) * 4);
@@ -276,7 +255,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* MOBILE (420px+) */
     @media (min-width: 420px) and (max-width: 767px) {
         .hero-header {
             padding-top: calc(var(--padding-mobile) * 3);
@@ -298,7 +276,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* MOBILE PEQUEÑO (0-419px) */
     @media (max-width: 419px) {
         .hero-header {
             padding-top: calc(var(--padding-mobile) * 2.5);
@@ -328,8 +305,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* === ACCESIBILIDAD === */
-    
     @media (prefers-reduced-motion: reduce) {
         .hero-logo-fixed,
         .hero-cta,
@@ -349,7 +324,7 @@ import HeroBackground from './HeroBackground.astro';
     @media (prefers-contrast: high) {
         .hero-cta {
             border-width: var(--border-4);
-            background: rgba(0, 0, 0, 0.2); /* Fondo semi-transparente para mejor contraste */
+            background: rgba(0, 0, 0, 0.2);
         }
         
         .hero-logo-fixed {
@@ -361,7 +336,6 @@ import HeroBackground from './HeroBackground.astro';
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
     .hero-logo-container {
         contain: layout style;
     }
@@ -376,7 +350,6 @@ import HeroBackground from './HeroBackground.astro';
         will-change: transform;
     }
 
-    /* === UTILIDADES DE DEBUG === */
     .hero-header.debug {
         border: 2px dashed rgba(255, 255, 255, 0.3);
     }
@@ -385,37 +358,3 @@ import HeroBackground from './HeroBackground.astro';
         border: 2px dashed rgba(255, 255, 255, 0.3);
     }
 </style>
-
-<!-- Script simplificado - ya no necesitamos cambio de logos por tema -->
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Funcionalidad adicional si se necesita
-        // Por ejemplo, animaciones de entrada, parallax, etc.
-        
-        // Opcional: efecto parallax suave en el logo
-        const logo = document.querySelector('.hero-logo-fixed');
-        if (logo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            let ticking = false;
-            
-            function updateParallax() {
-                const scrolled = window.pageYOffset;
-                const rate = scrolled * -0.1;
-                
-                if (logo) {
-                    logo.style.transform = `translateY(${rate}px) scale(${1 + scrolled * 0.00005})`;
-                }
-                
-                ticking = false;
-            }
-            
-            function requestTick() {
-                if (!ticking) {
-                    requestAnimationFrame(updateParallax);
-                    ticking = true;
-                }
-            }
-            
-            window.addEventListener('scroll', requestTick, { passive: true });
-        }
-    });
-</script>

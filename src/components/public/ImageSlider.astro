@@ -37,11 +37,9 @@ const { images } = Astro.props;
         ))}
     </div>
     
-    <!-- Flechas de navegación -->
     <button class="slider-arrow prev" aria-label="Imagen anterior">‹</button>
     <button class="slider-arrow next" aria-label="Siguiente imagen">›</button>
     
-    <!-- Puntos de navegación -->
     <div class="slider-nav">
         {images.map((_, index) => (
             <button 
@@ -54,8 +52,6 @@ const { images } = Astro.props;
 </div>
 
 <style>
-    /* === IMAGE SLIDER - MIGRADO AL DESIGN SYSTEM === */
-    
     .slider-container {
         position: relative;
         border-radius: var(--radius-2xl);
@@ -65,7 +61,6 @@ const { images } = Astro.props;
         min-height: inherit;
         height: 100%;
         
-        /* Optimizaciones del sistema */
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         isolation: isolate;
@@ -104,7 +99,6 @@ const { images } = Astro.props;
         z-index: 0;
     }
     
-    /* === CONTROLES DEL SLIDER - USANDO SISTEMA === */
     .slider-nav {
         position: absolute;
         bottom: var(--space-8);
@@ -140,13 +134,11 @@ const { images } = Astro.props;
         outline-offset: var(--space-1);
     }
     
-    /* === FLECHAS DEL SLIDER - USANDO CLASES DEL SISTEMA === */
     .slider-arrow {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         
-        /* Usando las clases glass del sistema */
         background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur);
         border: var(--border-1) solid var(--glass-border);
@@ -160,7 +152,6 @@ const { images } = Astro.props;
         transition: var(--transition-base);
         z-index: 10;
         
-        /* Centrar el contenido */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -186,7 +177,6 @@ const { images } = Astro.props;
         right: var(--space-8);
     }
     
-    /* === CAPTION CON EFECTO PILL - USANDO SISTEMA === */
     .slide-caption {
         position: absolute;
         bottom: var(--space-16);
@@ -197,11 +187,9 @@ const { images } = Astro.props;
         font-size: var(--text-lg);
         font-weight: var(--font-semibold);
         
-        /* Sombra de texto adaptativa */
         text-shadow: 0 0 var(--space-2) var(--text-shadow-color),
                      1px 1px var(--space-1) var(--text-shadow-color);
         
-        /* Usando glass del sistema */
         background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur-subtle);
         padding: var(--space-2) var(--space-4);
@@ -219,16 +207,12 @@ const { images } = Astro.props;
         opacity: 1;
     }
     
-    /* === RESPONSIVE - USANDO BREAKPOINTS DEL SISTEMA === */
-    
-    /* MÓVIL - BORDER-RADIUS MENOR */
     @media (max-width: 767px) {
         .slider-container {
             border-radius: var(--radius-xl);
         }
     }
-    
-    /* MÓVIL - CONTROLES MÁS PEQUEÑOS */
+
     @media (max-width: 640px) {
         .slider-arrow {
             width: var(--space-10);
@@ -255,7 +239,6 @@ const { images } = Astro.props;
         }
     }
     
-    /* MOBILE PEQUEÑO */
     @media (max-width: 420px) {
         .slider-arrow {
             width: var(--space-8);
@@ -282,8 +265,6 @@ const { images } = Astro.props;
             gap: var(--space-3);
         }
     }
-
-    /* === ESTADOS DE CARGA === */
     .slider-container.loading {
         opacity: 0.7;
     }
@@ -293,7 +274,6 @@ const { images } = Astro.props;
         opacity: 0.5;
     }
 
-    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         .slider-wrapper,
         .slide-caption,
@@ -328,7 +308,6 @@ const { images } = Astro.props;
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
     .slider-wrapper {
         will-change: transform;
     }
@@ -341,7 +320,6 @@ const { images } = Astro.props;
         contain: layout style paint;
     }
 
-    /* === UTILIDADES ADICIONALES DEL SISTEMA === */
     .slider-arrow.disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -381,7 +359,6 @@ const { images } = Astro.props;
         }
         
         init() {
-            // Event listeners para las flechas
             if (this.prevBtn) {
                 this.prevBtn.addEventListener('click', () => {
                     if (!this.isTransitioning) {
@@ -402,7 +379,6 @@ const { images } = Astro.props;
                 });
             }
             
-            // Event listeners para los dots
             this.dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
                     if (!this.isTransitioning) {
@@ -413,81 +389,40 @@ const { images } = Astro.props;
                 });
             });
             
-            // Pausar autoplay en hover
             if (this.sliderWrapper) {
                 this.sliderWrapper.addEventListener('mouseenter', () => this.clearAutoPlay());
                 this.sliderWrapper.addEventListener('mouseleave', () => this.startAutoPlay());
             }
             
-            // Iniciar autoplay
             this.startAutoPlay();
             
-            // Navegación por teclado
             this.container.addEventListener('keydown', (e) => this.handleKeydown(e));
             
-            // Hacer el container focusable
             this.container.setAttribute('tabindex', '0');
             this.container.setAttribute('role', 'region');
             this.container.setAttribute('aria-label', 'Galería de imágenes');
         }
         
-        handleKeydown(e) {
-            if (this.isTransitioning) return;
-            
-            switch(e.key) {
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    this.clearAutoPlay();
-                    this.prevSlide();
-                    this.startAutoPlay();
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    this.clearAutoPlay();
-                    this.nextSlide();
-                    this.startAutoPlay();
-                    break;
-                case 'Home':
-                    e.preventDefault();
-                    this.clearAutoPlay();
-                    this.goToSlide(0);
-                    this.startAutoPlay();
-                    break;
-                case 'End':
-                    e.preventDefault();
-                    this.clearAutoPlay();
-                    this.goToSlide(this.totalSlides - 1);
-                    this.startAutoPlay();
-                    break;
-            }
-        }
-        
         updateSlider() {
             if (!this.sliderWrapper || this.totalSlides === 0) return;
             
-            // Bloquear nuevas transiciones
             this.isTransitioning = true;
             
-            // Mover el slider
             const translateX = -this.currentSlide * 100;
             this.sliderWrapper.style.transform = `translateX(${translateX}%)`;
             
-            // Actualizar dots
             this.dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === this.currentSlide);
                 dot.setAttribute('aria-pressed', index === this.currentSlide);
             });
             
-            // Actualizar slides activos
             this.slides.forEach((slide, index) => {
                 slide.classList.toggle('active', index === this.currentSlide);
             });
-            
-            // Actualizar aria-live para lectores de pantalla
+
             const currentSlideInfo = `Imagen ${this.currentSlide + 1} de ${this.totalSlides}`;
             this.container.setAttribute('aria-label', `Galería de imágenes - ${currentSlideInfo}`);
             
-            // Desbloquear después de la transición
             setTimeout(() => {
                 this.isTransitioning = false;
             }, 500);
@@ -511,7 +446,6 @@ const { images } = Astro.props;
         }
         
         startAutoPlay() {
-            if (true) return; // Autoplay deshabilitado por defecto
             this.clearAutoPlay();
             if (this.totalSlides > 1) {
                 this.autoPlayInterval = setInterval(() => {
@@ -534,7 +468,6 @@ const { images } = Astro.props;
         }
     }
     
-    // Inicializar sliders cuando se carga la página
     document.addEventListener('DOMContentLoaded', () => {
         const sliderContainers = document.querySelectorAll('[data-slider]');
         const sliders = [];
@@ -547,7 +480,6 @@ const { images } = Astro.props;
             }
         });
         
-        // Limpiar todos los sliders al salir
         window.addEventListener('beforeunload', () => {
             sliders.forEach(slider => slider.destroy());
         });

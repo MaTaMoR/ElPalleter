@@ -4,8 +4,7 @@
  */
 
 export class ThemeService {
-    
-    // Configuración de temas disponibles (solo dark y light)
+
     static themes = {
         dark: {
             id: 'dark',
@@ -21,32 +20,21 @@ export class ThemeService {
         }
     };
 
-    // Tema por defecto
     static DEFAULT_THEME = 'dark';
-    
-    // Clave para localStorage
     static STORAGE_KEY = 'el-palleter-theme';
-    
-    // Callbacks para cambios de tema
     static callbacks = [];
-    
-    // Estado actual
     static currentTheme = null;
 
     /**
-     * 🎨 INICIALIZACIÓN - Llamar al cargar la aplicación
+     * INICIALIZACIÓN - Llamar al cargar la aplicación
      */
     static initialize() {
-        // Detectar tema actual del DOM o localStorage
         const savedTheme = this.getSavedTheme();
         const currentDOMTheme = this.getCurrentThemeFromDOM();
         
         const initialTheme = savedTheme || currentDOMTheme || this.DEFAULT_THEME;
         
-        // Aplicar tema inicial
         this.setTheme(initialTheme, { skipSave: false, triggerCallbacks: false });
-        
-        // Configurar clase de transición
         this.enableThemeTransitions();
         
         console.log(`🎨 ThemeService inicializado con tema: ${initialTheme}`);
@@ -55,7 +43,7 @@ export class ThemeService {
     }
 
     /**
-     * 🔄 TOGGLE - Alterna entre dark y light
+     * TOGGLE - Alterna entre dark y light
      */
     static toggle() {
         const currentTheme = this.getCurrentTheme();
@@ -66,7 +54,7 @@ export class ThemeService {
     }
 
     /**
-     * 🎯 SET THEME - Aplicar un tema específico
+     * SET THEME - Aplicar un tema específico
      * @param {string} themeId - 'dark' o 'light'
      * @param {Object} options - Opciones adicionales
      */
@@ -77,7 +65,6 @@ export class ThemeService {
             enableTransition = true
         } = options;
 
-        // Validar que el tema existe (solo dark o light)
         if (!this.themes[themeId]) {
             console.warn(`⚠️ Tema '${themeId}' no encontrado. Usando tema por defecto.`);
             themeId = this.DEFAULT_THEME;
@@ -86,43 +73,38 @@ export class ThemeService {
         const previousTheme = this.currentTheme;
         this.currentTheme = themeId;
 
-        // Aplicar clase de transición temporalmente
         if (enableTransition) {
             this.enableThemeTransitions();
         }
 
-        // Aplicar tema al DOM
         this.applyThemeToDOM(themeId);
 
-        // Guardar en localStorage
         if (!skipSave) {
             this.saveTheme(themeId);
         }
 
-        // Disparar callbacks
         if (triggerCallbacks) {
             this.notifyThemeChange(themeId, previousTheme);
         }
 
-        // Remover clase de transición después de la animación
         if (enableTransition) {
             setTimeout(() => {
                 this.disableThemeTransitions();
-            }, 300); // Duración de la transición CSS
+            }, 300);
         }
 
         return themeId;
     }
 
     /**
-     * 📖 GET CURRENT THEME - Obtiene el tema actual
+     * GET CURRENT THEME - Obtiene el tema actual
      */
     static getCurrentTheme() {
         return this.currentTheme || this.getCurrentThemeFromDOM() || this.DEFAULT_THEME;
     }
 
     /**
-     * 📋 GET THEME INFO - Obtiene información de un tema
+     * GET THEME INFO - Obtiene información de un tema
      * @param {string} themeId - 'dark' o 'light' (opcional)
      */
     static getThemeInfo(themeId = null) {
@@ -131,21 +113,21 @@ export class ThemeService {
     }
 
     /**
-     * 🌓 IS DARK MODE - Verifica si está en modo oscuro
+     * IS DARK MODE - Verifica si está en modo oscuro
      */
     static isDarkMode() {
         return this.getCurrentTheme() === 'dark';
     }
 
     /**
-     * ☀️ IS LIGHT MODE - Verifica si está en modo claro
+     * IS LIGHT MODE - Verifica si está en modo claro
      */
     static isLightMode() {
         return this.getCurrentTheme() === 'light';
     }
 
     /**
-     * 🔗 ON THEME CHANGE - Suscribirse a cambios de tema
+     * ON THEME CHANGE - Suscribirse a cambios de tema
      * @param {Function} callback - Función a ejecutar cuando cambie el tema
      */
     static onThemeChange(callback) {
@@ -153,7 +135,6 @@ export class ThemeService {
             this.callbacks.push(callback);
         }
         
-        // Retornar función para desuscribirse
         return () => {
             const index = this.callbacks.indexOf(callback);
             if (index > -1) {
@@ -163,7 +144,7 @@ export class ThemeService {
     }
 
     /**
-     * 🚀 NOTIFY THEME CHANGE - Notifica cambios a los suscriptores
+     * NOTIFY THEME CHANGE - Notifica cambios a los suscriptores
      */
     static notifyThemeChange(newTheme, previousTheme) {
         const themeInfo = this.getThemeInfo(newTheme);
@@ -185,25 +166,22 @@ export class ThemeService {
     }
 
     /**
-     * 🎨 APPLY THEME TO DOM - Aplica el tema al DOM
+     * APPLY THEME TO DOM - Aplica el tema al DOM
      */
     static applyThemeToDOM(themeId) {
         const html = document.documentElement;
         
-        // Remover tema anterior
         html.removeAttribute('data-theme');
         html.classList.remove('theme-dark', 'theme-light');
         
-        // Aplicar nuevo tema
         html.setAttribute('data-theme', themeId);
         html.classList.add(`theme-${themeId}`);
         
-        // Actualizar meta theme-color para navegadores móviles
         this.updateMetaThemeColor(themeId);
     }
 
     /**
-     * 🎨 UPDATE META THEME COLOR - Actualiza el color del tema en navegadores móviles
+     * UPDATE META THEME COLOR - Actualiza el color del tema en navegadores móviles
      */
     static updateMetaThemeColor(themeId) {
         let metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -213,17 +191,16 @@ export class ThemeService {
             document.head.appendChild(metaThemeColor);
         }
 
-        // Colores basados en tu sistema de diseño
         const themeColors = {
-            dark: '#141414',  // --dark-700 de tu sistema
-            light: '#ffffff'  // Color del tema claro
+            dark: '#141414',
+            light: '#ffffff'
         };
 
         metaThemeColor.content = themeColors[themeId] || themeColors.dark;
     }
 
     /**
-     * 💾 SAVE THEME - Guarda el tema en localStorage
+     * SAVE THEME - Guarda el tema en localStorage
      */
     static saveTheme(themeId) {
         try {
@@ -234,7 +211,7 @@ export class ThemeService {
     }
 
     /**
-     * 📖 GET SAVED THEME - Obtiene el tema guardado en localStorage
+     * GET SAVED THEME - Obtiene el tema guardado en localStorage
      */
     static getSavedTheme() {
         try {
@@ -247,7 +224,7 @@ export class ThemeService {
     }
 
     /**
-     * 🔍 GET CURRENT THEME FROM DOM - Detecta el tema actual del DOM
+     * GET CURRENT THEME FROM DOM - Detecta el tema actual del DOM
      */
     static getCurrentThemeFromDOM() {
         const html = document.documentElement;
@@ -257,7 +234,6 @@ export class ThemeService {
             return dataTheme;
         }
         
-        // Verificar clases
         if (html.classList.contains('theme-dark')) return 'dark';
         if (html.classList.contains('theme-light')) return 'light';
         
@@ -265,21 +241,21 @@ export class ThemeService {
     }
 
     /**
-     * ⚡ ENABLE THEME TRANSITIONS - Activa transiciones suaves
+     * ENABLE THEME TRANSITIONS - Activa transiciones suaves
      */
     static enableThemeTransitions() {
         document.documentElement.classList.add('theme-transition');
     }
 
     /**
-     * ⚡ DISABLE THEME TRANSITIONS - Desactiva transiciones
+     * DISABLE THEME TRANSITIONS - Desactiva transiciones
      */
     static disableThemeTransitions() {
         document.documentElement.classList.remove('theme-transition');
     }
 
     /**
-     * 🌓 DETECT SYSTEM PREFERENCE - Detecta preferencia del sistema
+     * DETECT SYSTEM PREFERENCE - Detecta preferencia del sistema
      */
     static detectSystemPreference() {
         if (!window.matchMedia) return this.DEFAULT_THEME;
@@ -289,7 +265,7 @@ export class ThemeService {
     }
 
     /**
-     * 🎯 AUTO MODE - Modo automático basado en preferencias del sistema
+     * AUTO MODE - Modo automático basado en preferencias del sistema
      */
     static enableAutoMode() {
         if (!window.matchMedia) return;
@@ -301,10 +277,8 @@ export class ThemeService {
             this.setTheme(systemTheme, { skipSave: true });
         };
 
-        // Aplicar inmediatamente
         updateTheme();
         
-        // Escuchar cambios
         darkModeQuery.addEventListener('change', updateTheme);
         
         return () => {
@@ -313,7 +287,7 @@ export class ThemeService {
     }
 
     /**
-     * 🔄 RESET - Resetea al tema por defecto
+     * RESET - Resetea al tema por defecto
      */
     static reset() {
         this.setTheme(this.DEFAULT_THEME);
@@ -321,7 +295,7 @@ export class ThemeService {
     }
 
     /**
-     * 🗑️ CLEAR SAVED THEME - Elimina el tema guardado
+     * CLEAR SAVED THEME - Elimina el tema guardado
      */
     static clearSavedTheme() {
         try {
@@ -332,14 +306,14 @@ export class ThemeService {
     }
 
     /**
-     * ✅ IS VALID THEME - Verifica si un tema es válido
+     * IS VALID THEME - Verifica si un tema es válido
      */
     static isValidTheme(themeId) {
         return themeId === 'dark' || themeId === 'light';
     }
 
     /**
-     * 📊 GET STATS - Estadísticas del servicio (para debug)
+     * GET STATS - Estadísticas del servicio (para debug)
      */
     static getStats() {
         return {
@@ -432,5 +406,4 @@ export class ThemeManager {
     }
 }
 
-// Export por defecto
 export default ThemeService;

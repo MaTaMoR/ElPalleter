@@ -22,7 +22,6 @@ const {
     adaptiveOverlay = true
 } = Astro.props;
 
-// Clases dinámicas usando design system
 const heroClasses = [
     'hero-background',
     adaptiveOverlay && 'adaptive-overlay',
@@ -31,7 +30,6 @@ const heroClasses = [
 ---
 
 <div class={heroClasses} id="hero">
-    <!-- Imagen de fondo responsiva -->
     <ResponsiveImage
         imageId={imageId}
         alt={alt}
@@ -46,19 +44,16 @@ const heroClasses = [
         fallbackIcon="picture"
     />
     
-    <!-- Overlay optimizado para elementos blancos -->
     {adaptiveOverlay && (
         <div class="hero-overlay-white-optimized"></div>
     )}
     
-    <!-- Slot para contenido del hero -->
     <div class="hero-content">
         <slot />
     </div>
 </div>
 
 <style>
-    /* === HERO BACKGROUND USANDO DESIGN TOKENS === */
     .hero-background {
         position: relative;
         width: 100%;
@@ -68,16 +63,14 @@ const heroClasses = [
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        color: #ffffff; /* Siempre blanco para elementos del hero */
+        color: #ffffff; 
         
-        /* Optimizaciones de performance */
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         contain: layout style paint;
         will-change: transform;
     }
 
-    /* === IMAGEN DE FONDO === */
     .hero-background :global(.hero-bg-image) {
         position: absolute;
         top: 0;
@@ -88,15 +81,12 @@ const heroClasses = [
         object-fit: cover;
         object-position: center;
         
-        /* Optimización de GPU */
         will-change: transform;
         transform: translate3d(0, 0, 0);
-        
-        /* Transición suave para filtros */
+    
         transition: filter var(--duration-300) var(--ease-out);
     }
 
-    /* === OVERLAY BASE === */
     .hero-overlay {
         position: absolute;
         top: 0;
@@ -109,7 +99,6 @@ const heroClasses = [
         transition: background var(--duration-300) var(--ease-out);
     }
 
-    /* === OVERLAY OPTIMIZADO PARA ELEMENTOS BLANCOS === */
     .hero-overlay-white-optimized {
         position: absolute;
         top: 0;
@@ -121,15 +110,12 @@ const heroClasses = [
         transition: background var(--duration-300) var(--ease-out),
                     opacity var(--duration-300) var(--ease-out);
         
-        /* Overlay muy sutil por defecto - elementos blancos necesitan poco contraste en imágenes oscuras */
         background: rgba(0, 0, 0, 0.05);
         opacity: 1;
     }
 
-    /* Overlay adaptativo para tema claro - más fuerte para mantener contraste con elementos blancos */
     :root[data-theme="light"] .hero-overlay-white-optimized,
     html[data-theme="light"] .hero-overlay-white-optimized {
-        /* Gradiente más fuerte en tema claro para que el blanco destaque */
         background: linear-gradient(
             rgba(0, 0, 0, 0.4) 0%,
             rgba(0, 0, 0, 0.45) 25%,
@@ -138,10 +124,8 @@ const heroClasses = [
         );
     }
 
-    /* === OPTIMIZACIÓN PARA TEMA DORADO === */
     :root[data-theme="gold"] .hero-overlay-white-optimized,
     html[data-theme="gold"] .hero-overlay-white-optimized {
-        /* Overlay más cálido para complementar el tema dorado */
         background: linear-gradient(
             rgba(0, 0, 0, 0.3) 0%,
             rgba(20, 10, 0, 0.35) 50%,
@@ -149,10 +133,8 @@ const heroClasses = [
         );
     }
 
-    /* === OPTIMIZACIÓN PARA TEMA AZUL === */
     :root[data-theme="blue"] .hero-overlay-white-optimized,
     html[data-theme="blue"] .hero-overlay-white-optimized {
-        /* Overlay más frío para complementar el tema azul */
         background: linear-gradient(
             rgba(0, 0, 0, 0.3) 0%,
             rgba(0, 10, 20, 0.35) 50%,
@@ -160,10 +142,8 @@ const heroClasses = [
         );
     }
 
-    /* === OPTIMIZACIÓN PARA TEMA RESTAURANTE === */
     :root[data-theme="restaurant"] .hero-overlay-white-optimized,
     html[data-theme="restaurant"] .hero-overlay-white-optimized {
-        /* Overlay más cálido y terroso */
         background: linear-gradient(
             rgba(0, 0, 0, 0.3) 0%,
             rgba(20, 15, 10, 0.35) 50%,
@@ -171,12 +151,10 @@ const heroClasses = [
         );
     }
 
-    /* === REDUCIR OVERLAY BASE CUANDO SE USA OVERLAY OPTIMIZADO === */
     .hero-background.adaptive-overlay .hero-overlay {
-        opacity: 0.2; /* Muy sutil ya que el overlay optimizado hace el trabajo principal */
+        opacity: 0.2;
     }
 
-    /* === FALLBACK PERSONALIZADO PARA HERO === */
     .hero-background :global(.responsive-image-fallback) {
         position: absolute;
         top: 0;
@@ -185,7 +163,6 @@ const heroClasses = [
         height: 100%;
         z-index: 0;
         
-        /* Usando tokens para el fondo de fallback */
         background: linear-gradient(135deg, 
             var(--dark-600) 0%, 
             var(--dark-400) 100%
@@ -201,13 +178,12 @@ const heroClasses = [
     }
 
     .hero-background :global(.responsive-image-fallback .fallback-title) {
-        color: #ffffff; /* Siempre blanco para consistencia */
+        color: #ffffff; 
     }
 
-    /* === CONTENIDO === */
     .hero-content {
         position: relative;
-        z-index: 3; /* Por encima de ambos overlays */
+        z-index: 3;
         width: 100%;
         height: 100%;
         display: flex;
@@ -216,9 +192,6 @@ const heroClasses = [
         align-items: center;
     }
 
-    /* === VARIANTES ADICIONALES DEL OVERLAY === */
-    
-    /* Overlay suave (menos contraste) */
     .hero-background.adaptive-soft .hero-overlay-white-optimized {
         background: rgba(0, 0, 0, 0.02);
     }
@@ -232,7 +205,6 @@ const heroClasses = [
         );
     }
 
-    /* Overlay fuerte (más contraste) */
     .hero-background.adaptive-strong .hero-overlay-white-optimized {
         background: rgba(0, 0, 0, 0.15);
     }
@@ -247,7 +219,6 @@ const heroClasses = [
         );
     }
 
-    /* === OVERLAY CON EFECTO CRISTAL === */
     .hero-background.glass-adaptive .hero-overlay-white-optimized {
         backdrop-filter: var(--backdrop-blur-subtle);
         background: rgba(0, 0, 0, 0.1);
@@ -259,7 +230,6 @@ const heroClasses = [
         backdrop-filter: var(--backdrop-blur);
     }
 
-    /* === GRADIENTE VERTICAL OPTIMIZADO === */
     .hero-background.gradient-adaptive .hero-overlay-white-optimized {
         background: linear-gradient(
             180deg,
@@ -281,15 +251,11 @@ const heroClasses = [
         );
     }
 
-    /* === RESPONSIVE === */
-    
-    /* Mobile optimizations - usando tokens */
     @media (max-width: 768px) {
         .hero-background {
-            height: 100svh; /* Safe viewport height */
+            height: 100svh;
         }
         
-        /* Overlay ligeramente más fuerte en móvil para mejor legibilidad */
         .hero-overlay-white-optimized {
             background: rgba(0, 0, 0, 0.08);
         }
@@ -308,30 +274,26 @@ const heroClasses = [
         }
     }
 
-    /* Tablet adjustments */
     @media (min-width: 768px) and (max-width: 1023px) {
         .hero-background :global(.responsive-image-fallback .fallback-content) {
             padding: var(--space-12) var(--space-6);
         }
     }
 
-    /* Desktop optimizations */
     @media (min-width: 1024px) {
         .hero-background :global(.responsive-image-fallback .fallback-content) {
             padding: var(--space-16) var(--space-8);
         }
     }
 
-    /* === TEMAS ESPECÍFICOS PARA FALLBACK === */
     [data-theme="light"] .hero-background :global(.responsive-image-fallback) {
         background: linear-gradient(135deg, 
             var(--dark-600) 0%, 
             var(--dark-400) 100%
         );
-        color: #ffffff; /* Mantener blanco incluso en tema claro */
+        color: #ffffff; 
     }
 
-    /* === ANIMACIONES === */
     .hero-background.animate-in {
         animation: heroFadeIn var(--duration-1000) var(--ease-out);
     }
@@ -345,15 +307,11 @@ const heroClasses = [
         }
     }
 
-    /* === ACCESIBILIDAD === */
-    
-    /* Alto contraste - overlay más fuerte para mejorar legibilidad */
     @media (prefers-contrast: high) {
         .hero-overlay-white-optimized {
-            background: rgba(0, 0, 0, 0.7) !important;
+            background: rgba(0, 0, 0, 0.7);
         }
         
-        /* En alto contraste, todos los temas usan overlay oscuro fuerte */
         :root[data-theme="light"] .hero-overlay-white-optimized,
         html[data-theme="light"] .hero-overlay-white-optimized,
         :root[data-theme="gold"] .hero-overlay-white-optimized,
@@ -362,11 +320,9 @@ const heroClasses = [
         html[data-theme="blue"] .hero-overlay-white-optimized,
         :root[data-theme="restaurant"] .hero-overlay-white-optimized,
         html[data-theme="restaurant"] .hero-overlay-white-optimized {
-            background: rgba(0, 0, 0, 0.8) !important;
+            background: rgba(0, 0, 0, 0.8) ;
         }
     }
-
-    /* Movimiento reducido */
     @media (prefers-reduced-motion: reduce) {
         .hero-overlay-white-optimized {
             transition: none;
@@ -377,7 +333,6 @@ const heroClasses = [
         }
     }
 
-    /* === OPTIMIZACIONES DE PERFORMANCE === */
     .hero-background {
         contain: layout style paint;
     }
@@ -391,7 +346,6 @@ const heroClasses = [
         backface-visibility: hidden;
     }
 
-    /* === UTILIDADES DE DEBUG === */
     .hero-background.debug-overlays .hero-overlay {
         border: 2px solid red;
         opacity: 0.5;
@@ -402,7 +356,6 @@ const heroClasses = [
         opacity: 0.5;
     }
 
-    /* === ESTADOS ADICIONALES === */
     .hero-background.loading {
         pointer-events: none;
     }

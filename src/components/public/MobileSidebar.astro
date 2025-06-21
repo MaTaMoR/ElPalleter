@@ -1,33 +1,27 @@
 ---
 export const prerender = true;
 
-import lightLogo from '../../assets/mini-logo-light.svg'; // Logo para tema oscuro
-import darkLogo from '../../assets/mini-logo-dark.svg';      // Logo para tema claro
+import lightLogo from '../../assets/mini-logo-light.svg';
+import darkLogo from '../../assets/mini-logo-dark.svg';
 import Text from '../i18n/Text.astro';
 ---
 
-<!-- Fullscreen Overlay Menu -->
 <div class="fullscreen-menu" id="fullscreenMenu">
     <div class="fullscreen-content">
-        <!-- Botón de cerrar en la esquina superior derecha -->
         <button class="close-btn" id="closeMenu" aria-label="Cerrar menú">
             <span>✕</span>
         </button>
-        
-        <!-- Container izquierdo para logo y nav -->
+
         <div class="left-content">
-            <!-- Logo dual en el overlay -->
             <div class="overlay-logo">
                 <a href="#hero" aria-label="Ir a inicio - El Palleter">
                     <div class="logo-container">
-                        <!-- Logo para tema oscuro -->
                         <img 
                             src={lightLogo.src} 
                             alt="El Palleter Logo" 
                             class="mini-logo logo-dark logo-transition"
                             data-logo="dark"
                         />
-                        <!-- Logo para tema claro -->
                         <img 
                             src={darkLogo.src} 
                             alt="El Palleter Logo" 
@@ -38,7 +32,6 @@ import Text from '../i18n/Text.astro';
                 </a>
             </div>
             
-            <!-- Navegación del overlay -->
             <nav class="overlay-nav">
                 <ul>
                     <li><a href="#hero" data-delay="0" data-nav="inicio"><Text key="nav.home"/></a></li>
@@ -52,7 +45,6 @@ import Text from '../i18n/Text.astro';
 </div>
 
 <style>
-    /* === FULLSCREEN MENU OVERLAY - MIGRADO === */
     .fullscreen-menu {
         position: fixed;
         top: 0;
@@ -79,7 +71,6 @@ import Text from '../i18n/Text.astro';
         height: 100%;
     }
     
-    /* === BOTÓN DE CERRAR - USANDO TOKENS === */
     .close-btn {
         position: absolute;
         top: var(--space-8);
@@ -114,7 +105,6 @@ import Text from '../i18n/Text.astro';
         color: var(--accent-primary);
     }
 
-    /* Hover cuando el menú está activo */
     .fullscreen-menu.active .close-btn:hover {
         transform: rotate(90deg) scale(1.1);
         background: var(--hover-overlay);
@@ -133,7 +123,6 @@ import Text from '../i18n/Text.astro';
         outline-offset: var(--space-1);
     }
     
-    /* === CONTAINER IZQUIERDO - USANDO TOKENS === */
     .left-content {
         position: absolute;
         top: var(--space-5);
@@ -143,7 +132,6 @@ import Text from '../i18n/Text.astro';
         align-items: flex-start;
     }
     
-    /* === LOGO DUAL EN EL OVERLAY - MIGRADO === */
     .overlay-logo {
         margin-bottom: var(--space-12);
         opacity: 0;
@@ -170,7 +158,6 @@ import Text from '../i18n/Text.astro';
         border-radius: var(--radius-lg);
     }
 
-    /* === CONTENEDOR DE MINI-LOGOS - USANDO SISTEMA === */
     .logo-container {
         position: relative;
         height: 100px;
@@ -192,10 +179,8 @@ import Text from '../i18n/Text.astro';
         max-width: 150px;
         object-fit: contain;
         filter: drop-shadow(0 var(--space-4) var(--space-12) var(--text-shadow-color));
-        /* Usando la clase del sistema */
     }
 
-    /* Por defecto mostrar logo light (para tema oscuro) */
     .logo-dark {
         opacity: 1;
     }
@@ -204,7 +189,6 @@ import Text from '../i18n/Text.astro';
         opacity: 0;
     }
 
-    /* En tema claro, mostrar logo dark */
     :root[data-theme="light"] .logo-dark,
     html[data-theme="light"] .logo-dark {
         opacity: 0;
@@ -219,7 +203,6 @@ import Text from '../i18n/Text.astro';
         transform: translate(-50%, -50%) scale(1.05);
     }
     
-    /* === NAVEGACIÓN DEL OVERLAY - MIGRADA === */
     .overlay-nav ul {
         list-style: none;
         padding: 0;
@@ -233,7 +216,6 @@ import Text from '../i18n/Text.astro';
         padding: 0;
     }
 
-    /* Espaciado manual para li */
     .overlay-nav li:not(:last-child) {
         margin-bottom: var(--space-6);
     }
@@ -261,14 +243,12 @@ import Text from '../i18n/Text.astro';
         outline-offset: var(--space-1);
     }
     
-    /* === ANIMACIÓN CUANDO SE ABRE EL MENU === */
     .fullscreen-menu.active .overlay-nav a {
         opacity: 1;
         transform: translateX(0);
         transition: all var(--duration-500) var(--ease-in-out);
     }
     
-    /* Delays escalonados para cada elemento */
     .fullscreen-menu.active .overlay-nav a[data-delay="0"] {
         transition-delay: var(--duration-300);
     }
@@ -293,7 +273,6 @@ import Text from '../i18n/Text.astro';
         border-left-color: transparent;
     }
     
-    /* === SECCIÓN DE IDIOMAS EN MOBILE - USANDO TOKENS === */
     .mobile-language-section {
         margin-top: var(--space-8);
         padding-top: var(--space-8);
@@ -318,7 +297,6 @@ import Text from '../i18n/Text.astro';
         letter-spacing: var(--tracking-wide);
     }
     
-    /* === RESPONSIVE - USANDO BREAKPOINTS DEL SISTEMA === */
     @media (max-width: 768px) {
         .left-content {
             top: var(--space-4);
@@ -380,7 +358,6 @@ import Text from '../i18n/Text.astro';
         }
     }
 
-    /* === ACCESIBILIDAD === */
     @media (prefers-reduced-motion: reduce) {
         .fullscreen-menu,
         .close-btn,
@@ -432,7 +409,6 @@ import Text from '../i18n/Text.astro';
         }
     }
 
-    /* === MEJORAS DE RENDIMIENTO === */
     .fullscreen-menu {
         will-change: opacity, visibility;
     }
@@ -443,7 +419,6 @@ import Text from '../i18n/Text.astro';
         backface-visibility: hidden;
     }
 
-    /* === ESTADOS ADICIONALES === */
     .fullscreen-menu.loading {
         pointer-events: none;
     }
@@ -452,43 +427,3 @@ import Text from '../i18n/Text.astro';
         opacity: 0.5;
     }
 </style>
-
-<script>
-    import ThemeService from "../../services/ThemeService";
-
-    // Función para actualizar los mini-logos según el tema
-    function updateMobileLogosForTheme(theme) {
-        const logosDark = document.querySelectorAll('.mini-logo[data-logo="dark"]');
-        const logosLight = document.querySelectorAll('.mini-logo[data-logo="light"]');
-        
-        if (theme === 'light') {
-            logosDark.forEach(logo => logo.style.opacity = '0');
-            logosLight.forEach(logo => logo.style.opacity = '1');
-        } else {
-            logosDark.forEach(logo => logo.style.opacity = '1');
-            logosLight.forEach(logo => logo.style.opacity = '0');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Inicializar ThemeService si no está inicializado
-        if (!ThemeService.currentTheme) {
-            ThemeService.initialize();
-        }
-
-        // Actualizar logos al cargar
-        updateMobileLogosForTheme(ThemeService.getCurrentTheme());
-
-        // Suscribirse a cambios de tema
-        ThemeService.onThemeChange((event) => {
-            updateMobileLogosForTheme(event.theme);
-        });
-    });
-
-    // Para navegación SPA en Astro
-    document.addEventListener('astro:page-load', () => {
-        if (ThemeService.currentTheme) {
-            updateMobileLogosForTheme(ThemeService.getCurrentTheme());
-        }
-    });
-</script>

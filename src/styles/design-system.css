@@ -1,35 +1,12 @@
-/* =====================================================
-   DESIGN SYSTEM - EL PALLETER
-   Archivo principal que importa todo el sistema completo
-   ===================================================== */
-
-/* === ORDEN DE IMPORTACIÓN CRÍTICO === */
-
-/* 1. Design Tokens (Variables fundamentales) */
 @import './design-system/design-tokens.css';
-
-/* 2. Breakpoints (Sistema responsivo) */
 @import './design-system/breakpoints.css';
-
-/* 3. Temas (Usa los tokens) */
 @import './design-system/themes.css';
-
-/* 4. Animaciones (Sistema de animaciones con tokens) */
 @import './design-system/animations.css';
-
-/* 5. Componentes Base (Usa tokens y temas) */
 @import './design-system/components.css';
-
-/* 6. Utilidades Específicas de Componentes */
 @import './design-system/component-specific.css';
-
-/* 7. Componentes del Theme Manager */
 @import './design-system/theme-components.css';
-
-/* 8. Utilidades Generales (Usa todo lo anterior) */
 @import './design-system/utilities.css';
 
-/* === CONFIGURACIÓN GLOBAL EXTENDIDA === */
 
 html {
   transition: background-color var(--duration-300) var(--ease-out),
@@ -60,7 +37,6 @@ body {
               color var(--duration-300) var(--ease-out);
 }
 
-/* === PREVENIR OVERFLOW EN CONTAINERS === */
 .container,
 [class*="container"],
 [class*="section"],
@@ -69,7 +45,6 @@ section {
   overflow-x: hidden;
 }
 
-/* === PREVENIR OVERFLOW EN ELEMENTOS CON TRANSFORM === */
 *[style*="transform"],
 *[class*="slide"],
 *[class*="slider"] {
@@ -77,13 +52,11 @@ section {
   transform-style: preserve-3d;
 }
 
-/* === OPTIMIZACIONES PARA SLIDERS === */
 [data-slider] {
   contain: layout style paint;
   isolation: isolate;
 }
 
-/* === FOCUS STYLES GLOBALES === */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -93,7 +66,6 @@ select:focus-visible {
   outline-offset: var(--space-1);
 }
 
-/* === ESTADOS INTERACTIVOS GLOBALES === */
 button,
 [role="button"],
 .interactive {
@@ -107,7 +79,6 @@ button:disabled,
   cursor: not-allowed;
 }
 
-/* === FORMULARIOS GLOBALES === */
 input,
 textarea,
 select {
@@ -136,7 +107,6 @@ select:disabled {
   background-color: var(--bg-tertiary);
 }
 
-/* === TIPOGRAFÍA GLOBAL === */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--text-primary);
@@ -177,7 +147,6 @@ li {
   margin-bottom: var(--space-2);
 }
 
-/* === SCROLLBARS PERSONALIZADOS === */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -201,7 +170,6 @@ li {
   scrollbar-color: var(--accent-primary) var(--bg-secondary);
 }
 
-/* === SELECCIÓN DE TEXTO === */
 ::selection {
   background-color: var(--selection-bg);
   color: var(--selection-text);
@@ -212,7 +180,6 @@ li {
   color: var(--selection-text);
 }
 
-/* === PLACEHOLDER STYLES === */
 ::placeholder {
   color: var(--text-muted);
   opacity: 1;
@@ -227,14 +194,12 @@ li {
   opacity: 1;
 }
 
-/* === IMÁGENES RESPONSIVAS === */
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* === ANIMACIONES GLOBALES === */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -268,7 +233,6 @@ img {
   }
 }
 
-/* === CLASES DE UTILIDAD PARA ANIMACIONES === */
 .fade-in {
   animation: fadeIn var(--duration-500) var(--ease-out);
 }
@@ -281,7 +245,6 @@ img {
   animation: slideInFromRight var(--duration-500) var(--ease-out);
 }
 
-/* === SKIP LINKS === */
 .skip-link {
   position: absolute;
   top: calc(-1 * var(--space-10));
@@ -299,8 +262,6 @@ img {
 .skip-link:focus {
   top: var(--space-2);
 }
-
-/* === RESPETO POR PREFERENCIAS DE USUARIO === */
 
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -322,7 +283,6 @@ img {
   }
 }
 
-/* === MODO PRINT === */
 @media print {
   * {
     background: transparent !important;
@@ -355,7 +315,6 @@ img {
   }
 }
 
-/* === THEMES TRANSITIONS === */
 .theme-transition,
 .theme-transition *,
 .theme-transition *::before,
@@ -366,7 +325,6 @@ img {
               box-shadow var(--duration-300) var(--ease-out) !important;
 }
 
-/* === SAFE AREAS PARA DISPOSITIVOS CON NOTCH === */
 .safe-area-top {
   padding-top: env(safe-area-inset-top);
 }
@@ -383,7 +341,6 @@ img {
   padding-right: env(safe-area-inset-right);
 }
 
-/* === UTILIDADES DE LAYOUT GLOBAL === */
 .h-screen-dynamic {
   height: 100vh;
   height: 100dvh;
@@ -394,7 +351,6 @@ img {
   min-height: 100dvh;
 }
 
-/* === LOADING OVERLAY GLOBAL === */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -417,7 +373,6 @@ img {
   visibility: visible;
 }
 
-/* === DEBUG BREAKPOINTS === */
 body[data-debug-breakpoints="true"] {
   position: relative;
 }

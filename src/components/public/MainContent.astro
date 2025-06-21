@@ -21,27 +21,20 @@ const {
 </main>
 
 <style>
-  /* =========================================== */
-  /* === CONTAINER EXTERIOR (main-content) === */
-  /* =========================================== */
-  
   .main-content {
     width: 100%;
     position: relative;
     z-index: var(--z-10);
     
-    /* SOLO centra horizontalmente */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 
     padding: calc(var(--space-10)) 0;
     
-    /* Optimización de rendering */
     contain: layout style;
   }
 
-  /* === BACKGROUNDS (aplicados al container exterior) === */
   .main-content--bg-dark {
     background: var(--dark-500);
   }
@@ -54,17 +47,14 @@ const {
     background: linear-gradient(180deg, var(--dark-500) 0%, var(--dark-800) 100%);
   }
 
-  /* === VARIANTES DE TEMA PARA BACKGROUNDS === */
-  
-  /* Tema claro - fondo menos blanco */
   :root[data-theme="light"] .main-content--bg-dark,
   html[data-theme="light"] .main-content--bg-dark {
-    background: var(--gray-100); /* Menos blanco que gray-50 */
+    background: var(--gray-100);
   }
 
   :root[data-theme="light"] .main-content--bg-darker,
   html[data-theme="light"] .main-content--bg-darker {
-    background: var(--gray-200); /* Un poco más oscuro */
+    background: var(--gray-200);
   }
 
   :root[data-theme="light"] .main-content--bg-gradient,
@@ -72,7 +62,6 @@ const {
     background: linear-gradient(180deg, var(--gray-100) 0%, var(--gray-200) 100%);
   }
 
-  /* === EFECTO DE PARTÍCULAS BASE === */
   .main-content--particles::before {
     content: '';
     position: absolute;
@@ -100,7 +89,6 @@ const {
     transition: opacity var(--duration-300) var(--ease-out);
   }
 
-  /* === PARTÍCULAS PARA TEMA CLARO === */
   :root[data-theme="light"] .main-content--particles::before,
   html[data-theme="light"] .main-content--particles::before {
     background-image: 
@@ -137,26 +125,16 @@ const {
     }
   }
 
-  /* ============================================== */
-  /* === CONTAINER INTERIOR (main-content-container) === */
-  /* ============================================== */
-  
   .main-content-container {
     max-width: 1200px;
     width: 100%;
     position: relative;
     z-index: var(--z-20);
-    
-    /* ESTE container maneja el layout y gaps */
+
     display: flex;
     flex-direction: column;
   }
 
-  /* ======================================= */
-  /* === GAPS (aplicados al container interior) === */
-  /* ======================================= */
-
-  /* Mobile gaps usando nuevos tokens de espaciado */
   .main-content-container--gap-none {
     gap: 0;
   }
@@ -181,9 +159,6 @@ const {
     gap: var(--space-10);
   }
 
-  /* === RESPONSIVE GAPS (aplicados al container interior) === */
-  
-  /* TABLET (768px+) */
   @media (min-width: 768px) {
     .main-content-container--gap-none {
       gap: 0;
@@ -210,7 +185,6 @@ const {
     }
   }
 
-  /* DESKTOP (1024px+) */
   @media (min-width: 1024px) {
     .main-content-container--gap-none {
       gap: 0;
@@ -237,28 +211,17 @@ const {
     }
   }
 
-  /* ================================================ */
-  /* === SECCIONES HIJAS (gestionadas por container interior) === */
-  /* ================================================ */
-  
   .main-content-container > :global(section) {
     position: relative;
     z-index: var(--z-20);
      
-    /* Eliminar backgrounds duplicados */
     background: transparent;
   }
 
   .main-content-container > :global(section)::before {
-    /* Eliminar efectos de partículas duplicados */
     display: none;
   }
 
-  /* =============================================== */
-  /* === VARIANTES OPCIONALES === */
-  /* =============================================== */
-  
-  /* Secciones como tarjetas */
   .main-content-container > :global(.section-card) {
     background: var(--glass-bg);
     backdrop-filter: var(--backdrop-blur);
@@ -280,9 +243,7 @@ const {
     }
   }
 
-  /* === VARIANTES DE TEMA PARA TARJETAS === */
-  
-  /* Tema claro */
+
   :root[data-theme="light"] .main-content-container > :global(.section-card),
   html[data-theme="light"] .main-content-container > :global(.section-card) {
     background: var(--bg-surface);
@@ -290,16 +251,12 @@ const {
     box-shadow: var(--shadow-lg);
   }
 
-  /* === VARIANTES DE PARTÍCULAS ADICIONALES === */
-  
-  /* Variante sin partículas explícita */
   .main-content--no-particles::before {
     display: none;
   }
   
-  /* Variante con partículas más intensas */
   .main-content--particles-intense::before {
-    opacity: 0.5; /* Más intenso */
+    opacity: 0.5;
     background-size: 
       80px 80px, 
       100px 100px, 
@@ -308,7 +265,6 @@ const {
       50px 50px;
   }
 
-  /* Tema claro - partículas intensas */
   :root[data-theme="light"] .main-content--particles-intense::before,
   html[data-theme="light"] .main-content--particles-intense::before {
     background-image: 
@@ -330,9 +286,6 @@ const {
     opacity: 0.7;
   }
 
-  /* === ACCESIBILIDAD === */
-  
-  /* Reducir movimiento si el usuario lo prefiere */
   @media (prefers-reduced-motion: reduce) {
     .main-content--particles::before {
       animation: none;
@@ -345,17 +298,12 @@ const {
     }
   }
 
-  /* === MEJORAS DE RENDIMIENTO === */
-  
   .main-content--particles::before {
     will-change: transform;
     backface-visibility: hidden;
     transform-style: preserve-3d;
   }
 
-  /* === ESTADOS ADICIONALES === */
-  
-  /* Estado de carga */
   .main-content.loading {
     opacity: 0.8;
     pointer-events: none;
@@ -365,15 +313,11 @@ const {
     filter: blur(1px);
   }
 
-  /* === SOPORTE PARA DISPOSITIVOS CON NOTCH === */
-  
   .main-content {
     padding-top: calc(var(--space-10) + env(safe-area-inset-top, 0px));
     padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom, 0px));
   }
 
-  /* === MODO PRINT === */
-  
   @media print {
     .main-content--particles::before {
       display: none;
@@ -389,19 +333,5 @@ const {
       box-shadow: none;
       border: var(--border-1) solid #ccc;
     }
-  }
-
-  /* === DEBUGGING EN DESARROLLO === */
-  
-  [data-debug="true"] .main-content {
-    outline: 2px dashed red;
-  }
-  
-  [data-debug="true"] .main-content-container {
-    outline: 2px dashed blue;
-  }
-  
-  [data-debug="true"] .main-content-container > :global(section) {
-    outline: 1px dashed green;
   }
 </style>
