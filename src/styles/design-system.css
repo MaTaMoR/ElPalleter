@@ -7,20 +7,22 @@
 @import './design-system/theme-components.css';
 @import './design-system/utilities.css';
 
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 html {
-  transition: background-color var(--duration-300) var(--ease-out),
-              color var(--duration-300) var(--ease-out);
+  font-family: var(--font-primary);
   scroll-behavior: smooth;
   overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+  transition: background-color var(--duration-300) var(--ease-out),
+              color var(--duration-300) var(--ease-out);
 }
 
 body {
@@ -55,6 +57,20 @@ section {
 [data-slider] {
   contain: layout style paint;
   isolation: isolate;
+}
+
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.no-transition,
+.no-transition *,
+.no-transition *:before,
+.no-transition *:after {
+  transition: none !important;
+  animation: none !important;
 }
 
 button:focus-visible,
@@ -107,6 +123,20 @@ select:disabled {
   background-color: var(--bg-tertiary);
 }
 
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: var(--text-muted);
+}
+
+::-moz-placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--text-primary);
@@ -147,6 +177,12 @@ li {
   margin-bottom: var(--space-2);
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -178,26 +214,6 @@ li {
 ::-moz-selection {
   background-color: var(--selection-bg);
   color: var(--selection-text);
-}
-
-::placeholder {
-  color: var(--text-muted);
-  opacity: 1;
-}
-
-::-webkit-input-placeholder {
-  color: var(--text-muted);
-}
-
-::-moz-placeholder {
-  color: var(--text-muted);
-  opacity: 1;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
 }
 
 @keyframes fadeIn {
@@ -263,56 +279,16 @@ img {
   top: var(--space-2);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-@media print {
-  * {
-    background: transparent !important;
-    color: black !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-  
-  body {
-    font-size: 12pt;
-    line-height: 1.5;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: black !important;
-    page-break-after: avoid;
-  }
-  
-  p {
-    orphans: 3;
-    widows: 3;
-  }
-  
-  a {
-    text-decoration: underline;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .theme-transition,
@@ -392,4 +368,64 @@ body[data-debug-breakpoints="true"]:before {
   z-index: var(--z-toast);
   pointer-events: none;
   border: var(--border-1) solid var(--accent-primary);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-contrast: high) {
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+}
+
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  a {
+    text-decoration: underline;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
 }
