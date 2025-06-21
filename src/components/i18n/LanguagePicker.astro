@@ -3,6 +3,7 @@ export const prerender = true;
 
 import { i18nCore } from '../../i18n/core.js';
 import ThemeToggle from '../theme/ThemeToggle.astro';
+import Text from '../i18n/Text.astro'; // Importar el componente Text
 
 export interface Props {
   variant?: 'desktop' | 'mobile';
@@ -59,10 +60,26 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       </a>
     ))}
     
-    <!-- Integrar ThemeToggle al final del dropdown -->
+    <!-- Integrar ThemeToggle con nueva estructura simplificada -->
     {includeThemeToggle && (
-      <div class="language-picker-theme">
-        <ThemeToggle size="small" />
+      <div class="language-picker-theme theme-section">
+        <div class="theme-separator">
+          <span class="separator-line"></span>
+          <div class="theme-status-badge">
+            <Text 
+              key="theme.dark" 
+              class="theme-text theme-text-dark" 
+            />
+            <Text 
+              key="theme.light" 
+              class="theme-text theme-text-light" 
+            />
+          </div>
+          <span class="separator-line"></span>
+        </div>
+        <div class="theme-control">
+          <ThemeToggle size="small" />
+        </div>
       </div>
     )}
   </div>
@@ -76,6 +93,11 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     font-family: var(--font-primary);
     z-index: var(--z-50);
     contain: layout style;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 
   /* === BOTÓN PRINCIPAL - COMPLETAMENTE MIGRADO === */
@@ -316,13 +338,103 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     transform: scaleY(1);
   }
 
+  /* === THEME SECTION: Compacta limpia usando design system === */
+  .language-picker-theme.theme-section {
+    padding: var(--space-3) var(--space-4);
+    margin-top: var(--space-1);
+  }
+
+  .theme-section .theme-separator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .theme-section .separator-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-secondary);
+  }
+
+  .theme-status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: var(--border-1) solid var(--border-primary);
+    transition: var(--transition-base);
+  }
+
+  .theme-section .theme-control {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* === THEME TEXT: Mostrar/ocultar según tema === */
+  .theme-text {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--text-primary);
+    text-transform: capitalize;
+  }
+
+  /* Por defecto, mostrar tema oscuro */
+  .theme-text-dark {
+    display: inline;
+  }
+
+  .theme-text-light {
+    display: none;
+  }
+
+  /* Cuando el tema es claro, mostrar el texto de tema claro */
+  html[data-theme="light"] .theme-text-dark {
+    display: none;
+  }
+
+  html[data-theme="light"] .theme-text-light {
+    display: inline;
+  }
+
+  /* Alternativamente, usando clases en el body o html */
+  .theme-light .theme-text-dark {
+    display: none;
+  }
+
+  .theme-light .theme-text-light {
+    display: inline;
+  }
+
+  .theme-dark .theme-text-dark {
+    display: inline;
+  }
+
+  .theme-dark .theme-text-light {
+    display: none;
+  }
+
+  /* === RESPONSIVE PARA THEME SECTION === */
+  @media (max-width: 768px) {
+    .language-picker-theme.theme-section {
+      padding: var(--space-3);
+    }
+    
+    .theme-status-badge {
+      padding: var(--space-2) var(--space-3);
+    }
+  }
+
   /* === ACCESIBILIDAD === */
   @media (prefers-reduced-motion: reduce) {
     .lang-current,
     .lang-options,
     .lang-option,
     .lang-arrow,
-    .lang-option::before {
+    .lang-option::before,
+    .theme-status-badge {
       transition: none;
       animation: none;
     }
@@ -356,6 +468,11 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     .lang-option:hover {
       background: var(--accent-light);
       border-color: var(--accent-primary);
+    }
+
+    .theme-status-badge {
+      border-width: var(--border-2);
+      border-color: var(--border-accent);
     }
   }
 
@@ -394,14 +511,6 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     display: block;
   }
 
-  /* === THEME TOGGLE INTEGRATION === */
-  .language-picker-theme {
-    display: flex;
-    justify-content: center;
-    padding: var(--space-3);
-    margin-top: var(--space-1);
-  }
-
   /* === ESTADOS ADICIONALES === */
   .language-picker:hover .lang-current {
     border-color: var(--border-primary);
@@ -409,6 +518,8 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
 </style>
 
 <script>
+  import { breakpointManager } from "../../utils/breakpoints";
+
   class LanguagePicker {
     constructor(element) {
       this.element = element;
@@ -422,23 +533,20 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
     
     // Detectar si es dispositivo móvil
     isMobile() {
-      return window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      return breakpointManager.isMobile();
     }
     
     init() {
       if (!this.button || !this.dropdown) return;
       
-      // Event listeners
+      // Event listeners básicos
       this.button.addEventListener('click', (e) => this.toggleDropdown(e));
-      this.button.addEventListener('keydown', (e) => this.handleKeydown(e));
-      
+
       // Cerrar al hacer clic fuera
       document.addEventListener('click', (e) => this.handleOutsideClick(e));
       
       // Navegación con teclado en opciones
       this.options.forEach((option, index) => {
-        option.addEventListener('keydown', (e) => this.handleOptionKeydown(e, index));
-        
         // Limpiar focus al hacer hover para evitar doble selección
         option.addEventListener('mouseenter', () => {
           if (!this.isMobile()) {
@@ -489,51 +597,6 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       
       // Limpiar cualquier focus activo en las opciones
       this.options.forEach(option => option.blur());
-    }
-    
-    handleKeydown(event) {
-      switch (event.key) {
-        case 'Enter':
-        case ' ':
-        case 'ArrowDown':
-          event.preventDefault();
-          this.openDropdown();
-          break;
-        case 'ArrowUp':
-          event.preventDefault();
-          this.openDropdown();
-          // Focus en última opción
-          if (!this.isMobile()) {
-            setTimeout(() => {
-              const lastOption = [...this.options].pop();
-              if (lastOption) lastOption.focus();
-            }, 100);
-          }
-          break;
-      }
-    }
-    
-    handleOptionKeydown(event, currentIndex) {
-      // Solo manejar navegación con teclado en desktop
-      if (this.isMobile()) return;
-      
-      switch (event.key) {
-        case 'ArrowDown':
-          event.preventDefault();
-          const nextIndex = (currentIndex + 1) % this.options.length;
-          this.options[nextIndex].focus();
-          break;
-        case 'ArrowUp':
-          event.preventDefault();
-          const prevIndex = currentIndex === 0 ? this.options.length - 1 : currentIndex - 1;
-          this.options[prevIndex].focus();
-          break;
-        case 'Enter':
-        case ' ':
-          event.preventDefault();
-          this.options[currentIndex].click();
-          break;
-      }
     }
     
     handleOutsideClick(event) {

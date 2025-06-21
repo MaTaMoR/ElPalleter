@@ -294,5 +294,9 @@
       "twitter": "Twitter",
       "whatsapp": "WhatsApp"
     }
+  },
+  "theme": {
+    "dark": "Modo Oscuro",
+    "light": "Modo Claro"
   }
 }

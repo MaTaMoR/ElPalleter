@@ -293,5 +293,9 @@
       "twitter": "Twitter",
       "whatsapp": "WhatsApp"
     }
+  },
+  "theme": {
+    "dark": "Modo Fosc",
+    "light": "Modo Clar"
   }
 }
