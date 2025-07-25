@@ -5,13 +5,20 @@
     "build": "astro build",
     "preview": "astro preview",
     "deploy:vercel": "vercel --prod",
-    "hash-passwords": "node scripts/hash-passwords.js"
+    "hash-passwords": "node scripts/hash-passwords.js",
+    "db:setup": "node scripts/setup-database.js",
+    "db:setup:dev": "node --env-file=.env scripts/setup-database.js",
+    "db:import": "node scripts/import-data.js",
+    "db:import:dev": "node --env-file=.env scripts/import-data.js",
+    "db:full-setup": "npm run db:setup:dev && npm run db:import:dev"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.0",
+    "@supabase/supabase-js": "^2.51.0",
     "astro": "^5.9.4",
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
+    "dotenv": "^17.2.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "sharp": "^0.34.2"
