@@ -10,7 +10,8 @@
     "db:setup:dev": "node --env-file=.env scripts/setup-database.js",
     "db:import": "node scripts/import-data.js",
     "db:import:dev": "node --env-file=.env scripts/import-data.js",
-    "db:full-setup": "npm run db:setup:dev && npm run db:import:dev"
+    "db:full-setup": "npm run db:setup:dev && npm run db:import:dev",
+    "print-structure": "node scripts/print-structure.js"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.0",

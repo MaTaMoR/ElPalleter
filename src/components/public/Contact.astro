@@ -1,10 +1,9 @@
 ---
 export const prerender = true;
 
-import Text from "../i18n/Text.astro";
-import contactData from "../../data/contact-data.json";
-import { i18nCore } from "../../i18n/core.js";
-import { ContactService } from "../../services/ContactService.js";
+import Text from '../i18n/Text.astro';
+import { i18nCore } from '../../i18n/core.js';
+import ContactService from '../../services/ContactService.js';
 
 // Obtener información de i18n
 const { locale } = i18nCore.getI18nInfo(Astro);
@@ -17,6 +16,8 @@ const contactServiceData = ContactService.getContactDataWithTranslations(
 const currentStatus = contactServiceData.status;
 const socialNetworks = contactServiceData.socials;
 const groupedSchedule = ContactService.getGroupedSchedule(locale);
+
+const contactData = ContactService.getContactData();
 ---
 
 <section class="contact-section container" id="contacto">
@@ -80,8 +81,8 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale);
                                     fallback="Teléfono"
                                 />:</strong
                             >
-                            <a href={`tel:${contactData.contact.phone.main}`}
-                                >{contactData.contact.phone.main}</a
+                            <a href={`tel:${ContactService.getContactData().contact.phone.main}`}
+                                >{ContactService.getContactData().contact.phone.main}</a
                             >
                         </p>
                         <p>
@@ -91,8 +92,8 @@ const groupedSchedule = ContactService.getGroupedSchedule(locale);
                                     fallback="Email"
                                 />:</strong
                             >
-                            <a href={`mailto:${contactData.contact.email.main}`}
-                                >{contactData.contact.email.main}</a
+                            <a href={`mailto:${ContactService.getContactData().contact.email.main}`}
+                                >{ContactService.getContactData().contact.email.main}</a
                             >
                         </p>
                     </div>

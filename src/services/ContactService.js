@@ -1,7 +1,7 @@
 import contactData from '../data/contact-data.json';
 import i18nCore from '../i18n/core.js';
 
- const DAY_TRANSLATIONS = {
+ const FALLBACK_DAY_TRANSLATIONS = {
     'sunday': 'Domingo',
     'monday': 'Lunes', 
     'tuesday': 'Martes',
@@ -11,7 +11,7 @@ import i18nCore from '../i18n/core.js';
     'saturday': 'Sábado'
 };
 
-const DAY_NAMES = Object.keys(DAY_TRANSLATIONS);
+const DAY_NAMES = Object.keys(FALLBACK_DAY_TRANSLATIONS);
 
 export class ContactService {
 
@@ -223,7 +223,7 @@ export class ContactService {
                 });
             }
 
-            scheduleGroups.get(scheduleKey).days.push(i18nCore.getTranslation(`contact.days.${dayName}`, locale) || DAY_TRANSLATIONS[dayName]);
+            scheduleGroups.get(scheduleKey).days.push(i18nCore.getTranslation(`contact.days.${dayName}`, locale) || FALLBACK_DAY_TRANSLATIONS[dayName]);
             scheduleGroups.get(scheduleKey).dayIndexes.push(index);
         });
         
@@ -366,7 +366,7 @@ export class ContactService {
             const daySchedule = contactData.hours.schedule[dayName];
             
             return {
-                dayName: i18nCore.getTranslation(`contact.days.${dayName}`, locale) || DAY_TRANSLATIONS[dayName],
+                dayName: i18nCore.getTranslation(`contact.days.${dayName}`, locale) || FALLBACK_DAY_TRANSLATIONS[dayName],
                 dayKey: `contact.days.${dayName}`,
                 dayIndex: index,
                 isOpen: daySchedule && daySchedule.open && daySchedule.ranges && daySchedule.ranges.length > 0,
@@ -465,7 +465,7 @@ export class ContactService {
             schedule.ranges.forEach(range => {
                 openingHours.push({
                     "@type": "OpeningHoursSpecification",
-                    "dayOfWeek": i18nCore.getTranslation(`contact.days.${dayName}`, locale) || DAY_TRANSLATIONS[dayName],
+                    "dayOfWeek": i18nCore.getTranslation(`contact.days.${dayName}`, locale) || FALLBACK_DAY_TRANSLATIONS[dayName],
                     "opens": range.start,
                     "closes": range.end,
                     "name": range.nameKey || range.name || undefined

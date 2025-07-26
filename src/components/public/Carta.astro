@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import Text from '../../components/i18n/Text.astro';
-import cartaData from '../../data/carta-data.json';
+import CartaService from '../../services/CartaService.js';
 import { i18nCore } from '../../i18n/core.js';
 ---
 
@@ -18,7 +18,7 @@ import { i18nCore } from '../../i18n/core.js';
         </div>
 
         <div class="menu-nav">
-            {cartaData.categories.map((category, index) => (
+            {CartaService.getCategories().map((category, index) => (
                 <button 
                     class={`menu-nav-btn ${index === 0 ? 'active' : ''}`} 
                     data-category={category.id}
@@ -29,9 +29,9 @@ import { i18nCore } from '../../i18n/core.js';
         </div>
 
         <div class="menu-content">
-            {cartaData.categories.map((category, categoryIndex) => (
+            {CartaService.getCategories().map((category, index) => (
                 <div 
-                    class={`menu-section ${categoryIndex === 0 ? 'active' : ''}`} 
+                    class={`menu-section ${index === 0 ? 'active' : ''}`} 
                     id={category.id}
                 >
                     {category.subcategories.map((subcategory) => (

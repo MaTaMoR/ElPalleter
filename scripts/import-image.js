@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// scripts/image-manager.js - Gestión automática de imágenes
 
 const sharp = require('sharp');
 const fs = require('fs').promises;
@@ -19,7 +18,7 @@ class ImageManager {
     }
 
     async addImage(imagePath, imageId, category = 'general') {
-        console.log(`\n🎯 Procesando imagen: ${imageId}`);
+        console.log(`\nProcesando imagen: ${imageId}`);
         
         try {
             // 1. Crear directorios necesarios
@@ -28,7 +27,7 @@ class ImageManager {
             // 2. Copiar imagen original
             const originalDest = path.join(this.publicDir, category, 'originals', `${imageId}-original.jpg`);
             await this.copyAndOptimize(imagePath, originalDest, { quality: 95 });
-            console.log(`✅ Original guardada: ${originalDest}`);
+            console.log(`Original guardada: ${originalDest}`);
             
             // 3. Generar versiones responsivas
             const versions = {};
@@ -45,12 +44,12 @@ class ImageManager {
                     .toFile(outputPath);
                 
                 versions[size.name] = `/images/${category}/${filename}`;
-                console.log(`✅ ${size.name}: ${filename}`);
+                console.log(`${size.name}: ${filename}`);
             }
             
             // 4. Actualizar configuración
             await this.updateConfig(imageId, category, versions);
-            console.log(`✅ Configuración actualizada`);
+            console.log(`Configuración actualizada`);
             
             // 5. Generar código para copiar
             this.generateCode(imageId, category, versions);
@@ -58,7 +57,7 @@ class ImageManager {
             return versions;
             
         } catch (error) {
-            console.error(`❌ Error procesando ${imageId}:`, error.message);
+            console.error(`Error procesando ${imageId}:`, error.message);
             throw error;
         }
     }
@@ -117,18 +116,18 @@ class ImageManager {
         if (existingIndex >= 0) {
             // Actualizar existente
             config.galleries[category].images[existingIndex] = imageConfig;
-            console.log(`📝 Imagen actualizada: ${imageId}`);
+            console.log(`Imagen actualizada: ${imageId}`);
         } else {
             // Agregar nueva
             config.galleries[category].images.push(imageConfig);
-            console.log(`➕ Imagen agregada: ${imageId}`);
+            console.log(`Imagen agregada: ${imageId}`);
         }
         
         await fs.writeFile(this.configPath, JSON.stringify(config, null, 2));
     }
 
     generateCode(imageId, category, versions) {
-        console.log(`\n📋 Código para usar en tu componente:\n`);
+        console.log(`\nCódigo para usar en tu componente:\n`);
         
         // Para imageUtils.js
         console.log(`// Agregar a TEMP_IMAGES_CONFIG.galleries.${category}.images:`);
@@ -158,7 +157,7 @@ class ImageManager {
             const configData = await fs.readFile(this.configPath, 'utf8');
             const config = JSON.parse(configData);
             
-            console.log('\n📸 Imágenes configuradas:\n');
+            console.log('\nImágenes configuradas:\n');
             
             for (const [categoryId, category] of Object.entries(config.galleries)) {
                 console.log(`📁 ${category.name} (${categoryId}):`);
@@ -174,7 +173,7 @@ class ImageManager {
             }
             
         } catch (error) {
-            console.log('❌ No hay configuración de imágenes aún');
+            console.log('No hay configuración de imágenes aún');
         }
     }
 
@@ -197,9 +196,9 @@ class ImageManager {
                             const fullPath = path.join('public', imagePath);
                             try {
                                 await fs.unlink(fullPath);
-                                console.log(`🗑️  Eliminado: ${fullPath}`);
+                                console.log(` Eliminado: ${fullPath}`);
                             } catch (err) {
-                                console.log(`⚠️  No se pudo eliminar: ${fullPath}`);
+                                console.log(` No se pudo eliminar: ${fullPath}`);
                             }
                         }
                     }
@@ -208,7 +207,7 @@ class ImageManager {
                     category.images.splice(imageIndex, 1);
                     found = true;
                     
-                    console.log(`✅ Imagen eliminada: ${imageId}`);
+                    console.log(`Imagen eliminada: ${imageId}`);
                     break;
                 }
             }
@@ -216,11 +215,11 @@ class ImageManager {
             if (found) {
                 await fs.writeFile(this.configPath, JSON.stringify(config, null, 2));
             } else {
-                console.log(`❌ Imagen no encontrada: ${imageId}`);
+                console.log(`Imagen no encontrada: ${imageId}`);
             }
             
         } catch (error) {
-            console.error('❌ Error eliminando imagen:', error.message);
+            console.error('Error eliminando imagen:', error.message);
         }
     }
 }
@@ -237,7 +236,7 @@ async function main() {
         return new Promise(resolve => rl.question(prompt, resolve));
     }
 
-    console.log('\n🎨 Image Manager para El Palleter\n');
+    console.log('\n Image Manager para El Palleter\n');
     console.log('1. Agregar nueva imagen');
     console.log('2. Listar imágenes');
     console.log('3. Eliminar imagen');
@@ -265,14 +264,14 @@ async function main() {
                 break;
                 
             case '4':
-                console.log('👋 ¡Hasta luego!');
+                console.log('¡Hasta luego!');
                 break;
                 
             default:
-                console.log('❌ Opción no válida');
+                console.log('Opción no válida');
         }
     } catch (error) {
-        console.error('❌ Error:', error.message);
+        console.error('Error:', error.message);
     }
 
     rl.close();

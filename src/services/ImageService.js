@@ -23,7 +23,7 @@ export class ImageService {
     static getResponsiveImageData(imageId) {
         const image = this.getImageById(imageId);
         if (!image?.responsive) {
-            console.warn(`⚠️  Imagen '${imageId}' no encontrada o no tiene versiones responsive`);
+            console.warn(`Imagen '${imageId}' no encontrada o no tiene versiones responsive`);
             return null;
         }
 
@@ -59,7 +59,7 @@ export class ImageService {
     static getGalleryImages(galleryId) {
         const gallery = galleriesData.galleries?.[galleryId];
         if (!gallery?.images) {
-            console.warn(`⚠️  Galería '${galleryId}' no encontrada`);
+            console.warn(`Galería '${galleryId}' no encontrada`);
             return [];
         }
 
