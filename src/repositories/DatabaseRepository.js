@@ -3,14 +3,16 @@ import { createClient } from '@supabase/supabase-js';
 /**
  * Servicio centralizado para gestionar la conexión a Supabase
  * Maneja la configuración, conexión y queries básicas
+ * Soporta tanto el cliente público como el service key para operaciones admin
  */
-export class DatabaseService {
+export class DatabaseRepository {
     static instance = null;
-    static client = null;
+    static publicClient = null;
+    static serviceClient = null;
     static isConnected = false;
 
     /**
-     * Inicializa la conexión a Supabase (Singleton)
+     * Inicializa las conexiones a Supabase (Singleton)
      */
     static initialize() {
         if (this.instance) {
@@ -18,50 +20,90 @@ export class DatabaseService {
         }
 
         const supabaseUrl = import.meta.env.SUPABASE_URL;
-        const supabaseKey = import.meta.env.SUPABASE_ANON_KEY;
+        const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+        const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        if (!supabaseUrl || !supabaseKey) {
+        if (!supabaseUrl || !supabaseAnonKey) {
             throw new Error('Missing Supabase environment variables. Please check SUPABASE_URL and SUPABASE_ANON_KEY');
         }
 
         try {
-            this.client = createClient(supabaseUrl, supabaseKey);
+            // Cliente público (con RLS)
+            this.publicClient = createClient(supabaseUrl, supabaseAnonKey);
+
+            // Cliente service (bypass RLS) - solo si está disponible
+            if (supabaseServiceKey) {
+                this.serviceClient = createClient(supabaseUrl, supabaseServiceKey, {
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                });
+            } else {
+                console.warn('DatabaseRepository: SUPABASE_SERVICE_ROLE_KEY not provided. Admin operations may be limited.');
+            }
+
             this.isConnected = true;
             this.instance = this;
 
             if (import.meta.env.DEV) {
-                console.log('DatabaseService: Connected to Supabase');
+                console.log('DatabaseRepository: Connected to Supabase');
+                console.log('DatabaseRepository: Service client available:', !!this.serviceClient);
             }
 
             return this.instance;
         } catch (error) {
-            console.error('DatabaseService: Failed to connect to Supabase:', error);
+            console.error('DatabaseRepository: Failed to connect to Supabase:', error);
             throw error;
         }
     }
 
     /**
-     * Obtiene el cliente de Supabase
+     * Obtiene el cliente público de Supabase (con RLS)
      */
     static getClient() {
-        if (!this.client) {
+        if (!this.publicClient) {
             this.initialize();
         }
-        return this.client;
+        return this.publicClient;
+    }
+
+    /**
+     * Obtiene el cliente service de Supabase (bypass RLS)
+     * Solo usar para operaciones administrativas críticas
+     */
+    static getServiceClient() {
+        if (!this.serviceClient) {
+            this.initialize();
+            if (!this.serviceClient) {
+                throw new Error('Service client not available. Please set SUPABASE_SERVICE_ROLE_KEY environment variable.');
+            }
+        }
+        return this.serviceClient;
     }
 
     /**
      * Verifica si la conexión está activa
      */
     static isConnectionActive() {
-        return this.isConnected && this.client;
+        return this.isConnected && this.publicClient;
+    }
+
+    /**
+     * Verifica si el service client está disponible
+     */
+    static isServiceClientAvailable() {
+        return this.isConnected && this.serviceClient;
     }
 
     /**
      * Ejecuta una query SELECT básica con manejo de errores
+     * @param {string} table - Nombre de la tabla
+     * @param {Object} options - Opciones de consulta
+     * @param {boolean} useServiceClient - Si usar el service client (bypass RLS)
      */
-    static async select(table, options = {}) {
-        const client = this.getClient();
+    static async select(table, options = {}, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             let query = client.from(table).select(options.select || '*');
@@ -95,14 +137,14 @@ export class DatabaseService {
             const { data, error } = await query;
 
             if (error) {
-                console.error(`DatabaseService: Error selecting from ${table}:`, error);
+                console.error(`DatabaseRepository: Error selecting from ${table}:`, error);
                 throw new Error(`Database error: ${error.message}`);
             }
 
             return data || [];
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to select from ${table}:`, error);
+            console.error(`DatabaseRepository: Failed to select from ${table}:`, error);
             throw error;
         }
     }
@@ -110,8 +152,8 @@ export class DatabaseService {
     /**
      * Ejecuta una query SELECT con JOIN
      */
-    static async selectWithJoin(table, options = {}) {
-        const client = this.getClient();
+    static async selectWithJoin(table, options = {}, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             let query = client.from(table).select(options.select || '*');
@@ -134,14 +176,14 @@ export class DatabaseService {
             const { data, error } = await query;
 
             if (error) {
-                console.error(`DatabaseService: Error selecting with join from ${table}:`, error);
+                console.error(`DatabaseRepository: Error selecting with join from ${table}:`, error);
                 throw error;
             }
 
             return data || [];
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to select with join from ${table}:`, error);
+            console.error(`DatabaseRepository: Failed to select with join from ${table}:`, error);
             throw error;
         }
     }
@@ -149,8 +191,8 @@ export class DatabaseService {
     /**
      * Inserta un nuevo registro
      */
-    static async insert(table, data) {
-        const client = this.getClient();
+    static async insert(table, data, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             const { data: result, error } = await client
@@ -160,14 +202,14 @@ export class DatabaseService {
                 .single();
 
             if (error) {
-                console.error(`DatabaseService: Error inserting into ${table}:`, error);
+                console.error(`DatabaseRepository: Error inserting into ${table}:`, error);
                 throw error;
             }
 
             return result;
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to insert into ${table}:`, error);
+            console.error(`DatabaseRepository: Failed to insert into ${table}:`, error);
             throw error;
         }
     }
@@ -175,8 +217,8 @@ export class DatabaseService {
     /**
      * Actualiza un registro existente
      */
-    static async update(table, id, data) {
-        const client = this.getClient();
+    static async update(table, id, data, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             const { data: result, error } = await client
@@ -187,14 +229,14 @@ export class DatabaseService {
                 .single();
 
             if (error) {
-                console.error(`DatabaseService: Error updating ${table}:`, error);
+                console.error(`DatabaseRepository: Error updating ${table}:`, error);
                 throw error;
             }
 
             return result;
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to update ${table}:`, error);
+            console.error(`DatabaseRepository: Failed to update ${table}:`, error);
             throw error;
         }
     }
@@ -202,8 +244,8 @@ export class DatabaseService {
     /**
      * Elimina un registro
      */
-    static async delete(table, id) {
-        const client = this.getClient();
+    static async delete(table, id, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             const { error } = await client
@@ -212,14 +254,14 @@ export class DatabaseService {
                 .eq('id', id);
 
             if (error) {
-                console.error(`DatabaseService: Error deleting from ${table}:`, error);
+                console.error(`DatabaseRepository: Error deleting from ${table}:`, error);
                 throw error;
             }
 
             return true;
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to delete from ${table}:`, error);
+            console.error(`DatabaseRepository: Failed to delete from ${table}:`, error);
             throw error;
         }
     }
@@ -227,21 +269,21 @@ export class DatabaseService {
     /**
      * Ejecuta una consulta RPC (función almacenada)
      */
-    static async rpc(functionName, params = {}) {
-        const client = this.getClient();
+    static async rpc(functionName, params = {}, useServiceClient = false) {
+        const client = useServiceClient ? this.getServiceClient() : this.getClient();
         
         try {
             const { data, error } = await client.rpc(functionName, params);
 
             if (error) {
-                console.error(`DatabaseService: Error calling RPC ${functionName}:`, error);
+                console.error(`DatabaseRepository: Error calling RPC ${functionName}:`, error);
                 throw error;
             }
 
             return data;
 
         } catch (error) {
-            console.error(`DatabaseService: Failed to call RPC ${functionName}:`, error);
+            console.error(`DatabaseRepository: Failed to call RPC ${functionName}:`, error);
             throw error;
         }
     }
@@ -286,15 +328,17 @@ export class DatabaseService {
             return {
                 status: 'healthy',
                 timestamp: new Date().toISOString(),
-                connected: true
+                connected: true,
+                service_client_available: this.isServiceClientAvailable()
             };
 
         } catch (error) {
-            console.error('DatabaseService: Health check failed:', error);
+            console.error('DatabaseRepository: Health check failed:', error);
             return {
                 status: 'unhealthy',
                 timestamp: new Date().toISOString(),
                 connected: false,
+                service_client_available: this.isServiceClientAvailable(),
                 error: error.message
             };
         }
@@ -326,7 +370,7 @@ export class DatabaseService {
             };
 
         } catch (error) {
-            console.error('DatabaseService: Failed to get stats:', error);
+            console.error('DatabaseRepository: Failed to get stats:', error);
             return {
                 error: error.message,
                 timestamp: new Date().toISOString()
@@ -335,18 +379,50 @@ export class DatabaseService {
     }
 
     /**
-     * Cierra la conexión (cleanup)
+     * Ejecuta una query personalizada usando SQL raw (solo service client)
+     */
+    static async executeSQL(query, params = []) {
+        if (!this.isServiceClientAvailable()) {
+            throw new Error('Service client required for raw SQL queries');
+        }
+
+        try {
+            const client = this.getServiceClient();
+            const { data, error } = await client.rpc('exec_sql', { 
+                query: query,
+                params: params 
+            });
+
+            if (error) {
+                console.error('DatabaseRepository: Error executing SQL:', error);
+                throw error;
+            }
+
+            return data;
+
+        } catch (error) {
+            console.error('DatabaseRepository: Failed to execute SQL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Cierra las conexiones (cleanup)
      */
     static disconnect() {
-        if (this.client) {
-            // Supabase no tiene método explícito de desconexión
-            this.client = null;
-            this.isConnected = false;
-            this.instance = null;
-            
-            if (import.meta.env.DEV) {
-                console.log('DatabaseService: Disconnected from Supabase');
-            }
+        if (this.publicClient) {
+            this.publicClient = null;
+        }
+        
+        if (this.serviceClient) {
+            this.serviceClient = null;
+        }
+        
+        this.isConnected = false;
+        this.instance = null;
+        
+        if (import.meta.env.DEV) {
+            console.log('DatabaseRepository: Disconnected from Supabase');
         }
     }
 }
@@ -354,10 +430,10 @@ export class DatabaseService {
 // Auto-inicialización en entornos de servidor
 if (typeof window === 'undefined') {
     try {
-        DatabaseService.initialize();
+        DatabaseRepository.initialize();
     } catch (error) {
-        console.error('Failed to auto-initialize DatabaseService:', error);
+        console.error('Failed to auto-initialize DatabaseRepository:', error);
     }
 }
 
-export default DatabaseService;
+export default DatabaseRepository;
