@@ -1,81 +1,165 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { serialize, parse } from 'cookie';
 import { AuthRepository } from '../repositories/AuthRepository.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-production';
 const COOKIE_NAME = 'admin_token';
 
 export class AuthService {
     /**
-     * Valida las credenciales de un usuario
+     * Autentica un usuario con el backend Java
      * @param {string} username - Username o email
      * @param {string} password - Contraseña en texto plano
-     * @returns {Object|null} Usuario sin contraseña o null si no es válido
+     * @returns {Object} Respuesta de autenticación
      */
-    static async validateUser(username, password) {
+    static async login(username, password) {
         try {
-            // Buscar usuario por username o email
-            const user = await AuthRepository.findUserByIdentifier(username);
-
-            if (!user) {
-                return null;
+            const response = await AuthRepository.login(username, password);
+            
+            if (response && response.token) {
+                return {
+                    token: response.token,
+                    success: true
+                };
             }
 
-            // Verificar que el usuario esté activo
-            if (!user.active) {
-                return null;
-            }
-
-            // Verificar la contraseña
-            const isValidPassword = await bcrypt.compare(password, user.password);
-            if (!isValidPassword) {
-                return null;
-            }
-
-            // Actualizar último acceso (opcional, en background)
-            this.updateLastAccess(user.id).catch(error => {
-                console.error('Failed to update last access:', error);
-            });
-
-            // Retornar usuario sin la contraseña
-            const { password: _, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            return {
+                success: false,
+                error: 'Login failed - no token received'
+            };
 
         } catch (error) {
-            console.error('AuthService: Error validating user:', error);
+            console.error('AuthService: Login failed:', error);
+            
+            // Manejo de errores específicos del backend
+            if (error.status === 400) {
+                return {
+                    success: false,
+                    error: 'Credenciales inválidas'
+                };
+            } else if (error.status === 401) {
+                return {
+                    success: false,
+                    error: 'No autorizado'
+                };
+            }
+            
+            return {
+                success: false,
+                error: 'Error de conexión con el servidor'
+            };
+        }
+    }
+
+    /**
+     * Registra un nuevo usuario con el backend Java
+     * @param {Object} userData - Datos del usuario
+     * @param {string} userData.username - Username
+     * @param {string} userData.name - Nombre
+     * @param {string} userData.surnames - Apellidos
+     * @param {string} userData.email - Email
+     * @param {string} userData.password - Contraseña en texto plano
+     * @returns {Object} Respuesta del registro
+     */
+    static async register(userData) {
+        try {
+            const response = await AuthRepository.register(userData);
+            
+            if (response && response.token) {
+                return {
+                    token: response.token,
+                    success: true
+                };
+            }
+
+            return {
+                success: false,
+                error: 'Registration failed - no token received'
+            };
+
+        } catch (error) {
+            console.error('AuthService: Registration failed:', error);
+            
+            if (error.status === 400) {
+                const errorMessage = error.details?.message || 'Usuario ya existe o datos inválidos';
+                return {
+                    success: false,
+                    error: errorMessage
+                };
+            }
+            
+            return {
+                success: false,
+                error: 'Error de conexión con el servidor'
+            };
+        }
+    }
+
+    /**
+     * Valida un token JWT con el backend
+     * @param {string} token - Token JWT (sin "Bearer ")
+     * @returns {Object|null} Datos del usuario o null si no es válido
+     */
+    static async validateToken(token) {
+        try {
+            // Limpiar el token si viene con "Bearer "
+            const cleanToken = token.replace('Bearer ', '');
+            const userData = await AuthRepository.validateToken(cleanToken);
+            
+            return userData || null;
+
+        } catch (error) {
+            console.error('AuthService: Token validation failed:', error);
             return null;
         }
     }
 
     /**
-     * Genera un token JWT para el usuario
-     * @param {Object} user - Datos del usuario
-     * @returns {string} Token JWT
+     * Actualiza los datos del usuario
+     * @param {string} token - Token de autorización
+     * @param {Object} userData - Datos a actualizar
+     * @param {number} userData.id - ID del usuario (requerido)
+     * @param {string} userData.username - Username (no se puede cambiar según backend)
+     * @param {string} userData.name - Nombre
+     * @param {string} userData.surnames - Apellidos
+     * @param {string} userData.email - Email (no se puede cambiar según backend)
+     * @param {string} [userData.password] - Nueva contraseña en texto plano (opcional)
+     * @returns {Object} Respuesta de actualización
      */
-    static generateToken(user) {
-        return jwt.sign(
-            {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                role: user.role
-            },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-    }
-
-    /**
-     * Verifica y decodifica un token JWT
-     * @param {string} token - Token JWT
-     * @returns {Object|null} Datos del token o null si no es válido
-     */
-    static verifyToken(token) {
+    static async updateUser(token, userData) {
         try {
-            return jwt.verify(token, JWT_SECRET);
+            // Validación de datos requeridos
+            if (!userData.id) {
+                return {
+                    success: false,
+                    error: 'ID de usuario requerido'
+                };
+            }
+
+            const response = await AuthRepository.updateUser(token, userData);
+            
+            return {
+                success: true,
+                user: response
+            };
+
         } catch (error) {
-            return null;
+            console.error('AuthService: User update failed:', error);
+            
+            if (error.status === 400) {
+                return {
+                    success: false,
+                    error: 'Datos de actualización inválidos o usuario no encontrado'
+                };
+            } else if (error.status === 401) {
+                return {
+                    success: false,
+                    error: 'Token inválido, expirado o no autorizado'
+                };
+            }
+            
+            return {
+                success: false,
+                error: 'Error de conexión con el servidor'
+            };
         }
     }
 
@@ -87,9 +171,9 @@ export class AuthService {
     static createAuthCookie(token) {
         return serialize(COOKIE_NAME, token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: import.meta.env.PROD, // Secure en producción
             sameSite: 'strict',
-            maxAge: 60 * 60 * 24, // 24 horas
+            maxAge: 60 * 60 * 5, // 5 horas (coincide con JWT_TOKEN_VALIDITY del backend)
             path: '/admin'
         });
     }
@@ -101,7 +185,7 @@ export class AuthService {
     static createLogoutCookie() {
         return serialize(COOKIE_NAME, '', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: import.meta.env.PROD,
             sameSite: 'strict',
             maxAge: 0,
             path: '/admin'
@@ -113,7 +197,7 @@ export class AuthService {
      * @param {Request} request - Request object
      * @returns {Object|null} Datos del usuario o null
      */
-    static getUserFromRequest(request) {
+    static async getUserFromRequest(request) {
         try {
             const cookies = request.headers.get('cookie');
             if (!cookies) return null;
@@ -123,7 +207,9 @@ export class AuthService {
 
             if (!token) return null;
 
-            return this.verifyToken(token);
+            // Validar el token con el backend
+            return await this.validateToken(token);
+            
         } catch (error) {
             console.error('Error getting user from request:', error);
             return null;
@@ -131,186 +217,32 @@ export class AuthService {
     }
 
     /**
-     * Actualiza el último acceso del usuario (método auxiliar)
-     * @param {string} userId - ID del usuario
+     * Obtiene los datos del usuario por token
+     * @param {string} token - Token del usuario
+     * @returns {Object|null} Usuario o null
      */
-    static async updateLastAccess(userId) {
+    static async getUserByToken(token) {
         try {
-            await AuthRepository.updateLastAccess(userId);
+            return await this.validateToken(token);
         } catch (error) {
-            console.error('AuthService: Failed to update last access:', error);
-            // No propagamos el error ya que es una operación opcional
-        }
-    }
-
-    /**
-     * Obtiene los datos completos del usuario por ID
-     * @param {string} userId - ID del usuario
-     * @returns {Object|null} Usuario completo o null
-     */
-    static async getUserById(userId) {
-        try {
-            const user = await AuthRepository.findUserById(userId);
-            if (!user) return null;
-
-            // Retornar usuario sin la contraseña
-            const { password: _, ...userWithoutPassword } = user;
-            return userWithoutPassword;
-
-        } catch (error) {
-            console.error('AuthService: Error getting user by ID:', error);
+            console.error('AuthService: Error getting user by token:', error);
             return null;
         }
     }
 
     /**
-     * Verifica si un usuario existe y está activo
-     * @param {string} identifier - Username o email
-     * @returns {boolean} True si existe y está activo
+     * Extrae el token del header Authorization
+     * @param {string} authHeader - Header de autorización
+     * @returns {string|null} Token limpio o null
      */
-    static async userExists(identifier) {
-        try {
-            const user = await AuthRepository.findUserByIdentifier(identifier);
-            return user && user.active;
-        } catch (error) {
-            console.error('AuthService: Error checking if user exists:', error);
-            return false;
+    static extractTokenFromHeader(authHeader) {
+        if (!authHeader) return null;
+        
+        if (authHeader.startsWith('Bearer ')) {
+            return authHeader.substring(7);
         }
-    }
-
-    /**
-     * Crea un nuevo usuario administrador
-     * @param {Object} userData - Datos del usuario
-     * @param {string} userData.username - Username
-     * @param {string} userData.email - Email
-     * @param {string} userData.password - Contraseña en texto plano
-     * @param {string} userData.role - Rol (opcional, default: 'admin')
-     * @returns {Object} Usuario creado sin contraseña
-     */
-    static async createUser(userData) {
-        try {
-            // Verificar que username y email no existan
-            const [usernameExists, emailExists] = await Promise.all([
-                AuthRepository.usernameExists(userData.username),
-                AuthRepository.emailExists(userData.email)
-            ]);
-
-            if (usernameExists) {
-                throw new Error('Username already exists');
-            }
-
-            if (emailExists) {
-                throw new Error('Email already exists');
-            }
-
-            // Hashear la contraseña
-            const hashedPassword = await bcrypt.hash(userData.password, 12);
-
-            // Preparar datos del usuario
-            const userToCreate = {
-                id: userData.id || this.generateUserId(),
-                username: userData.username,
-                email: userData.email,
-                password: hashedPassword,
-                role: userData.role || 'admin',
-                active: userData.active !== undefined ? userData.active : true
-            };
-
-            // Crear usuario
-            const createdUser = await AuthRepository.createUser(userToCreate);
-
-            // Retornar usuario sin contraseña
-            const { password: _, ...userWithoutPassword } = createdUser;
-            return userWithoutPassword;
-
-        } catch (error) {
-            console.error('AuthService: Error creating user:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Actualiza la contraseña de un usuario
-     * @param {string} userId - ID del usuario
-     * @param {string} newPassword - Nueva contraseña en texto plano
-     * @returns {Object} Usuario actualizado sin contraseña
-     */
-    static async updatePassword(userId, newPassword) {
-        try {
-            // Hashear la nueva contraseña
-            const hashedPassword = await bcrypt.hash(newPassword, 12);
-
-            // Actualizar en la base de datos
-            const updatedUser = await AuthRepository.updatePassword(userId, hashedPassword);
-
-            // Retornar usuario sin contraseña
-            const { password: _, ...userWithoutPassword } = updatedUser;
-            return userWithoutPassword;
-
-        } catch (error) {
-            console.error('AuthService: Error updating password:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Desactiva un usuario
-     * @param {string} userId - ID del usuario
-     * @returns {Object} Usuario desactivado
-     */
-    static async deactivateUser(userId) {
-        try {
-            const updatedUser = await AuthRepository.deactivateUser(userId);
-            const { password: _, ...userWithoutPassword } = updatedUser;
-            return userWithoutPassword;
-        } catch (error) {
-            console.error('AuthService: Error deactivating user:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Activa un usuario
-     * @param {string} userId - ID del usuario
-     * @returns {Object} Usuario activado
-     */
-    static async activateUser(userId) {
-        try {
-            const updatedUser = await AuthRepository.activateUser(userId);
-            const { password: _, ...userWithoutPassword } = updatedUser;
-            return userWithoutPassword;
-        } catch (error) {
-            console.error('AuthService: Error activating user:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene todos los usuarios activos
-     * @returns {Array} Lista de usuarios activos sin contraseñas
-     */
-    static async getAllActiveUsers() {
-        try {
-            const users = await AuthRepository.getAllActiveUsers();
-
-            // Remover contraseñas de todos los usuarios
-            return users.map(user => {
-                const { password: _, ...userWithoutPassword } = user;
-                return userWithoutPassword;
-            });
-
-        } catch (error) {
-            console.error('AuthService: Error getting active users:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Genera un ID único para usuario
-     * @returns {string} ID único
-     */
-    static generateUserId() {
-        return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        return authHeader;
     }
 
     /**
@@ -319,12 +251,12 @@ export class AuthService {
      */
     static async healthCheck() {
         try {
-            const repoHealth = await AuthRepository.healthCheck();
+            const backendHealth = await AuthRepository.healthCheck();
 
             return {
-                status: repoHealth.status === 'healthy' ? 'healthy' : 'unhealthy',
+                status: backendHealth.status,
                 service: 'AuthService',
-                repository: repoHealth,
+                backend: backendHealth,
                 timestamp: new Date().toISOString()
             };
 
@@ -340,15 +272,60 @@ export class AuthService {
     }
 
     /**
-     * Obtiene estadísticas del sistema de autenticación
-     * @returns {Object} Estadísticas
+     * Actualiza la contraseña de un usuario
+     * @param {string} token - Token de autorización
+     * @param {number} userId - ID del usuario
+     * @param {string} newPassword - Nueva contraseña en texto plano
+     * @param {Object} currentUserData - Datos actuales del usuario (para mantener username/email)
+     * @returns {Object} Respuesta de actualización
      */
-    static async getStats() {
+    static async updatePassword(token, userId, newPassword, currentUserData) {
         try {
-            return await AuthRepository.getUserStats();
+            if (!currentUserData) {
+                return {
+                    success: false,
+                    error: 'Datos del usuario requeridos'
+                };
+            }
+
+            const updateData = {
+                id: userId,
+                username: currentUserData.username,
+                name: currentUserData.name,
+                surnames: currentUserData.surnames,
+                email: currentUserData.email,
+                password: newPassword // TEXTO PLANO - el backend hashea
+            };
+
+            const response = await this.updateUser(token, updateData);
+            return response;
+
         } catch (error) {
-            console.error('AuthService: Error getting stats:', error);
-            throw error;
+            console.error('AuthService: Error updating password:', error);
+            return {
+                success: false,
+                error: 'Error actualizando contraseña'
+            };
+        }
+    }
+
+    /**
+     * Verifica si un token está expirado (aproximación - el backend valida realmente)
+     * @param {string} token - Token JWT
+     * @returns {boolean} True si probablemente está expirado
+     */
+    static isTokenLikelyExpired(token) {
+        try {
+            // Decodificar JWT sin verificar (solo para leer claims)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const exp = payload.exp * 1000; // Convertir a milisegundos
+            const now = Date.now();
+            
+            // Agregar margen de 5 minutos para evitar race conditions
+            return (exp - now) < (5 * 60 * 1000);
+        } catch (error) {
+            console.error('Error checking token expiration:', error);
+            return true; // Si no se puede decodificar, asumir expirado
         }
     }
 }
