@@ -6,7 +6,7 @@ import Text from '../i18n/Text.astro';
 import RichText from '../i18n/RichText.astro';
 import { ImageService } from '../../services/ImageService.js';
 
-const imagesToShow = ImageService.getGalleryImages('historia');
+const imagesToShow = await ImageService.getGalleryImages('historia');
 ---
 
 <section class="historia-section container" id="historia">

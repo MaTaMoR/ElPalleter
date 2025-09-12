@@ -8,16 +8,12 @@ import ContactService from '../../services/ContactService.js';
 // Obtener información de i18n
 const { locale } = i18nCore.getI18nInfo(Astro);
 
-// Obtener datos del servicio actualizado
-const contactServiceData = ContactService.getContactDataWithTranslations(
-    i18nCore,
-    locale,
-);
-const currentStatus = contactServiceData.status;
-const socialNetworks = contactServiceData.socials;
-const groupedSchedule = ContactService.getGroupedSchedule(locale);
-
-const contactData = ContactService.getContactData();
+const {
+    statusInfo,
+    socials,
+    groupedSchedule,
+    contactInfo
+} = await ContactService.getContactDataWithTranslations(i18nCore, locale);
 ---
 
 <section class="contact-section container" id="contacto">
@@ -36,12 +32,12 @@ const contactData = ContactService.getContactData();
         <div class="contact-component">
             <div class="top-bar">
                 <div
-                    class={`status status-${currentStatus.status}`}
+                    class={`status status-${statusInfo.status}`}
                     id="restaurantStatus"
                 >
                     <div class="status-dot"></div>
                     <span id="statusText" class="status-message">
-                        {currentStatus.fullMessage || "No Disponible"}
+                        {statusInfo.fullMessage || "No Disponible"}
                     </span>
                 </div>
             </div>
@@ -55,14 +51,14 @@ const contactData = ContactService.getContactData();
                                 fallback="Dirección"
                             />
                         </h4>
-                        <p>{contactData.contact.address.street}</p>
+                        <p>{contactInfo.street}</p>
                         <p>
-                            {contactData.contact.address.postalCode}
-                            {contactData.contact.address.city}
+                            {contactInfo.postalCode}
+                            {contactInfo.city}
                         </p>
                         <p>
-                            {contactData.contact.address.province}, {
-                                contactData.contact.address.country
+                            {contactInfo.province}, {
+                                contactInfo.country
                             }
                         </p>
                     </div>
@@ -81,8 +77,8 @@ const contactData = ContactService.getContactData();
                                     fallback="Teléfono"
                                 />:</strong
                             >
-                            <a href={`tel:${ContactService.getContactData().contact.phone.main}`}
-                                >{ContactService.getContactData().contact.phone.main}</a
+                            <a href={`tel:${contactInfo.phoneMain}`}
+                                >{contactInfo.phoneMain}</a
                             >
                         </p>
                         <p>
@@ -92,8 +88,8 @@ const contactData = ContactService.getContactData();
                                     fallback="Email"
                                 />:</strong
                             >
-                            <a href={`mailto:${ContactService.getContactData().contact.email.main}`}
-                                >{ContactService.getContactData().contact.email.main}</a
+                            <a href={`mailto:${contactInfo.emailMain}`}
+                                >{contactInfo.emailMain}</a
                             >
                         </p>
                     </div>
@@ -157,13 +153,13 @@ const contactData = ContactService.getContactData();
                         </p>
                         <div class="social-links">
                             {
-                                socialNetworks.map((social) => (
+                                socials.map((social) => (
                                     <a
                                         href={social.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         title={social.handle}
-                                        aria-label={`<Text key="contact.accessibility.${social.key}" fallback={social.key} />`}
+                                        aria-label={social.platform}
                                     >
                                         {social.icon}
                                     </a>

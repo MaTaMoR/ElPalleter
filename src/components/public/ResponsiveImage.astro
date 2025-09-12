@@ -38,12 +38,12 @@ const {
     priority = false
 } = Astro.props;
 
-const imageData = ImageService.getResponsiveImageData(imageId);
+const imageURL = ImageService.getImageURL(imageId);
 
 if (import.meta.env.DEV) {
-    console.log(`📸 ResponsiveImage [${imageId}]:`, {
-        found: !!imageData,
-        imageData: imageData ? 'OK' : 'NOT_FOUND'
+    console.log(`ResponsiveImage [${imageId}]:`, {
+        found: !!imageURL,
+        imageData: imageURL ? 'OK' : 'NOT_FOUND'
     });
 }
 
@@ -74,11 +74,10 @@ const altText = alt || `Imagen ${imageId}`;
 const finalLoading = priority ? 'eager' : loading;
 ---
 
-{imageData ? (
+{imageURL ? (
     <img 
         class={`responsive-image ${className}`}
-        src={imageData.src}
-        srcset={imageData.srcset}
+        src={imageURL}
         sizes={sizes}
         alt={altText}
         loading={finalLoading}

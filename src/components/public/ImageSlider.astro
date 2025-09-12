@@ -2,7 +2,6 @@
 export const prerender = true;
 
 import ResponsiveImage from './ResponsiveImage.astro';
-import { i18nCore } from '../../i18n/core';
 
 export interface Props {
     images: Array<{
@@ -20,7 +19,7 @@ const { images } = Astro.props;
         {images.map((image, index) => (
             <div class={`slide ${index === 0 ? 'active' : ''}`}>
                 <ResponsiveImage
-                    imageId={image.imageId}
+                    imageId={image.name}
                     alt={image.name}
                     className="slide-background"
                     loading={index === 0 ? 'eager' : 'lazy'}
@@ -29,10 +28,6 @@ const { images } = Astro.props;
                     fallbackText="Imagen no disponible"
                     fallbackIcon="image"
                 />
-                
-                {image.name && (
-                    <div class="slide-caption">{i18nCore.safeTranslation(image.name, Astro, image.name)}</div>
-                )}
             </div>
         ))}
     </div>

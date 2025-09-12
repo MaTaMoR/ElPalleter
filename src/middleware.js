@@ -16,8 +16,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Verificar autenticación para rutas admin protegidas
   try {
-    const user = AuthService.getUserFromRequest(context.request);
-    
+    const user = await AuthService.getUserFromRequest(context.request);
     if (!user) {
       return context.redirect('/admin/login');
     }

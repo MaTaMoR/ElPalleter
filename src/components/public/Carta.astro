@@ -4,6 +4,8 @@ export const prerender = true;
 import Text from '../../components/i18n/Text.astro';
 import CartaService from '../../services/CartaService.js';
 import { i18nCore } from '../../i18n/core.js';
+
+const categories = await CartaService.getCategories();
 ---
 
 <section class="carta-section container" id="carta">
@@ -18,38 +20,36 @@ import { i18nCore } from '../../i18n/core.js';
         </div>
 
         <div class="menu-nav">
-            {CartaService.getCategories().map((category, index) => (
+            {categories.map((category, index) => (
                 <button 
                     class={`menu-nav-btn ${index === 0 ? 'active' : ''}`} 
-                    data-category={category.id}
+                    data-category={category.nameKey}
                 >
-                    <Text key={category.nameKey} fallback={category.id} />
+                    {category.nameKey}
                 </button>
             ))}
         </div>
 
         <div class="menu-content">
-            {CartaService.getCategories().map((category, index) => (
+            {categories.map((category, index) => (
                 <div 
                     class={`menu-section ${index === 0 ? 'active' : ''}`} 
-                    id={category.id}
+                    id={category.nameKey}
                 >
                     {category.subcategories.map((subcategory) => (
                         <div class="menu-category">
                             <h3 class="category-title">
-                                <Text key={subcategory.nameKey} fallback={subcategory.id} />
+                               {subcategory.nameKey}
                             </h3>
                             
                             {subcategory.items.map((item) => (
                                 <div class="menu-item">
                                     <div class="item-info">
                                         <div class="item-name">
-                                            <Text key={item.nameKey} fallback={item.id} />
+                                            {item.nameKey}
                                         </div>
                                         {item.descriptionKey && (
-                                            <div class="item-description">
-                                                <Text key={item.descriptionKey} fallback="" />
-                                            </div>
+                                            <div class="item-description">{item.descriptionKey}</div>
                                         )}
                                     </div>
                                     <div class="item-price">

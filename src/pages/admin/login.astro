@@ -3,7 +3,7 @@ export const prerender = false;
 
 import { AuthService } from '../../services/AuthService.js';
 
-const user = AuthService.getUserFromRequest(Astro.request);
+const user = await AuthService.getUserFromRequest(Astro.request);
 if (user) {
   return Astro.redirect('/admin/dashboard');
 }
