@@ -6,11 +6,7 @@
 export class BaseRepository {
     
     static getBaseUrl() {
-        // Configurar según tu entorno
-        if (import.meta.env.DEV) {
-            return import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
-        }
-        return import.meta.env.PUBLIC_API_URL || '';
+        return import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
     }
 
     /**

@@ -1,38 +1,30 @@
 {
   "name": "el-palleter",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "concurrently \"npm run dev:astro\" \"npm run dev:admin\" \"npm run dev:webhook\"",
+    "dev:astro": "astro dev",
+    "dev:admin": "cd admin && npm run dev",
+    "dev:webhook": "cd build-webhook && npm run dev",
+    
+    "build": "npm run build:astro && npm run build:admin",
+    "build:astro": "astro build",
+    "build:admin": "cd admin && npm run build",
+    
     "preview": "astro preview",
-    "deploy:vercel": "vercel --prod",
-    "hash-passwords": "node scripts/hash-passwords.js",
-    "db:setup": "node scripts/setup-database.js",
-    "db:setup:dev": "node --env-file=.env scripts/setup-database.js",
-    "db:import": "node scripts/import-data.js",
-    "db:import:dev": "node --env-file=.env scripts/import-data.js",
-    "db:full-setup": "npm run db:setup:dev && npm run db:import:dev",
-    "print-structure": "node scripts/print-structure.js"
+    "astro": "astro",
+    
+    "install:all": "npm install && cd admin && npm install && cd build-webhook && npm install"
   },
   "dependencies": {
-    "@astrojs/vercel": "^8.2.0",
-    "@supabase/supabase-js": "^2.51.0",
-    "astro": "^5.9.4",
-    "bcryptjs": "^3.0.2",
-    "cookie": "^1.0.2",
-    "dotenv": "^17.2.0",
-    "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.21",
-    "sharp": "^0.34.2"
-  },
-  "overrides": {
-    "esbuild": "^0.25.0",
-    "node-fetch": "^3.3.2",
-    "path-to-regexp": "^6.3.0",
-    "semver": "^7.6.3",
-    "got": "^12.6.1"
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/node": "^8.3.3",
+    "astro": "^4.15.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^8.2.2"
   }
 }

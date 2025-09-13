@@ -20,7 +20,7 @@ export class AuthService {
     static async login(username, password) {
         try {
             const response = await AuthRepository.login(username, password);
-            
+
             if (response && response.token) {
                 return {
                     token: response.token,
@@ -52,7 +52,7 @@ export class AuthService {
     static async register(userData) {
         try {
             const response = await AuthRepository.register(userData);
-            
+
             if (response && response.token) {
                 return {
                     token: response.token,
@@ -82,12 +82,12 @@ export class AuthService {
             return userData || null;
         } catch (error) {
             console.error('AuthService: Token validation failed:', error);
-            
+
             // Para validación de token, los rate limits son menos críticos
             if (error.status === 429) {
                 console.warn('Rate limited during token validation');
             }
-            
+
             return null;
         }
     }
@@ -108,7 +108,7 @@ export class AuthService {
             }
 
             const response = await AuthRepository.updateUser(token, userData);
-            
+
             return {
                 success: true,
                 user: response
@@ -234,11 +234,11 @@ export class AuthService {
      */
     static extractTokenFromHeader(authHeader) {
         if (!authHeader) return null;
-        
+
         if (authHeader.startsWith('Bearer ')) {
             return authHeader.substring(7);
         }
-        
+
         return authHeader;
     }
 
@@ -265,34 +265,34 @@ export class AuthService {
                 return await operation();
             } catch (error) {
                 lastError = error;
-                
+
                 // No reintentar si no es rate limiting
                 if (error.status !== 429) {
                     throw error;
                 }
-                
+
                 // Si es el último intento, lanzar el error
                 if (attempt === maxRetries) {
                     throw error;
                 }
-                
+
                 // Calcular delay con backoff exponencial
                 const retryAfter = this.extractRetryAfter(error);
                 const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
                 const delay = retryAfter ? retryAfter * 1000 : exponentialDelay;
-                
+
                 console.warn(`Rate limited, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
-                
+
                 // Ejecutar callback si se proporciona
                 if (onRetry) {
                     onRetry(attempt + 1, delay / 1000, retryAfter);
                 }
-                
+
                 // Esperar antes del siguiente intento
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
-        
+
         throw lastError;
     }
 
@@ -321,7 +321,7 @@ export class AuthService {
             if (error.details && error.details.retryAfter) {
                 return parseInt(error.details.retryAfter);
             }
-            
+
             // Intentar extraer del mensaje de error
             if (error.message && error.message.includes('retry after')) {
                 const match = error.message.match(/retry after (\d+)/i);
@@ -329,15 +329,15 @@ export class AuthService {
                     return parseInt(match[1]);
                 }
             }
-            
+
             // Buscar en headers si están disponibles
             if (error.details && error.details.headers && error.details.headers['X-RateLimit-Reset-In']) {
                 return parseInt(error.details.headers['X-RateLimit-Reset-In']);
             }
-            
+
             // Valor por defecto para rate limiting
             return 60; // 1 minuto por defecto
-            
+
         } catch (e) {
             console.warn('Could not extract retry-after value:', e);
             return 60;
@@ -360,7 +360,7 @@ export class AuthService {
      */
     static formatRetryTime(retryAfter) {
         if (!retryAfter) return 'unos momentos';
-        
+
         if (retryAfter < 60) {
             return `${retryAfter} segundos`;
         } else {
@@ -387,7 +387,7 @@ export class AuthService {
      */
     static getRateLimitInfo(error) {
         const retryAfter = this.extractRetryAfter(error);
-        
+
         return {
             limited: true,
             retryAfter: retryAfter,
@@ -466,7 +466,7 @@ export class AuthService {
             const payload = JSON.parse(atob(token.split('.')[1]));
             const exp = payload.exp * 1000; // Convertir a milisegundos
             const now = Date.now();
-            
+
             // Agregar margen de 5 minutos para evitar race conditions
             return (exp - now) < (5 * 60 * 1000);
         } catch (error) {
@@ -570,6 +570,233 @@ export class AuthService {
         }
 
         return diagnosis;
+    }
+
+    // Agregar estos métodos a tu AuthService.js
+
+    // ==================== TOKEN STORAGE ====================
+
+    /**
+     * Clave para localStorage
+     */
+    static TOKEN_STORAGE_KEY = 'auth_token';
+
+    /**
+     * Guarda el token en localStorage
+     * @param {string} token - Token JWT a guardar
+     */
+    static setToken(token) {
+        try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                localStorage.setItem(this.TOKEN_STORAGE_KEY, token);
+            }
+        } catch (error) {
+            console.error('Error saving token to localStorage:', error);
+        }
+    }
+
+    /**
+     * Recupera el token de localStorage
+     * @returns {string|null} Token guardado o null
+     */
+    static getToken() {
+        try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                return localStorage.getItem(this.TOKEN_STORAGE_KEY);
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting token from localStorage:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Elimina el token de localStorage
+     */
+    static removeToken() {
+        try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                localStorage.removeItem(this.TOKEN_STORAGE_KEY);
+            }
+        } catch (error) {
+            console.error('Error removing token from localStorage:', error);
+        }
+    }
+
+    /**
+     * Verifica si hay un token guardado
+     * @returns {boolean} True si hay token guardado
+     */
+    static hasStoredToken() {
+        const token = this.getToken();
+        return token !== null && token !== undefined && token.length > 0;
+    }
+
+    // ==================== MÉTODOS ACTUALIZADOS ====================
+
+    /**
+     * Login actualizado - guarda el token automáticamente
+     */
+    static async login(username, password) {
+        try {
+            const response = await AuthRepository.login(username, password);
+
+            if (response && response.token) {
+                // Guardar token automáticamente
+                this.setToken(response.token);
+
+                return {
+                    token: response.token,
+                    success: true
+                };
+            }
+
+            return {
+                success: false,
+                error: 'Login failed - no token received'
+            };
+
+        } catch (error) {
+            console.error('AuthService: Login failed:', error);
+            return this.handleError(error, 'login');
+        }
+    }
+
+    /**
+     * Logout - elimina el token
+     */
+    static logout() {
+        this.removeToken();
+        return {
+            success: true,
+            message: 'Logged out successfully'
+        };
+    }
+
+    /**
+     * Valida el token actual (el guardado o el proporcionado)
+     * @param {string|null} token - Token específico o null para usar el guardado
+     * @returns {Promise<Object|null>} Datos del usuario o null
+     */
+    static async validateCurrentToken(token = null) {
+        try {
+            // Usar el token proporcionado o el guardado
+            const tokenToValidate = token || this.getToken();
+
+            if (!tokenToValidate) {
+                return null;
+            }
+
+            // Verificar si parece expirado antes de hacer la petición
+            if (this.isTokenLikelyExpired(tokenToValidate)) {
+                this.removeToken(); // Limpiar token expirado
+                return null;
+            }
+
+            const userData = await AuthRepository.validateToken(tokenToValidate);
+
+            if (!userData) {
+                this.removeToken(); // Limpiar token inválido
+                return null;
+            }
+
+            return userData;
+        } catch (error) {
+            console.error('AuthService: Token validation failed:', error);
+
+            // Si el token es inválido, limpiarlo
+            if (error.status === 401 || error.status === 403) {
+                this.removeToken();
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Verifica si hay una sesión válida
+     * @returns {Promise<boolean>} True si hay sesión válida
+     */
+    static async hasValidSession() {
+        try {
+            const userData = await this.validateCurrentToken();
+            return userData !== null;
+        } catch (error) {
+            console.error('Error checking session validity:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene los datos del usuario actual
+     * @returns {Promise<Object|null>} Datos del usuario o null
+     */
+    static async getCurrentUser() {
+        try {
+            const token = this.getToken();
+            if (!token) {
+                return null;
+            }
+
+            return await this.validateCurrentToken(token);
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Actualiza usuario usando el token guardado
+     * @param {Object} userData - Datos a actualizar
+     * @returns {Promise<Object>} Respuesta de actualización
+     */
+    static async updateCurrentUser(userData) {
+        try {
+            const token = this.getToken();
+            if (!token) {
+                return {
+                    success: false,
+                    error: 'No hay sesión activa'
+                };
+            }
+
+            return await this.updateUser(token, userData);
+        } catch (error) {
+            console.error('AuthService: User update failed:', error);
+            return this.handleError(error, 'actualización');
+        }
+    }
+
+    /**
+     * Cambia la contraseña del usuario actual
+     * @param {string} newPassword - Nueva contraseña
+     * @returns {Promise<Object>} Respuesta del cambio
+     */
+    static async changeCurrentPassword(newPassword) {
+        try {
+            const token = this.getToken();
+            if (!token) {
+                return {
+                    success: false,
+                    error: 'No hay sesión activa'
+                };
+            }
+
+            // Obtener datos actuales del usuario
+            const currentUser = await this.getCurrentUser();
+            if (!currentUser) {
+                return {
+                    success: false,
+                    error: 'No se pueden obtener los datos del usuario'
+                };
+            }
+
+            return await this.updatePassword(token, currentUser.id, newPassword, currentUser);
+        } catch (error) {
+            console.error('AuthService: Password change failed:', error);
+            return this.handleError(error, 'cambio de contraseña');
+        }
     }
 }
 
