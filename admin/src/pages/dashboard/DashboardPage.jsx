@@ -18,13 +18,14 @@ import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const { data: analyticsData, loading, error, refresh, lastUpdated } = useAnalyticsData();
+  // Ahora el hook devuelve también 'previousData' para comparaciones
+  const { data: analyticsData, previousData, loading, refreshing, error, refresh, lastUpdated } = useAnalyticsData();
 
   const managementSections = [
     {
       id: 'carta',
       title: 'Carta',
-      info: '24 platos', // Esto podría venir del CartaService
+      info: '24 platos',
       action: 'Gestionar',
       icon: Menu,
       className: 'carta'
@@ -63,7 +64,6 @@ const DashboardPage = () => {
     }
   ];
 
-  // Mock data para social media (esto podrías conectarlo con APIs reales más tarde)
   const socialStats = [
     {
       platform: 'Google Business',
@@ -171,10 +171,12 @@ const DashboardPage = () => {
         )}
       </div>
 
-      {/* Métricas Web Section - Con datos reales del backend */}
+      {/* Métricas Web Section - Ahora con datos de comparación */}
       <WebMetricsSection 
         analyticsData={analyticsData}
+        previousData={previousData}
         loading={loading}
+        refreshing={refreshing}
         error={error}
         onRefresh={refresh}
         lastUpdated={lastUpdated}

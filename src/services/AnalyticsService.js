@@ -290,6 +290,15 @@ export class AnalyticsService {
         }
     }
 
+    async getPreviousWeekStats() {
+        try {
+            return await AnalyticsRepository.getLastWeekStats(AuthService.getToken());
+        } catch (error) {
+            console.error('AnalyticsService: Error getting last week stats:', error);
+            throw error;
+        }
+    }
+
     /**
      * Obtiene estadísticas para un período personalizado (para admin)
      * @param {string} startDate - Fecha de inicio

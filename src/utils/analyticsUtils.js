@@ -95,3 +95,149 @@ export const formatTimeAgo = (dateString) => {
   const diffDays = Math.floor(diffHours / 24);
   return `Hace ${diffDays} días`;
 };
+
+/**
+ * Calcula el porcentaje de cambio entre dos valores
+ * @param {number} current - Valor actual
+ * @param {number} previous - Valor anterior
+ * @returns {Object} { percentage: number, isPositive: boolean, changeType: string, displayText: string, showChange: boolean }
+ */
+export const calculatePercentageChange = (current, previous) => {
+  if (!previous || previous === 0) {
+    return {
+      percentage: 0,
+      isPositive: false,
+      changeType: 'neutral',
+      displayText: '',
+      showChange: false // No mostrar change si no hay datos anteriores
+    };
+  }
+
+  const change = ((current - previous) / previous) * 100;
+  const roundedChange = Math.round(change * 10) / 10; // Redondear a 1 decimal
+  
+  const isPositive = change > 0;
+  const isNegative = change < 0;
+  
+  let changeType = 'neutral';
+  if (Math.abs(change) > 0.1) { // Solo mostrar cambio si es mayor a 0.1%
+    changeType = isPositive ? 'positive' : 'negative';
+  }
+
+  const sign = isPositive ? '+' : '';
+  const displayText = Math.abs(roundedChange) < 0.1 
+    ? 'Sin cambios' 
+    : `${sign}${roundedChange}% vs anterior`;
+
+  return {
+    percentage: roundedChange,
+    isPositive,
+    isNegative,
+    changeType,
+    displayText,
+    showChange: true
+  };
+};
+
+/**
+ * Calcula cambios para todas las métricas principales
+ * @param {Object} currentData - Datos de la semana actual
+ * @param {Object} previousData - Datos de la semana anterior
+ * @returns {Object} Objeto con todos los cambios calculados
+ */
+export const calculateAllMetricChanges = (currentData, previousData) => {
+  if (!currentData || !previousData) {
+    // Devolver objetos que indican no mostrar change
+    return {
+      uniqueVisitors: { displayText: '', changeType: 'neutral', showChange: false },
+      totalVisits: { displayText: '', changeType: 'neutral', showChange: false },
+      averageDuration: { displayText: '', changeType: 'neutral', showChange: false },
+      mobilePercentage: { displayText: '', changeType: 'neutral', showChange: false },
+      engagementRate: { displayText: '', changeType: 'neutral', showChange: false },
+      topSection: { displayText: '', changeType: 'neutral', showChange: false }
+    };
+  }
+
+  return {
+    uniqueVisitors: calculatePercentageChange(
+      currentData.uniqueVisitors || 0,
+      previousData.uniqueVisitors || 0
+    ),
+    totalVisits: calculatePercentageChange(
+      currentData.totalVisits || 0,
+      previousData.totalVisits || 0
+    ),
+    averageDuration: calculatePercentageChange(
+      currentData.averageDuration || 0,
+      previousData.averageDuration || 0
+    ),
+    // Para métricas calculadas, necesitamos calcular los valores para ambas semanas
+    mobilePercentage: calculateMobilePercentageChange(currentData, previousData),
+    engagementRate: calculateEngagementRateChange(currentData, previousData),
+    topSection: calculateTopSectionChange(currentData, previousData)
+  };
+};
+
+/**
+ * Calcula el cambio en porcentaje móvil
+ */
+const calculateMobilePercentageChange = (currentData, previousData) => {
+  const currentMobile = calculateMobilePercentage(currentData.deviceStats, currentData.totalVisits);
+  const previousMobile = calculateMobilePercentage(previousData.deviceStats, previousData.totalVisits);
+  
+  // Para porcentajes, mostramos la diferencia en puntos porcentuales
+  const change = currentMobile - previousMobile;
+  const roundedChange = Math.round(change * 10) / 10;
+  
+  let changeType = 'neutral';
+  if (Math.abs(change) > 0.5) { // Cambio significativo en puntos porcentuales
+    changeType = change > 0 ? 'positive' : 'negative';
+  }
+  
+  const sign = change > 0 ? '+' : '';
+  const displayText = Math.abs(roundedChange) < 0.1 
+    ? 'Sin cambios' 
+    : `${sign}${roundedChange}pp vs anterior`;
+
+  return { displayText, changeType, showChange: true };
+};
+
+/**
+ * Calcula el cambio en tasa de engagement
+ */
+const calculateEngagementRateChange = (currentData, previousData) => {
+  const currentRate = calculateEngagementRate(currentData.bounceRate);
+  const previousRate = calculateEngagementRate(previousData.bounceRate);
+  
+  return calculatePercentageChange(currentRate, previousRate);
+};
+
+/**
+ * Calcula el cambio en la sección más vista
+ */
+const calculateTopSectionChange = (currentData, previousData) => {
+  const currentTop = getMostViewedSection(currentData.sectionStats);
+  const previousTop = getMostViewedSection(previousData.sectionStats);
+  
+  if (currentTop.name === previousTop.name) {
+    // Misma sección, mostrar cambio en porcentaje de tráfico
+    const change = currentTop.percentage - previousTop.percentage;
+    const roundedChange = Math.round(change * 10) / 10;
+    
+    const sign = change > 0 ? '+' : '';
+    const displayText = Math.abs(roundedChange) < 0.1 
+      ? `${currentTop.percentage.toFixed(1)}% del tráfico` 
+      : `${currentTop.percentage.toFixed(1)}% (${sign}${roundedChange}pp)`;
+    
+    const changeType = Math.abs(change) > 0.5 ? (change > 0 ? 'positive' : 'negative') : 'neutral';
+    
+    return { displayText, changeType, showChange: true };
+  } else {
+    // Sección diferente
+    return {
+      displayText: `${currentTop.percentage.toFixed(1)}% (Nueva líder)`,
+      changeType: 'positive',
+      showChange: true
+    };
+  }
+};

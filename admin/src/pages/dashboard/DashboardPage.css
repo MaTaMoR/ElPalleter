@@ -47,6 +47,13 @@
   color: var(--text-primary);
 }
 
+/* Section actions */
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* Status Badges */
 .status-badge {
   background: rgba(16, 185, 129, 0.1);
@@ -55,6 +62,7 @@
   border-radius: 1.5625rem;
   font-size: 0.85rem;
   font-weight: 500;
+  transition: var(--transition);
 }
 
 .status-badge.warning {
@@ -65,6 +73,34 @@
 .status-badge.info {
   background: rgba(59, 130, 246, 0.1);
   color: var(--info);
+}
+
+.status-badge.updating {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--info);
+  position: relative;
+}
+
+.status-badge.updating::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1.5625rem;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: badge-shimmer 2s infinite;
+}
+
+@keyframes badge-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* Gestión Rápida - Tiles centrados */
@@ -331,6 +367,94 @@
 .metric-change.neutral {
   background: rgba(160, 160, 160, 0.1);
   color: var(--text-muted);
+}
+
+/* Efectos visuales durante refresh */
+.section.refreshing {
+  position: relative;
+}
+
+.section.refreshing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.section.refreshing .metrics-grid {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+/* Mensajes de error y sin datos */
+.error-message, .no-data-message {
+  text-align: center;
+  padding: 2rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.error-message p, .no-data-message p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.error-message button, .no-data-message button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.error-message button:hover, .no-data-message button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.error-message button:disabled, .no-data-message button:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Banner de error sutil */
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.error-banner p {
+  margin: 0;
+  color: var(--error);
 }
 
 /* Responsive Design */

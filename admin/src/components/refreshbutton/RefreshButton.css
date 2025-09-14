@@ -1,0 +1,89 @@
+.refresh-button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.refresh-button:hover {
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+.refresh-button.refreshing {
+  border-color: var(--primary);
+  color: var(--primary);
+  cursor: not-allowed;
+}
+
+.refresh-button.error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.refresh-button.error:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.refresh-button.disabled,
+.refresh-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.refresh-button:disabled:hover {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  transform: none;
+}
+
+/* Animación de spinning para el icono */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh-button .spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Variantes adicionales del botón */
+.refresh-button.small {
+  padding: 0.375rem;
+}
+
+.refresh-button.large {
+  padding: 0.75rem;
+}
+
+/* Estado de focus para accesibilidad */
+.refresh-button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .refresh-button {
+    padding: 0.375rem;
+  }
+  
+  .refresh-button:hover {
+    transform: none;
+  }
+}

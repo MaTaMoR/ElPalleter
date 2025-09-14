@@ -24,13 +24,13 @@ export class AnalyticsRepository extends BaseRepository {
 
     /**
      * Registra un evento de usuario
-     * POST /analytics/event
+     * POST /analytics/event/track
      * @param {Object} eventData - Datos del evento
      * @returns {Promise<void>}
      */
     static async trackEvent(eventData) {
         try {
-            await this.post('/analytics/event', eventData);
+            await this.post('/analytics/event/track', eventData);
         } catch (error) {
             console.error('AnalyticsRepository: Error tracking event:', error);
             throw error;
@@ -60,23 +60,32 @@ export class AnalyticsRepository extends BaseRepository {
      */
     static async getWeeklyStats(token) {
         try {
-            console.log('Token recibido:', token);
-            const headers = this.getAuthHeaders(token);
-            console.log('Headers a enviar:', headers);
-            
-            const response = await this.get('/analytics/stats/weekly', {
-                headers: headers
+            return await this.get('/analytics/stats/weekly', {
+                headers: this.getAuthHeaders(token)
             });
-            
-            console.log('Response recibida:', response);
-            return response;
         } catch (error) {
             console.error('AnalyticsRepository: Error getting weekly stats:', error);
-            console.error('Error details:', error.response?.data);
-            console.error('Error status:', error.response?.status);
             throw error;
         }
     }
+    
+    /**
+     * Obtiene estadísticas de la semana pasada
+     * GET /analytics/stats/last-week
+     * @param {string} token - Valid token for request
+     * @returns {Promise<Object>} Estadísticas semanales
+     */
+    static async getLastWeekStats(token) {
+        try {
+            return await this.get('/analytics/stats/last-week', {
+                headers: this.getAuthHeaders(token)
+            });
+        } catch (error) {
+            console.error('AnalyticsRepository: Error getting weekly stats:', error);
+            throw error;
+        }
+    }
+
     /**
      * Obtiene estadísticas para un período personalizado
      * GET /analytics/stats/
