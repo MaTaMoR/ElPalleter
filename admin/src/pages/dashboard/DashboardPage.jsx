@@ -101,11 +101,9 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-new">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard del Restaurante</h1>
-        <p className="dashboard-subtitle">Panel de control y gestión integral</p>
+        <h1 className="dashboard-title">Dashboard</h1>
       </div>
 
-      {/* Gestión Rápida Section */}
       <div className="section">
         <div className="section-header">
           <h2 className="section-title">Gestión Rápida</h2>
@@ -131,7 +129,6 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Marketing Digital Section - Sin DeviceStats */}
       <div className="section">
         <div className="section-header">
           <h2 className="section-title">Marketing Digital</h2>

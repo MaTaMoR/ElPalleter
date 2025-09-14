@@ -38,6 +38,7 @@
   --z-sidebar: 1000;
   --z-overlay: 999;
   --z-dropdown: 1001;
+  --z-topbar: 500;
 }
 
 * {

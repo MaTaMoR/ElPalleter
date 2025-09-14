@@ -1,17 +1,125 @@
-.admin-layout {
-  display: flex;
-  min-height: 100vh;
+/* ==================== MÓVIL (max-width: 768px) ==================== */
+@media (max-width: 768px) {
+  /* Sidebar en móvil - overlay mode */
+  .sidebar {
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .sidebar-close {
+    display: block;
+  }
+  
+  /* Layout móvil */
+  .admin-layout {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .topbar {
+    padding: 0 1rem;
+  }
+  
+  .page-container {
+    padding: 1rem;
+  }
+  
+  /* Grids y componentes */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .user-name-topbar {
+    display: none;
+  }
+  
+  .page-title {
+    font-size: 1.125rem;
+  }
+  
+  .welcome-section h2 {
+    font-size: 1.5rem;
+  }
 }
 
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+/* ==================== DESKTOP (min-width: 769px) ==================== */
+@media (min-width: 769px) {
+  /* Sidebar siempre visible en desktop */
+  .sidebar {
+    position: fixed;
+    transform: translateX(0);
+    transition: none;
+  }
+  
+  .main-content {
+    margin-left: 280px;
+  }
+  
+  .menu-button {
+    display: none;
+  }
+  
+  .topbar {
+    left: 280px;
+  }
 }
 
-.page-container {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
+/* ==================== MÓVIL PEQUEÑO (max-width: 480px) ==================== */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+  
+  .login-form {
+    padding: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .dashboard-card .card-content {
+    padding: 1rem;
+  }
+  
+  .reservation-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .reservation-time {
+    min-width: auto;
+  }
+  
+  .page-container {
+    padding: 0.75rem;
+  }
+}
+
+/* ==================== TABLET (769px - 1024px) ==================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .page-container {
+    padding: 1.5rem;
+  }
+}
+
+/* ==================== DESKTOP GRANDE (min-width: 1025px) ==================== */
+@media (min-width: 1025px) {
+  .page-container {
+    padding: 2rem;
+  }
 }

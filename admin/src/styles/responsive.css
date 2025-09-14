@@ -1,4 +1,6 @@
+/* ==================== MÓVIL (max-width: 768px) ==================== */
 @media (max-width: 768px) {
+  /* Sidebar en móvil - overlay mode */
   .sidebar {
     width: 100%;
     max-width: 280px;
@@ -12,6 +14,7 @@
     display: block;
   }
   
+  /* Layout móvil */
   .admin-layout {
     flex-direction: column;
   }
@@ -28,6 +31,7 @@
     padding: 1rem;
   }
   
+  /* Grids y componentes */
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -51,21 +55,29 @@
   }
 }
 
+/* ==================== DESKTOP (min-width: 769px) ==================== */
 @media (min-width: 769px) {
+  /* Sidebar siempre visible en desktop */
   .sidebar {
-    position: static;
+    position: fixed;
     transform: translateX(0);
+    transition: none;
   }
   
   .main-content {
-    margin-left: 0;
+    margin-left: 280px;
   }
   
   .menu-button {
     display: none;
   }
+  
+  .topbar {
+    left: 280px;
+  }
 }
 
+/* ==================== MÓVIL PEQUEÑO (max-width: 480px) ==================== */
 @media (max-width: 480px) {
   .login-container {
     padding: 0.5rem;
@@ -91,5 +103,23 @@
   
   .reservation-time {
     min-width: auto;
+  }
+  
+  .page-container {
+    padding: 0.75rem;
+  }
+}
+
+/* ==================== TABLET (769px - 1024px) ==================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .page-container {
+    padding: 1.5rem;
+  }
+}
+
+/* ==================== DESKTOP GRANDE (min-width: 1025px) ==================== */
+@media (min-width: 1025px) {
+  .page-container {
+    padding: 2rem;
   }
 }
