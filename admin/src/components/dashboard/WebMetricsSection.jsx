@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import RefreshButton from '../refreshbutton/RefreshButton';
+import DeviceStatsSection from './DeviceStatsSection';
+import './WebMetricsSection.css';
 import { 
   formatDuration, 
   formatPercentage, 
@@ -91,12 +93,17 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
     // Estado de carga inicial
     if (loading) {
       return (
-        <div className="metrics-grid">
-          {[...Array(6)].map((_, index) => (
-            <div key={index} className="metric-card loading">
-              <div className="metric-skeleton"></div>
-            </div>
-          ))}
+        <div className="metrics-content">
+          <div className="metrics-grid">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="metric-card loading">
+                <div className="metric-skeleton"></div>
+              </div>
+            ))}
+          </div>
+          <div className="device-stats-container">
+            <div className="device-stats-skeleton"></div>
+          </div>
         </div>
       );
     }
@@ -133,23 +140,30 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
           </div>
         )}
         
-        <div className="metrics-grid">
-          {processedData.map((metric, index) => (
-            <div key={index} className="metric-card">
-              <div className="metric-value">{metric.value}</div>
-              <div className="metric-label">{metric.label}</div>
-              {metric.showChange && (
-                <span className={`metric-change ${metric.changeType}`}>
-                  {getTrendIcon(metric.changeType)}
-                  {metric.change}
-                </span>
-              )}
-            </div>
-          ))}
+        <div className="metrics-content">
+          <div className="metrics-grid">
+            {processedData.map((metric, index) => (
+              <div key={index} className="metric-card">
+                <div className="metric-value">{metric.value}</div>
+                <div className="metric-label">{metric.label}</div>
+                {metric.showChange && (
+                  <span className={`metric-change ${metric.changeType}`}>
+                    {getTrendIcon(metric.changeType)}
+                    {metric.change}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {/* Estadísticas de dispositivos integradas */}
+          <div className="device-stats-container">
+            <DeviceStatsSection analyticsData={analyticsData} />
+          </div>
         </div>
       </>
     );
-  }, [loading, error, processedData, refreshing, onRefresh]);
+  }, [loading, error, processedData, refreshing, onRefresh, analyticsData]);
 
   return (
     <div className={`section ${refreshing ? 'refreshing' : ''}`}>

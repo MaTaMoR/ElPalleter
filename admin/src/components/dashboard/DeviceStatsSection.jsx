@@ -1,5 +1,6 @@
 import React from 'react';
 import { getDeviceIcon, formatNumber, formatPercentage } from '@utils/analyticsUtils';
+import './DeviceStatsSection.css';
 
 const DeviceStatsSection = ({ analyticsData }) => {
   const deviceStats = analyticsData?.deviceStats || {};

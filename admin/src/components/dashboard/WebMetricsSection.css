@@ -1,0 +1,335 @@
+/* WebMetricsSection.css */
+
+/* Estructura principal de métricas */
+.metrics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Tarjetas de métricas individuales */
+.metric-card {
+  background: var(--bg-tertiary);
+  padding: 1.5625rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--warning), var(--primary-light));
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.metric-card:hover::before {
+  transform: translateX(0);
+}
+
+.metric-card:hover {
+  border-color: var(--primary);
+  background: var(--bg-secondary);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.metric-change {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.metric-change.positive {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.metric-change.negative {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+.metric-change.neutral {
+  background: rgba(160, 160, 160, 0.1);
+  color: var(--text-muted);
+}
+
+/* Skeleton loading para métricas */
+.metric-card.loading {
+  background: var(--bg-tertiary);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-skeleton {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-skeleton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: skeleton-shimmer 2s infinite;
+}
+
+/* Contenedor de estadísticas de dispositivos */
+.device-stats-container {
+  background: var(--bg-tertiary);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.device-stats-container:hover {
+  border-color: var(--primary);
+  background: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Estilos para DeviceStatsSection integrado */
+.device-stats {
+  margin: 0;
+}
+
+.device-stats h4 {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.device-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.device-item {
+  background: var(--bg-card);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: var(--transition);
+}
+
+.device-item:hover {
+  background: var(--bg-primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.device-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  min-width: 24px;
+  text-align: center;
+}
+
+.device-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.device-item .device-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.device-count {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.device-percentage {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Skeleton para device stats */
+.device-stats-skeleton {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.device-stats-skeleton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: skeleton-shimmer 2s infinite;
+}
+
+/* Mensajes de error y sin datos */
+.error-message, .no-data-message {
+  text-align: center;
+  padding: 2rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.error-message p, .no-data-message p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.error-message button, .no-data-message button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.error-message button:hover, .no-data-message button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.error-message button:disabled, .no-data-message button:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Banner de error sutil */
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.error-banner p {
+  margin: 0;
+  color: var(--error);
+}
+
+/* Animaciones compartidas */
+@keyframes skeleton-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive Design específico para WebMetrics */
+@media (max-width: 768px) {
+  .metrics-content {
+    gap: 1.5rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .device-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .device-stats-container {
+    padding: 1rem;
+  }
+  
+  .metric-card {
+    padding: 1.25rem;
+  }
+  
+  .metric-value {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .device-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .device-item .device-stats {
+    align-items: center;
+  }
+  
+  .metric-card {
+    padding: 1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.4rem;
+  }
+}

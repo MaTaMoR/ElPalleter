@@ -4,6 +4,12 @@ import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [react()],
+   build: {
+    sourcemap: process.env.NODE_ENV === 'development' ? false : false,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
   server: {
     port: 3001,
     host: true

@@ -104,7 +104,6 @@ export class AnalyticsService {
         // Track initial page load event
         this.trackEvent('PAGE_LOAD', null, {
             url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-            timestamp: new Date().toISOString(),
             viewport: typeof window !== 'undefined' ? {
                 width: window.innerWidth,
                 height: window.innerHeight
@@ -125,9 +124,9 @@ export class AnalyticsService {
             sessionId: this.sessionId,
             eventType: eventType,
             sectionName: sectionName,
+            timestamp: new Date().toISOString(), // Campo directo, no dentro de eventData
             eventData: {
                 ...eventData,
-                timestamp: new Date().toISOString(),
                 url: typeof window !== 'undefined' ? window.location.href : 'unknown'
             }
         };
@@ -241,7 +240,7 @@ export class AnalyticsService {
         }
 
         try {
-            await AnalyticsRepository[method](data);
+            await AnalyticsRepository[method](data, AuthService.getToken());
         } catch (error) {
             console.warn('Analytics tracking failed:', error);
             // Queue for retry when back online

@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 
 import WebMetricsSection from '../../components/dashboard/WebMetricsSection';
-import DeviceStatsSection from '../../components/dashboard/DeviceStatsSection';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import './DashboardPage.css';
 
@@ -132,7 +131,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Marketing Digital Section */}
+      {/* Marketing Digital Section - Sin DeviceStats */}
       <div className="section">
         <div className="section-header">
           <h2 className="section-title">Marketing Digital</h2>
@@ -162,16 +161,9 @@ const DashboardPage = () => {
             );
           })}
         </div>
-
-        {/* Device Stats con datos reales */}
-        {analyticsData && (
-          <div className="additional-stats">
-            <DeviceStatsSection analyticsData={analyticsData} />
-          </div>
-        )}
       </div>
 
-      {/* Métricas Web Section - Ahora con datos de comparación */}
+      {/* Métricas Web Section - Ahora incluye DeviceStats */}
       <WebMetricsSection 
         analyticsData={analyticsData}
         previousData={previousData}
