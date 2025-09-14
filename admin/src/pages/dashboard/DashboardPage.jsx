@@ -1,132 +1,184 @@
 import React from 'react';
 import { useAuth } from '../../auth/AuthProvider';
 import { 
+  Menu,
+  Phone,
+  BookOpen,
+  Settings,
   Users,
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  Activity
+  MapPin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
+import WebMetricsSection from '../../components/dashboard/WebMetricsSection';
+import DeviceStatsSection from '../../components/dashboard/DeviceStatsSection';
+import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  
-  const stats = [
-    { 
-      label: 'Ventas Hoy', 
-      value: '€1,234', 
-      icon: DollarSign, 
-      color: 'green',
-      change: '+12%'
+  const { data: analyticsData, loading, error, refresh, lastUpdated } = useAnalyticsData();
+
+  const managementSections = [
+    {
+      id: 'carta',
+      title: 'Carta',
+      info: '24 platos', // Esto podría venir del CartaService
+      action: 'Gestionar',
+      icon: Menu,
+      className: 'carta'
     },
-    { 
-      label: 'Reservas Hoy', 
-      value: '24', 
-      icon: Calendar, 
-      color: 'blue',
-      change: '+5%'
+    {
+      id: 'contacto',
+      title: 'Contacto',
+      info: 'Información completa',
+      action: 'Editar',
+      icon: Phone,
+      className: 'contacto'
     },
-    { 
-      label: 'Clientes Mes', 
-      value: '486', 
-      icon: Users, 
-      color: 'purple',
-      change: '+18%'
+    {
+      id: 'historia',
+      title: 'Historia',
+      info: 'Del restaurante',
+      action: 'Modificar',
+      icon: BookOpen,
+      className: 'historia'
     },
-    { 
-      label: 'Platos Populares', 
-      value: '8', 
-      icon: TrendingUp, 
-      color: 'orange',
-      change: '+2%'
+    {
+      id: 'configuracion',
+      title: 'Configuración',
+      info: 'Ajustes generales',
+      action: 'Configurar',
+      icon: Settings,
+      className: 'configuracion'
     },
+    {
+      id: 'usuarios',
+      title: 'Usuarios',
+      info: '3 administradores',
+      action: 'Administrar',
+      icon: Users,
+      className: 'usuarios'
+    }
   ];
 
+  // Mock data para social media (esto podrías conectarlo con APIs reales más tarde)
+  const socialStats = [
+    {
+      platform: 'Google Business',
+      icon: MapPin,
+      mainStat: '4.8★',
+      label: '67 reseñas',
+      change: '+3',
+      changeLabel: 'esta semana',
+      className: 'google'
+    },
+    {
+      platform: 'Instagram',
+      icon: Instagram,
+      mainStat: '1,234',
+      label: 'seguidores',
+      change: '+47',
+      changeLabel: 'este mes',
+      className: 'instagram'
+    },
+    {
+      platform: 'Facebook',
+      icon: Facebook,
+      mainStat: '856',
+      label: 'me gusta',
+      change: '+23',
+      changeLabel: 'este mes',
+      className: 'facebook'
+    }
+  ];
+
+  const handleManagementClick = (sectionId) => {
+    console.log(`Navegando a: ${sectionId}`);
+    // TODO: Implementar navegación real aquí
+  };
+
   return (
-    <div className="dashboard">
-      <div className="welcome-section">
-        <h2>Bienvenido, {user?.name}!</h2>
-        <p>Aquí está el resumen de hoy para El Palleter</p>
+    <div className="dashboard-new">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Dashboard del Restaurante</h1>
+        <p className="dashboard-subtitle">Panel de control y gestión integral</p>
       </div>
 
-      <div className="stats-grid">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div key={index} className="stat-card">
-              <div className="stat-header">
-                <div className={`stat-icon stat-icon-${stat.color}`}>
-                  <Icon size={24} />
-                </div>
-                <span className={`stat-change change-${stat.change.startsWith('+') ? 'positive' : 'negative'}`}>
-                  {stat.change}
-                </span>
-              </div>
-              <div className="stat-value">{stat.value}</div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h3>Actividad Reciente</h3>
-            <Activity size={20} />
-          </div>
-          <div className="card-content">
-            <div className="activity-list">
-              <div className="activity-item">
-                <span className="activity-time">Hace 5 min</span>
-                <span className="activity-text">Nueva reserva para 4 personas</span>
-              </div>
-              <div className="activity-item">
-                <span className="activity-time">Hace 15 min</span>
-                <span className="activity-text">Pedido #1234 completado</span>
-              </div>
-              <div className="activity-item">
-                <span className="activity-time">Hace 1 hora</span>
-                <span className="activity-text">Actualización del menú del día</span>
-              </div>
-            </div>
-          </div>
+      {/* Gestión Rápida Section */}
+      <div className="section">
+        <div className="section-header">
+          <h2 className="section-title">Gestión Rápida</h2>
+          <span className="status-badge">Navegación rápida</span>
         </div>
-
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h3>Próximas Reservas</h3>
-            <Calendar size={20} />
-          </div>
-          <div className="card-content">
-            <div className="reservation-list">
-              <div className="reservation-item">
-                <div className="reservation-time">19:30</div>
-                <div className="reservation-info">
-                  <span className="reservation-name">María García</span>
-                  <span className="reservation-details">Mesa para 2</span>
-                </div>
+        
+        <div className="management-grid">
+          {managementSections.map((section) => {
+            const IconComponent = section.icon;
+            return (
+              <div 
+                key={section.id}
+                className={`management-tile ${section.className}`}
+                onClick={() => handleManagementClick(section.id)}
+              >
+                <IconComponent className="tile-icon" size={45} />
+                <h3 className="tile-title">{section.title}</h3>
+                <p className="tile-info">{section.info}</p>
+                <div className="tile-action">{section.action}</div>
               </div>
-              <div className="reservation-item">
-                <div className="reservation-time">20:00</div>
-                <div className="reservation-info">
-                  <span className="reservation-name">Juan Pérez</span>
-                  <span className="reservation-details">Mesa para 6</span>
-                </div>
-              </div>
-              <div className="reservation-item">
-                <div className="reservation-time">21:30</div>
-                <div className="reservation-info">
-                  <span className="reservation-name">Ana Martínez</span>
-                  <span className="reservation-details">Mesa para 4</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Marketing Digital Section */}
+      <div className="section">
+        <div className="section-header">
+          <h2 className="section-title">Marketing Digital</h2>
+          <span className="status-badge info">Rendimiento excelente</span>
+        </div>
+        
+        <div className="social-grid">
+          {socialStats.map((social, index) => {
+            const IconComponent = social.icon;
+            return (
+              <div key={index} className={`social-card ${social.className}`}>
+                <div className="social-header">
+                  <span className="social-platform">{social.platform}</span>
+                  <IconComponent className="social-icon" size={24} />
+                </div>
+                <div className="social-stats">
+                  <div>
+                    <div className="social-main-stat">{social.mainStat}</div>
+                    <div className="social-label">{social.label}</div>
+                  </div>
+                  <div className="social-change">
+                    <div className="change-positive">{social.change}</div>
+                    <div className="social-label">{social.changeLabel}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Device Stats con datos reales */}
+        {analyticsData && (
+          <div className="additional-stats">
+            <DeviceStatsSection analyticsData={analyticsData} />
+          </div>
+        )}
+      </div>
+
+      {/* Métricas Web Section - Con datos reales del backend */}
+      <WebMetricsSection 
+        analyticsData={analyticsData}
+        loading={loading}
+        error={error}
+        onRefresh={refresh}
+        lastUpdated={lastUpdated}
+      />
     </div>
   );
 };

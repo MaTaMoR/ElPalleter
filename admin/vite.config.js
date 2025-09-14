@@ -14,7 +14,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@styles': fileURLToPath(new URL('../src/styles', import.meta.url)),
       '@repositories': fileURLToPath(new URL('../src/repositories', import.meta.url)),
-      '@services': fileURLToPath(new URL('../src/services', import.meta.url))
+      '@services': fileURLToPath(new URL('../src/services', import.meta.url)),
+      '@utils': fileURLToPath(new URL('../src/utils', import.meta.url))
     }
   }
 });

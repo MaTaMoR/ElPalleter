@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import Sidebar from '../componentes/sidebar/Sidebar';
-import TopBar from '../componentes/topbar/TopBar';
+import Sidebar from '../components/sidebar/Sidebar';
+import TopBar from '../components/topbar/TopBar';
 
 import './AdminLayout.css';
 
