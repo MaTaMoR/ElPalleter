@@ -1,8 +1,8 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import './SettingsPage.css';
+import React from 'react';
+import styles from './SettingsPage.module.css';
 
 const SettingsPage = () => (
-  <div className="page-content">
+  <div className={styles.pageContent}>
     <h2>Configuración</h2>
     <p>Próximamente: configuración del sistema.</p>
   </div>

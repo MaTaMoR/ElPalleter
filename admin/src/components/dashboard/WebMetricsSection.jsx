@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import RefreshButton from '../refreshbutton/RefreshButton';
 import DeviceStatsSection from './DeviceStatsSection';
-import './WebMetricsSection.css';
+import LanguageStatsSection from './LanguageStatsSection';
+import styles from './WebMetricsSection.module.css'; // ← Cambio aquí
 import { 
   formatDuration, 
   formatPercentage, 
@@ -10,11 +11,10 @@ import {
   formatTimeAgo,
   calculateMobilePercentage,
   getMostViewedSection,
-  calculateEngagementRate ,
+  calculateEngagementRate,
   calculateAllMetricChanges
 } from '@utils/analyticsUtils';
 
-// Crear texto del badge con actualización
 const getBadgeText = (refreshing, lastUpdated) => {
   const baseText = 'Esta semana';
   if (refreshing) return `${baseText} (actualizando...)`;
@@ -45,7 +45,6 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
     const engagementRate = calculateEngagementRate(analyticsData.bounceRate);
     const topSection = getMostViewedSection(analyticsData.sectionStats);
 
-    // Calcular todos los cambios dinámicamente
     const changes = calculateAllMetricChanges(analyticsData, previousData);
 
     return [
@@ -88,40 +87,36 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
     ];
   }, [analyticsData, previousData]);
 
-  // Memo 2: Renderizar contenido basado en estado + datos procesados
   const content = useMemo(() => {
-    // Estado de carga inicial
     if (loading) {
       return (
-        <div className="metrics-content">
-          <div className="metrics-grid">
+        <div className={styles.metricsContent}>
+          <div className={styles.metricsGrid}>
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="metric-card loading">
-                <div className="metric-skeleton"></div>
+              <div key={index} className={`${styles.metricCard} ${styles.loading}`}>
+                <div className={styles.metricSkeleton}></div>
               </div>
             ))}
           </div>
-          <div className="device-stats-container">
-            <div className="device-stats-skeleton"></div>
+          <div className={styles.deviceStatsContainer}>
+            <div className={styles.deviceStatsSkeleton}></div>
           </div>
         </div>
       );
     }
 
-    // Estado de error completo (solo si no hay datos anteriores)
     if (loading === false && error && !processedData && !refreshing) {
       return (
-        <div className="error-message">
+        <div className={styles.errorMessage}>
           <p>Error cargando métricas: {error}</p>
           <button onClick={onRefresh}>Reintentar</button>
         </div>
       );
     }
 
-    // Estado sin datos
     if (!processedData) {
       return (
-        <div className="no-data-message">
+        <div className={styles.noDataMessage}>
           <p>No hay datos de métricas disponibles</p>
           <button onClick={onRefresh} disabled={refreshing}>
             {refreshing ? 'Cargando...' : 'Cargar datos'}
@@ -130,24 +125,22 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
       );
     }
 
-    // Estado con datos - renderizar métricas
     return (
       <>
-        {/* Banner de error sutil si hay error pero tenemos datos */}
         {error && (
-          <div className="error-banner">
+          <div className={styles.errorBanner}>
             <p>⚠️ Hubo un problema al actualizar. Mostrando datos anteriores.</p>
           </div>
         )}
         
-        <div className="metrics-content">
-          <div className="metrics-grid">
+        <div className={styles.metricsContent}>
+          <div className={styles.metricsGrid}>
             {processedData.map((metric, index) => (
-              <div key={index} className="metric-card">
-                <div className="metric-value">{metric.value}</div>
-                <div className="metric-label">{metric.label}</div>
+              <div key={index} className={styles.metricCard}>
+                <div className={styles.metricValue}>{metric.value}</div>
+                <div className={styles.metricLabel}>{metric.label}</div>
                 {metric.showChange && (
-                  <span className={`metric-change ${metric.changeType}`}>
+                  <span className={`${styles.metricChange} ${styles[metric.changeType]}`}>
                     {getTrendIcon(metric.changeType)}
                     {metric.change}
                   </span>
@@ -156,22 +149,26 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
             ))}
           </div>
           
-          {/* Estadísticas de dispositivos integradas */}
-          <div className="device-stats-container">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div className={styles.deviceStatsContainer}>
             <DeviceStatsSection analyticsData={analyticsData} />
           </div>
+          
+          <div className={styles.deviceStatsContainer}>
+            <LanguageStatsSection analyticsData={analyticsData} />
+          </div>
+        </div>
         </div>
       </>
     );
   }, [loading, error, processedData, refreshing, onRefresh, analyticsData]);
 
   return (
-    <div className={`section ${refreshing ? 'refreshing' : ''}`}>
-      {/* Header fijo - siempre presente */}
-      <div className="section-header">
-        <h2 className="section-title">Métricas de la Web</h2>
-        <div className="section-actions">
-          <span className={`status-badge warning ${refreshing ? 'updating' : ''}`}>
+    <div className={`${styles.section} ${refreshing ? styles.refreshing : ''}`}>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Métricas de la Web</h2>
+        <div className={styles.sectionActions}>
+          <span className={`${styles.statusBadge} ${styles.warning} ${refreshing ? styles.updating : ''}`}>
             {getBadgeText(refreshing, lastUpdated)}
           </span>
           <RefreshButton
@@ -182,7 +179,6 @@ const WebMetricsSection = ({ analyticsData, previousData, loading, refreshing, e
         </div>
       </div>
       
-      {/* Contenido dinámico */}
       {content}
     </div>
   );

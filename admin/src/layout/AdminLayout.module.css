@@ -6,20 +6,20 @@
     max-width: 280px;
   }
   
-  .sidebar-overlay {
+  .sidebarOverlay {
     display: block;
   }
   
-  .sidebar-close {
+  .sidebarClose {
     display: block;
   }
   
   /* Layout móvil */
-  .admin-layout {
+  .adminLayout {
     flex-direction: column;
   }
   
-  .main-content {
+  .mainContent {
     margin-left: 0;
   }
   
@@ -27,30 +27,30 @@
     padding: 0 1rem;
   }
   
-  .page-container {
+  .pageContainer {
     padding: 1rem;
   }
   
   /* Grids y componentes */
-  .stats-grid {
+  .statsGrid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .dashboard-grid {
+  .dashboardGrid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .user-name-topbar {
+  .userNameTopbar {
     display: none;
   }
   
-  .page-title {
+  .pageTitle {
     font-size: 1.125rem;
   }
   
-  .welcome-section h2 {
+  .welcomeSection h2 {
     font-size: 1.5rem;
   }
 }
@@ -64,11 +64,11 @@
     transition: none;
   }
   
-  .main-content {
+  .mainContent {
     margin-left: 280px;
   }
   
-  .menu-button {
+  .menuButton {
     display: none;
   }
   
@@ -79,47 +79,47 @@
 
 /* ==================== MÓVIL PEQUEÑO (max-width: 480px) ==================== */
 @media (max-width: 480px) {
-  .login-container {
+  .loginContainer {
     padding: 0.5rem;
   }
   
-  .login-form {
+  .loginForm {
     padding: 1.5rem;
   }
   
-  .stat-card {
+  .statCard {
     padding: 1rem;
   }
   
-  .dashboard-card .card-content {
+  .dashboardCard .cardContent {
     padding: 1rem;
   }
   
-  .reservation-item {
+  .reservationItem {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
   
-  .reservation-time {
+  .reservationTime {
     min-width: auto;
   }
   
-  .page-container {
+  .pageContainer {
     padding: 0.75rem;
   }
 }
 
 /* ==================== TABLET (769px - 1024px) ==================== */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .page-container {
+  .pageContainer {
     padding: 1.5rem;
   }
 }
 
 /* ==================== DESKTOP GRANDE (min-width: 1025px) ==================== */
 @media (min-width: 1025px) {
-  .page-container {
+  .pageContainer {
     padding: 2rem;
   }
 }

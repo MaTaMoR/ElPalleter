@@ -1,17 +1,9 @@
 import React from 'react';
 import { RefreshCw } from 'lucide-react';
-import './RefreshButton.css';
+import styles from './RefreshButton.module.css';
 
 /**
  * Componente reutilizable para botón de refresh/actualizar
- * @param {Object} props
- * @param {boolean} props.refreshing - Si está en proceso de refresh
- * @param {boolean} props.error - Si hay un error 
- * @param {function} props.onClick - Función a ejecutar al hacer click
- * @param {string} props.title - Tooltip del botón
- * @param {number} props.size - Tamaño del icono (default: 16)
- * @param {string} props.variant - Variante visual: 'default' | 'error'
- * @param {boolean} props.disabled - Si está deshabilitado
  */
 const RefreshButton = ({
   refreshing = false,
@@ -30,11 +22,11 @@ const RefreshButton = ({
   };
 
   const getClassName = () => {
-    let className = 'refresh-button';
+    let className = styles.refreshButton;
     
-    if (refreshing) className += ' refreshing';
-    if (error || variant === 'error') className += ' error';
-    if (disabled || refreshing) className += ' disabled';
+    if (refreshing) className += ` ${styles.refreshing}`;
+    if (error || variant === 'error') className += ` ${styles.error}`;
+    if (disabled || refreshing) className += ` ${styles.disabled}`;
     
     return className;
   };
@@ -50,7 +42,7 @@ const RefreshButton = ({
     >
       <RefreshCw 
         size={size} 
-        className={refreshing ? 'spinning' : ''} 
+        className={refreshing ? styles.spinning : ''} 
       />
     </button>
   );

@@ -11,7 +11,7 @@ Astro.locals.locale = locale;
 Astro.locals.cleanPath = '/';
 Astro.locals.isDefaultLocale = locale === 'es';
 
-import { i18nCore } from '../i18n/core.js';
+import { I18nService } from '../services/I18Service.js';
 
 import Layout from '../layouts/Layout.astro';
 import Header from './public/Header.astro';
@@ -24,15 +24,15 @@ import Contact from './public/Contact.astro';
 import ScrollToTop from './public/ScrollToTop.astro';
 import Footer from './public/Footer.astro';
 
-const { locale: currentLocale } = i18nCore.getI18nInfo(Astro);
+const { locale: currentLocale } = I18nService.getI18nInfo(Astro);
 
-const seoData = i18nCore.getSEOMetadata({
-  title: i18nCore.safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
-  description: i18nCore.safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
+const seoData = I18nService.getSEOMetadata({
+  title: I18nService.safeTranslation('title', Astro, 'El Palleter - Tapas y Parrilla en Benissa'),
+  description: I18nService.safeTranslation('description', Astro, 'Restaurante El Palleter en Benissa. Auténtica cocina mediterránea desde 1985.')
 }, Astro);
 
-const alternateUrls = i18nCore.getAlternateUrlsWithAstro(Astro);
-const textDirection = i18nCore.getTextDirectionWithAstro(Astro);
+const alternateUrls = I18nService.getAlternateUrlsWithAstro(Astro);
+const textDirection = I18nService.getTextDirectionWithAstro(Astro);
 ---
 
 <Layout 

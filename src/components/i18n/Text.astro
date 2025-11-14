@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { i18nCore } from '../../i18n/core.js';
+import { I18nService } from '../../services/I18Service.js';
 
 const { 
   key, 
@@ -14,7 +14,7 @@ const {
   ...restProps 
 } = Astro.props;
 
-let text = await i18nCore.safeTranslation(key, Astro, fallback ?? null, params);
+let text = await I18nService.safeTranslation(key, Astro, fallback ?? null, params);
 
 // Aplicar límite si existe
 if (maxLength && text.length > maxLength) {

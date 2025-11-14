@@ -1,10 +1,11 @@
-// src/repositories/I18nRepository.js
-
 import { BaseRepository } from './BaseRepository.js';
 
 /**
  * Repositorio para operaciones de internacionalización
  * Conecta con los endpoints /i18n del backend Spring Boot
+ * 
+ * RESPONSABILIDAD: Solo acceso a datos del backend
+ * La lógica de negocio está en I18nService
  */
 export class I18nRepository extends BaseRepository {
 
@@ -46,7 +47,7 @@ export class I18nRepository extends BaseRepository {
     /**
      * Obtiene todas las traducciones para múltiples idiomas
      * @param {Array} languages - Array de códigos de idiomas
-     * @returns {Promise<Object>} Objeto con traducciones por idioma
+     * @returns {Promise<Object>} Objeto con traducciones por idioma {es: [...], en: [...]}
      */
     static async getAllTranslations(languages = null) {
         try {
@@ -82,7 +83,10 @@ export class I18nRepository extends BaseRepository {
     }
 
     /**
-     * Convierte array de traducciones del backend a formato flat para i18nCore
+     * Convierte array de traducciones del backend a formato flat
+     * Transforma [{translationKey: "menu.home", translationValue: "Inicio"}] 
+     * a {"menu.home": "Inicio"}
+     * 
      * @param {Array} translationsArray - Array de objetos de traducción del backend
      * @returns {Object} Objeto flat de traducciones {key: value}
      */
@@ -103,7 +107,7 @@ export class I18nRepository extends BaseRepository {
     }
 
     /**
-     * Obtiene traducciones en formato flat para usar con i18nCore
+     * Obtiene traducciones en formato flat para un idioma
      * @param {string} language - Código del idioma
      * @returns {Promise<Object>} Objeto flat de traducciones
      */
@@ -119,8 +123,11 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Obtiene todas las traducciones en formato flat para múltiples idiomas
+     * ESTE ES EL MÉTODO PRINCIPAL QUE USA I18nService
+     * 
      * @param {Array} languages - Array de códigos de idiomas
      * @returns {Promise<Object>} Objeto con traducciones flat por idioma
+     *                            {es: {key: value}, en: {key: value}}
      */
     static async getAllFlatTranslations(languages = null) {
         try {
@@ -163,7 +170,23 @@ export class I18nRepository extends BaseRepository {
     }
 
     /**
-     * Obtiene estadísticas de traducciones
+     * Obtiene una traducción específica por clave e idioma
+     * @param {string} language - Código del idioma
+     * @param {string} key - Clave de traducción
+     * @returns {Promise<string|null>} Valor de la traducción o null si no existe
+     */
+    static async getTranslationByKey(language, key) {
+        try {
+            const flatTranslations = await this.getFlatTranslations(language);
+            return flatTranslations[key] || null;
+        } catch (error) {
+            console.error(`I18nRepository: Error getting translation for key ${key}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Obtiene estadísticas de traducciones desde el backend
      * @returns {Promise<Object>} Estadísticas de traducciones
      */
     static async getTranslationStats() {
@@ -211,7 +234,7 @@ export class I18nRepository extends BaseRepository {
     }
 
     /**
-     * Verifica si un idioma está disponible
+     * Verifica si un idioma está disponible en el backend
      * @param {string} language - Código del idioma a verificar
      * @returns {Promise<boolean>} true si el idioma está disponible
      */
@@ -226,33 +249,17 @@ export class I18nRepository extends BaseRepository {
     }
 
     /**
-     * Obtiene una traducción específica por clave e idioma
-     * @param {string} language - Código del idioma
-     * @param {string} key - Clave de traducción
-     * @returns {Promise<string|null>} Valor de la traducción o null si no existe
-     */
-    static async getTranslationByKey(language, key) {
-        try {
-            const flatTranslations = await this.getFlatTranslations(language);
-            return flatTranslations[key] || null;
-        } catch (error) {
-            console.error(`I18nRepository: Error getting translation for key ${key}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Verifica si el servicio de i18n está disponible
+     * Verifica el estado del servicio de i18n en el backend
      * @returns {Promise<Object>} Estado del servicio
      */
     static async healthCheck() {
         try {
-            // Intentar obtener idiomas disponibles como test
             const languages = await this.getAvailableLanguages();
             
             return {
                 status: 'healthy',
                 service: 'I18nRepository',
+                backend: this.getBaseUrl(),
                 endpoints: {
                     languages: '/i18n/languages',
                     translations: '/i18n/translations/{language}'
@@ -264,6 +271,7 @@ export class I18nRepository extends BaseRepository {
             return {
                 status: 'unhealthy',
                 service: 'I18nRepository',
+                backend: this.getBaseUrl(),
                 error: error.message,
                 lastCheck: new Date().toISOString()
             };
@@ -279,35 +287,18 @@ export class I18nRepository extends BaseRepository {
             baseUrl: this.getBaseUrl(),
             endpoints: {
                 languages: '/i18n/languages',
-                translations: '/i18n/translations/{language}'
+                translations: '/i18n/translations/{language}',
+                translationByKey: '/i18n/translations/{language}/{key}'
             }
         };
     }
 
     /**
-     * Método de conveniencia para cargar traducciones en i18nCore
-     * @param {Object} i18nCoreInstance - Instancia de i18nCore
-     * @param {Array} languages - Idiomas a cargar (opcional)
-     * @returns {Promise<void>}
+     * Invalida la caché de traducciones (si se implementa caché)
+     * Útil cuando se actualizan traducciones en el backend
      */
-    static async loadIntoI18nCore(i18nCoreInstance, languages = null) {
-        try {
-            const flatTranslations = await this.getAllFlatTranslations(languages);
-            
-            // Limpiar traducciones existentes
-            i18nCoreInstance.translations.clear();
-            
-            // Cargar nuevas traducciones
-            Object.entries(flatTranslations).forEach(([language, translations]) => {
-                i18nCoreInstance.translations.set(language, translations);
-            });
-
-            i18nCoreInstance.loaded = true;
-            
-            console.log(`I18nRepository: Loaded translations for languages: ${Object.keys(flatTranslations).join(', ')}`);
-        } catch (error) {
-            console.error('I18nRepository: Error loading translations into i18nCore:', error);
-            throw error;
-        }
+    static async invalidateCache() {
+        // Este método se puede implementar si se añade un sistema de caché
+        console.log('I18nRepository: Cache invalidation requested');
     }
 }

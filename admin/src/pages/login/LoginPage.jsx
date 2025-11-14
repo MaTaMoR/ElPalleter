@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Eye,
-  EyeOff
-} from 'lucide-react';
-
-import './LoginPage.css';
+import { Eye, EyeOff } from 'lucide-react';
+import styles from './LoginPage.module.css';
+console.log(styles);
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -34,15 +31,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
+    <div className={styles.loginContainer}>
+      <div className={styles.loginCard}>
+        <div className={styles.loginHeader}>
           <h1>El Palleter</h1>
           <p>Panel de Administración</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
+          <div className={styles.formGroup}>
             <label htmlFor="username">Usuario</label>
             <input
               id="username"
@@ -55,9 +52,9 @@ const LoginPage = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="password">Contraseña</label>
-            <div className="password-input-wrapper">
+            <div className={styles.passwordInputWrapper}>
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -69,7 +66,7 @@ const LoginPage = () => {
               />
               <button
                 type="button"
-                className="password-toggle"
+                className={styles.passwordToggle}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -78,14 +75,14 @@ const LoginPage = () => {
           </div>
 
           {error && (
-            <div className="error-message">
+            <div className={styles.errorMessage}>
               {error}
             </div>
           )}
 
           <button 
             type="submit" 
-            className="login-button"
+            className={styles.loginButton}
             disabled={loading}
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}

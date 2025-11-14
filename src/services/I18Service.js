@@ -1,7 +1,8 @@
-import esTranslations from './translations/es.json';
-import enTranslations from './translations/en.json';
-import valTranslations from './translations/val.json';
+import { I18nRepository } from '../repositories/I18nRepository.js';
 
+/**
+ * Configuración de idiomas disponibles
+ */
 export const LANGUAGE_CONFIG = {
   es: {
     code: 'es',
@@ -12,8 +13,7 @@ export const LANGUAGE_CONFIG = {
     flag: {
       value: '/flags/spain.svg'
     },
-    direction: 'ltr',
-    file: esTranslations
+    direction: 'ltr'
   },
   en: {
     code: 'en',
@@ -24,8 +24,7 @@ export const LANGUAGE_CONFIG = {
     flag: {
       value: '/flags/united-kingdom.svg'
     },
-    direction: 'ltr',
-    file: enTranslations
+    direction: 'ltr'
   },
   val: {
     code: 'val',
@@ -36,17 +35,16 @@ export const LANGUAGE_CONFIG = {
     flag: {
       value: '/flags/valencia.svg'
     },
-    direction: 'ltr',
-    file: valTranslations
+    direction: 'ltr'
   }
 };
 
-// Constantes derivadas (se generan automáticamente)
+// Constantes derivadas
 export const LOCALES = Object.keys(LANGUAGE_CONFIG);
 export const DEFAULT_LOCALE = Object.values(LANGUAGE_CONFIG).find(lang => lang.isDefault)?.code || 'es';
 
 /**
- * Clase para manejar banderas (emoji o SVG)
+ * Clase para manejar banderas (SVG)
  */
 export class FlagRenderer {
   static renderFlag(flagConfig, className = '', size = '1rem') {
@@ -55,144 +53,159 @@ export class FlagRenderer {
 
   static getFlagElement(flagConfig) {
     return {
-      type: flagConfig.type,
+      type: 'svg',
       value: flagConfig.value,
-      isSvg: flagConfig.type === 'svg'
+      isSvg: true
     };
   }
 }
 
-export class I18nCore {
-  constructor() {
-    // Singleton pattern
-    if (I18nCore.instance) {
-      return I18nCore.instance;
-    }
+/**
+ * Estado del servicio (a nivel de módulo)
+ */
+const state = {
+  translations: new Map(),
+  languages: Object.values(LANGUAGE_CONFIG),
+  defaultLanguage: Object.values(LANGUAGE_CONFIG).find(lang => lang.isDefault),
+  loaded: false,
+  loading: false,
+  loadPromise: null
+};
 
-    this.translations = new Map();
-    this.languages = Object.values(LANGUAGE_CONFIG);
-    this.defaultLanguage = this.languages.find(lang => lang.isDefault);
-    this.loaded = false;
-    this.loading = false;
-    this.loadPromise = null;
-
-    I18nCore.instance = this;
-  }
+/**
+ * Servicio de internacionalización
+ * Gestiona traducciones, URLs multiidioma, formateo y SEO
+ */
+export class I18nService {
 
   // ===============================================
-  // INICIALIZACIÓN Y CARGA - NUEVO CON IMPORTS DINÁMICOS
+  // INICIALIZACIÓN Y CARGA DESDE BACKEND
   // ===============================================
 
   /**
-   * Inicialización (carga las traducciones)
+   * Inicializa el servicio cargando traducciones desde el backend
    */
-  async init() {
-    if (!this.loaded && !this.loading) {
+  static async init() {
+    if (!state.loaded && !state.loading) {
       await this.loadAllTranslations();
     }
     return this;
   }
 
   /**
-   * Carga todas las traducciones con protección contra carga múltiple
+   * Carga todas las traducciones desde el backend con protección contra carga múltiple
    */
-  async loadAllTranslations() {
-    if (this.loaded) return;
+  static async loadAllTranslations() {
+    if (state.loaded) return;
 
-    if (this.loading && this.loadPromise) {
-      return await this.loadPromise;
+    if (state.loading && state.loadPromise) {
+      return await state.loadPromise;
     }
 
-    this.loading = true;
-    this.loadPromise = this._performLoad();
+    state.loading = true;
+    state.loadPromise = this._performLoad();
 
     try {
-      await this.loadPromise;
+      await state.loadPromise;
     } finally {
-      this.loading = false;
-      this.loadPromise = null;
+      state.loading = false;
+      state.loadPromise = null;
     }
   }
   
-  async _performLoad() {
+  /**
+   * Ejecuta la carga real de traducciones desde el repositorio
+   */
+  static async _performLoad() {
     try {
-      const loadPromises = LOCALES.map(async (locale) => {
-        try {
-          const translations = LANGUAGE_CONFIG[locale].file;
-        
-          if (!translations || typeof translations !== 'object') {
-            console.warn(`[I18nCore] Warning: Invalid translations for ${locale}`);
-            this.translations.set(locale, {});
-            return;
-          }
-          
-          const flattened = this.flattenObject(translations);
-          this.translations.set(locale, flattened);
+      const flatTranslations = await I18nRepository.getAllFlatTranslations(LOCALES);
 
-          if (import.meta.env.DEV) {
-            console.log(`[I18nCore] Loaded ${Object.keys(flattened).length} translations for ${locale}`);
-          }
-        } catch (error) {
-          console.warn(`[I18nCore] Warning: Could not load translations for ${locale}:`, error.message);
-          this.translations.set(locale, {});
+      Object.entries(flatTranslations).forEach(([locale, translations]) => {
+        if (!translations || typeof translations !== 'object') {
+          console.warn(`[I18nService] Warning: Invalid translations for ${locale}`);
+          state.translations.set(locale, {});
+          return;
+        }
+
+        state.translations.set(locale, translations);
+
+        if (import.meta.env.DEV) {
+          console.log(`[I18nService] Loaded ${Object.keys(translations).length} translations for ${locale}`);
         }
       });
 
-      await Promise.all(loadPromises);
-      this.loaded = true;
+      state.loaded = true;
 
       if (import.meta.env.DEV) {
-        console.log(`[I18nCore] Initialized with ${this.languages.length} languages:`,
-          this.languages.map(l => l.code).join(', '));
+        console.log(`[I18nService] Initialized with ${state.languages.length} languages:`,
+          state.languages.map(l => l.code).join(', '));
       }
 
     } catch (error) {
-      console.error('[I18nCore] Error loading translations:', error);
+      console.error('[I18nService] Error loading translations from backend:', error);
+      
+      LOCALES.forEach(locale => {
+        state.translations.set(locale, {});
+      });
+      
+      state.loaded = true;
+      
       throw error;
     }
   }
 
   /**
-   * Obtiene la URL base actual de forma dinámica
-   * Prioriza Astro.url.origin sobre Astro.site para auto-detección
+   * Recarga las traducciones desde el backend
    */
-  getCurrentOrigin(Astro) {
-    // 1. Usar el origin actual (auto-detecta el dominio)
+  static async reload() {
+    state.loaded = false;
+    state.loading = false;
+    state.loadPromise = null;
+    state.translations.clear();
+    
+    await this.init();
+    
+    if (import.meta.env.DEV) {
+      console.log('[I18nService] Translations reloaded from backend');
+    }
+  }
+
+  // ===============================================
+  // GESTIÓN DE URLs
+  // ===============================================
+
+  /**
+   * Obtiene la URL base actual de forma dinámica
+   */
+  static getCurrentOrigin(Astro) {
     if (Astro?.url?.origin) {
       return Astro.url.origin;
     }
     
-    // 2. Fallback a Astro.site si existe
     if (Astro?.site) {
       return Astro.site.toString().replace(/\/$/, '');
     }
     
-    // 3. Fallback para desarrollo local
     return '';
   }
 
   /**
    * Genera URL relativa para navegación (SIN dominio)
-   * Perfecto para language picker y navegación interna
    */
-  getRelativeUrl(path, locale = DEFAULT_LOCALE) {
-    // 🧹 Normalizar path: remover barras al inicio y final
+  static getRelativeUrl(path, locale = DEFAULT_LOCALE) {
     let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
     
-    // Si es locale por defecto, devolver path simple
     if (locale === DEFAULT_LOCALE) {
       return cleanPath === '' ? '/' : `/${cleanPath}`;
     }
     
-    // Para otros locales, añadir prefijo de idioma
     return cleanPath === '' ? `/${locale}` : `/${locale}/${cleanPath}`;
   }
 
   /**
    * Genera URL completa (CON dominio) para SEO/metadatos
-   * Solo cuando realmente necesites el dominio completo
    */
-  getAbsoluteUrl(path, locale = DEFAULT_LOCALE, Astro) {
+  static getAbsoluteUrl(path, locale = DEFAULT_LOCALE, Astro) {
     const origin = this.getCurrentOrigin(Astro);
     const relativePath = this.getRelativeUrl(path, locale);
     
@@ -200,228 +213,9 @@ export class I18nCore {
   }
 
   /**
-   * Aplana un objeto anidado para facilitar el acceso
-   */
-  flattenObject(obj, prefix = '') {
-    const flattened = {};
-
-    for (const [key, value] of Object.entries(obj)) {
-      const newKey = prefix ? `${prefix}.${key}` : key;
-
-      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        Object.assign(flattened, this.flattenObject(value, newKey));
-      } else {
-        flattened[newKey] = value;
-      }
-    }
-
-    return flattened;
-  }
-
-  // ===============================================
-  // 🔤 GESTIÓN DE TRADUCCIONES
-  // ===============================================
-
-  /**
-   * Obtiene una traducción
-   */
-  getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
-    if (!this.loaded) {
-      if (import.meta.env.DEV) {
-        console.warn('[I18nCore] Translations not loaded yet for key:', key);
-      }
-      return key;
-    }
-
-    const localeTranslations = this.translations.get(locale);
-    if (!localeTranslations) {
-      if (import.meta.env.DEV) {
-        console.warn(`[I18nCore] No translations found for locale: ${locale}`);
-      }
-      return key;
-    }
-
-    let translation = localeTranslations[key];
-
-    // Fallback al idioma por defecto
-    if (!translation && locale !== DEFAULT_LOCALE) {
-      const defaultTranslations = this.translations.get(DEFAULT_LOCALE);
-      translation = defaultTranslations?.[key];
-    }
-
-    // Si aún no hay traducción, usar la clave
-    if (!translation) {
-      if (import.meta.env.DEV) {
-        console.warn(`[I18nCore] Missing translation for key: ${key} (locale: ${locale})`);
-      }
-      return key;
-    }
-
-    // Reemplazar parámetros
-    if (params && Object.keys(params).length > 0) {
-      translation = this.replaceParams(translation, params);
-    }
-
-    return translation;
-  }
-
-  /**
-   * Reemplaza parámetros en una traducción
-   */
-  replaceParams(text, params) {
-    let result = text;
-
-    for (const [key, value] of Object.entries(params)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      result = result.replace(regex, String(value));
-    }
-
-    return result;
-  }
-
-  /**
-   * Obtiene todas las traducciones para un idioma
-   */
-  getAllTranslations(locale) {
-    return this.translations.get(locale) || {};
-  }
-
-  /**
-   * Verifica si existe una traducción
-   */
-  hasTranslation(key, locale) {
-    const translations = this.translations.get(locale);
-    return translations && key in translations;
-  }
-
-  /**
-   * Obtiene estadísticas de traducciones
-   */
-  getStats() {
-    const stats = {};
-
-    for (const locale of LOCALES) {
-      const translations = this.translations.get(locale) || {};
-      stats[locale] = {
-        total: Object.keys(translations).length,
-        missing: []
-      };
-    }
-
-    // Encontrar claves faltantes comparando con el idioma por defecto
-    const defaultKeys = Object.keys(this.translations.get(DEFAULT_LOCALE) || {});
-
-    for (const locale of LOCALES) {
-      if (locale === DEFAULT_LOCALE) continue;
-
-      const localeKeys = Object.keys(this.translations.get(locale) || {});
-      const missing = defaultKeys.filter(key => !localeKeys.includes(key));
-      stats[locale].missing = missing;
-    }
-
-    return stats;
-  }
-
-  /**
-   * Obtiene todas las traducciones para un namespace específico
-   */
-  getNamespaceTranslations(namespace, locale = DEFAULT_LOCALE) {
-    if (!this.loaded) {
-      console.warn('[I18nCore] Translations not loaded.');
-      return {};
-    }
-
-    const allTranslations = this.getAllTranslations(locale);
-    const namespaceTranslations = {};
-
-    const prefix = `${namespace}.`;
-    for (const [key, value] of Object.entries(allTranslations)) {
-      if (key.startsWith(prefix)) {
-        const shortKey = key.substring(prefix.length);
-        namespaceTranslations[shortKey] = value;
-      }
-    }
-
-    return namespaceTranslations;
-  }
-
-  // ===============================================
-  // GESTIÓN DE IDIOMAS
-  // ===============================================
-
-  /**
-   * Obtiene lista de idiomas disponibles
-   */
-  getAvailableLanguages() {
-    return this.languages;
-  }
-
-  /**
-   * Obtiene el idioma por defecto
-   */
-  getDefaultLanguage() {
-    return this.defaultLanguage;
-  }
-
-  /**
-   * Obtiene información de un idioma específico
-   */
-  getLanguage(code) {
-    return this.languages.find(lang => lang.code === code);
-  }
-
-  /**
-   * Obtiene códigos de idiomas disponibles
-   */
-  getLanguageCodes() {
-    return LOCALES;
-  }
-
-  /**
-   * Verifica si un código de idioma es válido
-   */
-  isValidLanguage(code) {
-    return LOCALES.includes(code);
-  }
-
-  /**
-   * Obtiene información completa del idioma
-   */
-  getLocaleInfo(locale) {
-    return LANGUAGE_CONFIG[locale] || LANGUAGE_CONFIG[DEFAULT_LOCALE];
-  }
-
-  /**
-   * MÉTODO LEGACY - Mantener compatibilidad
-   * @deprecated Usar getRelativeUrl() o getAbsoluteUrl() en su lugar
-   */
-  localizeUrl(path, locale = DEFAULT_LOCALE, baseUrl = '') {
-    // Normalizar path: remover barras al inicio y final
-    let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
-    
-    // Normalizar baseUrl: remover barra al final si existe
-    let cleanBaseUrl = baseUrl?.replace(/\/+$/, '') || '';
-    
-    // Si es locale por defecto, devolver path simple
-    if (locale === DEFAULT_LOCALE) {
-      return cleanPath === '' 
-        ? (cleanBaseUrl || '/') 
-        : `${cleanBaseUrl}/${cleanPath}`;
-    }
-    
-    // Para otros locales, añadir prefijo de idioma
-    const localizedPath = cleanPath === '' 
-      ? `/${locale}` 
-      : `/${locale}/${cleanPath}`;
-      
-    return `${cleanBaseUrl}${localizedPath}`;
-  }
-
-  /**
    * Obtiene todas las variantes de URL para diferentes idiomas
-   * ACTUALIZADO: Ahora usa URLs relativas por defecto
    */
-  getAlternateUrls(path, Astro = null, absolute = false) {
+  static getAlternateUrls(path, Astro = null, absolute = false) {
     const urls = {};
 
     LOCALES.forEach(locale => {
@@ -438,7 +232,7 @@ export class I18nCore {
   /**
    * Detecta el idioma de una URL
    */
-  detectLocaleFromPath(pathname) {
+  static detectLocaleFromPath(pathname) {
     const segments = pathname.split('/').filter(Boolean);
 
     if (segments.length === 0) {
@@ -459,13 +253,182 @@ export class I18nCore {
   }
 
   // ===============================================
+  // GESTIÓN DE TRADUCCIONES
+  // ===============================================
+
+  /**
+   * Obtiene una traducción
+   */
+  static getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
+    if (!state.loaded) {
+      if (import.meta.env.DEV) {
+        console.warn('[I18nService] Translations not loaded yet for key:', key);
+      }
+      return key;
+    }
+
+    const localeTranslations = state.translations.get(locale);
+    if (!localeTranslations) {
+      if (import.meta.env.DEV) {
+        console.warn(`[I18nService] No translations found for locale: ${locale}`);
+      }
+      return key;
+    }
+
+    let translation = localeTranslations[key];
+
+    if (!translation && locale !== DEFAULT_LOCALE) {
+      const defaultTranslations = state.translations.get(DEFAULT_LOCALE);
+      translation = defaultTranslations?.[key];
+    }
+
+    if (!translation) {
+      if (import.meta.env.DEV) {
+        console.warn(`[I18nService] Missing translation for key: ${key} (locale: ${locale})`);
+      }
+      return key;
+    }
+
+    if (params && Object.keys(params).length > 0) {
+      translation = this.replaceParams(translation, params);
+    }
+
+    return translation;
+  }
+
+  /**
+   * Reemplaza parámetros en una traducción
+   */
+  static replaceParams(text, params) {
+    let result = text;
+
+    for (const [key, value] of Object.entries(params)) {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      result = result.replace(regex, String(value));
+    }
+
+    return result;
+  }
+
+  /**
+   * Obtiene todas las traducciones para un idioma
+   */
+  static getAllTranslations(locale) {
+    return state.translations.get(locale) || {};
+  }
+
+  /**
+   * Verifica si existe una traducción
+   */
+  static hasTranslation(key, locale) {
+    const translations = state.translations.get(locale);
+    return translations && key in translations;
+  }
+
+  /**
+   * Obtiene todas las traducciones para un namespace específico
+   */
+  static getNamespaceTranslations(namespace, locale = DEFAULT_LOCALE) {
+    if (!state.loaded) {
+      console.warn('[I18nService] Translations not loaded.');
+      return {};
+    }
+
+    const allTranslations = this.getAllTranslations(locale);
+    const namespaceTranslations = {};
+
+    const prefix = `${namespace}.`;
+    for (const [key, value] of Object.entries(allTranslations)) {
+      if (key.startsWith(prefix)) {
+        const shortKey = key.substring(prefix.length);
+        namespaceTranslations[shortKey] = value;
+      }
+    }
+
+    return namespaceTranslations;
+  }
+
+  /**
+   * Obtiene estadísticas de traducciones
+   */
+  static getStats() {
+    const stats = {};
+
+    for (const locale of LOCALES) {
+      const translations = state.translations.get(locale) || {};
+      stats[locale] = {
+        total: Object.keys(translations).length,
+        missing: []
+      };
+    }
+
+    const defaultKeys = Object.keys(state.translations.get(DEFAULT_LOCALE) || {});
+
+    for (const locale of LOCALES) {
+      if (locale === DEFAULT_LOCALE) continue;
+
+      const localeKeys = Object.keys(state.translations.get(locale) || {});
+      const missing = defaultKeys.filter(key => !localeKeys.includes(key));
+      stats[locale].missing = missing;
+    }
+
+    return stats;
+  }
+
+  // ===============================================
+  // GESTIÓN DE IDIOMAS
+  // ===============================================
+
+  /**
+   * Obtiene lista de idiomas disponibles
+   */
+  static getAvailableLanguages() {
+    return state.languages;
+  }
+
+  /**
+   * Obtiene el idioma por defecto
+   */
+  static getDefaultLanguage() {
+    return state.defaultLanguage;
+  }
+
+  /**
+   * Obtiene información de un idioma específico
+   */
+  static getLanguage(code) {
+    return state.languages.find(lang => lang.code === code);
+  }
+
+  /**
+   * Obtiene códigos de idiomas disponibles
+   */
+  static getLanguageCodes() {
+    return LOCALES;
+  }
+
+  /**
+   * Verifica si un código de idioma es válido
+   */
+  static isValidLanguage(code) {
+    return LOCALES.includes(code);
+  }
+
+  /**
+   * Obtiene información completa del idioma
+   */
+  static getLocaleInfo(locale) {
+    return LANGUAGE_CONFIG[locale] || LANGUAGE_CONFIG[DEFAULT_LOCALE];
+  }
+
+  // ===============================================
   // FORMATEO
   // ===============================================
 
   /**
    * Formatea una fecha según el idioma
    */
-  formatDate(date, locale = DEFAULT_LOCALE, options = {}) {
+  static formatDate(date, locale = DEFAULT_LOCALE, options = {}) {
     const defaultOptions = {
       year: 'numeric',
       month: 'long',
@@ -477,7 +440,7 @@ export class I18nCore {
     try {
       return new Intl.DateTimeFormat(locale, formatOptions).format(date);
     } catch (error) {
-      console.warn(`[I18nCore] Error formatting date for locale ${locale}:`, error);
+      console.warn(`[I18nService] Error formatting date for locale ${locale}:`, error);
       return date.toLocaleDateString();
     }
   }
@@ -485,11 +448,11 @@ export class I18nCore {
   /**
    * Formatea un número según el idioma
    */
-  formatNumber(number, locale = DEFAULT_LOCALE, options = {}) {
+  static formatNumber(number, locale = DEFAULT_LOCALE, options = {}) {
     try {
       return new Intl.NumberFormat(locale, options).format(number);
     } catch (error) {
-      console.warn(`[I18nCore] Error formatting number for locale ${locale}:`, error);
+      console.warn(`[I18nService] Error formatting number for locale ${locale}:`, error);
       return number.toString();
     }
   }
@@ -497,7 +460,7 @@ export class I18nCore {
   /**
    * Formatea una moneda según el idioma
    */
-  formatCurrency(amount, currency = 'EUR', locale = DEFAULT_LOCALE) {
+  static formatCurrency(amount, currency = 'EUR', locale = DEFAULT_LOCALE) {
     return this.formatNumber(amount, locale, {
       style: 'currency',
       currency: currency
@@ -505,20 +468,17 @@ export class I18nCore {
   }
 
   // ===============================================
-  // 🔧 HELPERS PARA ASTRO - ACTUALIZADOS
+  // HELPERS PARA ASTRO
   // ===============================================
 
   /**
    * Helper principal para obtener información de i18n en componentes Astro
    */
-  getI18nInfo(Astro) {
-    // Obtener locale desde Astro (nativo)
+  static getI18nInfo(Astro) {
     const locale = Astro.currentLocale || DEFAULT_LOCALE;
 
-    // Extraer cleanPath de la URL actual
     let cleanPath = Astro.url.pathname;
 
-    // Si es una URL con prefijo de idioma, extraer la ruta limpia
     const localeMatch = cleanPath.match(/^\/([a-z]{2,3})(\/.*)?$/);
     if (localeMatch) {
       const [, detectedLocale, restOfPath] = localeMatch;
@@ -540,9 +500,8 @@ export class I18nCore {
 
   /**
    * Helper para generar enlaces localizados con Astro
-   * ACTUALIZADO: Ahora soporta URLs relativas y absolutas
    */
-  localizeUrlWithAstro(path, targetLocale = null, Astro, absolute = false) {
+  static localizeUrlWithAstro(path, targetLocale = null, Astro, absolute = false) {
     const { locale: currentLocale } = this.getI18nInfo(Astro);
     const locale = targetLocale || currentLocale;
 
@@ -557,18 +516,16 @@ export class I18nCore {
 
   /**
    * Helper para obtener URLs alternativas con Astro
-   * ACTUALIZADO: Soporta URLs relativas por defecto
    */
-  getAlternateUrlsWithAstro(Astro, absolute = false) {
+  static getAlternateUrlsWithAstro(Astro, absolute = false) {
     const { cleanPath } = this.getI18nInfo(Astro);
     return this.getAlternateUrls(cleanPath, Astro, absolute);
   }
 
   /**
    * Helper para cambiar idioma manteniendo la misma página
-   * ACTUALIZADO: URLs relativas por defecto
    */
-  switchLanguageUrl(targetLocale, Astro, absolute = false) {
+  static switchLanguageUrl(targetLocale, Astro, absolute = false) {
     const { cleanPath } = this.getI18nInfo(Astro);
     return this.localizeUrlWithAstro(cleanPath, targetLocale, Astro, absolute);
   }
@@ -576,7 +533,7 @@ export class I18nCore {
   /**
    * Helper robusto para obtener traducciones con Astro
    */
-  safeTranslation(key, Astro, fallback, params = {}) {
+  static safeTranslation(key, Astro, fallback, params = {}) {
     try {
       const { locale } = this.getI18nInfo(Astro);
 
@@ -589,7 +546,7 @@ export class I18nCore {
 
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.warn(`[I18nCore] Error getting translation for key: ${key}`, error);
+        console.warn(`[I18nService] Error getting translation for key: ${key}`, error);
       }
       return fallback || key;
     }
@@ -598,7 +555,7 @@ export class I18nCore {
   /**
    * Helper para formatear fechas con Astro
    */
-  formatDateWithAstro(date, Astro, options = {}) {
+  static formatDateWithAstro(date, Astro, options = {}) {
     const { locale } = this.getI18nInfo(Astro);
     return this.formatDate(date, locale, options);
   }
@@ -606,7 +563,7 @@ export class I18nCore {
   /**
    * Helper para formatear números con Astro
    */
-  formatNumberWithAstro(number, Astro, options = {}) {
+  static formatNumberWithAstro(number, Astro, options = {}) {
     const { locale } = this.getI18nInfo(Astro);
     return this.formatNumber(number, locale, options);
   }
@@ -614,7 +571,7 @@ export class I18nCore {
   /**
    * Helper para formatear precios con Astro
    */
-  formatPriceWithAstro(amount, Astro, currency = 'EUR') {
+  static formatPriceWithAstro(amount, Astro, currency = 'EUR') {
     const { locale } = this.getI18nInfo(Astro);
     return this.formatCurrency(amount, currency, locale);
   }
@@ -622,7 +579,7 @@ export class I18nCore {
   /**
    * Helper para obtener dirección del texto con Astro
    */
-  getTextDirectionWithAstro(Astro) {
+  static getTextDirectionWithAstro(Astro) {
     const { locale } = this.getI18nInfo(Astro);
     const localeInfo = this.getLocaleInfo(locale);
     return localeInfo.direction || 'ltr';
@@ -631,9 +588,8 @@ export class I18nCore {
   /**
    * Genera datos para el language picker con Astro
    */
-
-  getLanguagePickerData(currentLocale, currentPath, absolute = false, Astro = null) {
-    return this.languages.map(lang => ({
+  static getLanguagePickerData(currentLocale, currentPath, absolute = false, Astro = null) {
+    return state.languages.map(lang => ({
       code: lang.code,
       name: lang.name,
       nativeName: lang.nativeName,
@@ -649,22 +605,20 @@ export class I18nCore {
 
   /**
    * Helper conveniente para language picker con Astro
-   * ACTUALIZADO: URLs relativas por defecto
    */
-  getLanguagePickerDataWithAstro(Astro, absolute = false) {
+  static getLanguagePickerDataWithAstro(Astro, absolute = false) {
     const { locale, cleanPath } = this.getI18nInfo(Astro);
     return this.getLanguagePickerData(locale, cleanPath, absolute, Astro);
   }
 
   // ===============================================
-  // SEO Y METADATOS - ACTUALIZADOS
+  // SEO Y METADATOS
   // ===============================================
 
-  getSEOMetadata(pageData, Astro) {
+  static getSEOMetadata(pageData, Astro) {
     const { locale, cleanPath } = this.getI18nInfo(Astro);
-    const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true); // URLs absolutas para SEO
+    const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true);
 
-    // Obtener traducciones básicas
     const siteTitle = this.getTranslation('title', locale) || 'El Palleter';
     const siteDescription = this.getTranslation('description', locale) || 'Restaurante El Palleter en Benissa';
 
@@ -672,7 +626,6 @@ export class I18nCore {
     const description = pageData.description || siteDescription;
     const canonical = this.getAbsoluteUrl(cleanPath, locale, Astro);
 
-    // Generar datos estructurados
     const structuredData = this.generateStructuredData({
       type: 'WebPage',
       name: title,
@@ -705,9 +658,8 @@ export class I18nCore {
   /**
    * Helper para generar JSON-LD estructurado multiidioma
    */
-  generateStructuredData(data, Astro) {
+  static generateStructuredData(data, Astro) {
     const { locale } = this.getI18nInfo(Astro);
-    const baseUrl = this.getCurrentOrigin(Astro);
 
     const structuredData = {
       "@context": "https://schema.org",
@@ -727,7 +679,6 @@ export class I18nCore {
       }
     };
 
-    // Añadir URLs alternativas
     if (data.includeAlternates !== false) {
       const alternateUrls = this.getAlternateUrlsWithAstro(Astro, true);
       structuredData.alternateName = Object.entries(alternateUrls)
@@ -749,7 +700,7 @@ export class I18nCore {
   /**
    * Helper para detectar si una URL corresponde al idioma actual
    */
-  isCurrentLanguageUrl(url, Astro) {
+  static isCurrentLanguageUrl(url, Astro) {
     const { locale } = this.getI18nInfo(Astro);
 
     if (locale === DEFAULT_LOCALE) {
@@ -762,14 +713,12 @@ export class I18nCore {
   /**
    * Helper para detectar redirecciones automáticas de idioma
    */
-  handleLanguageRedirect(Astro) {
+  static handleLanguageRedirect(Astro) {
     const { url } = Astro;
     const pathname = url.pathname;
 
-    // Solo aplicar en la página raíz
     if (pathname !== '/') return null;
 
-    // Obtener idioma preferido del navegador
     const acceptLanguage = Astro.request.headers.get('accept-language');
     if (!acceptLanguage) return null;
 
@@ -780,7 +729,6 @@ export class I18nCore {
 
     const availableLocales = this.getLanguageCodes();
 
-    // Encontrar primer idioma soportado
     const preferredLocale = browserLangs.find(lang =>
       availableLocales.includes(lang) && lang !== DEFAULT_LOCALE
     );
@@ -796,21 +744,21 @@ export class I18nCore {
   /**
    * Renderiza una bandera
    */
-  renderFlag(flagConfig, className = '', size = '1rem') {
+  static renderFlag(flagConfig, className = '', size = '1rem') {
     return FlagRenderer.renderFlag(flagConfig, className, size);
   }
 
   /**
-   * 🔍 Helper para detectar si estamos en modo desarrollo
+   * Helper para detectar si estamos en modo desarrollo
    */
-  isDev() {
+  static isDev() {
     return import.meta.env.DEV;
   }
 
   /**
    * Helper para logging con información de idioma
    */
-  logWithLocale(message, Astro, level = 'log') {
+  static logWithLocale(message, Astro, level = 'log') {
     if (this.isDev()) {
       const { locale } = this.getI18nInfo(Astro);
       console[level](`[${locale}] ${message}`);
@@ -818,86 +766,43 @@ export class I18nCore {
   }
 }
 
-// ===============================================
-// INSTANCIA SINGLETON Y EXPORTS
-// ===============================================
-
-/**
- * Instancia singleton - LA ÚNICA QUE NECESITAS
- */
-export const i18nCore = new I18nCore();
-
-// 🚀 Auto-inicialización para entornos que no usan top-level await
-if (typeof window === 'undefined') { // Solo en el servidor
-  i18nCore.init().catch(console.error);
+// Auto-inicialización en servidor
+if (typeof window === 'undefined') {
+  I18nService.init().catch(console.error);
 }
 
 // ===============================================
-// FUNCIONES DE CONVENIENCIA (WRAPPERS)
+// FUNCIONES DE CONVENIENCIA
 // ===============================================
 
 /**
  * Función helper para obtener traducciones
  */
 export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
-  if (!i18nCore.loaded) {
-    await i18nCore.init();
+  if (!state.loaded) {
+    await I18nService.init();
   }
 
-  return i18nCore.getTranslation(key, locale, params);
+  return I18nService.getTranslation(key, locale, params);
 }
 
 /**
  * Función helper para obtener datos del language picker con Astro
  */
 export async function getLanguagePickerData(Astro, absolute = false) {
-  if (!i18nCore.loaded) {
-    await i18nCore.init();
+  if (!state.loaded) {
+    await I18nService.init();
   }
 
-  return i18nCore.getLanguagePickerDataWithAstro(Astro, absolute);
+  return I18nService.getLanguagePickerDataWithAstro(Astro, absolute);
 }
 
 /**
  * Hook para precargar traducciones en el servidor
  */
 export async function preloadTranslations() {
-  await i18nCore.init();
-  return i18nCore;
+  await I18nService.init();
+  return I18nService;
 }
 
-// ===============================================
-// CLASE HELPER PARA ERRORES
-// ===============================================
-
-/**
- * Clase helper para manejo de errores de i18n
- */
-export class I18nError extends Error {
-  constructor(message, locale, key) {
-    super(message);
-    this.name = 'I18nError';
-    this.locale = locale;
-    this.key = key;
-  }
-}
-
-// ===============================================
-// COMPATIBILIDAD CON CÓDIGO EXISTENTE
-// ===============================================
-
-/**
- * Aliases para compatibilidad con código existente
- * @deprecated Usar i18nCore directamente
- */
-export class I18nConfig {
-  static getInstance() {
-    return i18nCore;
-  }
-}
-
-export const i18nConfig = i18nCore;
-export const translationManager = i18nCore;
-export const languageManager = i18nCore;
-
-export default i18nCore;
+export default I18nService;

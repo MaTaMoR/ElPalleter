@@ -2,18 +2,19 @@
 export const prerender = true;
 
 import Text from '../i18n/Text.astro';
-import { i18nCore } from '../../i18n/core.js';
+import { I18nService } from '../../services/I18Service.js'
 import ContactService from '../../services/ContactService.js';
 
 // Obtener información de i18n
-const { locale } = i18nCore.getI18nInfo(Astro);
+const { locale } = I18nService.getI18nInfo(Astro);
 
 const {
     statusInfo,
     socials,
     groupedSchedule,
     contactInfo
-} = await ContactService.getContactDataWithTranslations(i18nCore, locale);
+} = await ContactService.getContactDataWithTranslations(I18nService, locale);
+console.log('test');
 ---
 
 <section class="contact-section container" id="contacto">
@@ -37,7 +38,7 @@ const {
                 >
                     <div class="status-dot"></div>
                     <span id="statusText" class="status-message">
-                        {statusInfo.fullMessage || "No Disponible"}
+                        <strong>{statusInfo.fullMessage || "No Disponible"}</strong>
                     </span>
                 </div>
             </div>
@@ -753,36 +754,6 @@ const {
                 disableTransitionsDuringResize(elementsToAdjust);
             },
         });
-
-        function formatStatusMessage() {
-            const statusTextElement = document.getElementById("statusText");
-            if (!statusTextElement) return;
-
-            const message = statusTextElement.textContent.trim();
-
-            if (message.includes(":")) {
-                const [statusPart, ...messageParts] = message.split(":");
-                const messageRest = messageParts.join(":").trim();
-
-                // Crear HTML con el estado en bold
-                statusTextElement.innerHTML = `<strong>${statusPart.trim()}</strong>: ${messageRest}`;
-            }
-        }
-
-        formatStatusMessage();
-
-        const statusTextElement = document.getElementById("statusText");
-        if (statusTextElement) {
-            const observer = new MutationObserver(() => {
-                setTimeout(formatStatusMessage, 10);
-            });
-
-            observer.observe(statusTextElement, {
-                childList: true,
-                characterData: true,
-                subtree: true,
-            });
-        }
 
         window.addEventListener("beforeunload", () => {
             breakpoints.unsubscribe();

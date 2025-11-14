@@ -1,18 +1,18 @@
-.page-content {
+.pageContent {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
   padding: 4rem 1rem;
 }
 
-.page-content h2 {
+.pageContent h2 {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1rem;
   color: var(--text-primary);
 }
 
-.page-content p {
+.pageContent p {
   color: var(--text-secondary);
   font-size: 1.1rem;
 }

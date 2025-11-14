@@ -16,7 +16,11 @@ const {
 } = Astro.props;
 
 import '../styles/design-system.css'; 
-import '../utils/breakpoints.js'; 
+import '../utils/breakpoints.js';
+import I18nService from '../services/I18Service';
+import AnalyticsTracker from '../components/analytics/AnalyticsTracker.astro';
+
+I18nService.init();
 ---
 
 <!DOCTYPE html>
@@ -46,6 +50,9 @@ import '../utils/breakpoints.js';
     
     <body>
         <slot />
+        
+        <!-- Analytics Tracker al final del body -->
+        <AnalyticsTracker />
     </body>
 
     <script>

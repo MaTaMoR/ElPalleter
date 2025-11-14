@@ -11,13 +11,13 @@
   z-index: var(--z-topbar);
 }
 
-.topbar-left {
+.topbarLeft {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.menu-button {
+.menuButton {
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -27,27 +27,27 @@
   transition: var(--transition);
 }
 
-.menu-button:hover {
+.menuButton:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
 }
 
-.page-title {
+.pageTitle {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.topbar-right {
+.topbarRight {
   display: flex;
   align-items: center;
 }
 
-.user-menu-container {
+.userMenuContainer {
   position: relative;
 }
 
-.user-menu-button {
+.userMenuButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -60,12 +60,12 @@
   transition: var(--transition);
 }
 
-.user-menu-button:hover {
+.userMenuButton:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
 }
 
-.user-avatar-small {
+.userAvatarSmall {
   width: 32px;
   height: 32px;
   background: var(--primary);
@@ -78,12 +78,12 @@
   font-size: 0.875rem;
 }
 
-.user-name-topbar {
+.userNameTopbar {
   font-weight: 500;
   white-space: nowrap;
 }
 
-.user-dropdown {
+.userDropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -96,7 +96,7 @@
   z-index: var(--z-dropdown);
 }
 
-.user-dropdown button {
+.userDropdown button {
   width: 100%;
   display: flex;
   align-items: center;
@@ -110,15 +110,15 @@
   transition: var(--transition);
 }
 
-.user-dropdown button:first-child {
+.userDropdown button:first-child {
   border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
-.user-dropdown button:last-child {
+.userDropdown button:last-child {
   border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
-.user-dropdown button:hover {
+.userDropdown button:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
 }

@@ -1,23 +1,23 @@
 /* Dashboard Principal */
-.dashboard-new {
+.dashboardNew {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 1.25rem;
 }
 
-.dashboard-header {
+.dashboardHeader {
   text-align: center;
   margin-bottom: 2.5rem;
 }
 
-.dashboard-title {
+.dashboardTitle {
   font-size: 2.5rem;
   color: var(--text-primary);
   margin-bottom: 0.625rem;
   font-weight: 700;
 }
 
-.dashboard-subtitle {
+.dashboardSubtitle {
   color: var(--text-secondary);
   font-size: 1.1rem;
 }
@@ -32,7 +32,7 @@
   border: 1px solid var(--border-color);
 }
 
-.section-header {
+.sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,21 +41,21 @@
   border-bottom: 2px solid var(--border-color);
 }
 
-.section-title {
+.sectionTitle {
   font-size: 1.4rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 /* Section actions */
-.section-actions {
+.sectionActions {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
 /* Status Badges */
-.status-badge {
+.statusBadge {
   background: rgba(16, 185, 129, 0.1);
   color: var(--success);
   padding: 0.5rem 1rem;
@@ -65,23 +65,23 @@
   transition: var(--transition);
 }
 
-.status-badge.warning {
+.statusBadge.warning {
   background: rgba(245, 158, 11, 0.1);
   color: var(--warning);
 }
 
-.status-badge.info {
+.statusBadge.info {
   background: rgba(59, 130, 246, 0.1);
   color: var(--info);
 }
 
-.status-badge.updating {
+.statusBadge.updating {
   background: rgba(59, 130, 246, 0.15);
   color: var(--info);
   position: relative;
 }
 
-.status-badge.updating::before {
+.statusBadge.updating::before {
   content: '';
   position: absolute;
   top: 0;
@@ -91,10 +91,10 @@
   border-radius: 1.5625rem;
   background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
   background-size: 200% 100%;
-  animation: badge-shimmer 2s infinite;
+  animation: badgeShimmer 2s infinite;
 }
 
-@keyframes badge-shimmer {
+@keyframes badgeShimmer {
   0% {
     background-position: -200% 0;
   }
@@ -104,13 +104,13 @@
 }
 
 /* Gestión Rápida - Tiles centrados */
-.management-grid {
+.managementGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5625rem;
 }
 
-.management-tile {
+.managementTile {
   color: white;
   padding: 1.5625rem 1.25rem;
   border-radius: var(--border-radius);
@@ -127,7 +127,7 @@
   border: 1px solid var(--border-color);
 }
 
-.management-tile::before {
+.managementTile::before {
   content: '';
   position: absolute;
   top: 0;
@@ -138,73 +138,73 @@
   transition: left 0.6s ease;
 }
 
-.management-tile:hover::before {
+.managementTile:hover::before {
   left: 100%;
 }
 
-.management-tile:hover {
+.managementTile:hover {
   transform: translateY(-8px) scale(1.02);
 }
 
 /* Gradientes específicos para cada tile */
-.management-tile.carta {
+.managementTile.carta {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
 }
 
-.management-tile.carta:hover {
+.managementTile.carta:hover {
   box-shadow: 0 15px 30px rgba(217, 119, 6, 0.3);
 }
 
-.management-tile.contacto {
+.managementTile.contacto {
   background: linear-gradient(135deg, var(--info) 0%, #1e40af 100%);
 }
 
-.management-tile.contacto:hover {
+.managementTile.contacto:hover {
   box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
 }
 
-.management-tile.historia {
+.managementTile.historia {
   background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
 }
 
-.management-tile.historia:hover {
+.managementTile.historia:hover {
   box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
 }
 
-.management-tile.configuracion {
+.managementTile.configuracion {
   background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
 }
 
-.management-tile.configuracion:hover {
+.managementTile.configuracion:hover {
   box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
 }
 
-.management-tile.usuarios {
+.managementTile.usuarios {
   background: linear-gradient(135deg, var(--warning) 0%, var(--primary) 100%);
 }
 
-.management-tile.usuarios:hover {
+.managementTile.usuarios:hover {
   box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3);
 }
 
 /* Elementos del tile */
-.tile-icon {
+.tileIcon {
   margin-bottom: 0.75rem;
 }
 
-.tile-title {
+.tileTitle {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 0.375rem;
 }
 
-.tile-info {
+.tileInfo {
   font-size: 0.85rem;
   opacity: 0.9;
   margin-bottom: 0.75rem;
 }
 
-.tile-action {
+.tileAction {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   padding: 0.375rem 1rem;
@@ -215,19 +215,19 @@
   transition: var(--transition);
 }
 
-.management-tile:hover .tile-action {
+.managementTile:hover .tileAction {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
 /* Marketing Digital */
-.social-grid {
+.socialGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
-.social-card {
+.socialCard {
   background: var(--bg-card);
   padding: 1.5625rem;
   border-radius: var(--border-radius);
@@ -237,58 +237,58 @@
   transition: var(--transition);
 }
 
-.social-card:hover {
+.socialCard:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
 
-.social-card.google {
+.socialCard.google {
   border-left-color: #4285f4;
 }
 
-.social-card.instagram {
+.socialCard.instagram {
   border-left-color: #E4405F;
 }
 
-.social-card.facebook {
+.socialCard.facebook {
   border-left-color: #1877f2;
 }
 
-.social-header {
+.socialHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.9375rem;
 }
 
-.social-platform {
+.socialPlatform {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 1.1rem;
 }
 
-.social-stats {
+.socialStats {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.social-main-stat {
+.socialMainStat {
   font-size: 1.6rem;
   font-weight: bold;
   color: var(--text-primary);
 }
 
-.social-label {
+.socialLabel {
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
-.social-change {
+.socialChange {
   text-align: right;
 }
 
-.change-positive {
+.changePositive {
   color: var(--success);
   font-weight: 600;
 }
@@ -321,32 +321,32 @@
   }
 }
 
-.section.refreshing .metrics-grid {
+.section.refreshing .metricsGrid {
   opacity: 0.8;
   transition: opacity 0.3s ease;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .dashboard-new {
+  .dashboardNew {
     padding: 1.25rem 0.9375rem;
   }
   
-  .dashboard-title {
+  .dashboardTitle {
     font-size: 2rem;
   }
   
-  .management-grid {
+  .managementGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
   }
   
-  .management-tile {
+  .managementTile {
     padding: 1.25rem 0.9375rem;
     min-height: 130px;
   }
   
-  .social-grid {
+  .socialGrid {
     grid-template-columns: 1fr;
   }
   
@@ -356,17 +356,17 @@
 }
 
 @media (max-width: 480px) {
-  .management-grid {
+  .managementGrid {
     grid-template-columns: 1fr;
   }
   
-  .social-stats {
+  .socialStats {
     flex-direction: column;
     text-align: center;
     gap: 0.5rem;
   }
   
-  .social-change {
+  .socialChange {
     text-align: center;
   }
 }

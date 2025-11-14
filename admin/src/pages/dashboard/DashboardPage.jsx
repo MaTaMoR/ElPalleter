@@ -10,14 +10,12 @@ import {
   Instagram,
   Facebook
 } from 'lucide-react';
-
 import WebMetricsSection from '../../components/dashboard/WebMetricsSection';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
-import './DashboardPage.css';
+import styles from './DashboardPage.module.css';
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  // Ahora el hook devuelve también 'previousData' para comparaciones
   const { data: analyticsData, previousData, loading, refreshing, error, refresh, lastUpdated } = useAnalyticsData();
 
   const managementSections = [
@@ -99,59 +97,59 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="dashboard-new">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard</h1>
+    <div className={styles.dashboardNew}>
+      <div className={styles.dashboardHeader}>
+        <h1 className={styles.dashboardTitle}>Dashboard</h1>
       </div>
 
-      <div className="section">
-        <div className="section-header">
-          <h2 className="section-title">Gestión Rápida</h2>
-          <span className="status-badge">Navegación rápida</span>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Gestión Rápida</h2>
+          <span className={styles.statusBadge}>Navegación rápida</span>
         </div>
         
-        <div className="management-grid">
+        <div className={styles.managementGrid}>
           {managementSections.map((section) => {
             const IconComponent = section.icon;
             return (
               <div 
                 key={section.id}
-                className={`management-tile ${section.className}`}
+                className={`${styles.managementTile} ${styles[section.className]}`}
                 onClick={() => handleManagementClick(section.id)}
               >
-                <IconComponent className="tile-icon" size={45} />
-                <h3 className="tile-title">{section.title}</h3>
-                <p className="tile-info">{section.info}</p>
-                <div className="tile-action">{section.action}</div>
+                <IconComponent className={styles.tileIcon} size={45} />
+                <h3 className={styles.tileTitle}>{section.title}</h3>
+                <p className={styles.tileInfo}>{section.info}</p>
+                <div className={styles.tileAction}>{section.action}</div>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="section">
-        <div className="section-header">
-          <h2 className="section-title">Marketing Digital</h2>
-          <span className="status-badge info">Rendimiento excelente</span>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Marketing Digital</h2>
+          <span className={`${styles.statusBadge} ${styles.info}`}>Rendimiento excelente</span>
         </div>
         
-        <div className="social-grid">
+        <div className={styles.socialGrid}>
           {socialStats.map((social, index) => {
             const IconComponent = social.icon;
             return (
-              <div key={index} className={`social-card ${social.className}`}>
-                <div className="social-header">
-                  <span className="social-platform">{social.platform}</span>
-                  <IconComponent className="social-icon" size={24} />
+              <div key={index} className={`${styles.socialCard} ${styles[social.className]}`}>
+                <div className={styles.socialHeader}>
+                  <span className={styles.socialPlatform}>{social.platform}</span>
+                  <IconComponent className={styles.socialIcon} size={24} />
                 </div>
-                <div className="social-stats">
+                <div className={styles.socialStats}>
                   <div>
-                    <div className="social-main-stat">{social.mainStat}</div>
-                    <div className="social-label">{social.label}</div>
+                    <div className={styles.socialMainStat}>{social.mainStat}</div>
+                    <div className={styles.socialLabel}>{social.label}</div>
                   </div>
-                  <div className="social-change">
-                    <div className="change-positive">{social.change}</div>
-                    <div className="social-label">{social.changeLabel}</div>
+                  <div className={styles.socialChange}>
+                    <div className={styles.changePositive}>{social.change}</div>
+                    <div className={styles.socialLabel}>{social.changeLabel}</div>
                   </div>
                 </div>
               </div>
@@ -160,7 +158,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Métricas Web Section - Ahora incluye DeviceStats */}
+      {/* Métricas Web Section */}
       <WebMetricsSection 
         analyticsData={analyticsData}
         previousData={previousData}

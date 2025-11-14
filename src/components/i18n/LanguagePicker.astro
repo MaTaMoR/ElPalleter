@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { i18nCore } from '../../i18n/core.js';
+import { I18nService } from '../../services/I18Service.js';
 import ThemeToggle from '../theme/ThemeToggle.astro';
 import Text from '../i18n/Text.astro'; // Importar el componente Text
 
@@ -18,7 +18,7 @@ const {
 } = Astro.props;
 
 // Obtener datos de idiomas desde el sistema centralizado
-const languages = await i18nCore.getLanguagePickerDataWithAstro(Astro);
+const languages = await I18nService.getLanguagePickerDataWithAstro(Astro);
 
 // Encontrar idioma actual y otros idiomas
 const currentLanguage = languages.find(lang => lang.isActive) || languages[0];

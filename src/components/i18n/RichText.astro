@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import richContent from '../../data/rich-content.json';
-import { i18nCore } from '../../i18n/core';
+import { I18nService } from '../../services/I18Service.js';
 
 export interface Props {
   key: string;
@@ -26,7 +26,7 @@ const {
   ...restProps 
 } = Astro.props;
 
-const { locale } = i18nCore.getI18nInfo(Astro);
+const { locale } = I18nService.getI18nInfo(Astro);
 
 function getRichContent(contentKey: string, lang: string): string {
   const content = richContent[contentKey as keyof typeof richContent];

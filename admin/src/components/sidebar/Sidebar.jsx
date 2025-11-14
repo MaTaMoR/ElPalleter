@@ -9,8 +9,7 @@ import {
   Settings, 
   LogOut
 } from 'lucide-react';
-
-import './Sidebar.css';
+import styles from './Sidebar.module.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -18,7 +17,6 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 
-  // Detectar cambios de tamaño de ventana
   useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth > 768);
@@ -42,7 +40,6 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    // Solo cerrar sidebar en móvil
     if (!isDesktop) {
       onClose();
     }
@@ -50,20 +47,18 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Overlay solo en móvil y cuando el sidebar está abierto */}
       {!isDesktop && isOpen && (
         <div 
-          className="sidebar-overlay"
+          className={styles.sidebarOverlay}
           onClick={onClose}
         />
       )}
       
-      <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
-        <div className="sidebar-header">
+      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+        <div className={styles.sidebarHeader}>
           <h2>El Palleter</h2>
-          {/* Botón de cerrar solo visible en móvil */}
           <button 
-            className="sidebar-close"
+            className={styles.sidebarClose}
             onClick={onClose}
             style={{ display: isDesktop ? 'none' : 'block' }}
           >
@@ -71,7 +66,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className={styles.sidebarNav}>
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -79,7 +74,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             return (
               <button
                 key={item.path}
-                className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
+                className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                 onClick={() => handleNavigation(item.path)}
               >
                 <Icon size={20} />
@@ -89,18 +84,18 @@ const Sidebar = ({ isOpen, onClose }) => {
           })}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <div className="user-avatar">
+        <div className={styles.sidebarFooter}>
+          <div className={styles.userInfo}>
+            <div className={styles.userAvatar}>
               {user?.name?.charAt(0).toUpperCase()}
             </div>
-            <div className="user-details">
-              <span className="user-name">{user?.name}</span>
-              <span className="user-role">Administrador</span>
+            <div className={styles.userDetails}>
+              <span className={styles.userName}>{user?.name}</span>
+              <span className={styles.userRole}>Administrador</span>
             </div>
           </div>
           <button 
-            className="logout-button"
+            className={styles.logoutButton}
             onClick={handleLogout}
           >
             <LogOut size={20} />

@@ -7,8 +7,7 @@ import {
   LogOut, 
   ChevronDown,
 } from 'lucide-react';
-
-import './TopBar.css';
+import styles from './TopBar.module.css';
 
 const TopBar = ({ onMenuClick, title }) => {
   const { user } = useAuth();
@@ -22,32 +21,32 @@ const TopBar = ({ onMenuClick, title }) => {
   };
 
   return (
-    <header className="topbar">
-      <div className="topbar-left">
+    <header className={styles.topbar}>
+      <div className={styles.topbarLeft}>
         <button 
-          className="menu-button"
+          className={styles.menuButton}
           onClick={onMenuClick}
         >
           <Menu size={24} />
         </button>
-        <h1 className="page-title">{title}</h1>
+        <h1 className={styles.pageTitle}>{title}</h1>
       </div>
 
-      <div className="topbar-right">
-        <div className="user-menu-container">
+      <div className={styles.topbarRight}>
+        <div className={styles.userMenuContainer}>
           <button 
-            className="user-menu-button"
+            className={styles.userMenuButton}
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
-            <div className="user-avatar-small">
+            <div className={styles.userAvatarSmall}>
               {user?.name?.charAt(0).toUpperCase()}
             </div>
-            <span className="user-name-topbar">{user?.name}</span>
+            <span className={styles.userNameTopbar}>{user?.name}</span>
             <ChevronDown size={16} />
           </button>
 
           {showUserMenu && (
-            <div className="user-dropdown">
+            <div className={styles.userDropdown}>
               <button onClick={() => navigate('/admin/settings')}>
                 <Settings size={16} />
                 Configuración

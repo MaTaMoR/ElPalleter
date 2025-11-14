@@ -3,7 +3,7 @@ export const prerender = true;
 
 import Text from '../../components/i18n/Text.astro';
 import CartaService from '../../services/CartaService.js';
-import { i18nCore } from '../../i18n/core.js';
+import { I18nService } from '../../services/I18Service.js';
 
 const categories = await CartaService.getCategories();
 ---
@@ -53,7 +53,7 @@ const categories = await CartaService.getCategories();
                                         )}
                                     </div>
                                     <div class="item-price">
-                                        {i18nCore.formatCurrency(item.price)}
+                                        {I18nService.formatCurrency(item.price)}
                                     </div>
                                 </div>
                             ))}

@@ -1,0 +1,282 @@
+---
+// src/components/AnalyticsTracker.astro
+// Componente para inicializar el tracking de analytics con detección precisa de dispositivo
+// Incluye tracking automático de secciones para páginas de scroll único
+---
+
+<script>
+  import analyticsService from '../../services/AnalyticsService.js';
+  import { breakpointManager } from '../../utils/breakpoints.js';
+
+  /**
+   * Detecta el tipo de DISPOSITIVO REAL (hardware) independiente del tamaño de ventana
+   * Combina User Agent, touch capability y screen size para mayor precisión
+   * @returns {string} 'MOBILE' | 'TABLET' | 'DESKTOP' | 'UNKNOWN'
+   */
+  function detectActualDevice() {
+    const ua = navigator.userAgent.toLowerCase();
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const maxScreenDimension = Math.max(screenWidth, screenHeight);
+    const minScreenDimension = Math.min(screenWidth, screenHeight);
+    
+    // Patrones específicos de móviles
+    const mobilePatterns = [
+      /android.*mobile/i,
+      /iphone/i,
+      /ipod/i,
+      /blackberry/i,
+      /windows phone/i,
+      /opera mini/i,
+      /iemobile/i,
+      /mobile safari/i
+    ];
+    
+    // Patrones específicos de tablets
+    const tabletPatterns = [
+      /ipad/i,
+      /android(?!.*mobile)/i,
+      /tablet/i,
+      /kindle/i,
+      /silk/i,
+      /playbook/i
+    ];
+    
+    const isMobileUA = mobilePatterns.some(pattern => pattern.test(ua));
+    const isTabletUA = tabletPatterns.some(pattern => pattern.test(ua));
+    
+    if (isMobileUA) {
+      return 'MOBILE';
+    }
+    
+    if (isTabletUA) {
+      return 'TABLET';
+    }
+    
+    if (hasTouch) {
+      if (maxScreenDimension <= 768 || minScreenDimension <= 480) {
+        return 'MOBILE';
+      }
+      
+      if (maxScreenDimension <= 1366 && minScreenDimension >= 600) {
+        return 'TABLET';
+      }
+      
+      return 'DESKTOP';
+    }
+    
+    if (maxScreenDimension >= 1024) {
+      return 'DESKTOP';
+    }
+    
+    return 'DESKTOP';
+  }
+
+  /**
+   * Obtiene el breakpoint actual del viewport (tamaño de ventana)
+   */
+  function getCurrentViewport() {
+    if (!breakpointManager.isInitialized) {
+      breakpointManager.init();
+    }
+    return breakpointManager.getCurrentBreakpoint();
+  }
+
+  /**
+   * Obtiene información completa del dispositivo y viewport
+   */
+  function getDeviceInfo() {
+    const actualDevice = detectActualDevice();
+    const currentViewport = getCurrentViewport();
+    
+    return {
+      deviceType: actualDevice,
+      viewport: currentViewport,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+      hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+      touchPoints: navigator.maxTouchPoints || 0,
+      pixelRatio: window.devicePixelRatio || 1,
+      orientation: window.screen.orientation?.type || 
+                   (window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'),
+      platform: navigator.platform,
+      vendor: navigator.vendor,
+      userAgent: navigator.userAgent,
+      isWindowResized: window.innerWidth < window.screen.width * 0.9
+    };
+  }
+
+  /**
+   * Configura el tracking automático de secciones visibles
+   */
+  function setupSectionTracking() {
+    // Buscar todas las secciones principales con ID
+    const mainSections = [
+      'hero',
+      'historia', 
+      'carta',
+      'contacto'
+    ];
+    
+    const sections = mainSections
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+    
+    if (sections.length === 0) return;
+
+    // Usar IntersectionObserver para detectar visibilidad
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            const sectionId = entry.target.id;
+            
+            // Track la visualización de la sección
+            analyticsService.trackSectionView(sectionId);
+            
+            console.log('Section viewed:', sectionId);
+          }
+        });
+      },
+      {
+        threshold: [0.3, 0.5, 0.7], // Diferentes niveles de visibilidad
+        rootMargin: '-10% 0px -10% 0px' // Margin para activar antes/después
+      }
+    );
+
+    // Observar cada sección
+    sections.forEach(section => observer.observe(section));
+    
+    return observer;
+  }
+
+  /**
+   * Configura el tracking de navegación (clicks en links)
+   */
+  function setupNavigationTracking() {
+    // Trackear clicks en navegación
+    const navLinks = document.querySelectorAll('[data-scroll-to], [href^="#"]');
+    
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const target = link.getAttribute('data-scroll-to') || 
+                      link.getAttribute('href')?.replace('#', '');
+        
+        if (target) {
+          analyticsService.trackEvent('NAVIGATION_CLICK', target, {
+            linkText: link.textContent?.trim(),
+            fromSection: getCurrentSection()
+          });
+          
+          console.log('Navigation click:', target);
+        }
+      });
+    });
+  }
+
+  /**
+   * Obtiene la sección actual visible
+   */
+  function getCurrentSection() {
+    const sections = ['hero', 'historia', 'carta', 'contacto'];
+    
+    for (const sectionId of sections) {
+      const section = document.getElementById(sectionId);
+      if (!section) continue;
+      
+      const rect = section.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Si la sección está en el centro del viewport
+      if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
+        return sectionId;
+      }
+    }
+    
+    return 'unknown';
+  }
+
+  /**
+   * Inicializa el tracking cuando el DOM esté listo
+   */
+  function initAnalytics() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startTracking);
+    } else {
+      startTracking();
+    }
+  }
+
+  /**
+   * Inicia el tracking y registra la información del dispositivo
+   */
+  function startTracking() {
+    try {
+      const deviceInfo = getDeviceInfo();
+      
+      // Inicializar el breakpoint manager
+      if (!breakpointManager.isInitialized) {
+        breakpointManager.init();
+      }
+      
+      // Track device detection
+      analyticsService.trackEvent('DEVICE_DETECTED', null, {
+        deviceType: deviceInfo.deviceType,
+        viewport: deviceInfo.viewport,
+        screenWidth: deviceInfo.screenWidth,
+        screenHeight: deviceInfo.screenHeight,
+        windowWidth: deviceInfo.windowWidth,
+        windowHeight: deviceInfo.windowHeight,
+        hasTouch: deviceInfo.hasTouch,
+        touchPoints: deviceInfo.touchPoints,
+        pixelRatio: deviceInfo.pixelRatio,
+        orientation: deviceInfo.orientation,
+        isWindowResized: deviceInfo.isWindowResized,
+        timestamp: new Date().toISOString()
+      });
+
+      console.log('Analytics initialized', {
+        device: deviceInfo.deviceType,
+        viewport: deviceInfo.viewport,
+        resized: deviceInfo.isWindowResized
+      });
+      
+      // Configurar tracking de secciones y navegación
+      // Esperar un poco para que todo el DOM esté listo
+      setTimeout(() => {
+        setupSectionTracking();
+        setupNavigationTracking();
+        console.log('Section and navigation tracking configured');
+      }, 500);
+      
+      // Track cambios de orientación
+      trackOrientationChanges(deviceInfo.deviceType);
+      
+    } catch (error) {
+      console.error('Error initializing analytics:', error);
+    }
+  }
+
+  /**
+   * Trackea cambios de orientación del dispositivo
+   */
+  function trackOrientationChanges(deviceType) {
+    if (!window.screen.orientation) return;
+    
+    window.screen.orientation.addEventListener('change', () => {
+      analyticsService.trackEvent('ORIENTATION_CHANGE', null, {
+        deviceType: deviceType,
+        orientation: window.screen.orientation.type,
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    });
+  }
+
+  // Iniciar analytics
+  initAnalytics();
+</script>

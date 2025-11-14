@@ -4,9 +4,52 @@ import { AnalyticsRepository } from '../repositories/AnalyticsRepository.js';
 import { AuthService } from './AuthService.js';
 
 /**
+ * Detecta el tipo de dispositivo real basándose en múltiples factores
+ * @returns {string} 'MOBILE' | 'TABLET' | 'DESKTOP' | 'UNKNOWN'
+ */
+function detectDeviceType() {
+    if (typeof window === 'undefined') return 'UNKNOWN';
+    
+    const ua = navigator.userAgent.toLowerCase();
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const maxScreenDimension = Math.max(screenWidth, screenHeight);
+    const minScreenDimension = Math.min(screenWidth, screenHeight);
+    
+    // Patrones de móviles
+    const mobilePatterns = [
+        /android.*mobile/i, /iphone/i, /ipod/i, /blackberry/i,
+        /windows phone/i, /opera mini/i, /iemobile/i
+    ];
+    
+    // Patrones de tablets
+    const tabletPatterns = [
+        /ipad/i, /android(?!.*mobile)/i, /tablet/i, /kindle/i, /silk/i
+    ];
+    
+    // Detectar por UA primero
+    if (mobilePatterns.some(pattern => pattern.test(ua))) {
+        return 'MOBILE';
+    }
+    
+    if (tabletPatterns.some(pattern => pattern.test(ua))) {
+        return 'TABLET';
+    }
+    
+    // Si tiene touch, usar tamaño de pantalla física
+    if (hasTouch) {
+        if (maxScreenDimension <= 768) return 'MOBILE';
+        if (maxScreenDimension <= 1366 && minScreenDimension >= 600) return 'TABLET';
+    }
+    
+    // Por defecto, desktop
+    return 'DESKTOP';
+}
+
+/**
  * Servicio de Analytics compartido
  * Maneja el tracking automático y envío de datos
- * Usado tanto por la web Astro como por el admin React
  */
 export class AnalyticsService {
     constructor() {
@@ -16,6 +59,7 @@ export class AnalyticsService {
         this.eventQueue = [];
         this.isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
         this.hasStartedVisit = false;
+        this.deviceType = typeof window !== 'undefined' ? detectDeviceType() : 'UNKNOWN';
         
         // Solo configurar listeners si estamos en el browser
         if (typeof window !== 'undefined') {
@@ -23,31 +67,21 @@ export class AnalyticsService {
         }
     }
 
-    /**
-     * Genera un ID único para la sesión
-     * @returns {string} Session ID único
-     */
     generateSessionId() {
         return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    /**
-     * Configura los event listeners del browser
-     */
     setupEventListeners() {
-        // Track page visibility changes
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 this.endVisitTracking();
             }
         });
 
-        // Track page unload
         window.addEventListener('beforeunload', () => {
             this.endVisitTracking();
         });
 
-        // Track online/offline status
         window.addEventListener('online', () => {
             this.isOnline = true;
             this.processEventQueue();
@@ -57,21 +91,16 @@ export class AnalyticsService {
             this.isOnline = false;
         });
 
-        // Auto-start tracking después de que la página cargue
+        // Auto-start tracking
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 this.startVisitTracking();
             });
         } else {
-            // Ya está cargada
             setTimeout(() => this.startVisitTracking(), 100);
         }
     }
 
-    /**
-     * Obtiene el código de idioma desde la URL
-     * @returns {string} Código de idioma
-     */
     getLanguageFromUrl() {
         if (typeof window === 'undefined') return 'es';
         
@@ -79,11 +108,12 @@ export class AnalyticsService {
         if (path.startsWith('/en')) return 'en';
         if (path.startsWith('/val')) return 'val';
         if (path.startsWith('/es') || path === '/') return 'es';
-        return 'es'; // default
+        return 'es';
     }
 
     /**
      * Inicia el tracking de la visita
+     * IMPORTANTE: Ahora incluye el deviceType detectado correctamente
      */
     async startVisitTracking() {
         if (!this.isTrackingEnabled || this.hasStartedVisit) return;
@@ -96,7 +126,8 @@ export class AnalyticsService {
             languageCode: this.getLanguageFromUrl(),
             referrer: typeof document !== 'undefined' ? document.referrer || null : null,
             screenWidth: typeof window !== 'undefined' ? window.screen?.width : null,
-            screenHeight: typeof window !== 'undefined' ? window.screen?.height : null
+            screenHeight: typeof window !== 'undefined' ? window.screen?.height : null,
+            deviceType: this.deviceType  // ← Añadido: tipo de dispositivo real
         };
 
         await this.sendToRepository('trackVisitStart', visitData);
@@ -104,6 +135,7 @@ export class AnalyticsService {
         // Track initial page load event
         this.trackEvent('PAGE_LOAD', null, {
             url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+            deviceType: this.deviceType,
             viewport: typeof window !== 'undefined' ? {
                 width: window.innerWidth,
                 height: window.innerHeight
@@ -111,12 +143,6 @@ export class AnalyticsService {
         });
     }
 
-    /**
-     * Registra un evento de usuario
-     * @param {string} eventType - Tipo de evento
-     * @param {string|null} sectionName - Nombre de la sección
-     * @param {Object} eventData - Datos adicionales del evento
-     */
     async trackEvent(eventType, sectionName = null, eventData = {}) {
         if (!this.isTrackingEnabled) return;
 
@@ -124,20 +150,17 @@ export class AnalyticsService {
             sessionId: this.sessionId,
             eventType: eventType,
             sectionName: sectionName,
-            timestamp: new Date().toISOString(), // Campo directo, no dentro de eventData
+            timestamp: new Date().toISOString(),
             eventData: {
                 ...eventData,
-                url: typeof window !== 'undefined' ? window.location.href : 'unknown'
+                url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+                deviceType: this.deviceType  // Incluir en todos los eventos
             }
         };
 
         await this.sendToRepository('trackEvent', event);
     }
 
-    /**
-     * Registra la visualización de una sección
-     * @param {string} sectionName - Nombre de la sección
-     */
     async trackSectionView(sectionName) {
         await this.trackEvent('SECTION_VIEW', sectionName, {
             scrollPosition: typeof window !== 'undefined' ? window.scrollY : 0,
@@ -145,43 +168,24 @@ export class AnalyticsService {
         });
     }
 
-    /**
-     * Registra el envío de un formulario
-     * @param {string} formType - Tipo de formulario
-     * @param {string} sectionName - Sección donde está el formulario
-     */
     async trackFormSubmit(formType, sectionName) {
         await this.trackEvent('FORM_SUBMIT', sectionName, {
             formType: formType
         });
     }
 
-    /**
-     * Registra un click de contacto
-     * @param {string} contactType - Tipo de contacto (phone, email, etc.)
-     * @param {string} sectionName - Sección donde se hizo click
-     */
     async trackContactClick(contactType, sectionName) {
         await this.trackEvent('CONTACT_CLICK', sectionName, {
             contactType: contactType
         });
     }
 
-    /**
-     * Registra la visualización del menú
-     * @param {string} menuSection - Sección del menú vista
-     */
     async trackMenuView(menuSection) {
         await this.trackEvent('MENU_VIEW', 'carta', {
             menuSection: menuSection
         });
     }
 
-    /**
-     * Verifica si una sección está visible
-     * @param {string} sectionName - Nombre de la sección
-     * @returns {boolean} True si está visible
-     */
     isSectionVisible(sectionName) {
         if (typeof window === 'undefined') return false;
         
@@ -193,16 +197,12 @@ export class AnalyticsService {
         const rect = element.getBoundingClientRect();
         const windowHeight = window.innerHeight;
         
-        // Section is visible if at least 50% is in viewport
         const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
         const sectionHeight = rect.height;
         
         return visibleHeight / sectionHeight > 0.5;
     }
 
-    /**
-     * Finaliza el tracking de la visita
-     */
     async endVisitTracking() {
         if (!this.isTrackingEnabled || !this.hasStartedVisit) return;
 
@@ -213,7 +213,7 @@ export class AnalyticsService {
             durationSeconds: duration
         };
 
-        // Use sendBeacon for reliable sending on page unload if available
+        // Use sendBeacon for reliable sending on page unload
         if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             try {
                 const blob = new Blob([JSON.stringify(endData)], { type: 'application/json' });
@@ -228,11 +228,6 @@ export class AnalyticsService {
         await this.sendToRepository('trackVisitEnd', endData);
     }
 
-    /**
-     * Envía datos al repositorio con manejo de errores y queue
-     * @param {string} method - Método del repositorio a llamar
-     * @param {Object} data - Datos a enviar
-     */
     async sendToRepository(method, data) {
         if (!this.isOnline) {
             this.eventQueue.push({ method, data });
@@ -243,14 +238,10 @@ export class AnalyticsService {
             await AnalyticsRepository[method](data, AuthService.getToken());
         } catch (error) {
             console.warn('Analytics tracking failed:', error);
-            // Queue for retry when back online
             this.eventQueue.push({ method, data });
         }
     }
 
-    /**
-     * Procesa la cola de eventos pendientes
-     */
     async processEventQueue() {
         if (!this.isOnline || this.eventQueue.length === 0) return;
 
@@ -262,24 +253,14 @@ export class AnalyticsService {
         }
     }
 
-    /**
-     * Deshabilita el tracking (para privacidad)
-     */
     disableTracking() {
         this.isTrackingEnabled = false;
     }
 
-    /**
-     * Habilita el tracking
-     */
     enableTracking() {
         this.isTrackingEnabled = true;
     }
 
-    /**
-     * Obtiene estadísticas (para admin)
-     * @returns {Promise<Object>} Estadísticas semanales
-     */
     async getWeeklyStats() {
         try {
             return await AnalyticsRepository.getWeeklyStats(AuthService.getToken());
@@ -298,12 +279,6 @@ export class AnalyticsService {
         }
     }
 
-    /**
-     * Obtiene estadísticas para un período personalizado (para admin)
-     * @param {string} startDate - Fecha de inicio
-     * @param {string} endDate - Fecha de fin
-     * @returns {Promise<Object>} Estadísticas del período
-     */
     async getCustomPeriodStats(startDate, endDate) {
         try {
             return await AnalyticsRepository.getCustomPeriodStats(AuthService.getToken(), startDate, endDate);
@@ -313,10 +288,6 @@ export class AnalyticsService {
         }
     }
 
-    /**
-     * Verifica el estado del servicio
-     * @returns {Promise<Object>} Estado del servicio
-     */
     async healthCheck() {
         try {
             const repoHealth = await AnalyticsRepository.healthCheck();
@@ -327,6 +298,7 @@ export class AnalyticsService {
                 sessionId: this.sessionId,
                 trackingEnabled: this.isTrackingEnabled,
                 hasStartedVisit: this.hasStartedVisit,
+                deviceType: this.deviceType,
                 queueLength: this.eventQueue.length,
                 lastCheck: new Date().toISOString()
             };
@@ -340,10 +312,6 @@ export class AnalyticsService {
         }
     }
 
-    /**
-     * Configura un intersection observer para tracking automático de secciones
-     * @param {Array<string>} sectionIds - IDs de las secciones a observar
-     */
     setupSectionTracking(sectionIds = []) {
         if (typeof window === 'undefined' || !window.IntersectionObserver) return;
 
@@ -365,7 +333,6 @@ export class AnalyticsService {
             }
         );
 
-        // Observar secciones especificadas o encontrar automáticamente
         const sectionsToObserve = sectionIds.length > 0 
             ? sectionIds.map(id => document.getElementById(id)).filter(Boolean)
             : Array.from(document.querySelectorAll('[id], [data-section]'));
@@ -377,22 +344,19 @@ export class AnalyticsService {
         return observer;
     }
 
-    /**
-     * Obtiene la configuración del servicio
-     * @returns {Object} Configuración actual
-     */
     getConfig() {
         return {
             repository: AnalyticsRepository.getConfig(),
             sessionId: this.sessionId,
             trackingEnabled: this.isTrackingEnabled,
+            deviceType: this.deviceType,
             supportedLanguages: ['es', 'en', 'val'],
             defaultLanguage: 'es'
         };
     }
 }
 
-// Crear instancia singleton para uso global
+// Crear instancia singleton
 const analyticsService = new AnalyticsService();
 
 export default analyticsService;

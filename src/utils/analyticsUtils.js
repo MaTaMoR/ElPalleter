@@ -43,16 +43,35 @@ export const getDeviceIcon = (deviceType) => {
 };
 
 export const getLanguageFlag = (languageCode) => {
-  switch (languageCode?.toLowerCase()) {
-    case 'es':
-      return '🇪🇸';
-    case 'en':
-      return '🇬🇧';
-    case 'val':
-      return '🏴';
-    default:
-      return '🌐';
-  }
+  const flags = {
+    'es': '🇪🇸',
+    'en': '🇬🇧',
+    'val': '🏴', // Valencia/Catalán
+    'ca': '🏴', // Catalán
+    'fr': '🇫🇷',
+    'de': '🇩🇪',
+    'it': '🇮🇹',
+    'pt': '🇵🇹',
+    'unknown': '🌐'
+  };
+  
+  return flags[languageCode?.toLowerCase()] || flags['unknown'];
+};
+
+export const getLanguageName = (languageCode) => {
+  const names = {
+    'es': 'Español',
+    'en': 'English',
+    'val': 'Valencià',
+    'ca': 'Català',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'it': 'Italiano',
+    'pt': 'Português',
+    'unknown': 'Desconocido'
+  };
+  
+  return names[languageCode?.toLowerCase()] || names['unknown'];
 };
 
 export const calculateMobilePercentage = (deviceStats, totalVisits) => {

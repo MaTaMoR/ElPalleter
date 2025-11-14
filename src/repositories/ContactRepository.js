@@ -1,6 +1,6 @@
 // src/repositories/ContactRepository.js
-
 import { BaseRepository } from './BaseRepository.js';
+import { I18nService } from '../services/I18Service.js';
 
 /**
  * Repositorio para operaciones de información de contacto
@@ -137,7 +137,7 @@ export class ContactRepository extends BaseRepository {
                 return {
                     status: 'closed',
                     isOpen: false,
-                    message: 'Cerrado',
+                    message: I18nService.getTranslation('contact.status.states.closed', language),
                     nextOpening: await this.getNextOpening(schedules, currentDay, currentTime)
                 };
             }
@@ -149,12 +149,14 @@ export class ContactRepository extends BaseRepository {
                 
                 if (currentTime >= startMinutes && currentTime <= endMinutes) {
                     const minutesUntilClose = endMinutes - currentTime;
-                    
+                    // contact.status.messages.closingIn
                     if (minutesUntilClose <= 30) {
                         return {
                             status: 'closing_soon',
                             isOpen: true,
-                            message: `Cierra en ${minutesUntilClose} minutos`,
+                            message: I18nService.getTranslation('contact.status.messages.closingIn', language, { 
+                                minutes: minutesUntilClose
+                            }),
                             minutesUntilClose,
                             closingTime: range.endTime
                         };
@@ -163,7 +165,9 @@ export class ContactRepository extends BaseRepository {
                     return {
                         status: 'open',
                         isOpen: true,
-                        message: `Abierto hasta las ${range.endTime}`,
+                        message: I18nService.getTranslation('contact.status.messages.until', language, { 
+                            time: range.endTime
+                        }),
                         closingTime: range.endTime
                     };
                 }
@@ -181,7 +185,9 @@ export class ContactRepository extends BaseRepository {
                     return {
                         status: 'opening_soon',
                         isOpen: false,
-                        message: `Abre en ${minutesUntilOpen} minutos`,
+                        message: I18nService.getTranslation('contact.status.messages.openingAt', language, { 
+                            time: minutesUntilOpen
+                        }),
                         minutesUntilOpen,
                         openingTime: nextRange.startTime
                     };
@@ -191,10 +197,9 @@ export class ContactRepository extends BaseRepository {
             return {
                 status: 'closed',
                 isOpen: false,
-                message: 'Cerrado',
+                message: I18nService.getTranslation('contact.status.states.closed', language),
                 nextOpening: await this.getNextOpening(schedules, currentDay, currentTime)
             };
-
         } catch (error) {
             console.error('ContactRepository: Error calculating current status:', error);
             return {

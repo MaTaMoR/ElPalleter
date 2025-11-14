@@ -1,7 +1,7 @@
 // src/services/ContactService.js
 
 import { ContactRepository } from '../repositories/ContactRepository.js';
-import i18nCore from '../i18n/core.js';
+import I18nService from '../services/I18Service.js';
 
 /**
  * Servicio de contacto actualizado para usar el backend Spring Boot
@@ -190,8 +190,8 @@ export class ContactService {
 
                 // Obtener nombre traducido del día
                 const dayTranslationKey = `contact.days.${dayName}`;
-                const translatedDay = i18nCore.getTranslation ? 
-                    i18nCore.getTranslation(dayTranslationKey, language, dayName) : 
+                const translatedDay = I18nService.getTranslation ? 
+                    I18nService.getTranslation(dayTranslationKey, language, dayName) : 
                     dayName;
 
                 scheduleGroups.get(scheduleKey).days.push(translatedDay);
@@ -257,10 +257,9 @@ export class ContactService {
             return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
         }
         
-        const andWord = i18nCore.getTranslation ? 
-            i18nCore.getTranslation('contact.status.and', language, 'y') : 
-            'y';
-        
+        const andWord = I18nService.getTranslation ? 
+            I18nService.getTranslation('contact.status.and', language, 'y') : 'y';
+    
         if (sortedDays.length === 2) {
             return sortedDays.join(` ${andWord} `);
         }
