@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { LOCALES, DEFAULT_LOCALE } from '../../i18n/core';
+import { LOCALES, DEFAULT_LOCALE } from '../../services/I18nService';
 
 export async function getStaticPaths() {
   return LOCALES.filter(locale => locale !== DEFAULT_LOCALE).map(locale => ({

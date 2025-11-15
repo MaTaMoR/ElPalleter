@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import analyticsService from '../../../src/services/AnalyticsService.js';
+import { AnalyticsService } from '@services/AnalyticsService';
 
 /**
  * Hook para obtener datos de analytics para períodos personalizados
@@ -18,7 +18,7 @@ export const useAnalyticsCustomPeriod = () => {
       const startISO = startDate instanceof Date ? startDate.toISOString() : startDate;
       const endISO = endDate instanceof Date ? endDate.toISOString() : endDate;
       
-      const analyticsData = await analyticsService.getCustomPeriodStats(startISO, endISO);
+      const analyticsData = await AnalyticsService.getCustomPeriodStats(startISO, endISO);
       setData(analyticsData);
     } catch (err) {
       setError(err.message);

@@ -1,7 +1,47 @@
+import { I18nService } from '../services/I18nService.js';
 
 /**
- * Utilidades para formatear y procesar datos de analytics
+ * Obtiene el nombre del idioma desde I18nService
+ * @param {string} languageCode - Código del idioma (es, en, val)
+ * @returns {string} Nombre del idioma en su idioma nativo
  */
+export const getLanguageName = (languageCode) => {
+  if (!languageCode) return 'Desconocido';
+  
+  // Obtener el idioma desde I18nService
+  const language = I18nService.getLanguage(languageCode);
+  
+  if (language) {
+    return language.nativeName || language.name;
+  }
+  
+  // Fallback si no se encuentra
+  const fallbackNames = {
+    'es': 'Español',
+    'en': 'English',
+    'val': 'Valencià'
+  };
+  
+  return fallbackNames[languageCode] || languageCode.toUpperCase();
+};
+
+/**
+ * Obtiene la URL de la bandera desde I18nService
+ * @param {string} languageCode - Código del idioma
+ * @returns {string|null} URL de la imagen de la bandera
+ */
+export const getLanguageFlagUrl = (languageCode) => {
+  if (!languageCode) return null;
+  
+  // Obtener el idioma desde I18nService
+  const language = I18nService.getLanguage(languageCode);
+  
+  if (language && language.flag && language.flag.value) {
+    return language.flag.value;
+  }
+  
+  return null;
+};
 
 export const formatDuration = (seconds) => {
   if (!seconds || seconds === 0) return '0:00';
@@ -42,36 +82,20 @@ export const getDeviceIcon = (deviceType) => {
   }
 };
 
-export const getLanguageFlag = (languageCode) => {
-  const flags = {
-    'es': '🇪🇸',
-    'en': '🇬🇧',
-    'val': '🏴', // Valencia/Catalán
-    'ca': '🏴', // Catalán
-    'fr': '🇫🇷',
-    'de': '🇩🇪',
-    'it': '🇮🇹',
-    'pt': '🇵🇹',
-    'unknown': '🌐'
-  };
-  
-  return flags[languageCode?.toLowerCase()] || flags['unknown'];
-};
-
-export const getLanguageName = (languageCode) => {
+/**
+ * Obtiene el nombre traducido del dispositivo
+ * @param {string} deviceType - Tipo de dispositivo (DESKTOP, MOBILE, TABLET, UNKNOWN)
+ * @returns {string} Nombre del dispositivo en español
+ */
+export const getDeviceName = (deviceType) => {
   const names = {
-    'es': 'Español',
-    'en': 'English',
-    'val': 'Valencià',
-    'ca': 'Català',
-    'fr': 'Français',
-    'de': 'Deutsch',
-    'it': 'Italiano',
-    'pt': 'Português',
-    'unknown': 'Desconocido'
+    'DESKTOP': 'Escritorio',
+    'MOBILE': 'Móvil',
+    'TABLET': 'Tablet',
+    'UNKNOWN': 'Desconocido'
   };
   
-  return names[languageCode?.toLowerCase()] || names['unknown'];
+  return names[deviceType?.toUpperCase()] || 'Desconocido';
 };
 
 export const calculateMobilePercentage = (deviceStats, totalVisits) => {

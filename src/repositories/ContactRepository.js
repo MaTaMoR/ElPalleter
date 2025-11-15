@@ -1,6 +1,6 @@
 // src/repositories/ContactRepository.js
 import { BaseRepository } from './BaseRepository.js';
-import { I18nService } from '../services/I18Service.js';
+import { I18nService } from '../services/I18nService.js';
 
 /**
  * Repositorio para operaciones de información de contacto

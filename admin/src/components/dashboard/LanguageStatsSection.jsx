@@ -1,5 +1,5 @@
 import React from 'react';
-import { getLanguageFlag, getLanguageName, formatNumber, formatPercentage } from '@utils/analyticsUtils';
+import { getLanguageFlagUrl, getLanguageName, formatNumber, formatPercentage } from '@utils/analyticsUtils';
 import styles from './LanguageStatsSection.module.css';
 
 const LanguageStatsSection = ({ analyticsData }) => {
@@ -11,14 +11,16 @@ const LanguageStatsSection = ({ analyticsData }) => {
     name: getLanguageName(code),
     count: count,
     percentage: totalVisits > 0 ? (count / totalVisits) * 100 : 0,
-    flag: getLanguageFlag(code)
+    flagUrl: getLanguageFlagUrl(code)
   })).sort((a, b) => b.count - a.count);
 
   if (languages.length === 0) {
     return (
       <div className={styles.languageStats}>
         <h4>Idiomas</h4>
-        <p className="text-muted">No hay datos de idiomas disponibles</p>
+        <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>
+          No hay datos de idiomas disponibles
+        </p>
       </div>
     );
   }
@@ -29,11 +31,19 @@ const LanguageStatsSection = ({ analyticsData }) => {
       <div className={styles.languageList}>
         {languages.map((language) => (
           <div key={language.code} className={styles.languageItem}>
-            <span className={styles.languageFlag}>{language.flag}</span>
-            <span className={styles.languageName}>{language.name}</span>
-            <div>
-              <div className={styles.languageCount}>{formatNumber(language.count)}</div>
-              <div className={styles.languagePercentage}>({formatPercentage(language.percentage)})</div>
+            <div className={styles.languageLeft}>
+              {language.flagUrl && (
+                <img 
+                  src={language.flagUrl} 
+                  alt={`${language.name} flag`}
+                  className={styles.languageFlag}
+                />
+              )}
+              <span className={styles.languageName}>{language.name}</span>
+            </div>
+            <div className={styles.languageRight}>
+              <span className={styles.languageCount}>{formatNumber(language.count)}</span>
+              <span className={styles.languagePercentage}>{formatPercentage(language.percentage)}</span>
             </div>
           </div>
         ))}

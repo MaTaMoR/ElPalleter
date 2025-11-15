@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import analyticsService from '../../../src/services/AnalyticsService.js';
+import analyticsService from '@services/AnalyticsService.js';
 
 /**
  * Hook para obtener datos de analytics en el admin

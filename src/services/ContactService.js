@@ -1,7 +1,7 @@
 // src/services/ContactService.js
 
 import { ContactRepository } from '../repositories/ContactRepository.js';
-import I18nService from '../services/I18Service.js';
+import I18nService from '../services/I18nService.js';
 
 /**
  * Servicio de contacto actualizado para usar el backend Spring Boot

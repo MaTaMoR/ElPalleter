@@ -3,7 +3,7 @@ export const prerender = true;
 
 import Text from '../../components/i18n/Text.astro';
 import CartaService from '../../services/CartaService.js';
-import { I18nService } from '../../services/I18Service.js';
+import { I18nService } from '../../services/I18nService.js';
 
 const categories = await CartaService.getCategories();
 ---
@@ -463,7 +463,7 @@ const categories = await CartaService.getCategories();
         
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
-                console.log(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
+                console.debug(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
                 const elementsToAdjust = [...menuCategories];
                 disableTransitionsDuringResize(elementsToAdjust);

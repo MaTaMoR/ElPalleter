@@ -6,7 +6,9 @@
 export class BaseRepository {
     
     static getBaseUrl() {
-        return import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
+        return import.meta.env.VITE_API_URL || 
+            import.meta.env.PUBLIC_API_URL || 
+            'http://localhost:8080';
     }
 
     /**

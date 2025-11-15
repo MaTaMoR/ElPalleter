@@ -1,4 +1,4 @@
-/* Similar a DeviceStatsSection pero para idiomas */
+/* Language Stats */
 .languageStats {
   margin: 0;
 }
@@ -13,44 +13,67 @@
 }
 
 .languageList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .languageItem {
-  background: var(--bg-card);
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .languageItem:hover {
   background: var(--bg-primary);
   border-color: var(--primary);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.languageLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .languageFlag {
-  font-size: 1.5rem;
-  min-width: 24px;
-  text-align: center;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .languageName {
   font-weight: 500;
   color: var(--text-primary);
-  flex: 1;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.languageRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
 }
 
 .languageCount {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .languagePercentage {
@@ -58,47 +81,18 @@
   color: var(--text-secondary);
 }
 
-/* Skeleton para language stats */
-.languageStatsSkeleton {
-  background: var(--bg-tertiary);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  min-height: 120px;
-  position: relative;
-  overflow: hidden;
-}
-
-.languageStatsSkeleton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  animation: skeletonShimmer 2s infinite;
-}
-
-@keyframes skeletonShimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
 /* Responsive */
-@media (max-width: 768px) {
-  .languageList {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 480px) {
   .languageItem {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
+    padding: 0.875rem;
+  }
+  
+  .languageFlag {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .languageCount {
+    font-size: 1.1rem;
   }
 }

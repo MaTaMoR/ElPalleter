@@ -17,10 +17,10 @@ const {
 
 import '../styles/design-system.css'; 
 import '../utils/breakpoints.js';
-import I18nService from '../services/I18Service';
+import I18nService from '../services/I18nService';
 import AnalyticsTracker from '../components/analytics/AnalyticsTracker.astro';
 
-I18nService.init();
+await I18nService.init();
 ---
 
 <!DOCTYPE html>

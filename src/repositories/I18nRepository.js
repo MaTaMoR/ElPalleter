@@ -1,34 +1,123 @@
 import { BaseRepository } from './BaseRepository.js';
+import ImageService from '../services/ImageService.js';
 
 /**
  * Repositorio para operaciones de internacionalización
- * Conecta con los endpoints /i18n del backend Spring Boot
- * 
- * RESPONSABILIDAD: Solo acceso a datos del backend
- * La lógica de negocio está en I18nService
  */
 export class I18nRepository extends BaseRepository {
 
+    // ===============================================
+    // GESTIÓN DE IDIOMAS
+    // ===============================================
+
     /**
-     * Obtiene los idiomas disponibles
-     * GET /i18n/languages
-     * @returns {Promise<Array>} Array de códigos de idiomas disponibles
+     * Obtiene los códigos de idiomas disponibles
+     * GET /i18n/languages/codes
+     * @returns {Promise<Array<string>>} Array de códigos de idiomas
      */
-    static async getAvailableLanguages() {
+    static async getAvailableLanguageCodes() {
         try {
-            const response = await this.get('/i18n/languages');
+            const response = await this.get('/i18n/languages/codes');
             return response || [];
         } catch (error) {
-            console.error('I18nRepository: Error getting available languages:', error);
+            console.error('I18nRepository: Error getting language codes:', error);
             throw error;
         }
     }
 
     /**
+     * Obtiene la configuración completa de todos los idiomas
+     * GET /i18n/languages
+     * @returns {Promise<Array<Object>>} Array de objetos de idioma con toda su configuración
+     */
+    static async getLanguages() {
+        try {
+            const response = await this.get('/i18n/languages');
+            return response || [];
+        } catch (error) {
+            console.error('I18nRepository: Error getting languages:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene la configuración de un idioma específico por código
+     * GET /i18n/languages/{code}
+     * @param {string} code - Código del idioma (es, en, val)
+     * @returns {Promise<Object>} Objeto con la configuración del idioma
+     */
+    static async getLanguageByCode(code) {
+        if (!code) {
+            throw new Error('Language code is required');
+        }
+
+        try {
+            const response = await this.get(`/i18n/languages/${code}`);
+            return response || null;
+        } catch (error) {
+            console.error(`I18nRepository: Error getting language ${code}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Convierte idiomas del backend a formato frontend
+     * Transforma el formato DTO del backend al formato LANGUAGE_CONFIG del frontend
+     * @param {Array<Object>} languagesFromBackend - Array de LanguageDTO del backend
+     * @returns {Object} Objeto de idiomas en formato LANGUAGE_CONFIG
+     */
+    static convertLanguagesToFrontendFormat(languagesFromBackend) {
+        const languageConfig = {};
+        
+        if (!Array.isArray(languagesFromBackend)) {
+            return languageConfig;
+        }
+
+        languagesFromBackend.forEach(lang => {
+            // Usar ImageService para construir URL de la bandera
+            const flagImageUrl = lang.flagImagePath 
+                ? ImageService.getImageURL(lang.flagImagePath)
+                : null;
+
+            languageConfig[lang.code] = {
+                code: lang.code,
+                name: lang.name,
+                nativeName: lang.nativeName,
+                shortName: lang.shortName,
+                isDefault: lang.isDefault,
+                flag: {
+                    value: flagImageUrl // URL construida por ImageService
+                },
+                direction: lang.direction,
+                enabled: lang.enabled,
+                displayOrder: lang.displayOrder
+            };
+        });
+
+        return languageConfig;
+    }
+
+    /**
+     * Obtiene los idiomas en formato LANGUAGE_CONFIG
+     * @returns {Promise<Object>} Idiomas en formato frontend
+     */
+    static async getLanguagesConfig() {
+        try {
+            const languages = await this.getLanguages();
+            return this.convertLanguagesToFrontendFormat(languages);
+        } catch (error) {
+            console.error('I18nRepository: Error getting languages config:', error);
+            throw error;
+        }
+    }
+
+    // ===============================================
+    // GESTIÓN DE TRADUCCIONES (ya existentes)
+    // ===============================================
+
+    /**
      * Obtiene las traducciones para un idioma específico
      * GET /i18n/translations/{language}
-     * @param {string} language - Código del idioma (es, en, val)
-     * @returns {Promise<Array>} Array de objetos de traducción
      */
     static async getTranslationsByLanguage(language) {
         if (!language) {
@@ -46,19 +135,16 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Obtiene todas las traducciones para múltiples idiomas
-     * @param {Array} languages - Array de códigos de idiomas
-     * @returns {Promise<Object>} Objeto con traducciones por idioma {es: [...], en: [...]}
      */
     static async getAllTranslations(languages = null) {
         try {
-            // Si no se especifican idiomas, obtener todos los disponibles
+            // Si no se especifican idiomas, obtener códigos desde el backend
             if (!languages) {
-                languages = await this.getAvailableLanguages();
+                languages = await this.getAvailableLanguageCodes();
             }
 
             const translations = {};
             
-            // Obtener traducciones para cada idioma en paralelo
             const promises = languages.map(async (language) => {
                 try {
                     const langTranslations = await this.getTranslationsByLanguage(language);
@@ -84,11 +170,6 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Convierte array de traducciones del backend a formato flat
-     * Transforma [{translationKey: "menu.home", translationValue: "Inicio"}] 
-     * a {"menu.home": "Inicio"}
-     * 
-     * @param {Array} translationsArray - Array de objetos de traducción del backend
-     * @returns {Object} Objeto flat de traducciones {key: value}
      */
     static convertToFlatFormat(translationsArray) {
         const flatTranslations = {};
@@ -108,8 +189,6 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Obtiene traducciones en formato flat para un idioma
-     * @param {string} language - Código del idioma
-     * @returns {Promise<Object>} Objeto flat de traducciones
      */
     static async getFlatTranslations(language) {
         try {
@@ -123,11 +202,6 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Obtiene todas las traducciones en formato flat para múltiples idiomas
-     * ESTE ES EL MÉTODO PRINCIPAL QUE USA I18nService
-     * 
-     * @param {Array} languages - Array de códigos de idiomas
-     * @returns {Promise<Object>} Objeto con traducciones flat por idioma
-     *                            {es: {key: value}, en: {key: value}}
      */
     static async getAllFlatTranslations(languages = null) {
         try {
@@ -145,116 +219,16 @@ export class I18nRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Busca traducciones por clave parcial
-     * @param {string} language - Código del idioma
-     * @param {string} keyPattern - Patrón de clave a buscar
-     * @returns {Promise<Object>} Traducciones que coinciden con el patrón
-     */
-    static async searchTranslations(language, keyPattern) {
-        try {
-            const flatTranslations = await this.getFlatTranslations(language);
-            const matchingTranslations = {};
-
-            Object.entries(flatTranslations).forEach(([key, value]) => {
-                if (key.includes(keyPattern)) {
-                    matchingTranslations[key] = value;
-                }
-            });
-
-            return matchingTranslations;
-        } catch (error) {
-            console.error(`I18nRepository: Error searching translations for pattern ${keyPattern}:`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene una traducción específica por clave e idioma
-     * @param {string} language - Código del idioma
-     * @param {string} key - Clave de traducción
-     * @returns {Promise<string|null>} Valor de la traducción o null si no existe
-     */
-    static async getTranslationByKey(language, key) {
-        try {
-            const flatTranslations = await this.getFlatTranslations(language);
-            return flatTranslations[key] || null;
-        } catch (error) {
-            console.error(`I18nRepository: Error getting translation for key ${key}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Obtiene estadísticas de traducciones desde el backend
-     * @returns {Promise<Object>} Estadísticas de traducciones
-     */
-    static async getTranslationStats() {
-        try {
-            const languages = await this.getAvailableLanguages();
-            const stats = {
-                availableLanguages: languages.length,
-                languages: {},
-                totalKeys: 0,
-                missingTranslations: {}
-            };
-
-            const allTranslations = await this.getAllFlatTranslations(languages);
-
-            // Obtener todas las claves únicas
-            const allKeys = new Set();
-            Object.values(allTranslations).forEach(langTranslations => {
-                Object.keys(langTranslations).forEach(key => allKeys.add(key));
-            });
-
-            stats.totalKeys = allKeys.size;
-
-            // Calcular estadísticas por idioma
-            languages.forEach(language => {
-                const langTranslations = allTranslations[language] || {};
-                const translatedKeys = Object.keys(langTranslations).length;
-                const missingKeys = Array.from(allKeys).filter(key => !langTranslations[key]);
-
-                stats.languages[language] = {
-                    translated: translatedKeys,
-                    missing: missingKeys.length,
-                    completeness: allKeys.size > 0 ? Math.round((translatedKeys / allKeys.size) * 100) : 0
-                };
-
-                if (missingKeys.length > 0) {
-                    stats.missingTranslations[language] = missingKeys;
-                }
-            });
-
-            return stats;
-        } catch (error) {
-            console.error('I18nRepository: Error getting translation stats:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Verifica si un idioma está disponible en el backend
-     * @param {string} language - Código del idioma a verificar
-     * @returns {Promise<boolean>} true si el idioma está disponible
-     */
-    static async isLanguageAvailable(language) {
-        try {
-            const availableLanguages = await this.getAvailableLanguages();
-            return availableLanguages.includes(language);
-        } catch (error) {
-            console.error(`I18nRepository: Error checking if language ${language} is available:`, error);
-            return false;
-        }
-    }
+    // ===============================================
+    // UTILIDADES
+    // ===============================================
 
     /**
      * Verifica el estado del servicio de i18n en el backend
-     * @returns {Promise<Object>} Estado del servicio
      */
     static async healthCheck() {
         try {
-            const languages = await this.getAvailableLanguages();
+            const languageCodes = await this.getAvailableLanguageCodes();
             
             return {
                 status: 'healthy',
@@ -262,9 +236,11 @@ export class I18nRepository extends BaseRepository {
                 backend: this.getBaseUrl(),
                 endpoints: {
                     languages: '/i18n/languages',
+                    languageCodes: '/i18n/languages/codes',
+                    languageByCode: '/i18n/languages/{code}',
                     translations: '/i18n/translations/{language}'
                 },
-                availableLanguages: languages,
+                availableLanguages: languageCodes,
                 lastCheck: new Date().toISOString()
             };
         } catch (error) {
@@ -280,25 +256,16 @@ export class I18nRepository extends BaseRepository {
 
     /**
      * Obtiene la configuración del repositorio
-     * @returns {Object} Configuración actual
      */
     static getConfig() {
         return {
             baseUrl: this.getBaseUrl(),
             endpoints: {
                 languages: '/i18n/languages',
-                translations: '/i18n/translations/{language}',
-                translationByKey: '/i18n/translations/{language}/{key}'
+                languageCodes: '/i18n/languages/codes',
+                languageByCode: '/i18n/languages/{code}',
+                translations: '/i18n/translations/{language}'
             }
         };
-    }
-
-    /**
-     * Invalida la caché de traducciones (si se implementa caché)
-     * Útil cuando se actualizan traducciones en el backend
-     */
-    static async invalidateCache() {
-        // Este método se puede implementar si se añade un sistema de caché
-        console.log('I18nRepository: Cache invalidation requested');
     }
 }

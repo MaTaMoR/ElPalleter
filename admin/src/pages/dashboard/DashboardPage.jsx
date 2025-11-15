@@ -92,7 +92,7 @@ const DashboardPage = () => {
   ];
 
   const handleManagementClick = (sectionId) => {
-    console.log(`Navegando a: ${sectionId}`);
+    console.debug(`Navegando a: ${sectionId} / TODO`);
     // TODO: Implementar navegación real aquí
   };
 

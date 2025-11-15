@@ -1,0 +1,71 @@
+.metricCard {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.metricCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+}
+
+.cardTitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardValue {
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.cardChange {
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cardChange.positive {
+  color: var(--success);
+}
+
+.cardChange.negative {
+  color: var(--error);
+}
+
+.cardChange.neutral {
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .metricCard {
+    padding: 1.25rem;
+  }
+
+  .cardValue {
+    font-size: 1.75rem;
+  }
+}

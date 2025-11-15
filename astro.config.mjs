@@ -17,8 +17,8 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
-    host: true
+    host: '192.168.1.14',
+    port: 3000
   },
   proxy: {
     '/admin': {

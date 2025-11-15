@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import analyticsService from '../../../src/services/AnalyticsService.js';
+import analyticsService from '@services/AnalyticsService.js';
 
 /**
  * Hook para monitorear el estado del servicio de analytics

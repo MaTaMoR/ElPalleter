@@ -1,33 +1,4 @@
-/* Métricas Web - Estructura actualizada */
-.metricsContent {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.metricsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
-}
-
-/* Contenedor de estadísticas de dispositivos */
-.deviceStatsContainer {
-  background: var(--bg-tertiary);
-  padding: 1.5rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  transition: var(--transition);
-}
-
-.deviceStatsContainer:hover {
-  border-color: var(--primary);
-  background: var(--bg-secondary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Estilos para DeviceStatsSection */
+/* Device Stats */
 .deviceStats {
   margin: 0;
 }
@@ -42,52 +13,68 @@
 }
 
 .deviceList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .deviceItem {
-  background: var(--bg-card);
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .deviceItem:hover {
   background: var(--bg-primary);
   border-color: var(--primary);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.deviceLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .deviceIcon {
-  font-size: 1.5rem;
-  color: var(--primary);
-  min-width: 24px;
-  text-align: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .deviceName {
   font-weight: 500;
   color: var(--text-primary);
-  flex: 1;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.deviceStats {
+.deviceRight {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
+  align-items: flex-end;
+  gap: 0.125rem;
 }
 
 .deviceCount {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .devicePercentage {
@@ -95,264 +82,19 @@
   color: var(--text-secondary);
 }
 
-/* Skeleton para device stats */
-.deviceStatsSkeleton {
-  background: var(--bg-tertiary);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  min-height: 120px;
-  position: relative;
-  overflow: hidden;
-}
-
-.deviceStatsSkeleton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  animation: skeletonShimmer 2s infinite;
-}
-
-@keyframes skeletonShimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-.metricCard {
-  background: var(--bg-tertiary);
-  padding: 1.5625rem;
-  border-radius: var(--border-radius);
-  text-align: center;
-  border: 1px solid var(--border-color);
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-}
-
-.metricCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary), var(--warning), var(--primary-light));
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.metricCard:hover::before {
-  transform: translateX(0);
-}
-
-.metricCard:hover {
-  border-color: var(--primary);
-  background: var(--bg-secondary);
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
-}
-
-.metricValue {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-
-.metricLabel {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
-}
-
-.metricChange {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.75rem;
-  font-weight: 500;
-}
-
-.metricChange.positive {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--success);
-}
-
-.metricChange.negative {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
-}
-
-.metricChange.neutral {
-  background: rgba(160, 160, 160, 0.1);
-  color: var(--text-muted);
-}
-
-/* Efectos visuales durante refresh */
-.section.refreshing {
-  position: relative;
-}
-
-.section.refreshing::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  z-index: 1;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.section.refreshing .metricsGrid {
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-/* Mensajes de error y sin datos */
-.errorMessage, .noDataMessage {
-  text-align: center;
-  padding: 2rem;
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.errorMessage p, .noDataMessage p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-.errorMessage button, .noDataMessage button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.errorMessage button:hover, .noDataMessage button:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.errorMessage button:disabled, .noDataMessage button:disabled {
-  background: var(--text-muted);
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Banner de error sutil */
-.errorBanner {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-}
-
-.errorBanner p {
-  margin: 0;
-  color: var(--error);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .dashboardNew {
-    padding: 1.25rem 0.9375rem;
-  }
-  
-  .dashboardTitle {
-    font-size: 2rem;
-  }
-  
-  .managementGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-  }
-  
-  .managementTile {
-    padding: 1.25rem 0.9375rem;
-    min-height: 130px;
-  }
-  
-  .socialGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .metricsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .section {
-    padding: 1.25rem;
-  }
-  
-  .metricsContent {
-    gap: 1.5rem;
-  }
-  
-  .deviceList {
-    grid-template-columns: 1fr;
-  }
-  
-  .deviceStatsContainer {
-    padding: 1rem;
-  }
-}
-
+/* Responsive */
 @media (max-width: 480px) {
-  .managementGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .metricsGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .socialStats {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  
-  .socialChange {
-    text-align: center;
-  }
-  
   .deviceItem {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
+    padding: 0.875rem;
   }
   
-  .deviceStats {
-    align-items: center;
+  .deviceIcon {
+    font-size: 1.5rem;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .deviceCount {
+    font-size: 1.1rem;
   }
 }

@@ -1,0 +1,136 @@
+.chartContainer {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.chartContainer h4 {
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.chartLegend {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendDot.current {
+  background: var(--primary);
+}
+
+.legendDot.previous {
+  background: var(--text-muted);
+}
+
+.chartWrapper {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 1rem;
+}
+
+.noData {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1rem;
+}
+
+.chartSummary {
+  display: flex;
+  justify-content: space-around;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.summaryLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .chartLegend {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .chartWrapper {
+    height: 250px;
+  }
+
+  .chartSummary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chartContainer {
+    padding: 1rem;
+  }
+
+  .chartWrapper {
+    height: 220px;
+  }
+
+  .summaryValue {
+    font-size: 1.25rem;
+  }
+}
+
+.summaryValue.positive {
+  color: var(--success);
+}
+
+.summaryValue.negative {
+  color: var(--error);
+}

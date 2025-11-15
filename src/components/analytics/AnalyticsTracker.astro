@@ -138,7 +138,7 @@
             // Track la visualización de la sección
             analyticsService.trackSectionView(sectionId);
             
-            console.log('Section viewed:', sectionId);
+            console.debug('Section viewed:', sectionId);
           }
         });
       },
@@ -172,7 +172,7 @@
             fromSection: getCurrentSection()
           });
           
-          console.log('Navigation click:', target);
+          console.debug('Navigation click:', target);
         }
       });
     });
@@ -239,7 +239,7 @@
         timestamp: new Date().toISOString()
       });
 
-      console.log('Analytics initialized', {
+      console.debug('Analytics initialized', {
         device: deviceInfo.deviceType,
         viewport: deviceInfo.viewport,
         resized: deviceInfo.isWindowResized
@@ -250,7 +250,7 @@
       setTimeout(() => {
         setupSectionTracking();
         setupNavigationTracking();
-        console.log('Section and navigation tracking configured');
+        console.debug('Section and navigation tracking configured');
       }, 500);
       
       // Track cambios de orientación

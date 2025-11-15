@@ -328,7 +328,7 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
         
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
-                console.log(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
+                console.debug(`Historia: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
                 
                 const elementsToAdjust = [historyContent, sliderSection].filter(Boolean);
                 disableTransitionsDuringResize(elementsToAdjust);

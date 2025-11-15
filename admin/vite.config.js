@@ -11,8 +11,8 @@ export default defineConfig({
     include: ['react', 'react-dom'],
   },
   server: {
-    port: 3001,
-    host: true
+    host: '192.168.1.14',
+    port: 3001
   },
   base: '/admin',
   resolve: {

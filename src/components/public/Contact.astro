@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import Text from '../i18n/Text.astro';
-import { I18nService } from '../../services/I18Service.js'
+import { I18nService } from '../../services/I18nService.js'
 import ContactService from '../../services/ContactService.js';
 
 // Obtener información de i18n
@@ -14,7 +14,6 @@ const {
     groupedSchedule,
     contactInfo
 } = await ContactService.getContactDataWithTranslations(I18nService, locale);
-console.log('test');
 ---
 
 <section class="contact-section container" id="contacto">
@@ -746,7 +745,7 @@ console.log('test');
 
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
-                console.log(
+                console.debug(
                     `Contact: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`,
                 );
 

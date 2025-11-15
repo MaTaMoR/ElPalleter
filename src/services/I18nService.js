@@ -1,60 +1,36 @@
 import { I18nRepository } from '../repositories/I18nRepository.js';
 
 /**
- * Configuración de idiomas disponibles
+ * NOTA: LANGUAGE_CONFIG ahora se carga dinámicamente desde el backend
+ * Este objeto solo sirve como fallback si falla la carga
  */
-export const LANGUAGE_CONFIG = {
+const FALLBACK_LANGUAGE_CONFIG = {
   es: {
     code: 'es',
     name: 'Español',
     nativeName: 'Español',
     shortName: 'ES',
     isDefault: true,
-    flag: {
-      value: '/flags/spain.svg'
-    },
-    direction: 'ltr'
-  },
-  en: {
-    code: 'en',
-    name: 'English',
-    nativeName: 'English',
-    shortName: 'EN',
-    isDefault: false,
-    flag: {
-      value: '/flags/united-kingdom.svg'
-    },
-    direction: 'ltr'
-  },
-  val: {
-    code: 'val',
-    name: 'Valenciano',
-    nativeName: 'Valencià',
-    shortName: 'VAL',
-    isDefault: false,
-    flag: {
-      value: '/flags/valencia.svg'
-    },
+    flag: { value: null },
     direction: 'ltr'
   }
 };
-
-// Constantes derivadas
-export const LOCALES = Object.keys(LANGUAGE_CONFIG);
-export const DEFAULT_LOCALE = Object.values(LANGUAGE_CONFIG).find(lang => lang.isDefault)?.code || 'es';
 
 /**
  * Clase para manejar banderas (SVG)
  */
 export class FlagRenderer {
   static renderFlag(flagConfig, className = '', size = '1rem') {
+    if (!flagConfig?.value) {
+      return '';
+    }
     return `<img src="${flagConfig.value}" alt="" class="flag-svg ${className}" style="width: ${size}; height: ${size};" aria-hidden="true" />`;
   }
 
   static getFlagElement(flagConfig) {
     return {
       type: 'svg',
-      value: flagConfig.value,
+      value: flagConfig?.value || null,
       isSvg: true
     };
   }
@@ -65,8 +41,10 @@ export class FlagRenderer {
  */
 const state = {
   translations: new Map(),
-  languages: Object.values(LANGUAGE_CONFIG),
-  defaultLanguage: Object.values(LANGUAGE_CONFIG).find(lang => lang.isDefault),
+  languageConfig: { ...FALLBACK_LANGUAGE_CONFIG },
+  languages: [],
+  languageCodes: [],
+  defaultLanguage: null,
   loaded: false,
   loading: false,
   loadPromise: null
@@ -83,19 +61,19 @@ export class I18nService {
   // ===============================================
 
   /**
-   * Inicializa el servicio cargando traducciones desde el backend
+   * Inicializa el servicio cargando idiomas y traducciones desde el backend
    */
   static async init() {
     if (!state.loaded && !state.loading) {
-      await this.loadAllTranslations();
+      await this.loadFromBackend();
     }
     return this;
   }
 
   /**
-   * Carga todas las traducciones desde el backend con protección contra carga múltiple
+   * Carga idiomas y traducciones desde el backend con protección contra carga múltiple
    */
-  static async loadAllTranslations() {
+  static async loadFromBackend() {
     if (state.loaded) return;
 
     if (state.loading && state.loadPromise) {
@@ -114,11 +92,50 @@ export class I18nService {
   }
   
   /**
-   * Ejecuta la carga real de traducciones desde el repositorio
+   * Ejecuta la carga real desde el repositorio
    */
   static async _performLoad() {
     try {
-      const flatTranslations = await I18nRepository.getAllFlatTranslations(LOCALES);
+      console.log('[I18nService] Starting load from backend...');
+      
+      // 1. Cargar configuración de idiomas desde backend
+      const languageConfig = await I18nRepository.getLanguagesConfig();
+      
+      console.log('[I18nService] Raw language config from backend:', languageConfig);
+      
+      if (Object.keys(languageConfig).length === 0) {
+        console.warn('[I18nService] No languages received from backend, using fallback');
+        state.languageConfig = FALLBACK_LANGUAGE_CONFIG;
+      } else {
+        state.languageConfig = languageConfig;
+      }
+
+      // 2. Extraer información derivada
+      state.languages = Object.values(state.languageConfig)
+        .filter(lang => lang.enabled !== false)
+        .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+      
+      console.log('[I18nService] Processed languages:', state.languages);
+      
+      state.languageCodes = state.languages.map(lang => lang.code);
+      
+      console.log('[I18nService] Language codes:', state.languageCodes);
+      
+      state.defaultLanguage = state.languages.find(lang => lang.isDefault) || state.languages[0];
+
+      console.log('[I18nService] Default language:', state.defaultLanguage);
+
+      if (import.meta.env.DEV) {
+        console.log(`[I18nService] Loaded ${state.languages.length} languages from backend:`,
+          state.languageCodes.join(', '));
+      }
+
+      // 3. Cargar traducciones para todos los idiomas
+      console.log('[I18nService] Loading translations for:', state.languageCodes);
+      
+      const flatTranslations = await I18nRepository.getAllFlatTranslations(state.languageCodes);
+
+      console.log('[I18nService] Flat translations received:', Object.keys(flatTranslations));
 
       Object.entries(flatTranslations).forEach(([locale, translations]) => {
         if (!translations || typeof translations !== 'object') {
@@ -129,22 +146,23 @@ export class I18nService {
 
         state.translations.set(locale, translations);
 
-        if (import.meta.env.DEV) {
-          console.log(`[I18nService] Loaded ${Object.keys(translations).length} translations for ${locale}`);
-        }
+        console.log(`[I18nService] Loaded ${Object.keys(translations).length} translations for ${locale}`);
       });
+
+      console.log('[I18nService] Final translations map keys:', Array.from(state.translations.keys()));
 
       state.loaded = true;
 
-      if (import.meta.env.DEV) {
-        console.log(`[I18nService] Initialized with ${state.languages.length} languages:`,
-          state.languages.map(l => l.code).join(', '));
-      }
-
     } catch (error) {
-      console.error('[I18nService] Error loading translations from backend:', error);
+      console.error('[I18nService] Error loading from backend:', error);
       
-      LOCALES.forEach(locale => {
+      // Fallback: usar configuración mínima
+      state.languageConfig = FALLBACK_LANGUAGE_CONFIG;
+      state.languages = Object.values(FALLBACK_LANGUAGE_CONFIG);
+      state.languageCodes = Object.keys(FALLBACK_LANGUAGE_CONFIG);
+      state.defaultLanguage = state.languages[0];
+      
+      state.languageCodes.forEach(locale => {
         state.translations.set(locale, {});
       });
       
@@ -155,18 +173,21 @@ export class I18nService {
   }
 
   /**
-   * Recarga las traducciones desde el backend
+   * Recarga todo desde el backend
    */
   static async reload() {
     state.loaded = false;
     state.loading = false;
     state.loadPromise = null;
     state.translations.clear();
+    state.languageConfig = {};
+    state.languages = [];
+    state.languageCodes = [];
     
     await this.init();
     
     if (import.meta.env.DEV) {
-      console.log('[I18nService] Translations reloaded from backend');
+      console.log('[I18nService] Reloaded from backend');
     }
   }
 
@@ -190,22 +211,32 @@ export class I18nService {
   }
 
   /**
+   * Obtiene el código del idioma por defecto
+   */
+  static getDefaultLocale() {
+    return state.defaultLanguage?.code || 'es';
+  }
+
+  /**
    * Genera URL relativa para navegación (SIN dominio)
    */
-  static getRelativeUrl(path, locale = DEFAULT_LOCALE) {
+  static getRelativeUrl(path, locale = null) {
+    const defaultLocale = this.getDefaultLocale();
+    const targetLocale = locale || defaultLocale;
+    
     let cleanPath = path?.replace(/^\/+|\/+$/g, '') || '';
     
-    if (locale === DEFAULT_LOCALE) {
+    if (targetLocale === defaultLocale) {
       return cleanPath === '' ? '/' : `/${cleanPath}`;
     }
     
-    return cleanPath === '' ? `/${locale}` : `/${locale}/${cleanPath}`;
+    return cleanPath === '' ? `/${targetLocale}` : `/${targetLocale}/${cleanPath}`;
   }
 
   /**
    * Genera URL completa (CON dominio) para SEO/metadatos
    */
-  static getAbsoluteUrl(path, locale = DEFAULT_LOCALE, Astro) {
+  static getAbsoluteUrl(path, locale = null, Astro) {
     const origin = this.getCurrentOrigin(Astro);
     const relativePath = this.getRelativeUrl(path, locale);
     
@@ -218,7 +249,7 @@ export class I18nService {
   static getAlternateUrls(path, Astro = null, absolute = false) {
     const urls = {};
 
-    LOCALES.forEach(locale => {
+    state.languageCodes.forEach(locale => {
       if (absolute && Astro) {
         urls[locale] = this.getAbsoluteUrl(path, locale, Astro);
       } else {
@@ -233,15 +264,16 @@ export class I18nService {
    * Detecta el idioma de una URL
    */
   static detectLocaleFromPath(pathname) {
+    const defaultLocale = this.getDefaultLocale();
     const segments = pathname.split('/').filter(Boolean);
 
     if (segments.length === 0) {
-      return { locale: DEFAULT_LOCALE, cleanPath: '/' };
+      return { locale: defaultLocale, cleanPath: '/' };
     }
 
     const firstSegment = segments[0];
 
-    if (LOCALES.includes(firstSegment) && firstSegment !== DEFAULT_LOCALE) {
+    if (state.languageCodes.includes(firstSegment) && firstSegment !== defaultLocale) {
       const cleanPath = '/' + segments.slice(1).join('/');
       return {
         locale: firstSegment,
@@ -249,7 +281,7 @@ export class I18nService {
       };
     }
 
-    return { locale: DEFAULT_LOCALE, cleanPath: pathname };
+    return { locale: defaultLocale, cleanPath: pathname };
   }
 
   // ===============================================
@@ -259,7 +291,9 @@ export class I18nService {
   /**
    * Obtiene una traducción
    */
-  static getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
+  static getTranslation(key, locale = null, params = {}) {
+    const targetLocale = locale || this.getDefaultLocale();
+    
     if (!state.loaded) {
       if (import.meta.env.DEV) {
         console.warn('[I18nService] Translations not loaded yet for key:', key);
@@ -267,28 +301,31 @@ export class I18nService {
       return key;
     }
 
-    const localeTranslations = state.translations.get(locale);
+    const localeTranslations = state.translations.get(targetLocale);
     if (!localeTranslations) {
       if (import.meta.env.DEV) {
-        console.warn(`[I18nService] No translations found for locale: ${locale}`);
+        console.warn(`[I18nService] No translations found for locale: ${targetLocale}`);
       }
       return key;
     }
 
     let translation = localeTranslations[key];
 
-    if (!translation && locale !== DEFAULT_LOCALE) {
-      const defaultTranslations = state.translations.get(DEFAULT_LOCALE);
+    // Fallback al idioma por defecto
+    const defaultLocale = this.getDefaultLocale();
+    if (!translation && targetLocale !== defaultLocale) {
+      const defaultTranslations = state.translations.get(defaultLocale);
       translation = defaultTranslations?.[key];
     }
 
     if (!translation) {
       if (import.meta.env.DEV) {
-        console.warn(`[I18nService] Missing translation for key: ${key} (locale: ${locale})`);
+        console.warn(`[I18nService] Missing translation for key: ${key} (locale: ${targetLocale})`);
       }
       return key;
     }
 
+    // Reemplazar parámetros si existen
     if (params && Object.keys(params).length > 0) {
       translation = this.replaceParams(translation, params);
     }
@@ -328,13 +365,15 @@ export class I18nService {
   /**
    * Obtiene todas las traducciones para un namespace específico
    */
-  static getNamespaceTranslations(namespace, locale = DEFAULT_LOCALE) {
+  static getNamespaceTranslations(namespace, locale = null) {
+    const targetLocale = locale || this.getDefaultLocale();
+    
     if (!state.loaded) {
       console.warn('[I18nService] Translations not loaded.');
       return {};
     }
 
-    const allTranslations = this.getAllTranslations(locale);
+    const allTranslations = this.getAllTranslations(targetLocale);
     const namespaceTranslations = {};
 
     const prefix = `${namespace}.`;
@@ -353,8 +392,9 @@ export class I18nService {
    */
   static getStats() {
     const stats = {};
+    const defaultLocale = this.getDefaultLocale();
 
-    for (const locale of LOCALES) {
+    for (const locale of state.languageCodes) {
       const translations = state.translations.get(locale) || {};
       stats[locale] = {
         total: Object.keys(translations).length,
@@ -362,10 +402,10 @@ export class I18nService {
       };
     }
 
-    const defaultKeys = Object.keys(state.translations.get(DEFAULT_LOCALE) || {});
+    const defaultKeys = Object.keys(state.translations.get(defaultLocale) || {});
 
-    for (const locale of LOCALES) {
-      if (locale === DEFAULT_LOCALE) continue;
+    for (const locale of state.languageCodes) {
+      if (locale === defaultLocale) continue;
 
       const localeKeys = Object.keys(state.translations.get(locale) || {});
       const missing = defaultKeys.filter(key => !localeKeys.includes(key));
@@ -404,21 +444,21 @@ export class I18nService {
    * Obtiene códigos de idiomas disponibles
    */
   static getLanguageCodes() {
-    return LOCALES;
+    return state.languageCodes;
   }
 
   /**
    * Verifica si un código de idioma es válido
    */
   static isValidLanguage(code) {
-    return LOCALES.includes(code);
+    return state.languageCodes.includes(code);
   }
 
   /**
    * Obtiene información completa del idioma
    */
   static getLocaleInfo(locale) {
-    return LANGUAGE_CONFIG[locale] || LANGUAGE_CONFIG[DEFAULT_LOCALE];
+    return state.languageConfig[locale] || state.defaultLanguage;
   }
 
   // ===============================================
@@ -428,7 +468,8 @@ export class I18nService {
   /**
    * Formatea una fecha según el idioma
    */
-  static formatDate(date, locale = DEFAULT_LOCALE, options = {}) {
+  static formatDate(date, locale = null, options = {}) {
+    const targetLocale = locale || this.getDefaultLocale();
     const defaultOptions = {
       year: 'numeric',
       month: 'long',
@@ -438,9 +479,9 @@ export class I18nService {
     const formatOptions = { ...defaultOptions, ...options };
 
     try {
-      return new Intl.DateTimeFormat(locale, formatOptions).format(date);
+      return new Intl.DateTimeFormat(targetLocale, formatOptions).format(date);
     } catch (error) {
-      console.warn(`[I18nService] Error formatting date for locale ${locale}:`, error);
+      console.warn(`[I18nService] Error formatting date for locale ${targetLocale}:`, error);
       return date.toLocaleDateString();
     }
   }
@@ -448,11 +489,13 @@ export class I18nService {
   /**
    * Formatea un número según el idioma
    */
-  static formatNumber(number, locale = DEFAULT_LOCALE, options = {}) {
+  static formatNumber(number, locale = null, options = {}) {
+    const targetLocale = locale || this.getDefaultLocale();
+    
     try {
-      return new Intl.NumberFormat(locale, options).format(number);
+      return new Intl.NumberFormat(targetLocale, options).format(number);
     } catch (error) {
-      console.warn(`[I18nService] Error formatting number for locale ${locale}:`, error);
+      console.warn(`[I18nService] Error formatting number for locale ${targetLocale}:`, error);
       return number.toString();
     }
   }
@@ -460,8 +503,10 @@ export class I18nService {
   /**
    * Formatea una moneda según el idioma
    */
-  static formatCurrency(amount, currency = 'EUR', locale = DEFAULT_LOCALE) {
-    return this.formatNumber(amount, locale, {
+  static formatCurrency(amount, currency = 'EUR', locale = null) {
+    const targetLocale = locale || this.getDefaultLocale();
+    
+    return this.formatNumber(amount, targetLocale, {
       style: 'currency',
       currency: currency
     });
@@ -475,7 +520,8 @@ export class I18nService {
    * Helper principal para obtener información de i18n en componentes Astro
    */
   static getI18nInfo(Astro) {
-    const locale = Astro.currentLocale || DEFAULT_LOCALE;
+    const defaultLocale = this.getDefaultLocale();
+    const locale = Astro.currentLocale || defaultLocale;
 
     let cleanPath = Astro.url.pathname;
 
@@ -491,9 +537,9 @@ export class I18nService {
       locale,
       cleanPath,
       localeInfo: this.getLocaleInfo(locale),
-      defaultLocale: DEFAULT_LOCALE,
+      defaultLocale,
       availableLocales: this.getLanguageCodes(),
-      isDefaultLocale: locale === DEFAULT_LOCALE,
+      isDefaultLocale: locale === defaultLocale,
       i18n: this
     };
   }
@@ -582,7 +628,7 @@ export class I18nService {
   static getTextDirectionWithAstro(Astro) {
     const { locale } = this.getI18nInfo(Astro);
     const localeInfo = this.getLocaleInfo(locale);
-    return localeInfo.direction || 'ltr';
+    return localeInfo?.direction || 'ltr';
   }
 
   /**
@@ -702,8 +748,9 @@ export class I18nService {
    */
   static isCurrentLanguageUrl(url, Astro) {
     const { locale } = this.getI18nInfo(Astro);
+    const defaultLocale = this.getDefaultLocale();
 
-    if (locale === DEFAULT_LOCALE) {
+    if (locale === defaultLocale) {
       return !url.match(/^\/[a-z]{2,3}\//);
     } else {
       return url.startsWith(`/${locale}/`) || url === `/${locale}`;
@@ -728,9 +775,10 @@ export class I18nService {
       .filter(lang => lang.length >= 2);
 
     const availableLocales = this.getLanguageCodes();
+    const defaultLocale = this.getDefaultLocale();
 
     const preferredLocale = browserLangs.find(lang =>
-      availableLocales.includes(lang) && lang !== DEFAULT_LOCALE
+      availableLocales.includes(lang) && lang !== defaultLocale
     );
 
     if (preferredLocale) {
@@ -766,6 +814,11 @@ export class I18nService {
   }
 }
 
+// Exportar constantes dinámicas
+export const LOCALES = state.languageCodes;
+export const DEFAULT_LOCALE = state.defaultLanguage?.code || 'es';
+export const LANGUAGE_CONFIG = state.languageConfig;
+
 // Auto-inicialización en servidor
 if (typeof window === 'undefined') {
   I18nService.init().catch(console.error);
@@ -778,7 +831,7 @@ if (typeof window === 'undefined') {
 /**
  * Función helper para obtener traducciones
  */
-export async function getTranslation(key, locale = DEFAULT_LOCALE, params = {}) {
+export async function getTranslation(key, locale = null, params = {}) {
   if (!state.loaded) {
     await I18nService.init();
   }

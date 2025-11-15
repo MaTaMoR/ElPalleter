@@ -37,7 +37,7 @@ export class ThemeService {
         this.setTheme(initialTheme, { skipSave: false, triggerCallbacks: false });
         this.enableThemeTransitions();
         
-        console.log(`🎨 ThemeService inicializado con tema: ${initialTheme}`);
+        console.debug(`[ThemeService] Inicializado con tema: ${initialTheme}`);
         
         return initialTheme;
     }

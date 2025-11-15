@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { I18nService } from '../../services/I18Service.js';
+import { I18nService } from '../../services/I18nService.js';
 import ThemeToggle from '../theme/ThemeToggle.astro';
 import Text from '../i18n/Text.astro'; // Importar el componente Text
 
@@ -32,7 +32,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       {currentLanguage.flag.isEmoji ? (
         <span class="flag-emoji" aria-hidden="true">{currentLanguage.flag.value}</span>
       ) : (
-        <img src={currentLanguage.flag.value} alt="" class="flag-svg" aria-hidden="true" />
+        <img src={currentLanguage.flag.value} alt="flag-svg" class="flag-svg" aria-hidden="true" />
       )}
     </span>
     <span class="lang-arrow" aria-hidden="true">▼</span>
@@ -53,7 +53,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
           {lang.flag.isEmoji ? (
             <span class="flag-emoji" aria-hidden="true">{lang.flag.value}</span>
           ) : (
-            <img src={lang.flag.value} alt="" class="flag-svg" aria-hidden="true" />
+            <img src={lang.flag.value} alt="flag-svg" class="flag-svg" aria-hidden="true" />
           )}
         </span>
         <span class="lang-full-name">{lang.nativeName}</span>
