@@ -10,7 +10,207 @@ import { useMenuData } from '../../hooks/useMenuData';
 import { MenuService } from '../../services/MenuService';
 import styles from './MenuPage.module.css';
 
-// Datos mock para testing (fallback)
+// ============================================================================
+// DATA STRUCTURE UTILITIES
+// ============================================================================
+
+/**
+ * Builds a hierarchical ID from components
+ */
+const buildHierarchicalId = (categoryId, subcategoryId = null, itemId = null) => {
+  if (itemId) return `${categoryId}.${subcategoryId}.${itemId}`;
+  if (subcategoryId) return `${categoryId}.${subcategoryId}`;
+  return categoryId;
+};
+
+/**
+ * Parses a hierarchical ID into its components
+ */
+const parseHierarchicalId = (hierarchicalId) => {
+  const parts = hierarchicalId.split('.');
+  return {
+    categoryId: parts[0] || null,
+    subcategoryId: parts[1] || null,
+    itemId: parts[2] || null,
+    level: parts.length === 1 ? 'category' : parts.length === 2 ? 'subcategory' : 'item'
+  };
+};
+
+/**
+ * Converts nested menu data to flat Maps structure
+ */
+const flattenMenuData = (nestedData) => {
+  const categoriesMap = new Map();
+  const subcategoriesMap = new Map();
+  const itemsMap = new Map();
+  const childrenMap = new Map();
+
+  nestedData.forEach((category) => {
+    const categoryId = category.id;
+    const categoryHId = buildHierarchicalId(categoryId);
+
+    // Store category
+    categoriesMap.set(categoryHId, {
+      id: category.id,
+      nameKey: category.nameKey,
+      orderIndex: category.orderIndex,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      _state: category._state || 'normal',
+      _previousState: category._previousState
+    });
+
+    // Track category's subcategories
+    const subcategoryIds = [];
+
+    (category.subcategories || []).forEach((subcategory) => {
+      const subcategoryId = subcategory.id;
+      const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+
+      subcategoryIds.push(subcategoryHId);
+
+      // Store subcategory
+      subcategoriesMap.set(subcategoryHId, {
+        id: subcategory.id,
+        parentId: categoryId,
+        nameKey: subcategory.nameKey,
+        orderIndex: subcategory.orderIndex,
+        createdAt: subcategory.createdAt,
+        updatedAt: subcategory.updatedAt,
+        _state: subcategory._state || 'normal',
+        _previousState: subcategory._previousState
+      });
+
+      // Track subcategory's items
+      const itemIds = [];
+
+      (subcategory.items || []).forEach((item) => {
+        const itemId = item.id;
+        const itemHId = buildHierarchicalId(categoryId, subcategoryId, itemId);
+
+        itemIds.push(itemHId);
+
+        // Store item
+        itemsMap.set(itemHId, {
+          id: item.id,
+          parentId: subcategoryId,
+          categoryId: categoryId,
+          nameKey: item.nameKey,
+          descriptionKey: item.descriptionKey,
+          price: item.price,
+          available: item.available !== undefined ? item.available : true,
+          orderIndex: item.orderIndex,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          _state: item._state || 'normal',
+          _previousState: item._previousState
+        });
+      });
+
+      if (itemIds.length > 0) {
+        childrenMap.set(subcategoryHId, itemIds);
+      }
+    });
+
+    if (subcategoryIds.length > 0) {
+      childrenMap.set(categoryHId, subcategoryIds);
+    }
+  });
+
+  return { categoriesMap, subcategoriesMap, itemsMap, childrenMap };
+};
+
+/**
+ * Converts flat Maps structure back to nested array for backend/rendering
+ */
+const unflattenMenuData = (categoriesMap, subcategoriesMap, itemsMap, childrenMap) => {
+  const categories = [];
+
+  // Get all root categories sorted by orderIndex
+  const categoryEntries = Array.from(categoriesMap.entries())
+    .sort((a, b) => a[1].orderIndex - b[1].orderIndex);
+
+  categoryEntries.forEach(([categoryHId, category]) => {
+    const subcategoryHIds = childrenMap.get(categoryHId) || [];
+    const subcategories = [];
+
+    subcategoryHIds.forEach((subcategoryHId) => {
+      const subcategory = subcategoriesMap.get(subcategoryHId);
+      if (!subcategory) return;
+
+      const itemHIds = childrenMap.get(subcategoryHId) || [];
+      const items = [];
+
+      itemHIds.forEach((itemHId) => {
+        const item = itemsMap.get(itemHId);
+        if (!item) return;
+
+        items.push({
+          id: item.id,
+          nameKey: item.nameKey,
+          descriptionKey: item.descriptionKey,
+          price: item.price,
+          available: item.available,
+          orderIndex: item.orderIndex,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          _state: item._state,
+          _previousState: item._previousState
+        });
+      });
+
+      subcategories.push({
+        id: subcategory.id,
+        nameKey: subcategory.nameKey,
+        orderIndex: subcategory.orderIndex,
+        createdAt: subcategory.createdAt,
+        updatedAt: subcategory.updatedAt,
+        items: items,
+        _state: subcategory._state,
+        _previousState: subcategory._previousState
+      });
+    });
+
+    categories.push({
+      id: category.id,
+      nameKey: category.nameKey,
+      orderIndex: category.orderIndex,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      subcategories: subcategories,
+      _state: category._state,
+      _previousState: category._previousState
+    });
+  });
+
+  return categories;
+};
+
+/**
+ * Gets all parent hierarchical IDs for a given hierarchical ID
+ */
+const getParentHierarchicalIds = (hierarchicalId) => {
+  const parts = hierarchicalId.split('.');
+  const parents = [];
+
+  for (let i = 1; i < parts.length; i++) {
+    parents.push(parts.slice(0, i).join('.'));
+  }
+
+  return parents;
+};
+
+/**
+ * Checks if a hierarchical ID is a descendant of another
+ */
+const isDescendantOf = (childId, potentialParentId) => {
+  return childId !== potentialParentId && childId.startsWith(potentialParentId + '.');
+};
+
+// ============================================================================
+// MOCK DATA
+// ============================================================================
+
 const MOCK_MENU_DATA = [
   {
     id: 'cat-1',
@@ -80,7 +280,7 @@ const MOCK_MENU_DATA = [
         id: 'sub-3',
         nameKey: 'Arroces',
         orderIndex: 0,
-        createdAt: '2024-01-15T10:00:00Z',
+        createdAt: '2024-01-15T10:00:00:00Z',
         updatedAt: '2024-01-20T15:30:00Z',
         items: [
           {
@@ -109,279 +309,273 @@ const MOCK_MENU_DATA = [
   }
 ];
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 const MenuPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [isEditing, setIsEditing] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Cargar datos del backend
+  // Load data from backend
   const { data: backendData, loading, error, reload } = useMenuData(selectedLanguage);
-  const [menuData, setMenuData] = useState([]);
 
-  // Sistema de tracking de cambios - Mucho más simple
-  // Map donde la key es el ID del elemento y el value es el tipo de cambio
+  // Flat data structure using Maps
+  const [categoriesMap, setCategoriesMap] = useState(new Map());
+  const [subcategoriesMap, setSubcategoriesMap] = useState(new Map());
+  const [itemsMap, setItemsMap] = useState(new Map());
+  const [childrenMap, setChildrenMap] = useState(new Map());
+
+  // Change tracking
   const [changeTracking, setChangeTracking] = useState(new Map());
 
-  // Sincronizar datos del backend con el estado local
+  // Sync backend data with local state
   useEffect(() => {
+    let dataToUse = null;
+
     if (backendData && backendData.length > 0) {
-      setMenuData(backendData);
-      setChangeTracking(new Map()); // Limpiar cambios al cargar nuevos datos
+      dataToUse = backendData;
     } else if (!loading && !error) {
-      // Si no hay datos del backend, usar mock
-      setMenuData(MOCK_MENU_DATA);
-      setChangeTracking(new Map()); // Limpiar cambios al cargar mock
+      dataToUse = MOCK_MENU_DATA;
+    }
+
+    if (dataToUse) {
+      const flattened = flattenMenuData(dataToUse);
+      setCategoriesMap(flattened.categoriesMap);
+      setSubcategoriesMap(flattened.subcategoriesMap);
+      setItemsMap(flattened.itemsMap);
+      setChildrenMap(flattened.childrenMap);
+      setChangeTracking(new Map());
     }
   }, [backendData, loading, error]);
 
-  // Estado para navegación por niveles
+  // Navigation state
   const [currentLevel, setCurrentLevel] = useState('categories');
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [selectedCategoryHId, setSelectedCategoryHId] = useState(null);
+  const [selectedSubcategoryHId, setSelectedSubcategoryHId] = useState(null);
 
-  // Funciones para gestionar el tracking de cambios
-  const trackChange = (id, type) => {
+  // ============================================================================
+  // CHANGE TRACKING UTILITIES
+  // ============================================================================
+
+  const trackChange = (hierarchicalId, type) => {
     setChangeTracking(prev => {
       const newMap = new Map(prev);
-      newMap.set(id, type);
+      newMap.set(hierarchicalId, type);
       return newMap;
     });
   };
 
-  const untrackChange = (id) => {
+  const untrackChange = (hierarchicalId) => {
     setChangeTracking(prev => {
       const newMap = new Map(prev);
-      newMap.delete(id);
+      newMap.delete(hierarchicalId);
       return newMap;
     });
   };
 
-  const hasRealChanges = () => {
-    return changeTracking.size > 0;
-  };
+  const hasRealChanges = () => changeTracking.size > 0;
 
-  // Función auxiliar para construir el ID jerárquico de un elemento
-  const buildHierarchicalId = (categoryId, subcategoryId = null, itemId = null) => {
-    if (itemId) {
-      return `${categoryId}.${subcategoryId}.${itemId}`;
-    }
-    if (subcategoryId) {
-      return `${categoryId}.${subcategoryId}`;
-    }
-    return categoryId;
-  };
-
-  // Función auxiliar para verificar si hay cambios en hijos (usando IDs jerárquicos)
   const hasChildChanges = (hierarchicalId) => {
     for (const [changeId] of changeTracking) {
-      // Si el changeId empieza con hierarchicalId pero no es igual, es un hijo
-      if (changeId !== hierarchicalId && changeId.startsWith(hierarchicalId + '.')) {
+      if (isDescendantOf(changeId, hierarchicalId)) {
         return true;
       }
     }
     return false;
   };
 
-  // Función para enriquecer los datos del menú con el estado visual basado en el tracking
-  const enrichMenuDataWithVisualState = (data) => {
-    return data.map(category => {
-      const categoryHierarchicalId = buildHierarchicalId(category.id);
+  // ============================================================================
+  // VISUAL STATE ENRICHMENT
+  // ============================================================================
 
-      // Primero procesar subcategorías e items
-      const enrichedSubcategories = (category.subcategories || []).map(subcategory => {
-        const subcategoryHierarchicalId = buildHierarchicalId(category.id, subcategory.id);
+  const calculateVisualState = (hierarchicalId, currentState) => {
+    if (currentState === 'new') return 'new';
 
-        // Procesar items - calcular su estado visual
-        const enrichedItems = (subcategory.items || []).map(item => {
-          const itemHierarchicalId = buildHierarchicalId(category.id, subcategory.id, item.id);
+    if (changeTracking.has(hierarchicalId)) {
+      const changeType = changeTracking.get(hierarchicalId);
+      if (changeType === 'delete') return 'deleted';
+      if (changeType === 'edit' || changeType === 'create') return 'edited';
+    }
 
-          let itemState = 'normal';
-          if (item._state === 'new') {
-            itemState = 'new';
-          } else if (changeTracking.has(itemHierarchicalId)) {
-            const changeType = changeTracking.get(itemHierarchicalId);
-            if (changeType === 'delete') itemState = 'deleted';
-            else if (changeType === 'edit' || changeType === 'create') itemState = 'edited';
-          }
+    if (hasChildChanges(hierarchicalId)) return 'edited';
 
-          return {
-            ...item,
-            _state: itemState
-          };
-        });
+    return 'normal';
+  };
 
-        // Calcular estado de la subcategoría
-        let subcategoryState = 'normal';
+  const enrichWithVisualState = () => {
+    const enrichedCategories = new Map();
+    const enrichedSubcategories = new Map();
+    const enrichedItems = new Map();
 
-        if (subcategory._state === 'new') {
-          subcategoryState = 'new';
-        } else if (changeTracking.has(subcategoryHierarchicalId)) {
-          const changeType = changeTracking.get(subcategoryHierarchicalId);
-          if (changeType === 'delete') {
-            subcategoryState = 'deleted';
-          } else if (changeType === 'edit' || changeType === 'create') {
-            subcategoryState = 'edited';
-          } 
-        } else if (hasChildChanges(subcategoryHierarchicalId)) {
-          // Si tiene items con cambios
-          subcategoryState = 'edited';
-        }
-
-        return {
-          ...subcategory,
-          _state: subcategoryState,
-          items: enrichedItems
-        };
+    // Enrich items
+    itemsMap.forEach((item, itemHId) => {
+      enrichedItems.set(itemHId, {
+        ...item,
+        _state: calculateVisualState(itemHId, item._state)
       });
+    });
 
-      // Calcular estado de la categoría
-      let categoryState = 'normal';
+    // Enrich subcategories
+    subcategoriesMap.forEach((subcategory, subcategoryHId) => {
+      enrichedSubcategories.set(subcategoryHId, {
+        ...subcategory,
+        _state: calculateVisualState(subcategoryHId, subcategory._state)
+      });
+    });
 
-      if (category._state === 'new') {
-        categoryState = 'new';
-      } else if (changeTracking.has(categoryHierarchicalId)) {
-        const changeType = changeTracking.get(categoryHierarchicalId);
-        if (changeType === 'delete') {
-          categoryState = 'deleted';
-        } else if (changeType === 'edit' || changeType === 'create') {
-          categoryState = 'edited';
-        }
-      } else if (hasChildChanges(categoryHierarchicalId)) {
-        // Si tiene subcategorías o items con cambios
-        categoryState = 'edited';
-      }
+    // Enrich categories
+    categoriesMap.forEach((category, categoryHId) => {
+      enrichedCategories.set(categoryHId, {
+        ...category,
+        _state: calculateVisualState(categoryHId, category._state)
+      });
+    });
+
+    return { enrichedCategories, enrichedSubcategories, enrichedItems };
+  };
+
+  // ============================================================================
+  // DATA RETRIEVAL FOR VIEWS
+  // ============================================================================
+
+  const getCategoriesForView = () => {
+    const { enrichedCategories } = enrichWithVisualState();
+    return unflattenMenuData(enrichedCategories, new Map(), new Map(), childrenMap);
+  };
+
+  const getCurrentCategoryData = () => {
+    if (!selectedCategoryHId) return null;
+    const { enrichedCategories, enrichedSubcategories, enrichedItems } = enrichWithVisualState();
+
+    const category = enrichedCategories.get(selectedCategoryHId);
+    if (!category) return null;
+
+    const subcategoryHIds = childrenMap.get(selectedCategoryHId) || [];
+    const subcategories = subcategoryHIds.map(hId => {
+      const sub = enrichedSubcategories.get(hId);
+      const itemHIds = childrenMap.get(hId) || [];
+      const items = itemHIds.map(itemHId => enrichedItems.get(itemHId)).filter(Boolean);
 
       return {
-        ...category,
-        _state: categoryState,
-        subcategories: enrichedSubcategories
+        ...sub,
+        items
       };
+    }).filter(Boolean);
+
+    return {
+      ...category,
+      subcategories
+    };
+  };
+
+  const getCurrentSubcategoryData = () => {
+    if (!selectedSubcategoryHId) return null;
+    const { enrichedSubcategories, enrichedItems } = enrichWithVisualState();
+
+    const subcategory = enrichedSubcategories.get(selectedSubcategoryHId);
+    if (!subcategory) return null;
+
+    const itemHIds = childrenMap.get(selectedSubcategoryHId) || [];
+    const items = itemHIds.map(hId => enrichedItems.get(hId)).filter(Boolean);
+
+    return {
+      ...subcategory,
+      items
+    };
+  };
+
+  const getSubcategoryCounts = () => {
+    const counts = {};
+    categoriesMap.forEach((category, categoryHId) => {
+      const subcategoryHIds = childrenMap.get(categoryHId) || [];
+      counts[category.id] = subcategoryHIds.length;
     });
+    return counts;
   };
 
-  // Estado para diálogos de confirmación
-  const [confirmDialog, setConfirmDialog] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    onConfirm: null,
-    type: 'warning'
-  });
+  const getItemCounts = () => {
+    const counts = {};
+    if (!selectedCategoryHId) return counts;
 
-  // Función para procesar datos antes de enviar al backend
-  const processMenuDataForBackend = (data) => {
-    return data
-      .filter(category => category._state !== 'deleted') // Eliminar categorías marcadas para borrar
-      .map(category => {
-        const cleanCategory = {
-          // Si es un ID temporal (nuevo), enviar null para que el backend asigne un ID real
-          id: category.id?.startsWith('temp-') ? null : category.id,
-          nameKey: category.nameKey,
-          orderIndex: category.orderIndex,
-          createdAt: category.createdAt,
-          updatedAt: category.updatedAt
-        };
-
-        // Procesar subcategorías
-        if (category.subcategories && category.subcategories.length > 0) {
-          cleanCategory.subcategories = category.subcategories
-            .filter(subcategory => subcategory._state !== 'deleted')
-            .map(subcategory => {
-              const cleanSubcategory = {
-                id: subcategory.id?.startsWith('temp-') ? null : subcategory.id,
-                nameKey: subcategory.nameKey,
-                orderIndex: subcategory.orderIndex,
-                createdAt: subcategory.createdAt,
-                updatedAt: subcategory.updatedAt
-              };
-
-              // Procesar items
-              if (subcategory.items && subcategory.items.length > 0) {
-                cleanSubcategory.items = subcategory.items
-                  .filter(item => item._state !== 'deleted')
-                  .map(item => ({
-                    id: item.id?.startsWith('temp-') ? null : item.id,
-                    nameKey: item.nameKey,
-                    descriptionKey: item.descriptionKey,
-                    price: parseFloat(item.price),
-                    available: item.available !== undefined ? item.available : true,
-                    orderIndex: item.orderIndex,
-                    createdAt: item.createdAt,
-                    updatedAt: item.updatedAt
-                  }));
-              }
-
-              return cleanSubcategory;
-            });
-        }
-
-        return cleanCategory;
-      });
+    const subcategoryHIds = childrenMap.get(selectedCategoryHId) || [];
+    subcategoryHIds.forEach(subcategoryHId => {
+      const subcategory = subcategoriesMap.get(subcategoryHId);
+      if (subcategory) {
+        const itemHIds = childrenMap.get(subcategoryHId) || [];
+        counts[subcategory.id] = itemHIds.length;
+      }
+    });
+    return counts;
   };
 
-  // Función de validación
-  const validateMenuData = (data) => {
+  // ============================================================================
+  // VALIDATION
+  // ============================================================================
+
+  const validateMenuData = () => {
     const errors = {};
 
-    data.forEach(category => {
+    categoriesMap.forEach((category, categoryHId) => {
       const categoryErrors = {};
 
-      // Validar nombre de categoría
       if (!category.nameKey || category.nameKey.trim().length < 3) {
         categoryErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
       }
 
-      // Validar subcategorías
-      if (category.subcategories) {
-        const subcategoriesErrors = {};
-        category.subcategories.forEach(subcategory => {
-          const subcategoryErrors = {};
+      const subcategoryHIds = childrenMap.get(categoryHId) || [];
+      const subcategoriesErrors = {};
 
-          // Validar nombre de subcategoría
-          if (!subcategory.nameKey || subcategory.nameKey.trim().length < 3) {
-            subcategoryErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
+      subcategoryHIds.forEach(subcategoryHId => {
+        const subcategory = subcategoriesMap.get(subcategoryHId);
+        if (!subcategory) return;
+
+        const subcategoryErrors = {};
+
+        if (!subcategory.nameKey || subcategory.nameKey.trim().length < 3) {
+          subcategoryErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
+        }
+
+        const itemHIds = childrenMap.get(subcategoryHId) || [];
+        const itemsErrors = {};
+
+        itemHIds.forEach(itemHId => {
+          const item = itemsMap.get(itemHId);
+          if (!item) return;
+
+          const itemErrors = {};
+
+          if (!item.nameKey || item.nameKey.trim().length < 3) {
+            itemErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
           }
 
-          // Validar items
-          if (subcategory.items) {
-            const itemsErrors = {};
-            subcategory.items.forEach(item => {
-              const itemErrors = {};
-
-              // Validar nombre del item
-              if (!item.nameKey || item.nameKey.trim().length < 3) {
-                itemErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
-              }
-
-              // Validar precio
-              if (item.price === undefined || item.price === null || item.price === '') {
-                itemErrors.price = 'El precio es requerido';
-              } else {
-                const priceNum = parseFloat(item.price);
-                if (isNaN(priceNum) || priceNum < 0) {
-                  itemErrors.price = 'El precio debe ser un número positivo';
-                }
-              }
-
-              if (Object.keys(itemErrors).length > 0) {
-                itemsErrors[item.id] = itemErrors;
-              }
-            });
-
-            if (Object.keys(itemsErrors).length > 0) {
-              subcategoryErrors.items = itemsErrors;
+          if (item.price === undefined || item.price === null || item.price === '') {
+            itemErrors.price = 'El precio es requerido';
+          } else {
+            const priceNum = parseFloat(item.price);
+            if (isNaN(priceNum) || priceNum < 0) {
+              itemErrors.price = 'El precio debe ser un número positivo';
             }
           }
 
-          if (Object.keys(subcategoryErrors).length > 0) {
-            subcategoriesErrors[subcategory.id] = subcategoryErrors;
+          if (Object.keys(itemErrors).length > 0) {
+            itemsErrors[item.id] = itemErrors;
           }
         });
 
-        if (Object.keys(subcategoriesErrors).length > 0) {
-          categoryErrors.subcategories = subcategoriesErrors;
+        if (Object.keys(itemsErrors).length > 0) {
+          subcategoryErrors.items = itemsErrors;
         }
+
+        if (Object.keys(subcategoryErrors).length > 0) {
+          subcategoriesErrors[subcategory.id] = subcategoryErrors;
+        }
+      });
+
+      if (Object.keys(subcategoriesErrors).length > 0) {
+        categoryErrors.subcategories = subcategoriesErrors;
       }
 
       if (Object.keys(categoryErrors).length > 0) {
@@ -392,90 +586,71 @@ const MenuPage = () => {
     return errors;
   };
 
-  // Validar datos cada vez que cambian en modo edición
   useEffect(() => {
-    if (isEditing && menuData.length > 0) {
-      const errors = validateMenuData(menuData);
+    if (isEditing) {
+      const errors = validateMenuData();
       setValidationErrors(errors);
     } else {
       setValidationErrors({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuData, isEditing]);
+  }, [categoriesMap, subcategoriesMap, itemsMap, isEditing]);
 
-  // Funciones de navegación
+  // ============================================================================
+  // NAVIGATION
+  // ============================================================================
+
   const handleNavigateToCategories = () => {
     setCurrentLevel('categories');
-    setSelectedCategory(null);
-    setSelectedSubcategory(null);
+    setSelectedCategoryHId(null);
+    setSelectedSubcategoryHId(null);
   };
 
   const handleNavigateToSubcategories = () => {
-    if (selectedCategory) {
+    if (selectedCategoryHId) {
       setCurrentLevel('subcategories');
-      setSelectedSubcategory(null);
+      setSelectedSubcategoryHId(null);
     }
   };
 
   const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
+    const categoryHId = buildHierarchicalId(category.id);
+    setSelectedCategoryHId(categoryHId);
     setCurrentLevel('subcategories');
   };
 
   const handleSubcategoryClick = (subcategory) => {
-    setSelectedSubcategory(subcategory);
+    const { categoryId } = parseHierarchicalId(selectedCategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategory.id);
+    setSelectedSubcategoryHId(subcategoryHId);
     setCurrentLevel('items');
   };
 
   const handleBackFromSubcategories = () => {
     setCurrentLevel('categories');
-    setSelectedCategory(null);
+    setSelectedCategoryHId(null);
   };
 
   const handleBackFromItems = () => {
     setCurrentLevel('subcategories');
-    setSelectedSubcategory(null);
+    setSelectedSubcategoryHId(null);
   };
 
-  // Obtener datos filtrados según la navegación actual
-  const getCurrentCategory = () => {
-    if (!selectedCategory) return null;
-    return menuData.find(cat => cat.id === selectedCategory.id);
-  };
+  // ============================================================================
+  // DIALOG STATE
+  // ============================================================================
 
-  const getCurrentSubcategories = () => {
-    const category = getCurrentCategory();
-    return category?.subcategories || [];
-  };
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+    type: 'warning'
+  });
 
-  const getCurrentSubcategory = () => {
-    if (!selectedSubcategory) return null;
-    const subcategories = getCurrentSubcategories();
-    return subcategories.find(sub => sub.id === selectedSubcategory.id);
-  };
-
-  const getCurrentItems = () => {
-    const subcategory = getCurrentSubcategory();
-    return subcategory?.items || [];
-  };
-
-  // Contar subcategorías e items para mostrar en las vistas
-  const getSubcategoryCounts = () => {
-    const counts = {};
-    menuData.forEach(category => {
-      counts[category.id] = category.subcategories?.length || 0;
-    });
-    return counts;
-  };
-
-  const getItemCounts = () => {
-    const counts = {};
-    const subcategories = getCurrentSubcategories();
-    subcategories.forEach(subcategory => {
-      counts[subcategory.id] = subcategory.items?.length || 0;
-    });
-    return counts;
-  };
+  // ============================================================================
+  // SAVE/CANCEL/EDIT MODE
+  // ============================================================================
 
   const handleLanguageChange = (language) => {
     if (hasRealChanges()) {
@@ -504,7 +679,7 @@ const MenuPage = () => {
         onConfirm: () => {
           setIsEditing(false);
           setConfirmDialog({ ...confirmDialog, isOpen: false });
-          reload(); // Recargar datos originales desde el backend
+          reload();
         }
       });
     } else {
@@ -512,16 +687,62 @@ const MenuPage = () => {
     }
   };
 
+  const processMenuDataForBackend = (data) => {
+    return data
+      .filter(category => category._state !== 'deleted')
+      .map(category => {
+        const cleanCategory = {
+          id: category.id?.startsWith('temp-') ? null : category.id,
+          nameKey: category.nameKey,
+          orderIndex: category.orderIndex,
+          createdAt: category.createdAt,
+          updatedAt: category.updatedAt
+        };
+
+        if (category.subcategories && category.subcategories.length > 0) {
+          cleanCategory.subcategories = category.subcategories
+            .filter(subcategory => subcategory._state !== 'deleted')
+            .map(subcategory => {
+              const cleanSubcategory = {
+                id: subcategory.id?.startsWith('temp-') ? null : subcategory.id,
+                nameKey: subcategory.nameKey,
+                orderIndex: subcategory.orderIndex,
+                createdAt: subcategory.createdAt,
+                updatedAt: subcategory.updatedAt
+              };
+
+              if (subcategory.items && subcategory.items.length > 0) {
+                cleanSubcategory.items = subcategory.items
+                  .filter(item => item._state !== 'deleted')
+                  .map(item => ({
+                    id: item.id?.startsWith('temp-') ? null : item.id,
+                    nameKey: item.nameKey,
+                    descriptionKey: item.descriptionKey,
+                    price: parseFloat(item.price),
+                    available: item.available !== undefined ? item.available : true,
+                    orderIndex: item.orderIndex,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt
+                  }));
+              }
+
+              return cleanSubcategory;
+            });
+        }
+
+        return cleanCategory;
+      });
+  };
+
   const handleSave = () => {
-    // Validar antes de guardar
-    const errors = validateMenuData(menuData);
+    const errors = validateMenuData();
     const hasErrors = Object.keys(errors).length > 0;
 
     if (hasErrors) {
       setConfirmDialog({
         isOpen: true,
         title: 'Errores de validación',
-        message: 'No se puede guardar porque hay errores de validación en la carta. Por favor, corrígelos antes de continuar.',
+        message: 'No se puede guardar porque hay errores de validación en la carta.',
         type: 'danger',
         onConfirm: () => {
           setConfirmDialog({ ...confirmDialog, isOpen: false });
@@ -540,19 +761,13 @@ const MenuPage = () => {
         setIsSaving(true);
 
         try {
-          // Procesar datos para el backend
-          const processedData = processMenuDataForBackend(menuData);
-
-          // Enviar datos al backend
+          const nestedData = unflattenMenuData(categoriesMap, subcategoriesMap, itemsMap, childrenMap);
+          const processedData = processMenuDataForBackend(nestedData);
           await MenuService.saveMenu(processedData, selectedLanguage);
-
-          // Recargar datos desde el backend
           await reload();
-
           setIsEditing(false);
           setIsSaving(false);
 
-          // Mostrar mensaje de éxito
           setConfirmDialog({
             isOpen: true,
             title: 'Guardado exitoso',
@@ -566,7 +781,6 @@ const MenuPage = () => {
           console.error('Error al guardar:', error);
           setIsSaving(false);
 
-          // Mostrar mensaje de error
           setConfirmDialog({
             isOpen: true,
             title: 'Error al guardar',
@@ -590,83 +804,90 @@ const MenuPage = () => {
       onConfirm: () => {
         setIsEditing(false);
         setConfirmDialog({ ...confirmDialog, isOpen: false });
-        reload(); // Recargar datos originales desde el backend
+        reload();
       }
     });
   };
 
+  // ============================================================================
+  // CATEGORY CRUD OPERATIONS - O(1) access!
+  // ============================================================================
+
   const handleAddCategory = () => {
+    const newCategoryId = `temp-category-${Date.now()}`;
+    const categoryHId = buildHierarchicalId(newCategoryId);
+
     const newCategory = {
-      id: `temp-category-${Date.now()}`,
+      id: newCategoryId,
       nameKey: '',
-      subcategories: [],
-      orderIndex: menuData.length,
+      orderIndex: categoriesMap.size,
       _state: 'new'
     };
 
-    setMenuData(prevData => [...prevData, newCategory]);
-
-    // Navegar automáticamente a la nueva categoría
-    setSelectedCategory(newCategory);
+    setCategoriesMap(prev => new Map(prev).set(categoryHId, newCategory));
+    setSelectedCategoryHId(categoryHId);
     setCurrentLevel('subcategories');
-
-    // No marcar cambios hasta que se edite el elemento nuevo
   };
 
   const handleUpdateCategory = (categoryId, updates) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        if (category.id !== categoryId) return category;
+    const categoryHId = buildHierarchicalId(categoryId);
+    const category = categoriesMap.get(categoryHId);
+    if (!category) return;
 
-        const isNew = category._state === 'new';
+    const isNew = category._state === 'new';
 
-        // Si no es nuevo, registrar el cambio
-        if (!isNew) {
-          const hierarchicalId = buildHierarchicalId(categoryId);
-          trackChange(hierarchicalId, 'edit');
-        }
-
-        return {
-          ...category,
-          ...updates,
-          _state: isNew ? 'new' : 'edited'
-        };
+    setCategoriesMap(prev => {
+      const newMap = new Map(prev);
+      newMap.set(categoryHId, {
+        ...category,
+        ...updates,
+        _state: isNew ? 'new' : 'edited'
       });
+      return newMap;
     });
+
+    if (!isNew) {
+      trackChange(categoryHId, 'edit');
+    }
   };
 
   const handleDeleteCategory = (categoryId) => {
     setConfirmDialog({
       isOpen: true,
       title: 'Eliminar categoría',
-      message: '¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se aplicará hasta que guardes los cambios.',
+      message: '¿Estás seguro de que quieres eliminar esta categoría?',
       type: 'danger',
       onConfirm: () => {
-        const category = menuData.find(c => c.id === categoryId);
-        const isNewCategory = category && category._state === 'new';
+        const categoryHId = buildHierarchicalId(categoryId);
+        const category = categoriesMap.get(categoryHId);
+        if (!category) return;
 
-        setMenuData(prevData => {
-          return prevData.filter(category => {
-            // Si la categoría es nueva, eliminarla completamente
-            if (category.id === categoryId && category._state === 'new') {
-              return false;
-            }
-            return true;
-          }).map(category => {
-            // Para categorías existentes, marcarlas como eliminadas
-            if (category.id !== categoryId) return category;
-            return {
+        const isNew = category._state === 'new';
+
+        if (isNew) {
+          // Remove completely if new
+          setCategoriesMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(categoryHId);
+            return newMap;
+          });
+          setChildrenMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(categoryHId);
+            return newMap;
+          });
+        } else {
+          // Mark as deleted
+          setCategoriesMap(prev => {
+            const newMap = new Map(prev);
+            newMap.set(categoryHId, {
               ...category,
               _previousState: category._state,
               _state: 'deleted'
-            };
+            });
+            return newMap;
           });
-        });
-
-        // Registrar el cambio si no era nueva
-        if (!isNewCategory) {
-          const hierarchicalId = buildHierarchicalId(categoryId);
-          trackChange(hierarchicalId, 'delete');
+          trackChange(categoryHId, 'delete');
         }
 
         setConfirmDialog({ ...confirmDialog, isOpen: false });
@@ -675,148 +896,138 @@ const MenuPage = () => {
   };
 
   const handleUndoDeleteCategory = (categoryId) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        if (category.id !== categoryId) return category;
-        const previousState = category._previousState || 'normal';
-        const updatedCategory = {
-          ...category,
-          _state: previousState
-        };
-        delete updatedCategory._previousState;
-        return updatedCategory;
-      });
+    const categoryHId = buildHierarchicalId(categoryId);
+    const category = categoriesMap.get(categoryHId);
+    if (!category) return;
+
+    setCategoriesMap(prev => {
+      const newMap = new Map(prev);
+      const previousState = category._previousState || 'normal';
+      const updated = { ...category, _state: previousState };
+      delete updated._previousState;
+      newMap.set(categoryHId, updated);
+      return newMap;
     });
 
-    // Quitar el cambio del tracking
-    const hierarchicalId = buildHierarchicalId(categoryId);
-    untrackChange(hierarchicalId);
+    untrackChange(categoryHId);
   };
 
   const handleMoveCategoryUp = (categoryId) => {
-    setMenuData(prevData => {
-      const index = prevData.findIndex(cat => cat.id === categoryId);
-      if (index <= 0) return prevData; // Ya está en la primera posición
+    const categoryHId = buildHierarchicalId(categoryId);
 
-      const newData = [...prevData];
-      // Intercambiar con el elemento anterior
-      [newData[index - 1], newData[index]] = [newData[index], newData[index - 1]];
+    const categoryList = Array.from(categoriesMap.entries())
+      .sort((a, b) => a[1].orderIndex - b[1].orderIndex);
 
-      // Actualizar orderIndex y marcar solo los elementos movidos como editados
-      return newData.map((item, idx) => {
-        const wasMoved = idx === index - 1 || idx === index;
-        return {
-          ...item,
-          orderIndex: idx,
-          _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-        };
+    const index = categoryList.findIndex(([hId]) => hId === categoryHId);
+    if (index <= 0) return;
+
+    setCategoriesMap(prev => {
+      const newMap = new Map(prev);
+
+      const [currentHId, current] = categoryList[index];
+      const [prevHId, previous] = categoryList[index - 1];
+
+      newMap.set(currentHId, {
+        ...current,
+        orderIndex: previous.orderIndex,
+        _state: current._state !== 'new' ? 'edited' : current._state
       });
+
+      newMap.set(prevHId, {
+        ...previous,
+        orderIndex: current.orderIndex,
+        _state: previous._state !== 'new' ? 'edited' : previous._state
+      });
+
+      return newMap;
     });
   };
 
   const handleMoveCategoryDown = (categoryId) => {
-    setMenuData(prevData => {
-      const index = prevData.findIndex(cat => cat.id === categoryId);
-      if (index < 0 || index >= prevData.length - 1) return prevData; // Ya está en la última posición
+    const categoryHId = buildHierarchicalId(categoryId);
 
-      const newData = [...prevData];
-      // Intercambiar con el elemento siguiente
-      [newData[index], newData[index + 1]] = [newData[index + 1], newData[index]];
+    const categoryList = Array.from(categoriesMap.entries())
+      .sort((a, b) => a[1].orderIndex - b[1].orderIndex);
 
-      // Actualizar orderIndex y marcar solo los elementos movidos como editados
-      return newData.map((item, idx) => {
-        const wasMoved = idx === index || idx === index + 1;
-        return {
-          ...item,
-          orderIndex: idx,
-          _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-        };
+    const index = categoryList.findIndex(([hId]) => hId === categoryHId);
+    if (index < 0 || index >= categoryList.length - 1) return;
+
+    setCategoriesMap(prev => {
+      const newMap = new Map(prev);
+
+      const [currentHId, current] = categoryList[index];
+      const [nextHId, next] = categoryList[index + 1];
+
+      newMap.set(currentHId, {
+        ...current,
+        orderIndex: next.orderIndex,
+        _state: current._state !== 'new' ? 'edited' : current._state
       });
+
+      newMap.set(nextHId, {
+        ...next,
+        orderIndex: current.orderIndex,
+        _state: next._state !== 'new' ? 'edited' : next._state
+      });
+
+      return newMap;
     });
   };
 
-  // Handlers para subcategorías
+  // ============================================================================
+  // SUBCATEGORY CRUD OPERATIONS - O(1) access!
+  // ============================================================================
+
   const handleAddSubcategory = (categoryId) => {
+    const categoryHId = buildHierarchicalId(categoryId);
+    const subcategoryHIds = childrenMap.get(categoryHId) || [];
+
     const newSubcategoryId = `temp-subcategory-${Date.now()}`;
-    let newSubcategory = null;
+    const subcategoryHId = buildHierarchicalId(categoryId, newSubcategoryId);
 
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        if (category.id !== categoryId) return category;
+    const newSubcategory = {
+      id: newSubcategoryId,
+      parentId: categoryId,
+      nameKey: '',
+      orderIndex: subcategoryHIds.length,
+      _state: 'new'
+    };
 
-        newSubcategory = {
-          id: newSubcategoryId,
-          nameKey: '',
-          items: [],
-          orderIndex: (category.subcategories || []).length,
-          _state: 'new'
-        };
-
-        // Registrar el cambio con ID jerárquico
-        const hierarchicalId = buildHierarchicalId(category.id, newSubcategoryId);
-        trackChange(hierarchicalId, 'create');
-
-        const updatedSubcategories = [...(category.subcategories || []), newSubcategory];
-
-        return {
-          ...category,
-          subcategories: updatedSubcategories
-        };
-      });
+    setSubcategoriesMap(prev => new Map(prev).set(subcategoryHId, newSubcategory));
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      newMap.set(categoryHId, [...subcategoryHIds, subcategoryHId]);
+      return newMap;
     });
 
-    // Navegar automáticamente a la nueva subcategoría
-    if (newSubcategory) {
-      setSelectedSubcategory(newSubcategory);
-      setCurrentLevel('items');
-    }
-
-    // No marcar cambios al añadir una subcategoría temporal
+    setSelectedSubcategoryHId(subcategoryHId);
+    setCurrentLevel('items');
   };
 
   const handleUpdateSubcategory = (subcategoryId, updates) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        let subcategoryFound = false;
-        let isSubcategoryNew = false;
-        let hasContentNow = false;
+    const { categoryId } = parseHierarchicalId(selectedCategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+    const subcategory = subcategoriesMap.get(subcategoryHId);
+    if (!subcategory) return;
 
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          if (subcategory.id !== subcategoryId) return subcategory;
+    const isNew = subcategory._state === 'new';
+    const hasContentNow = updates.nameKey && updates.nameKey.trim().length > 0;
 
-          subcategoryFound = true;
-          isSubcategoryNew = subcategory._state === 'new';
-          const updatedSubcategory = {
-            ...subcategory,
-            ...updates,
-            _state: isSubcategoryNew ? 'new' : 'edited'
-          };
-
-          // Verificar si tiene contenido significativo ahora
-          hasContentNow = updatedSubcategory.nameKey && updatedSubcategory.nameKey.trim().length > 0;
-
-          return updatedSubcategory;
-        });
-
-        if (!subcategoryFound) return category;
-
-        // Registrar cambios en el tracking con ID jerárquico
-        const hierarchicalId = buildHierarchicalId(category.id, subcategoryId);
-        if (!isSubcategoryNew) {
-          // Subcategoría existente fue editada
-          trackChange(hierarchicalId, 'edit');
-        } else if (hasContentNow) {
-          // Nueva subcategoría con contenido - registrar como creación
-          trackChange(hierarchicalId, 'create');
-        }
-
-        return {
-          ...category,
-          subcategories: updatedSubcategories,
-          _state: category._state
-        };
+    setSubcategoriesMap(prev => {
+      const newMap = new Map(prev);
+      newMap.set(subcategoryHId, {
+        ...subcategory,
+        ...updates,
+        _state: isNew ? 'new' : 'edited'
       });
+      return newMap;
     });
+
+    if (!isNew) {
+      trackChange(subcategoryHId, 'edit');
+    } else if (hasContentNow) {
+      trackChange(subcategoryHId, 'create');
+    }
   };
 
   const handleDeleteSubcategory = (categoryId, subcategoryId) => {
@@ -826,44 +1037,38 @@ const MenuPage = () => {
       message: '¿Estás seguro de que quieres eliminar esta subcategoría?',
       type: 'danger',
       onConfirm: () => {
-        const category = menuData.find(c => c.id === categoryId);
-        const subcategory = category?.subcategories?.find(s => s.id === subcategoryId);
-        const isNewSubcategory = subcategory?._state === 'new';
+        const categoryHId = buildHierarchicalId(categoryId);
+        const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+        const subcategory = subcategoriesMap.get(subcategoryHId);
+        if (!subcategory) return;
 
-        setMenuData(prevData => {
-          return prevData.map(category => {
-            if (category.id !== categoryId) return category;
+        const isNew = subcategory._state === 'new';
 
-            const updatedSubcategories = (category.subcategories || []).filter(subcategory => {
-              // Si la subcategoría es nueva, eliminarla completamente
-              if (subcategory.id === subcategoryId && subcategory._state === 'new') {
-                return false;
-              }
-              return true;
-            }).map(subcategory => {
-              // Para subcategorías existentes, marcarlas como eliminadas
-              if (subcategory.id !== subcategoryId) return subcategory;
-              return {
-                ...subcategory,
-                _previousState: subcategory._state,
-                _state: 'deleted'
-              };
-            });
-
-            return {
-              ...category,
-              subcategories: updatedSubcategories
-            };
+        if (isNew) {
+          setSubcategoriesMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(subcategoryHId);
+            return newMap;
           });
-        });
-
-        // Registrar el cambio con ID jerárquico
-        const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId);
-        if (!isNewSubcategory) {
-          trackChange(hierarchicalId, 'delete');
+          setChildrenMap(prev => {
+            const newMap = new Map(prev);
+            const categoryChildren = newMap.get(categoryHId) || [];
+            newMap.set(categoryHId, categoryChildren.filter(id => id !== subcategoryHId));
+            newMap.delete(subcategoryHId);
+            return newMap;
+          });
+          untrackChange(subcategoryHId);
         } else {
-          // Si era nueva y la borramos, quitar su tracking de 'create' si existe
-          untrackChange(hierarchicalId);
+          setSubcategoriesMap(prev => {
+            const newMap = new Map(prev);
+            newMap.set(subcategoryHId, {
+              ...subcategory,
+              _previousState: subcategory._state,
+              _state: 'deleted'
+            });
+            return newMap;
+          });
+          trackChange(subcategoryHId, 'delete');
         }
 
         setConfirmDialog({ ...confirmDialog, isOpen: false });
@@ -872,199 +1077,166 @@ const MenuPage = () => {
   };
 
   const handleUndoDeleteSubcategory = (subcategoryId) => {
-    let categoryId = null;
+    const { categoryId } = parseHierarchicalId(selectedCategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+    const subcategory = subcategoriesMap.get(subcategoryHId);
+    if (!subcategory) return;
 
-    // Encontrar el categoryId
-    menuData.forEach(category => {
-      if ((category.subcategories || []).some(sub => sub.id === subcategoryId)) {
-        categoryId = category.id;
-      }
+    setSubcategoriesMap(prev => {
+      const newMap = new Map(prev);
+      const previousState = subcategory._previousState || 'normal';
+      const updated = { ...subcategory, _state: previousState };
+      delete updated._previousState;
+      newMap.set(subcategoryHId, updated);
+      return newMap;
     });
 
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          if (subcategory.id !== subcategoryId) return subcategory;
-          const previousState = subcategory._previousState || 'normal';
-          const updatedSubcategory = {
-            ...subcategory,
-            _state: previousState
-          };
-          delete updatedSubcategory._previousState;
-          return updatedSubcategory;
-        });
-
-        return {
-          ...category,
-          subcategories: updatedSubcategories
-        };
-      });
-    });
-
-    // Quitar el cambio del tracking con ID jerárquico
-    if (categoryId) {
-      const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId);
-      untrackChange(hierarchicalId);
-    }
+    untrackChange(subcategoryHId);
   };
 
   const handleMoveSubcategoryUp = (categoryId, subcategoryId) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        if (category.id !== categoryId) return category;
+    const categoryHId = buildHierarchicalId(categoryId);
+    const subcategoryHIds = childrenMap.get(categoryHId) || [];
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
 
-        const subcategories = category.subcategories || [];
-        const index = subcategories.findIndex(sub => sub.id === subcategoryId);
-        if (index <= 0) return category; // Ya está en la primera posición
+    const index = subcategoryHIds.indexOf(subcategoryHId);
+    if (index <= 0) return;
 
-        const newSubcategories = [...subcategories];
-        // Intercambiar con el elemento anterior
-        [newSubcategories[index - 1], newSubcategories[index]] = [newSubcategories[index], newSubcategories[index - 1]];
+    setSubcategoriesMap(prev => {
+      const newMap = new Map(prev);
 
-        // Actualizar orderIndex y marcar solo los elementos movidos como editados
-        return {
-          ...category,
-          subcategories: newSubcategories.map((item, idx) => {
-            const wasMoved = idx === index - 1 || idx === index;
-            return {
-              ...item,
-              orderIndex: idx,
-              _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-            };
-          })
-        };
-      });
+      const current = newMap.get(subcategoryHIds[index]);
+      const previous = newMap.get(subcategoryHIds[index - 1]);
+
+      if (current && previous) {
+        newMap.set(subcategoryHIds[index], {
+          ...current,
+          orderIndex: previous.orderIndex,
+          _state: current._state !== 'new' ? 'edited' : current._state
+        });
+
+        newMap.set(subcategoryHIds[index - 1], {
+          ...previous,
+          orderIndex: current.orderIndex,
+          _state: previous._state !== 'new' ? 'edited' : previous._state
+        });
+      }
+
+      return newMap;
+    });
+
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      const newList = [...subcategoryHIds];
+      [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+      newMap.set(categoryHId, newList);
+      return newMap;
     });
   };
 
   const handleMoveSubcategoryDown = (categoryId, subcategoryId) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        if (category.id !== categoryId) return category;
+    const categoryHId = buildHierarchicalId(categoryId);
+    const subcategoryHIds = childrenMap.get(categoryHId) || [];
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
 
-        const subcategories = category.subcategories || [];
-        const index = subcategories.findIndex(sub => sub.id === subcategoryId);
-        if (index < 0 || index >= subcategories.length - 1) return category; // Ya está en la última posición
+    const index = subcategoryHIds.indexOf(subcategoryHId);
+    if (index < 0 || index >= subcategoryHIds.length - 1) return;
 
-        const newSubcategories = [...subcategories];
-        // Intercambiar con el elemento siguiente
-        [newSubcategories[index], newSubcategories[index + 1]] = [newSubcategories[index + 1], newSubcategories[index]];
+    setSubcategoriesMap(prev => {
+      const newMap = new Map(prev);
 
-        // Actualizar orderIndex y marcar solo los elementos movidos como editados
-        return {
-          ...category,
-          subcategories: newSubcategories.map((item, idx) => {
-            const wasMoved = idx === index || idx === index + 1;
-            return {
-              ...item,
-              orderIndex: idx,
-              _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-            };
-          })
-        };
-      });
+      const current = newMap.get(subcategoryHIds[index]);
+      const next = newMap.get(subcategoryHIds[index + 1]);
+
+      if (current && next) {
+        newMap.set(subcategoryHIds[index], {
+          ...current,
+          orderIndex: next.orderIndex,
+          _state: current._state !== 'new' ? 'edited' : current._state
+        });
+
+        newMap.set(subcategoryHIds[index + 1], {
+          ...next,
+          orderIndex: current.orderIndex,
+          _state: next._state !== 'new' ? 'edited' : next._state
+        });
+      }
+
+      return newMap;
+    });
+
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      const newList = [...subcategoryHIds];
+      [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+      newMap.set(categoryHId, newList);
+      return newMap;
     });
   };
 
-  // Handlers para items
+  // ============================================================================
+  // ITEM CRUD OPERATIONS - O(1) access!
+  // ============================================================================
+
   const handleAddItem = (subcategoryId) => {
+    const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+    const itemHIds = childrenMap.get(subcategoryHId) || [];
+
     const newItemId = `temp-item-${Date.now()}`;
+    const itemHId = buildHierarchicalId(categoryId, subcategoryId, newItemId);
 
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          if (subcategory.id !== subcategoryId) return subcategory;
+    const newItem = {
+      id: newItemId,
+      parentId: subcategoryId,
+      categoryId: categoryId,
+      nameKey: '',
+      descriptionKey: '',
+      price: '',
+      available: true,
+      orderIndex: itemHIds.length,
+      _state: 'new'
+    };
 
-          const newItem = {
-            id: newItemId,
-            nameKey: '',
-            descriptionKey: '',
-            price: '',
-            available: true,
-            orderIndex: (subcategory.items || []).length,
-            _state: 'new'
-          };
-
-          const updatedItems = [...(subcategory.items || []), newItem];
-
-          return {
-            ...subcategory,
-            items: updatedItems
-          };
-        });
-
-        // Registrar el cambio con ID jerárquico
-        const hierarchicalId = buildHierarchicalId(category.id, subcategoryId, newItemId);
-        trackChange(hierarchicalId, 'create');
-
-        console.log('track create: ' + hierarchicalId);
-
-        const hasChanges = updatedSubcategories.some((sub, idx) =>
-          sub !== (category.subcategories || [])[idx]
-        );
-
-        return hasChanges ? {
-          ...category,
-          subcategories: updatedSubcategories
-        } : category;
-      });
+    setItemsMap(prev => new Map(prev).set(itemHId, newItem));
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      newMap.set(subcategoryHId, [...itemHIds, itemHId]);
+      return newMap;
     });
+
+    trackChange(itemHId, 'create');
   };
 
   const handleUpdateItem = (itemId, updates) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        let itemFound = false;
-        let isItemNew = false;
-        let hasContentNow = false;
-        let foundSubcategoryId = null;
+    const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+    const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
+    if (!subcategory) return;
 
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          const updatedItems = (subcategory.items || []).map(item => {
-            if (item.id !== itemId) return item;
+    const itemHId = buildHierarchicalId(categoryId, subcategory.id, itemId);
+    const item = itemsMap.get(itemHId);
+    if (!item) return;
 
-            itemFound = true;
-            foundSubcategoryId = subcategory.id;
-            isItemNew = item._state === 'new';
-            const updatedItem = {
-              ...item,
-              ...updates,
-              _state: isItemNew ? 'new' : 'edited'
-            };
+    const isNew = item._state === 'new';
+    const hasContentNow =
+      (updates.nameKey && updates.nameKey.trim().length > 0) ||
+      (updates.price !== undefined && updates.price !== null && updates.price !== '');
 
-            // Verificar si tiene contenido significativo ahora
-            hasContentNow = (
-              (updatedItem.nameKey && updatedItem.nameKey.trim().length > 0) ||
-              (updatedItem.price !== undefined && updatedItem.price !== null && updatedItem.price !== '')
-            );
-
-            return updatedItem;
-          });
-
-          return {
-            ...subcategory,
-            items: updatedItems
-          };
-        });
-
-        if (!itemFound) return category;
-
-        // Registrar cambios en el tracking con ID jerárquico
-        const hierarchicalId = buildHierarchicalId(category.id, foundSubcategoryId, itemId);
-        if (!isItemNew) {
-          // Item existente fue editado
-          trackChange(hierarchicalId, 'edit');
-        } else if (hasContentNow) {
-          // Nuevo item con contenido - registrar como creación
-          trackChange(hierarchicalId, 'create');
-        }
-
-        return {
-          ...category,
-          subcategories: updatedSubcategories
-        };
+    setItemsMap(prev => {
+      const newMap = new Map(prev);
+      newMap.set(itemHId, {
+        ...item,
+        ...updates,
+        _state: isNew ? 'new' : 'edited'
       });
+      return newMap;
     });
+
+    if (!isNew) {
+      trackChange(itemHId, 'edit');
+    } else if (hasContentNow) {
+      trackChange(itemHId, 'create');
+    }
   };
 
   const handleDeleteItem = (subcategoryId, itemId) => {
@@ -1074,65 +1246,38 @@ const MenuPage = () => {
       message: '¿Estás seguro de que quieres eliminar este item?',
       type: 'danger',
       onConfirm: () => {
-        let isNewItem = false;
-        let categoryId = null;
+        const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+        const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+        const itemHId = buildHierarchicalId(categoryId, subcategoryId, itemId);
+        const item = itemsMap.get(itemHId);
+        if (!item) return;
 
-        // Encontrar el item para ver si es nuevo y el categoryId
-        menuData.forEach(category => {
-          (category.subcategories || []).forEach(subcategory => {
-            if (subcategory.id === subcategoryId) {
-              categoryId = category.id;
-              const item = (subcategory.items || []).find(i => i.id === itemId);
-              if (item && item._state === 'new') {
-                isNewItem = true;
-              }
-            }
+        const isNew = item._state === 'new';
+
+        if (isNew) {
+          setItemsMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(itemHId);
+            return newMap;
           });
-        });
-
-        setMenuData(prevData => {
-          return prevData.map(category => {
-            const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-              if (subcategory.id !== subcategoryId) return subcategory;
-
-              const updatedItems = (subcategory.items || []).filter(item => {
-                // Si el item es nuevo, eliminarlo completamente
-                if (item.id === itemId && item._state === 'new') {
-                  return false;
-                }
-                return true;
-              }).map(item => {
-                // Para items existentes, marcarlos como eliminados
-                if (item.id !== itemId) return item;
-                return {
-                  ...item,
-                  _previousState: item._state,
-                  _state: 'deleted'
-                };
-              });
-
-              return {
-                ...subcategory,
-                items: updatedItems
-              };
+          setChildrenMap(prev => {
+            const newMap = new Map(prev);
+            const subcategoryChildren = newMap.get(subcategoryHId) || [];
+            newMap.set(subcategoryHId, subcategoryChildren.filter(id => id !== itemHId));
+            return newMap;
+          });
+          untrackChange(itemHId);
+        } else {
+          setItemsMap(prev => {
+            const newMap = new Map(prev);
+            newMap.set(itemHId, {
+              ...item,
+              _previousState: item._state,
+              _state: 'deleted'
             });
-
-            return {
-              ...category,
-              subcategories: updatedSubcategories
-            };
+            return newMap;
           });
-        });
-
-        // Registrar el cambio con ID jerárquico
-        if (categoryId) {
-          const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId, itemId);
-          if (!isNewItem) {
-            trackChange(hierarchicalId, 'delete');
-          } else {
-            // Si era nuevo y lo borramos, quitar su tracking de 'create' si existe
-            untrackChange(hierarchicalId);
-          }
+          trackChange(itemHId, 'delete');
         }
 
         setConfirmDialog({ ...confirmDialog, isOpen: false });
@@ -1141,137 +1286,112 @@ const MenuPage = () => {
   };
 
   const handleUndoDeleteItem = (itemId) => {
-    let categoryId = null;
-    let subcategoryId = null;
+    const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+    const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
+    if (!subcategory) return;
 
-    // Encontrar el categoryId y subcategoryId
-    menuData.forEach(category => {
-      (category.subcategories || []).forEach(subcategory => {
-        if ((subcategory.items || []).some(item => item.id === itemId)) {
-          categoryId = category.id;
-          subcategoryId = subcategory.id;
-        }
-      });
+    const itemHId = buildHierarchicalId(categoryId, subcategory.id, itemId);
+    const item = itemsMap.get(itemHId);
+    if (!item) return;
+
+    setItemsMap(prev => {
+      const newMap = new Map(prev);
+      const previousState = item._previousState || 'normal';
+      const updated = { ...item, _state: previousState };
+      delete updated._previousState;
+      newMap.set(itemHId, updated);
+      return newMap;
     });
 
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          const updatedItems = (subcategory.items || []).map(item => {
-            if (item.id !== itemId) return item;
-            const previousState = item._previousState || 'normal';
-            const updatedItem = {
-              ...item,
-              _state: previousState
-            };
-            delete updatedItem._previousState;
-            return updatedItem;
-          });
-
-          return {
-            ...subcategory,
-            items: updatedItems
-          };
-        });
-
-        return {
-          ...category,
-          subcategories: updatedSubcategories
-        };
-      });
-    });
-
-    // Quitar el cambio del tracking con ID jerárquico
-    if (categoryId && subcategoryId) {
-      const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId, itemId);
-      untrackChange(hierarchicalId);
-    }
+    untrackChange(itemHId);
   };
 
   const handleMoveItemUp = (subcategoryId, itemId) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          if (subcategory.id !== subcategoryId) return subcategory;
+    const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+    const itemHIds = childrenMap.get(subcategoryHId) || [];
+    const itemHId = buildHierarchicalId(categoryId, subcategoryId, itemId);
 
-          const items = subcategory.items || [];
-          const index = items.findIndex(item => item.id === itemId);
-          if (index <= 0) return subcategory; // Ya está en la primera posición
+    const index = itemHIds.indexOf(itemHId);
+    if (index <= 0) return;
 
-          const newItems = [...items];
-          // Intercambiar con el elemento anterior
-          [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+    setItemsMap(prev => {
+      const newMap = new Map(prev);
 
-          // Actualizar orderIndex y marcar solo los elementos movidos como editados
-          return {
-            ...subcategory,
-            items: newItems.map((item, idx) => {
-              const wasMoved = idx === index - 1 || idx === index;
-              return {
-                ...item,
-                orderIndex: idx,
-                _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-              };
-            })
-          };
+      const current = newMap.get(itemHIds[index]);
+      const previous = newMap.get(itemHIds[index - 1]);
+
+      if (current && previous) {
+        newMap.set(itemHIds[index], {
+          ...current,
+          orderIndex: previous.orderIndex,
+          _state: current._state !== 'new' ? 'edited' : current._state
         });
 
-        // Solo actualizar si hubo cambios
-        const hasChanges = updatedSubcategories.some((sub, idx) =>
-          sub !== (category.subcategories || [])[idx]
-        );
+        newMap.set(itemHIds[index - 1], {
+          ...previous,
+          orderIndex: current.orderIndex,
+          _state: previous._state !== 'new' ? 'edited' : previous._state
+        });
+      }
 
-        return hasChanges ? {
-          ...category,
-          subcategories: updatedSubcategories
-        } : category;
-      });
+      return newMap;
+    });
+
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      const newList = [...itemHIds];
+      [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+      newMap.set(subcategoryHId, newList);
+      return newMap;
     });
   };
 
   const handleMoveItemDown = (subcategoryId, itemId) => {
-    setMenuData(prevData => {
-      return prevData.map(category => {
-        const updatedSubcategories = (category.subcategories || []).map(subcategory => {
-          if (subcategory.id !== subcategoryId) return subcategory;
+    const { categoryId } = parseHierarchicalId(selectedSubcategoryHId);
+    const subcategoryHId = buildHierarchicalId(categoryId, subcategoryId);
+    const itemHIds = childrenMap.get(subcategoryHId) || [];
+    const itemHId = buildHierarchicalId(categoryId, subcategoryId, itemId);
 
-          const items = subcategory.items || [];
-          const index = items.findIndex(item => item.id === itemId);
-          if (index < 0 || index >= items.length - 1) return subcategory; // Ya está en la última posición
+    const index = itemHIds.indexOf(itemHId);
+    if (index < 0 || index >= itemHIds.length - 1) return;
 
-          const newItems = [...items];
-          // Intercambiar con el elemento siguiente
-          [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+    setItemsMap(prev => {
+      const newMap = new Map(prev);
 
-          // Actualizar orderIndex y marcar solo los elementos movidos como editados
-          return {
-            ...subcategory,
-            items: newItems.map((item, idx) => {
-              const wasMoved = idx === index || idx === index + 1;
-              return {
-                ...item,
-                orderIndex: idx,
-                _state: wasMoved && item._state !== 'new' ? 'edited' : item._state
-              };
-            })
-          };
+      const current = newMap.get(itemHIds[index]);
+      const next = newMap.get(itemHIds[index + 1]);
+
+      if (current && next) {
+        newMap.set(itemHIds[index], {
+          ...current,
+          orderIndex: next.orderIndex,
+          _state: current._state !== 'new' ? 'edited' : current._state
         });
 
-        // Solo actualizar si hubo cambios
-        const hasChanges = updatedSubcategories.some((sub, idx) =>
-          sub !== (category.subcategories || [])[idx]
-        );
+        newMap.set(itemHIds[index + 1], {
+          ...next,
+          orderIndex: current.orderIndex,
+          _state: next._state !== 'new' ? 'edited' : next._state
+        });
+      }
 
-        return hasChanges ? {
-          ...category,
-          subcategories: updatedSubcategories
-        } : category;
-      });
+      return newMap;
+    });
+
+    setChildrenMap(prev => {
+      const newMap = new Map(prev);
+      const newList = [...itemHIds];
+      [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+      newMap.set(subcategoryHId, newList);
+      return newMap;
     });
   };
 
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
-  // Mostrar loading
   if (loading) {
     return (
       <div className={styles.menuPage}>
@@ -1283,8 +1403,7 @@ const MenuPage = () => {
     );
   }
 
-  // Mostrar error
-  if (error && !menuData.length) {
+  if (error && categoriesMap.size === 0) {
     return (
       <div className={styles.menuPage}>
         <div className={styles.errorContainer}>
@@ -1300,6 +1419,9 @@ const MenuPage = () => {
       </div>
     );
   }
+
+  const currentCategory = getCurrentCategoryData();
+  const currentSubcategory = getCurrentSubcategoryData();
 
   return (
     <div className={styles.menuPage}>
@@ -1365,20 +1487,18 @@ const MenuPage = () => {
             )}
           </div>
 
-          {/* Breadcrumbs de navegación */}
           <Breadcrumbs
             currentLevel={currentLevel}
-            categoryName={selectedCategory?.nameKey}
-            subcategoryName={selectedSubcategory?.nameKey}
+            categoryName={currentCategory?.nameKey}
+            subcategoryName={currentSubcategory?.nameKey}
             onNavigateToCategories={handleNavigateToCategories}
             onNavigateToSubcategories={handleNavigateToSubcategories}
           />
 
-          {/* Vista según nivel actual */}
           <div className={styles.viewContainer}>
             {currentLevel === 'categories' && (
               <CategoryView
-                categories={enrichMenuDataWithVisualState(menuData)}
+                categories={getCategoriesForView()}
                 onCategoryClick={handleCategoryClick}
                 onAddCategory={isEditing ? handleAddCategory : undefined}
                 onDeleteCategory={isEditing ? handleDeleteCategory : undefined}
@@ -1388,41 +1508,37 @@ const MenuPage = () => {
               />
             )}
 
-            {currentLevel === 'subcategories' && selectedCategory && (
+            {currentLevel === 'subcategories' && currentCategory && (
               <SubcategoryView
-                subcategories={enrichMenuDataWithVisualState(menuData).find(c => c.id === selectedCategory.id)?.subcategories || []}
-                categoryName={selectedCategory.nameKey || 'Sin nombre'}
-                category={enrichMenuDataWithVisualState(menuData).find(c => c.id === selectedCategory.id)}
+                subcategories={currentCategory.subcategories || []}
+                categoryName={currentCategory.nameKey || 'Sin nombre'}
+                category={currentCategory}
                 onSubcategoryClick={handleSubcategoryClick}
-                onAddSubcategory={isEditing ? () => handleAddSubcategory(selectedCategory.id) : undefined}
-                onDeleteSubcategory={isEditing ? (subId) => handleDeleteSubcategory(selectedCategory.id, subId) : undefined}
+                onAddSubcategory={isEditing ? () => handleAddSubcategory(currentCategory.id) : undefined}
+                onDeleteSubcategory={isEditing ? (subId) => handleDeleteSubcategory(currentCategory.id, subId) : undefined}
                 onUndoDeleteSubcategory={isEditing ? handleUndoDeleteSubcategory : undefined}
                 onUpdateCategory={isEditing ? handleUpdateCategory : undefined}
                 onBack={handleBackFromSubcategories}
                 itemCounts={getItemCounts()}
                 isEditing={isEditing}
-                categoryError={validationErrors[selectedCategory.id]?.nameKey}
+                categoryError={validationErrors[currentCategory.id]?.nameKey}
               />
             )}
 
-            {currentLevel === 'items' && selectedSubcategory && (
+            {currentLevel === 'items' && currentSubcategory && (
               <ItemView
-                items={enrichMenuDataWithVisualState(menuData)
-                  .flatMap(c => c.subcategories || [])
-                  .find(s => s.id === selectedSubcategory.id)?.items || []}
-                subcategoryName={selectedSubcategory.nameKey || 'Sin nombre'}
-                subcategory={enrichMenuDataWithVisualState(menuData)
-                  .flatMap(c => c.subcategories || [])
-                  .find(s => s.id === selectedSubcategory.id)}
-                onAddItem={isEditing ? () => handleAddItem(selectedSubcategory.id) : undefined}
+                items={currentSubcategory.items || []}
+                subcategoryName={currentSubcategory.nameKey || 'Sin nombre'}
+                subcategory={currentSubcategory}
+                onAddItem={isEditing ? () => handleAddItem(currentSubcategory.id) : undefined}
                 onUpdateItem={isEditing ? handleUpdateItem : undefined}
                 onUpdateSubcategory={isEditing ? handleUpdateSubcategory : undefined}
-                onDeleteItem={isEditing ? (itemId) => handleDeleteItem(selectedSubcategory.id, itemId) : undefined}
+                onDeleteItem={isEditing ? (itemId) => handleDeleteItem(currentSubcategory.id, itemId) : undefined}
                 onUndoDeleteItem={isEditing ? handleUndoDeleteItem : undefined}
                 onBack={handleBackFromItems}
                 isEditing={isEditing}
                 errors={validationErrors}
-                subcategoryError={validationErrors[getCurrentCategory()?.id]?.subcategories?.[selectedSubcategory.id]?.nameKey}
+                subcategoryError={validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.nameKey}
               />
             )}
           </div>
