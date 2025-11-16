@@ -28,7 +28,6 @@ const SubcategoryView = ({
       )}
 
       <div className={styles.pageTitle}>
-        <span className={styles.pageTitleLabel}>Categoría:</span>
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
       </div>
 
