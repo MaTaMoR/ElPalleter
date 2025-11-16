@@ -1,0 +1,395 @@
+.container {
+  padding: 1.5rem;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.backButton:hover {
+  color: var(--text-primary);
+}
+
+.subcategoryEditSection {
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.addButtonHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.addButtonHeader:hover {
+  background-color: var(--primary-dark);
+}
+
+.count {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.searchBar {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  transition: var(--transition);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--bg-tertiary);
+}
+
+.clearSearch {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: var(--transition);
+}
+
+.clearSearch:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.itemCard {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  transition: var(--transition);
+}
+
+.itemCard:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.itemCard.new {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.itemCard.edited {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.itemCard.deleted {
+  opacity: 0.6;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.itemCard.deleted .itemName {
+  text-decoration: line-through;
+}
+
+.itemContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.375rem 0;
+}
+
+.itemDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.625rem 0;
+  line-height: 1.5;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.itemPrice {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.availabilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.25rem;
+}
+
+.availabilityBadge.available {
+  color: var(--success);
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.availabilityBadge.unavailable {
+  color: var(--error);
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.itemActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.actionButton {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.actionButton:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.editButton:hover {
+  color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary);
+}
+
+.deleteButton:hover {
+  color: var(--error);
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--error);
+}
+
+.undoButton {
+  color: var(--error);
+}
+
+.undoButton:hover {
+  color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary);
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+}
+
+.editActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.cancelEditButton,
+.saveEditButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cancelEditButton {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.cancelEditButton:hover {
+  background-color: var(--bg-secondary);
+}
+
+.saveEditButton {
+  background-color: var(--primary);
+  color: white;
+}
+
+.saveEditButton:hover {
+  background-color: var(--primary-dark);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.addButton {
+  width: 100%;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.addButton:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    margin-bottom: 0.875rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .fieldsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .itemActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .itemCard {
+    padding: 0.875rem;
+  }
+
+  .itemContent {
+    flex-direction: column;
+  }
+
+  .itemActions {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .itemName {
+    font-size: 1rem;
+  }
+
+  .itemPrice {
+    font-size: 1rem;
+  }
+
+  .addButton {
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+  }
+}

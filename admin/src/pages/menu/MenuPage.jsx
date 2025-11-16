@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit3, Eye, Save, X } from 'lucide-react';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
-import CategoryAccordion from '../../components/menu/items/CategoryAccordion';
+import Breadcrumbs from '../../components/menu/navigation/Breadcrumbs';
+import CategoryView from '../../components/menu/views/CategoryView';
+import SubcategoryView from '../../components/menu/views/SubcategoryView';
+import ItemView from '../../components/menu/views/ItemView';
 import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import { useMenuData } from '../../hooks/useMenuData';
 import { MenuService } from '../../services/MenuService';
@@ -109,7 +112,6 @@ const MOCK_MENU_DATA = [
 const MenuPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [isEditing, setIsEditing] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -117,60 +119,146 @@ const MenuPage = () => {
   const { data: backendData, loading, error, reload } = useMenuData(selectedLanguage);
   const [menuData, setMenuData] = useState([]);
 
+  // Sistema de tracking de cambios - Mucho más simple
+  // Map donde la key es el ID del elemento y el value es el tipo de cambio
+  const [changeTracking, setChangeTracking] = useState(new Map());
+
   // Sincronizar datos del backend con el estado local
   useEffect(() => {
     if (backendData && backendData.length > 0) {
       setMenuData(backendData);
+      setChangeTracking(new Map()); // Limpiar cambios al cargar nuevos datos
     } else if (!loading && !error) {
       // Si no hay datos del backend, usar mock
       setMenuData(MOCK_MENU_DATA);
+      setChangeTracking(new Map()); // Limpiar cambios al cargar mock
     }
   }, [backendData, loading, error]);
 
-  // Estado para controlar qué acordeones están expandidos
-  const [expandedCategories, setExpandedCategories] = useState({});
-  const [expandedSubcategories, setExpandedSubcategories] = useState({});
-  const [expandedItems, setExpandedItems] = useState({});
+  // Estado para navegación por niveles
+  const [currentLevel, setCurrentLevel] = useState('categories');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
 
-  // Expandir solo la primera categoría en modo visualización (solo al iniciar)
-  useEffect(() => {
-    if (!isEditing && menuData.length > 0 && Object.keys(expandedCategories).length === 0) {
-      const firstCategory = menuData[0];
-      const expandedCats = {};
-      const expandedSubs = {};
-      const expandedItms = {};
+  // Funciones para gestionar el tracking de cambios
+  const trackChange = (id, type) => {
+    setChangeTracking(prev => {
+      const newMap = new Map(prev);
+      newMap.set(id, type);
+      return newMap;
+    });
+  };
 
-      // Expandir solo la primera categoría
-      expandedCats[firstCategory.id] = true;
+  const untrackChange = (id) => {
+    setChangeTracking(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(id);
+      return newMap;
+    });
+  };
 
-      // Expandir todas sus subcategorías e items
-      if (firstCategory.subcategories) {
-        firstCategory.subcategories.forEach(subcategory => {
-          expandedSubs[subcategory.id] = true;
+  const hasRealChanges = () => {
+    return changeTracking.size > 0;
+  };
 
-          if (subcategory.items) {
-            subcategory.items.forEach(item => {
-              expandedItms[item.id] = true;
-            });
+  // Función auxiliar para construir el ID jerárquico de un elemento
+  const buildHierarchicalId = (categoryId, subcategoryId = null, itemId = null) => {
+    if (itemId) {
+      return `${categoryId}.${subcategoryId}.${itemId}`;
+    }
+    if (subcategoryId) {
+      return `${categoryId}.${subcategoryId}`;
+    }
+    return categoryId;
+  };
+
+  // Función auxiliar para verificar si hay cambios en hijos (usando IDs jerárquicos)
+  const hasChildChanges = (hierarchicalId) => {
+    for (const [changeId] of changeTracking) {
+      // Si el changeId empieza con hierarchicalId pero no es igual, es un hijo
+      if (changeId !== hierarchicalId && changeId.startsWith(hierarchicalId + '.')) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Función para enriquecer los datos del menú con el estado visual basado en el tracking
+  const enrichMenuDataWithVisualState = (data) => {
+    return data.map(category => {
+      const categoryHierarchicalId = buildHierarchicalId(category.id);
+
+      // Primero procesar subcategorías e items
+      const enrichedSubcategories = (category.subcategories || []).map(subcategory => {
+        const subcategoryHierarchicalId = buildHierarchicalId(category.id, subcategory.id);
+
+        // Procesar items - calcular su estado visual
+        const enrichedItems = (subcategory.items || []).map(item => {
+          const itemHierarchicalId = buildHierarchicalId(category.id, subcategory.id, item.id);
+
+          let itemState = 'normal';
+          if (item._state === 'new') {
+            itemState = 'new';
+          } else if (changeTracking.has(itemHierarchicalId)) {
+            const changeType = changeTracking.get(itemHierarchicalId);
+            if (changeType === 'delete') itemState = 'deleted';
+            else if (changeType === 'edit' || changeType === 'create') itemState = 'edited';
           }
+
+          return {
+            ...item,
+            _state: itemState
+          };
         });
+
+        // Calcular estado de la subcategoría
+        let subcategoryState = 'normal';
+
+        if (subcategory._state === 'new') {
+          subcategoryState = 'new';
+        } else if (changeTracking.has(subcategoryHierarchicalId)) {
+          const changeType = changeTracking.get(subcategoryHierarchicalId);
+          if (changeType === 'delete') {
+            subcategoryState = 'deleted';
+          } else if (changeType === 'edit' || changeType === 'create') {
+            subcategoryState = 'edited';
+          } 
+        } else if (hasChildChanges(subcategoryHierarchicalId)) {
+          // Si tiene items con cambios
+          subcategoryState = 'edited';
+        }
+
+        return {
+          ...subcategory,
+          _state: subcategoryState,
+          items: enrichedItems
+        };
+      });
+
+      // Calcular estado de la categoría
+      let categoryState = 'normal';
+
+      if (category._state === 'new') {
+        categoryState = 'new';
+      } else if (changeTracking.has(categoryHierarchicalId)) {
+        const changeType = changeTracking.get(categoryHierarchicalId);
+        if (changeType === 'delete') {
+          categoryState = 'deleted';
+        } else if (changeType === 'edit' || changeType === 'create') {
+          categoryState = 'edited';
+        }
+      } else if (hasChildChanges(categoryHierarchicalId)) {
+        // Si tiene subcategorías o items con cambios
+        categoryState = 'edited';
       }
 
-      setExpandedCategories(expandedCats);
-      setExpandedSubcategories(expandedSubs);
-      setExpandedItems(expandedItms);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuData]);
-
-  // Cerrar subcategorías e items al entrar en modo edición
-  useEffect(() => {
-    if (isEditing) {
-      setExpandedSubcategories({});
-      setExpandedItems({});
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditing]);
+      return {
+        ...category,
+        _state: categoryState,
+        subcategories: enrichedSubcategories
+      };
+    });
+  };
 
   // Estado para diálogos de confirmación
   const [confirmDialog, setConfirmDialog] = useState({
@@ -315,29 +403,82 @@ const MenuPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuData, isEditing]);
 
-  const handleToggleCategory = (categoryId) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
+  // Funciones de navegación
+  const handleNavigateToCategories = () => {
+    setCurrentLevel('categories');
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
   };
 
-  const handleToggleSubcategory = (subcategoryId) => {
-    setExpandedSubcategories(prev => ({
-      ...prev,
-      [subcategoryId]: !prev[subcategoryId]
-    }));
+  const handleNavigateToSubcategories = () => {
+    if (selectedCategory) {
+      setCurrentLevel('subcategories');
+      setSelectedSubcategory(null);
+    }
   };
 
-  const handleToggleItem = (itemId) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }));
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+    setCurrentLevel('subcategories');
+  };
+
+  const handleSubcategoryClick = (subcategory) => {
+    setSelectedSubcategory(subcategory);
+    setCurrentLevel('items');
+  };
+
+  const handleBackFromSubcategories = () => {
+    setCurrentLevel('categories');
+    setSelectedCategory(null);
+  };
+
+  const handleBackFromItems = () => {
+    setCurrentLevel('subcategories');
+    setSelectedSubcategory(null);
+  };
+
+  // Obtener datos filtrados según la navegación actual
+  const getCurrentCategory = () => {
+    if (!selectedCategory) return null;
+    return menuData.find(cat => cat.id === selectedCategory.id);
+  };
+
+  const getCurrentSubcategories = () => {
+    const category = getCurrentCategory();
+    return category?.subcategories || [];
+  };
+
+  const getCurrentSubcategory = () => {
+    if (!selectedSubcategory) return null;
+    const subcategories = getCurrentSubcategories();
+    return subcategories.find(sub => sub.id === selectedSubcategory.id);
+  };
+
+  const getCurrentItems = () => {
+    const subcategory = getCurrentSubcategory();
+    return subcategory?.items || [];
+  };
+
+  // Contar subcategorías e items para mostrar en las vistas
+  const getSubcategoryCounts = () => {
+    const counts = {};
+    menuData.forEach(category => {
+      counts[category.id] = category.subcategories?.length || 0;
+    });
+    return counts;
+  };
+
+  const getItemCounts = () => {
+    const counts = {};
+    const subcategories = getCurrentSubcategories();
+    subcategories.forEach(subcategory => {
+      counts[subcategory.id] = subcategory.items?.length || 0;
+    });
+    return counts;
   };
 
   const handleLanguageChange = (language) => {
-    if (hasChanges) {
+    if (hasRealChanges()) {
       setConfirmDialog({
         isOpen: true,
         title: 'Cambios sin guardar',
@@ -345,7 +486,6 @@ const MenuPage = () => {
         type: 'warning',
         onConfirm: () => {
           setSelectedLanguage(language);
-          setHasChanges(false);
           setConfirmDialog({ ...confirmDialog, isOpen: false });
         }
       });
@@ -355,7 +495,7 @@ const MenuPage = () => {
   };
 
   const handleToggleEditMode = () => {
-    if (isEditing && hasChanges) {
+    if (isEditing && hasRealChanges()) {
       setConfirmDialog({
         isOpen: true,
         title: 'Salir del modo edición',
@@ -363,7 +503,6 @@ const MenuPage = () => {
         type: 'warning',
         onConfirm: () => {
           setIsEditing(false);
-          setHasChanges(false);
           setConfirmDialog({ ...confirmDialog, isOpen: false });
           reload(); // Recargar datos originales desde el backend
         }
@@ -410,7 +549,6 @@ const MenuPage = () => {
           // Recargar datos desde el backend
           await reload();
 
-          setHasChanges(false);
           setIsEditing(false);
           setIsSaving(false);
 
@@ -450,7 +588,6 @@ const MenuPage = () => {
       message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
       type: 'danger',
       onConfirm: () => {
-        setHasChanges(false);
         setIsEditing(false);
         setConfirmDialog({ ...confirmDialog, isOpen: false });
         reload(); // Recargar datos originales desde el backend
@@ -469,35 +606,33 @@ const MenuPage = () => {
 
     setMenuData(prevData => [...prevData, newCategory]);
 
-    // Expandir automáticamente la nueva categoría
-    setExpandedCategories(prev => ({
-      ...prev,
-      [newCategory.id]: true
-    }));
+    // Navegar automáticamente a la nueva categoría
+    setSelectedCategory(newCategory);
+    setCurrentLevel('subcategories');
 
-    // Hacer scroll al nuevo elemento
-    setTimeout(() => {
-      const element = document.querySelector(`[data-accordion-id="${newCategory.id}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-
-    setHasChanges(true);
+    // No marcar cambios hasta que se edite el elemento nuevo
   };
 
   const handleUpdateCategory = (categoryId, updates) => {
     setMenuData(prevData => {
       return prevData.map(category => {
         if (category.id !== categoryId) return category;
+
+        const isNew = category._state === 'new';
+
+        // Si no es nuevo, registrar el cambio
+        if (!isNew) {
+          const hierarchicalId = buildHierarchicalId(categoryId);
+          trackChange(hierarchicalId, 'edit');
+        }
+
         return {
           ...category,
           ...updates,
-          _state: category._state === 'new' ? 'new' : 'edited'
+          _state: isNew ? 'new' : 'edited'
         };
       });
     });
-    setHasChanges(true);
   };
 
   const handleDeleteCategory = (categoryId) => {
@@ -507,22 +642,33 @@ const MenuPage = () => {
       message: '¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se aplicará hasta que guardes los cambios.',
       type: 'danger',
       onConfirm: () => {
+        const category = menuData.find(c => c.id === categoryId);
+        const isNewCategory = category && category._state === 'new';
+
         setMenuData(prevData => {
-          return prevData.map(category => {
+          return prevData.filter(category => {
+            // Si la categoría es nueva, eliminarla completamente
+            if (category.id === categoryId && category._state === 'new') {
+              return false;
+            }
+            return true;
+          }).map(category => {
+            // Para categorías existentes, marcarlas como eliminadas
             if (category.id !== categoryId) return category;
             return {
               ...category,
-              _previousState: category._state, // Guardar estado anterior
+              _previousState: category._state,
               _state: 'deleted'
             };
           });
         });
-        // Cerrar el acordeón al marcar como eliminado
-        setExpandedCategories(prev => ({
-          ...prev,
-          [categoryId]: false
-        }));
-        setHasChanges(true);
+
+        // Registrar el cambio si no era nueva
+        if (!isNewCategory) {
+          const hierarchicalId = buildHierarchicalId(categoryId);
+          trackChange(hierarchicalId, 'delete');
+        }
+
         setConfirmDialog({ ...confirmDialog, isOpen: false });
       }
     });
@@ -541,7 +687,10 @@ const MenuPage = () => {
         return updatedCategory;
       });
     });
-    setHasChanges(true);
+
+    // Quitar el cambio del tracking
+    const hierarchicalId = buildHierarchicalId(categoryId);
+    untrackChange(hierarchicalId);
   };
 
   const handleMoveCategoryUp = (categoryId) => {
@@ -563,7 +712,6 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
   };
 
   const handleMoveCategoryDown = (categoryId) => {
@@ -585,18 +733,18 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
   };
 
   // Handlers para subcategorías
   const handleAddSubcategory = (categoryId) => {
     const newSubcategoryId = `temp-subcategory-${Date.now()}`;
+    let newSubcategory = null;
 
     setMenuData(prevData => {
       return prevData.map(category => {
         if (category.id !== categoryId) return category;
 
-        const newSubcategory = {
+        newSubcategory = {
           id: newSubcategoryId,
           nameKey: '',
           items: [],
@@ -604,58 +752,71 @@ const MenuPage = () => {
           _state: 'new'
         };
 
-        const updatedSubcategories = [...(category.subcategories || []), newSubcategory];
+        // Registrar el cambio con ID jerárquico
+        const hierarchicalId = buildHierarchicalId(category.id, newSubcategoryId);
+        trackChange(hierarchicalId, 'create');
 
-        // Expandir automáticamente la nueva subcategoría
-        setExpandedSubcategories(prev => ({
-          ...prev,
-          [newSubcategory.id]: true
-        }));
+        const updatedSubcategories = [...(category.subcategories || []), newSubcategory];
 
         return {
           ...category,
-          subcategories: updatedSubcategories,
-          _state: category._state === 'new' ? 'new' : 'edited'
+          subcategories: updatedSubcategories
         };
       });
     });
 
-    // Hacer scroll al nuevo elemento
-    setTimeout(() => {
-      const element = document.querySelector(`[data-accordion-id="${newSubcategoryId}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
+    // Navegar automáticamente a la nueva subcategoría
+    if (newSubcategory) {
+      setSelectedSubcategory(newSubcategory);
+      setCurrentLevel('items');
+    }
 
-    setHasChanges(true);
+    // No marcar cambios al añadir una subcategoría temporal
   };
 
   const handleUpdateSubcategory = (subcategoryId, updates) => {
     setMenuData(prevData => {
       return prevData.map(category => {
+        let subcategoryFound = false;
+        let isSubcategoryNew = false;
+        let hasContentNow = false;
+
         const updatedSubcategories = (category.subcategories || []).map(subcategory => {
           if (subcategory.id !== subcategoryId) return subcategory;
-          return {
+
+          subcategoryFound = true;
+          isSubcategoryNew = subcategory._state === 'new';
+          const updatedSubcategory = {
             ...subcategory,
             ...updates,
-            _state: subcategory._state === 'new' ? 'new' : 'edited'
+            _state: isSubcategoryNew ? 'new' : 'edited'
           };
+
+          // Verificar si tiene contenido significativo ahora
+          hasContentNow = updatedSubcategory.nameKey && updatedSubcategory.nameKey.trim().length > 0;
+
+          return updatedSubcategory;
         });
 
-        // Solo marcar la categoría como editada si alguna subcategoría cambió
-        const hasChanges = updatedSubcategories.some((sub, idx) =>
-          sub !== (category.subcategories || [])[idx]
-        );
+        if (!subcategoryFound) return category;
 
-        return hasChanges ? {
+        // Registrar cambios en el tracking con ID jerárquico
+        const hierarchicalId = buildHierarchicalId(category.id, subcategoryId);
+        if (!isSubcategoryNew) {
+          // Subcategoría existente fue editada
+          trackChange(hierarchicalId, 'edit');
+        } else if (hasContentNow) {
+          // Nueva subcategoría con contenido - registrar como creación
+          trackChange(hierarchicalId, 'create');
+        }
+
+        return {
           ...category,
           subcategories: updatedSubcategories,
-          _state: category._state === 'new' ? 'new' : 'edited'
-        } : category;
+          _state: category._state
+        };
       });
     });
-    setHasChanges(true);
   };
 
   const handleDeleteSubcategory = (categoryId, subcategoryId) => {
@@ -665,15 +826,26 @@ const MenuPage = () => {
       message: '¿Estás seguro de que quieres eliminar esta subcategoría?',
       type: 'danger',
       onConfirm: () => {
+        const category = menuData.find(c => c.id === categoryId);
+        const subcategory = category?.subcategories?.find(s => s.id === subcategoryId);
+        const isNewSubcategory = subcategory?._state === 'new';
+
         setMenuData(prevData => {
           return prevData.map(category => {
             if (category.id !== categoryId) return category;
 
-            const updatedSubcategories = (category.subcategories || []).map(subcategory => {
+            const updatedSubcategories = (category.subcategories || []).filter(subcategory => {
+              // Si la subcategoría es nueva, eliminarla completamente
+              if (subcategory.id === subcategoryId && subcategory._state === 'new') {
+                return false;
+              }
+              return true;
+            }).map(subcategory => {
+              // Para subcategorías existentes, marcarlas como eliminadas
               if (subcategory.id !== subcategoryId) return subcategory;
               return {
                 ...subcategory,
-                _previousState: subcategory._state, // Guardar estado anterior
+                _previousState: subcategory._state,
                 _state: 'deleted'
               };
             });
@@ -684,18 +856,31 @@ const MenuPage = () => {
             };
           });
         });
-        // Cerrar el acordeón al marcar como eliminado
-        setExpandedSubcategories(prev => ({
-          ...prev,
-          [subcategoryId]: false
-        }));
-        setHasChanges(true);
+
+        // Registrar el cambio con ID jerárquico
+        const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId);
+        if (!isNewSubcategory) {
+          trackChange(hierarchicalId, 'delete');
+        } else {
+          // Si era nueva y la borramos, quitar su tracking de 'create' si existe
+          untrackChange(hierarchicalId);
+        }
+
         setConfirmDialog({ ...confirmDialog, isOpen: false });
       }
     });
   };
 
   const handleUndoDeleteSubcategory = (subcategoryId) => {
+    let categoryId = null;
+
+    // Encontrar el categoryId
+    menuData.forEach(category => {
+      if ((category.subcategories || []).some(sub => sub.id === subcategoryId)) {
+        categoryId = category.id;
+      }
+    });
+
     setMenuData(prevData => {
       return prevData.map(category => {
         const updatedSubcategories = (category.subcategories || []).map(subcategory => {
@@ -715,7 +900,12 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
+
+    // Quitar el cambio del tracking con ID jerárquico
+    if (categoryId) {
+      const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId);
+      untrackChange(hierarchicalId);
+    }
   };
 
   const handleMoveSubcategoryUp = (categoryId, subcategoryId) => {
@@ -745,7 +935,6 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
   };
 
   const handleMoveSubcategoryDown = (categoryId, subcategoryId) => {
@@ -775,7 +964,6 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
   };
 
   // Handlers para items
@@ -799,18 +987,17 @@ const MenuPage = () => {
 
           const updatedItems = [...(subcategory.items || []), newItem];
 
-          // Expandir automáticamente el nuevo item
-          setExpandedItems(prev => ({
-            ...prev,
-            [newItem.id]: true
-          }));
-
           return {
             ...subcategory,
-            items: updatedItems,
-            _state: subcategory._state === 'new' ? 'new' : 'edited'
+            items: updatedItems
           };
         });
+
+        // Registrar el cambio con ID jerárquico
+        const hierarchicalId = buildHierarchicalId(category.id, subcategoryId, newItemId);
+        trackChange(hierarchicalId, 'create');
+
+        console.log('track create: ' + hierarchicalId);
 
         const hasChanges = updatedSubcategories.some((sub, idx) =>
           sub !== (category.subcategories || [])[idx]
@@ -818,80 +1005,108 @@ const MenuPage = () => {
 
         return hasChanges ? {
           ...category,
-          subcategories: updatedSubcategories,
-          _state: category._state === 'new' ? 'new' : 'edited'
+          subcategories: updatedSubcategories
         } : category;
       });
     });
-
-    // Hacer scroll al nuevo elemento
-    setTimeout(() => {
-      const element = document.querySelector(`[data-accordion-id="${newItemId}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-
-    setHasChanges(true);
   };
 
   const handleUpdateItem = (itemId, updates) => {
     setMenuData(prevData => {
       return prevData.map(category => {
+        let itemFound = false;
+        let isItemNew = false;
+        let hasContentNow = false;
+        let foundSubcategoryId = null;
+
         const updatedSubcategories = (category.subcategories || []).map(subcategory => {
           const updatedItems = (subcategory.items || []).map(item => {
             if (item.id !== itemId) return item;
-            return {
+
+            itemFound = true;
+            foundSubcategoryId = subcategory.id;
+            isItemNew = item._state === 'new';
+            const updatedItem = {
               ...item,
               ...updates,
-              _state: item._state === 'new' ? 'new' : 'edited'
+              _state: isItemNew ? 'new' : 'edited'
             };
+
+            // Verificar si tiene contenido significativo ahora
+            hasContentNow = (
+              (updatedItem.nameKey && updatedItem.nameKey.trim().length > 0) ||
+              (updatedItem.price !== undefined && updatedItem.price !== null && updatedItem.price !== '')
+            );
+
+            return updatedItem;
           });
 
-          // Solo marcar la subcategoría como editada si algún item cambió
-          const hasChanges = updatedItems.some((itm, idx) =>
-            itm !== (subcategory.items || [])[idx]
-          );
-
-          return hasChanges ? {
+          return {
             ...subcategory,
-            items: updatedItems,
-            _state: subcategory._state === 'new' ? 'new' : 'edited'
-          } : subcategory;
+            items: updatedItems
+          };
         });
 
-        // Solo marcar la categoría como editada si alguna subcategoría cambió
-        const hasChanges = updatedSubcategories.some((sub, idx) =>
-          sub !== (category.subcategories || [])[idx]
-        );
+        if (!itemFound) return category;
 
-        return hasChanges ? {
+        // Registrar cambios en el tracking con ID jerárquico
+        const hierarchicalId = buildHierarchicalId(category.id, foundSubcategoryId, itemId);
+        if (!isItemNew) {
+          // Item existente fue editado
+          trackChange(hierarchicalId, 'edit');
+        } else if (hasContentNow) {
+          // Nuevo item con contenido - registrar como creación
+          trackChange(hierarchicalId, 'create');
+        }
+
+        return {
           ...category,
-          subcategories: updatedSubcategories,
-          _state: category._state === 'new' ? 'new' : 'edited'
-        } : category;
+          subcategories: updatedSubcategories
+        };
       });
     });
-    setHasChanges(true);
   };
 
   const handleDeleteItem = (subcategoryId, itemId) => {
     setConfirmDialog({
       isOpen: true,
-      title: 'Eliminar plato',
-      message: '¿Estás seguro de que quieres eliminar este plato?',
+      title: 'Eliminar item',
+      message: '¿Estás seguro de que quieres eliminar este item?',
       type: 'danger',
       onConfirm: () => {
+        let isNewItem = false;
+        let categoryId = null;
+
+        // Encontrar el item para ver si es nuevo y el categoryId
+        menuData.forEach(category => {
+          (category.subcategories || []).forEach(subcategory => {
+            if (subcategory.id === subcategoryId) {
+              categoryId = category.id;
+              const item = (subcategory.items || []).find(i => i.id === itemId);
+              if (item && item._state === 'new') {
+                isNewItem = true;
+              }
+            }
+          });
+        });
+
         setMenuData(prevData => {
           return prevData.map(category => {
             const updatedSubcategories = (category.subcategories || []).map(subcategory => {
               if (subcategory.id !== subcategoryId) return subcategory;
 
-              const updatedItems = (subcategory.items || []).map(item => {
+              const updatedItems = (subcategory.items || []).filter(item => {
+                // Si el item es nuevo, eliminarlo completamente
+                if (item.id === itemId && item._state === 'new') {
+                  return false;
+                }
+                return true;
+              }).map(item => {
+                // Para items existentes, marcarlos como eliminados
                 if (item.id !== itemId) return item;
                 return {
                   ...item,
-                  _previousState: item._state, // Guardar estado anterior
+                  _previousState: item._state,
                   _state: 'deleted'
                 };
               });
@@ -908,18 +1123,37 @@ const MenuPage = () => {
             };
           });
         });
-        // Cerrar el acordeón al marcar como eliminado
-        setExpandedItems(prev => ({
-          ...prev,
-          [itemId]: false
-        }));
-        setHasChanges(true);
+
+        // Registrar el cambio con ID jerárquico
+        if (categoryId) {
+          const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId, itemId);
+          if (!isNewItem) {
+            trackChange(hierarchicalId, 'delete');
+          } else {
+            // Si era nuevo y lo borramos, quitar su tracking de 'create' si existe
+            untrackChange(hierarchicalId);
+          }
+        }
+
         setConfirmDialog({ ...confirmDialog, isOpen: false });
       }
     });
   };
 
   const handleUndoDeleteItem = (itemId) => {
+    let categoryId = null;
+    let subcategoryId = null;
+
+    // Encontrar el categoryId y subcategoryId
+    menuData.forEach(category => {
+      (category.subcategories || []).forEach(subcategory => {
+        if ((subcategory.items || []).some(item => item.id === itemId)) {
+          categoryId = category.id;
+          subcategoryId = subcategory.id;
+        }
+      });
+    });
+
     setMenuData(prevData => {
       return prevData.map(category => {
         const updatedSubcategories = (category.subcategories || []).map(subcategory => {
@@ -946,7 +1180,12 @@ const MenuPage = () => {
         };
       });
     });
-    setHasChanges(true);
+
+    // Quitar el cambio del tracking con ID jerárquico
+    if (categoryId && subcategoryId) {
+      const hierarchicalId = buildHierarchicalId(categoryId, subcategoryId, itemId);
+      untrackChange(hierarchicalId);
+    }
   };
 
   const handleMoveItemUp = (subcategoryId, itemId) => {
@@ -988,7 +1227,6 @@ const MenuPage = () => {
         } : category;
       });
     });
-    setHasChanges(true);
   };
 
   const handleMoveItemDown = (subcategoryId, itemId) => {
@@ -1030,7 +1268,6 @@ const MenuPage = () => {
         } : category;
       });
     });
-    setHasChanges(true);
   };
 
 
@@ -1100,8 +1337,8 @@ const MenuPage = () => {
             {isEditing && (
               <div className={styles.editingBar}>
                 <div className={styles.editingInfo}>
-                  <span className={hasChanges ? styles.changesBadge : styles.editingBadge}>
-                    {hasChanges ? 'Cambios sin guardar' : 'Modo Edición'}
+                  <span className={hasRealChanges() ? styles.changesBadge : styles.editingBadge}>
+                    {hasRealChanges() ? 'Cambios sin guardar' : 'Modo Edición'}
                   </span>
                 </div>
                 <div className={styles.editingActions}>
@@ -1109,7 +1346,7 @@ const MenuPage = () => {
                     type="button"
                     className={styles.cancelButton}
                     onClick={handleCancel}
-                    disabled={!hasChanges || isSaving}
+                    disabled={!hasRealChanges() || isSaving}
                   >
                     <X size={18} strokeWidth={2.5} />
                     <span>Cancelar</span>
@@ -1118,77 +1355,76 @@ const MenuPage = () => {
                     type="button"
                     className={styles.saveButton}
                     onClick={handleSave}
-                    disabled={!hasChanges || isSaving}
+                    disabled={!hasRealChanges() || isSaving}
                   >
                     <Save size={18} />
                     <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.addCategoryButton}
-                    onClick={handleAddCategory}
-                    disabled={isSaving}
-                  >
-                    <Plus size={20} />
-                    <span>Añadir Categoría</span>
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          <div className={styles.categoriesList}>
-          {menuData.length > 0 ? (
-            <>
-              {menuData.map((category, index) => (
-                <CategoryAccordion
-                  key={category.id}
-                  category={category}
-                  isExpanded={expandedCategories[category.id]}
-                  onToggle={() => handleToggleCategory(category.id)}
-                  onUpdate={handleUpdateCategory}
-                  onDelete={() => handleDeleteCategory(category.id)}
-                  onUndoDelete={() => handleUndoDeleteCategory(category.id)}
-                  onMoveUp={() => handleMoveCategoryUp(category.id)}
-                  onMoveDown={() => handleMoveCategoryDown(category.id)}
-                  canMoveUp={index > 0}
-                  canMoveDown={index < menuData.length - 1}
-                  onAddSubcategory={handleAddSubcategory}
-                  onUpdateSubcategory={handleUpdateSubcategory}
-                  onDeleteSubcategory={handleDeleteSubcategory}
-                  onUndoDeleteSubcategory={handleUndoDeleteSubcategory}
-                  onMoveSubcategoryUp={handleMoveSubcategoryUp}
-                  onMoveSubcategoryDown={handleMoveSubcategoryDown}
-                  onAddItem={handleAddItem}
-                  onUpdateItem={handleUpdateItem}
-                  onDeleteItem={handleDeleteItem}
-                  onUndoDeleteItem={handleUndoDeleteItem}
-                  onMoveItemUp={handleMoveItemUp}
-                  onMoveItemDown={handleMoveItemDown}
-                  expandedSubcategories={expandedSubcategories}
-                  expandedItems={expandedItems}
-                  onToggleSubcategory={handleToggleSubcategory}
-                  onToggleItem={handleToggleItem}
-                  isEditing={isEditing}
-                  errors={validationErrors[category.id] || {}}
-                />
-              ))}
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              <p>No hay categorías en la carta</p>
-              {isEditing && (
-                <button
-                  type="button"
-                  className={styles.emptyAddButton}
-                  onClick={handleAddCategory}
-                >
-                  <Plus size={24} />
-                  <span>Añadir primera categoría</span>
-                </button>
-              )}
-            </div>
-          )}
+          {/* Breadcrumbs de navegación */}
+          <Breadcrumbs
+            currentLevel={currentLevel}
+            categoryName={selectedCategory?.nameKey}
+            subcategoryName={selectedSubcategory?.nameKey}
+            onNavigateToCategories={handleNavigateToCategories}
+            onNavigateToSubcategories={handleNavigateToSubcategories}
+          />
+
+          {/* Vista según nivel actual */}
+          <div className={styles.viewContainer}>
+            {currentLevel === 'categories' && (
+              <CategoryView
+                categories={enrichMenuDataWithVisualState(menuData)}
+                onCategoryClick={handleCategoryClick}
+                onAddCategory={isEditing ? handleAddCategory : undefined}
+                onDeleteCategory={isEditing ? handleDeleteCategory : undefined}
+                onUndoDeleteCategory={isEditing ? handleUndoDeleteCategory : undefined}
+                subcategoryCounts={getSubcategoryCounts()}
+                isEditing={isEditing}
+              />
+            )}
+
+            {currentLevel === 'subcategories' && selectedCategory && (
+              <SubcategoryView
+                subcategories={enrichMenuDataWithVisualState(menuData).find(c => c.id === selectedCategory.id)?.subcategories || []}
+                categoryName={selectedCategory.nameKey || 'Sin nombre'}
+                category={enrichMenuDataWithVisualState(menuData).find(c => c.id === selectedCategory.id)}
+                onSubcategoryClick={handleSubcategoryClick}
+                onAddSubcategory={isEditing ? () => handleAddSubcategory(selectedCategory.id) : undefined}
+                onDeleteSubcategory={isEditing ? (subId) => handleDeleteSubcategory(selectedCategory.id, subId) : undefined}
+                onUndoDeleteSubcategory={isEditing ? handleUndoDeleteSubcategory : undefined}
+                onUpdateCategory={isEditing ? handleUpdateCategory : undefined}
+                onBack={handleBackFromSubcategories}
+                itemCounts={getItemCounts()}
+                isEditing={isEditing}
+                categoryError={validationErrors[selectedCategory.id]?.nameKey}
+              />
+            )}
+
+            {currentLevel === 'items' && selectedSubcategory && (
+              <ItemView
+                items={enrichMenuDataWithVisualState(menuData)
+                  .flatMap(c => c.subcategories || [])
+                  .find(s => s.id === selectedSubcategory.id)?.items || []}
+                subcategoryName={selectedSubcategory.nameKey || 'Sin nombre'}
+                subcategory={enrichMenuDataWithVisualState(menuData)
+                  .flatMap(c => c.subcategories || [])
+                  .find(s => s.id === selectedSubcategory.id)}
+                onAddItem={isEditing ? () => handleAddItem(selectedSubcategory.id) : undefined}
+                onUpdateItem={isEditing ? handleUpdateItem : undefined}
+                onUpdateSubcategory={isEditing ? handleUpdateSubcategory : undefined}
+                onDeleteItem={isEditing ? (itemId) => handleDeleteItem(selectedSubcategory.id, itemId) : undefined}
+                onUndoDeleteItem={isEditing ? handleUndoDeleteItem : undefined}
+                onBack={handleBackFromItems}
+                isEditing={isEditing}
+                errors={validationErrors}
+                subcategoryError={validationErrors[getCurrentCategory()?.id]?.subcategories?.[selectedSubcategory.id]?.nameKey}
+              />
+            )}
           </div>
         </div>
       </div>
