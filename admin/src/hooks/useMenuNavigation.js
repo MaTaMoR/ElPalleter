@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
-import { buildHierarchicalId, parseHierarchicalId, unflattenMenuData } from '../utils/menuDataUtils';
+import { useParams } from 'react-router-dom';
+import { buildHierarchicalId, unflattenMenuData } from '../utils/menuDataUtils';
 
 /**
  * Hook to manage menu navigation and view data
+ * Now using React Router params instead of internal state
  */
 export const useMenuNavigation = (menuState) => {
   const {
@@ -13,46 +15,24 @@ export const useMenuNavigation = (menuState) => {
     enrichWithVisualState
   } = menuState;
 
-  const [currentLevel, setCurrentLevel] = useState('categories');
-  const [selectedCategoryHId, setSelectedCategoryHId] = useState(null);
-  const [selectedSubcategoryHId, setSelectedSubcategoryHId] = useState(null);
+  // Get current selection from URL params instead of internal state
+  const { categoryId, subcategoryId } = useParams();
 
-  // Navigation handlers
-  const handleNavigateToCategories = () => {
-    setCurrentLevel('categories');
-    setSelectedCategoryHId(null);
-    setSelectedSubcategoryHId(null);
-  };
+  // Build hierarchical IDs from params
+  const selectedCategoryHId = categoryId ? buildHierarchicalId(categoryId) : null;
+  const selectedSubcategoryHId = (categoryId && subcategoryId)
+    ? buildHierarchicalId(categoryId, subcategoryId)
+    : null;
 
-  const handleNavigateToSubcategories = () => {
-    if (selectedCategoryHId) {
-      setCurrentLevel('subcategories');
-      setSelectedSubcategoryHId(null);
-    }
-  };
+  // These are needed for backwards compatibility with entity operations
+  // But they should eventually be removed as we transition fully to URL-based navigation
+  const [tempCategoryHId, setTempCategoryHId] = useState(null);
+  const [tempSubcategoryHId, setTempSubcategoryHId] = useState(null);
+  const [tempCurrentLevel, setTempCurrentLevel] = useState('categories');
 
-  const handleCategoryClick = (category) => {
-    const categoryHId = buildHierarchicalId(category.id);
-    setSelectedCategoryHId(categoryHId);
-    setCurrentLevel('subcategories');
-  };
-
-  const handleSubcategoryClick = (subcategory) => {
-    const { categoryId } = parseHierarchicalId(selectedCategoryHId);
-    const subcategoryHId = buildHierarchicalId(categoryId, subcategory.id);
-    setSelectedSubcategoryHId(subcategoryHId);
-    setCurrentLevel('items');
-  };
-
-  const handleBackFromSubcategories = () => {
-    setCurrentLevel('categories');
-    setSelectedCategoryHId(null);
-  };
-
-  const handleBackFromItems = () => {
-    setCurrentLevel('subcategories');
-    setSelectedSubcategoryHId(null);
-  };
+  // Use URL params if available, fallback to temp state
+  const effectiveCategoryHId = selectedCategoryHId || tempCategoryHId;
+  const effectiveSubcategoryHId = selectedSubcategoryHId || tempSubcategoryHId;
 
   // Data retrieval for views
   const getCategoriesForView = () => {
@@ -61,13 +41,13 @@ export const useMenuNavigation = (menuState) => {
   };
 
   const getCurrentCategoryData = () => {
-    if (!selectedCategoryHId) return null;
+    if (!effectiveCategoryHId) return null;
     const { enrichedCategories, enrichedSubcategories, enrichedItems } = enrichWithVisualState();
 
-    const category = enrichedCategories.get(selectedCategoryHId);
+    const category = enrichedCategories.get(effectiveCategoryHId);
     if (!category) return null;
 
-    const subcategoryHIds = childrenMap.get(selectedCategoryHId) || [];
+    const subcategoryHIds = childrenMap.get(effectiveCategoryHId) || [];
     const subcategories = subcategoryHIds.map(hId => {
       const sub = enrichedSubcategories.get(hId);
       const itemHIds = childrenMap.get(hId) || [];
@@ -86,13 +66,13 @@ export const useMenuNavigation = (menuState) => {
   };
 
   const getCurrentSubcategoryData = () => {
-    if (!selectedSubcategoryHId) return null;
+    if (!effectiveSubcategoryHId) return null;
     const { enrichedSubcategories, enrichedItems } = enrichWithVisualState();
 
-    const subcategory = enrichedSubcategories.get(selectedSubcategoryHId);
+    const subcategory = enrichedSubcategories.get(effectiveSubcategoryHId);
     if (!subcategory) return null;
 
-    const itemHIds = childrenMap.get(selectedSubcategoryHId) || [];
+    const itemHIds = childrenMap.get(effectiveSubcategoryHId) || [];
     const items = itemHIds.map(hId => enrichedItems.get(hId)).filter(Boolean);
 
     return {
@@ -112,9 +92,9 @@ export const useMenuNavigation = (menuState) => {
 
   const getItemCounts = () => {
     const counts = {};
-    if (!selectedCategoryHId) return counts;
+    if (!effectiveCategoryHId) return counts;
 
-    const subcategoryHIds = childrenMap.get(selectedCategoryHId) || [];
+    const subcategoryHIds = childrenMap.get(effectiveCategoryHId) || [];
     subcategoryHIds.forEach(subcategoryHId => {
       const subcategory = subcategoriesMap.get(subcategoryHId);
       if (subcategory) {
@@ -126,7 +106,7 @@ export const useMenuNavigation = (menuState) => {
   };
 
   const currentCategory = useMemo(() => getCurrentCategoryData(), [
-    selectedCategoryHId,
+    effectiveCategoryHId,
     categoriesMap,
     subcategoriesMap,
     itemsMap,
@@ -134,26 +114,23 @@ export const useMenuNavigation = (menuState) => {
   ]);
 
   const currentSubcategory = useMemo(() => getCurrentSubcategoryData(), [
-    selectedSubcategoryHId,
+    effectiveSubcategoryHId,
     subcategoriesMap,
     itemsMap,
     childrenMap
   ]);
 
   return {
-    // State
-    currentLevel,
-    selectedCategoryHId,
-    selectedSubcategoryHId,
-    setSelectedCategoryHId,
-    setCurrentLevel,
-    // Navigation handlers
-    handleNavigateToCategories,
-    handleNavigateToSubcategories,
-    handleCategoryClick,
-    handleSubcategoryClick,
-    handleBackFromSubcategories,
-    handleBackFromItems,
+    // URL-based state (primary)
+    selectedCategoryHId: effectiveCategoryHId,
+    selectedSubcategoryHId: effectiveSubcategoryHId,
+
+    // Temporary setters for backwards compatibility
+    // These will be used during transition period
+    setSelectedCategoryHId: setTempCategoryHId,
+    setSelectedSubcategoryHId: setTempSubcategoryHId,
+    setCurrentLevel: setTempCurrentLevel,
+
     // Data for views
     getCategoriesForView,
     getCurrentCategoryData,

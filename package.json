@@ -5,22 +5,20 @@
     "dev:astro": "astro dev",
     "dev:admin": "cd admin && npm run dev",
     "dev:webhook": "cd build-webhook && npm run dev",
-    
     "build": "npm run build:astro && npm run build:admin",
     "build:astro": "astro build",
     "build:admin": "cd admin && npm run build",
-    
     "preview": "astro preview",
     "astro": "astro",
-    
     "install:all": "npm install && cd admin && npm install && cd build-webhook && npm install"
   },
   "dependencies": {
-    "@astrojs/react": "^3.6.2",
     "@astrojs/node": "^8.3.3",
+    "@astrojs/react": "^3.6.2",
     "astro": "^4.15.9",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
     "@types/react": "^18.3.10",
