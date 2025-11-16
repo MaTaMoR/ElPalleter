@@ -33,11 +33,20 @@ const CategoryListView = () => {
     navigate(`${pathParts}/categories/${category.id}`);
   };
 
+  // Add category handler - navigate to new category after creation
+  const handleAddCategory = () => {
+    const newCategoryId = entityOps.handleAdd('category');
+    if (newCategoryId) {
+      const pathParts = location.pathname.split('/categories')[0];
+      navigate(`${pathParts}/categories/${newCategoryId}`);
+    }
+  };
+
   return (
     <CategoryView
       categories={getCategoriesForView()}
       onCategoryClick={handleCategoryClick}
-      onAddCategory={isEditing ? () => entityOps.handleAdd('category') : undefined}
+      onAddCategory={isEditing ? handleAddCategory : undefined}
       onDeleteCategory={isEditing ? (id) => entityOps.handleDelete('category', id) : undefined}
       onUndoDeleteCategory={isEditing ? (id) => entityOps.handleUndoDelete('category', id) : undefined}
       subcategoryCounts={getSubcategoryCounts()}

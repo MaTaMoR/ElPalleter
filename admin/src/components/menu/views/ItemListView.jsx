@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useMenuEdit } from '../../../contexts/MenuEditContext';
 import { buildHierarchicalId } from '../../../utils/menuDataUtils';
@@ -12,6 +12,7 @@ const ItemListView = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isEditing, menuState, entityOps, validationErrors } = useMenuEdit();
+  const [autoEditItemId, setAutoEditItemId] = useState(null);
 
   // Get current subcategory and category data
   const getCurrentSubcategoryData = () => {
@@ -56,12 +57,22 @@ const ItemListView = () => {
     navigate(`${pathParts}/categories/${categoryId}`);
   };
 
+  // Add item handler - auto-scroll and open in edit mode
+  const handleAddItem = () => {
+    const newItemId = entityOps.handleAdd('item', currentSubcategory.id, categoryId);
+    if (newItemId) {
+      setAutoEditItemId(newItemId);
+      // Clear after a short delay to allow re-triggering if needed
+      setTimeout(() => setAutoEditItemId(null), 100);
+    }
+  };
+
   return (
     <ItemView
       items={currentSubcategory.items || []}
       subcategoryName={currentSubcategory.nameKey || 'Sin nombre'}
       subcategory={currentSubcategory}
-      onAddItem={isEditing ? () => entityOps.handleAdd('item', currentSubcategory.id, categoryId) : undefined}
+      onAddItem={isEditing ? handleAddItem : undefined}
       onUpdateItem={isEditing ? (id, updates) => entityOps.handleUpdate('item', id, updates) : undefined}
       onUpdateSubcategory={isEditing ? (id, updates) => entityOps.handleUpdate('subcategory', id, updates) : undefined}
       onDeleteItem={isEditing ? (itemId) => entityOps.handleDelete('item', itemId, currentSubcategory.id, categoryId) : undefined}
@@ -70,6 +81,7 @@ const ItemListView = () => {
       isEditing={isEditing}
       errors={validationErrors}
       subcategoryError={validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.nameKey}
+      autoEditItemId={autoEditItemId}
     />
   );
 };

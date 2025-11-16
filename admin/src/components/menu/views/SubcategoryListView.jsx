@@ -76,13 +76,22 @@ const SubcategoryListView = () => {
     navigate(`${pathParts}/categories`);
   };
 
+  // Add subcategory handler - navigate to new subcategory after creation
+  const handleAddSubcategory = () => {
+    const newSubcategoryId = entityOps.handleAdd('subcategory', currentCategory.id);
+    if (newSubcategoryId) {
+      const pathParts = location.pathname.split('/categories')[0];
+      navigate(`${pathParts}/categories/${categoryId}/${newSubcategoryId}`);
+    }
+  };
+
   return (
     <SubcategoryView
       subcategories={currentCategory.subcategories || []}
       categoryName={currentCategory.nameKey || 'Sin nombre'}
       category={currentCategory}
       onSubcategoryClick={handleSubcategoryClick}
-      onAddSubcategory={isEditing ? () => entityOps.handleAdd('subcategory', currentCategory.id) : undefined}
+      onAddSubcategory={isEditing ? handleAddSubcategory : undefined}
       onDeleteSubcategory={isEditing ? (subId) => entityOps.handleDelete('subcategory', subId, currentCategory.id) : undefined}
       onUndoDeleteSubcategory={isEditing ? (id) => entityOps.handleUndoDelete('subcategory', id) : undefined}
       onUpdateCategory={isEditing ? (id, updates) => entityOps.handleUpdate('category', id, updates) : undefined}

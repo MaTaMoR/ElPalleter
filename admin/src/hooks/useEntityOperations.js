@@ -88,6 +88,7 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
   /**
    * Generic ADD operation
+   * Returns the new entity ID so views can handle navigation/editing
    */
   const handleAdd = (entityType, parentId = null, categoryId = null) => {
     const config = ENTITY_CONFIG[entityType];
@@ -125,17 +126,13 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       });
     }
 
-    // Handle navigation after add
-    const navigation = getNavigation();
-    if (entityType === 'category' && navigation) {
-      navigation.setSelectedCategoryHId(hierarchicalId);
-      navigation.setCurrentLevel('subcategories');
-    } else if (entityType === 'subcategory' && navigation) {
-      navigation.setSelectedSubcategoryHId(hierarchicalId);
-      navigation.setCurrentLevel('items');
-    } else if (entityType === 'item') {
+    // Track change for items
+    if (entityType === 'item') {
       trackChange(hierarchicalId, 'create');
     }
+
+    // Return the new entity ID so views can navigate/handle it
+    return newEntityId;
   };
 
   /**
