@@ -29,7 +29,7 @@ export default function App() {
           }>
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="menu" element={<MenuPage />} />
+            <Route path="menu/*" element={<MenuPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

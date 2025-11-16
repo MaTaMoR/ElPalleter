@@ -54,7 +54,7 @@ const ENTITY_CONFIG = {
  * Unified hook for entity CRUD operations (Category, Subcategory, Item)
  * This eliminates the need for separate handlers for each entity type
  */
-export const useEntityOperations = (menuState, navigation, setConfirmDialog) => {
+export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) => {
   const {
     categoriesMap,
     subcategoriesMap,
@@ -67,8 +67,6 @@ export const useEntityOperations = (menuState, navigation, setConfirmDialog) => 
     trackChange,
     untrackChange
   } = menuState;
-
-  const { selectedCategoryHId, selectedSubcategoryHId, setSelectedCategoryHId, setCurrentLevel } = navigation;
 
   // Get the appropriate map and setter based on entity type
   const getMapAndSetter = (entityType) => {
@@ -128,12 +126,13 @@ export const useEntityOperations = (menuState, navigation, setConfirmDialog) => 
     }
 
     // Handle navigation after add
-    if (entityType === 'category') {
-      setSelectedCategoryHId(hierarchicalId);
-      setCurrentLevel('subcategories');
-    } else if (entityType === 'subcategory') {
+    const navigation = getNavigation();
+    if (entityType === 'category' && navigation) {
+      navigation.setSelectedCategoryHId(hierarchicalId);
+      navigation.setCurrentLevel('subcategories');
+    } else if (entityType === 'subcategory' && navigation) {
       navigation.setSelectedSubcategoryHId(hierarchicalId);
-      setCurrentLevel('items');
+      navigation.setCurrentLevel('items');
     } else if (entityType === 'item') {
       trackChange(hierarchicalId, 'create');
     }
@@ -144,13 +143,18 @@ export const useEntityOperations = (menuState, navigation, setConfirmDialog) => 
    */
   const handleUpdate = (entityType, entityId, updates, parentId = null, categoryId = null) => {
     let hierarchicalId;
+    const navigation = getNavigation();
 
     if (entityType === 'category') {
       hierarchicalId = buildHierarchicalId(entityId);
     } else if (entityType === 'subcategory') {
+      const selectedCategoryHId = navigation?.selectedCategoryHId;
+      if (!selectedCategoryHId) return;
       const { categoryId: catId } = parseHierarchicalId(selectedCategoryHId);
       hierarchicalId = buildHierarchicalId(catId, entityId);
     } else if (entityType === 'item') {
+      const selectedSubcategoryHId = navigation?.selectedSubcategoryHId;
+      if (!selectedSubcategoryHId) return;
       const { categoryId: catId } = parseHierarchicalId(selectedSubcategoryHId);
       const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
       if (!subcategory) return;
@@ -258,13 +262,18 @@ export const useEntityOperations = (menuState, navigation, setConfirmDialog) => 
    */
   const handleUndoDelete = (entityType, entityId, parentId = null, categoryId = null) => {
     let hierarchicalId;
+    const navigation = getNavigation();
 
     if (entityType === 'category') {
       hierarchicalId = buildHierarchicalId(entityId);
     } else if (entityType === 'subcategory') {
+      const selectedCategoryHId = navigation?.selectedCategoryHId;
+      if (!selectedCategoryHId) return;
       const { categoryId: catId } = parseHierarchicalId(selectedCategoryHId);
       hierarchicalId = buildHierarchicalId(catId, entityId);
     } else if (entityType === 'item') {
+      const selectedSubcategoryHId = navigation?.selectedSubcategoryHId;
+      if (!selectedSubcategoryHId) return;
       const { categoryId: catId } = parseHierarchicalId(selectedSubcategoryHId);
       const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
       if (!subcategory) return;

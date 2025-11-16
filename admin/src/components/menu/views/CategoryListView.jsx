@@ -1,0 +1,49 @@
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useMenuEdit } from '../../../contexts/MenuEditContext';
+import { unflattenMenuData } from '../../../utils/menuDataUtils';
+import CategoryView from './CategoryView';
+
+/**
+ * Category list view - reads from context and uses React Router for navigation
+ */
+const CategoryListView = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isEditing, menuState, entityOps } = useMenuEdit();
+
+  // Get categories for view
+  const getCategoriesForView = () => {
+    const { enrichedCategories } = menuState.enrichWithVisualState();
+    return unflattenMenuData(enrichedCategories, new Map(), new Map(), menuState.childrenMap);
+  };
+
+  const getSubcategoryCounts = () => {
+    const counts = {};
+    menuState.categoriesMap.forEach((category, categoryHId) => {
+      const subcategoryHIds = menuState.childrenMap.get(categoryHId) || [];
+      counts[category.id] = subcategoryHIds.length;
+    });
+    return counts;
+  };
+
+  // Navigation handler
+  const handleCategoryClick = (category) => {
+    const pathParts = location.pathname.split('/categories')[0];
+    navigate(`${pathParts}/categories/${category.id}`);
+  };
+
+  return (
+    <CategoryView
+      categories={getCategoriesForView()}
+      onCategoryClick={handleCategoryClick}
+      onAddCategory={isEditing ? () => entityOps.handleAdd('category') : undefined}
+      onDeleteCategory={isEditing ? (id) => entityOps.handleDelete('category', id) : undefined}
+      onUndoDeleteCategory={isEditing ? (id) => entityOps.handleUndoDelete('category', id) : undefined}
+      subcategoryCounts={getSubcategoryCounts()}
+      isEditing={isEditing}
+    />
+  );
+};
+
+export default CategoryListView;
