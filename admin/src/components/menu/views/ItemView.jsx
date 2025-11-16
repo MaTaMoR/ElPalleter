@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X, Search } from 'lucide-react';
 import MenuTextField from '../fields/MenuTextField';
@@ -18,10 +18,12 @@ const ItemView = ({
   onBack,
   isEditing,
   errors = {},
-  subcategoryError
+  subcategoryError,
+  autoEditItemId
 }) => {
   const [editingItemId, setEditingItemId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const itemRefs = useRef({});
 
   const handleEdit = (itemId) => {
     setEditingItemId(itemId);
@@ -40,6 +42,20 @@ const ItemView = ({
       onUpdateItem(itemId, { [field]: value });
     }
   };
+
+  // Handle auto-edit and auto-scroll for newly created items
+  useEffect(() => {
+    if (autoEditItemId && isEditing) {
+      setEditingItemId(autoEditItemId);
+      // Scroll to the new item after a short delay to ensure it's rendered
+      setTimeout(() => {
+        const itemElement = itemRefs.current[autoEditItemId];
+        if (itemElement) {
+          itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [autoEditItemId, isEditing]);
 
   const getFilteredItems = () => {
     if (!searchTerm) return items;
@@ -135,6 +151,7 @@ const ItemView = ({
             return (
               <div
                 key={item.id}
+                ref={(el) => { itemRefs.current[item.id] = el; }}
                 className={`${styles.itemCard} ${item._state ? styles[item._state] : ''}`}
               >
                 {isEditingItem ? (
@@ -273,7 +290,8 @@ ItemView.propTypes = {
   onBack: PropTypes.func,
   isEditing: PropTypes.bool,
   errors: PropTypes.object,
-  subcategoryError: PropTypes.string
+  subcategoryError: PropTypes.string,
+  autoEditItemId: PropTypes.string
 };
 
 export default ItemView;
