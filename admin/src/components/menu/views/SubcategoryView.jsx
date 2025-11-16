@@ -27,6 +27,11 @@ const SubcategoryView = ({
         </button>
       )}
 
+      <div className={styles.pageTitle}>
+        <span className={styles.pageTitleLabel}>Categoría:</span>
+        <h1 className={styles.pageTitleName}>{categoryName}</h1>
+      </div>
+
       {isEditing && category && onUpdateCategory && (
         <div className={styles.categoryEditSection}>
           <MenuTextField

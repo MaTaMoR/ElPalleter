@@ -61,6 +61,11 @@ const ItemView = ({
         </button>
       )}
 
+      <div className={styles.pageTitle}>
+        <span className={styles.pageTitleLabel}>Subcategoría:</span>
+        <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
+      </div>
+
       {isEditing && subcategory && onUpdateSubcategory && (
         <div className={styles.subcategoryEditSection}>
           <MenuTextField
