@@ -62,7 +62,6 @@ const ItemView = ({
       )}
 
       <div className={styles.pageTitle}>
-        <span className={styles.pageTitleLabel}>Subcategoría:</span>
         <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
       </div>
 
