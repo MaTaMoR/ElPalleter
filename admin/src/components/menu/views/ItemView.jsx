@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X, Search } from 'lucide-react';
 import MenuTextField from '../fields/MenuTextField';
-import MenuNumberField from '../fields/MenuNumberField';
+import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
 import styles from './ItemView.module.css';
 
@@ -166,12 +166,11 @@ const ItemView = ({
                         error={errors[item.id]?.nameKey}
                         helperText="Mínimo 3 caracteres"
                       />
-                      <MenuNumberField
-                        label="Precio (€)"
+                      <MenuPriceField
+                        label="Precio"
                         value={item.price || ''}
                         onChange={(value) => handleFieldChange(item.id, 'price', value)}
                         min={0}
-                        step={0.01}
                         required
                         error={errors[item.id]?.price}
                       />
