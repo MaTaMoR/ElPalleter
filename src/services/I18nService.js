@@ -434,6 +434,13 @@ export class I18nService {
   }
 
   /**
+   * Obtiene el codigo del idioma por defecto
+   */
+  static getDefaultLanguageCode() {
+    return state.defaultLanguage.code;
+  }
+
+  /**
    * Obtiene información de un idioma específico
    */
   static getLanguage(code) {
@@ -813,11 +820,6 @@ export class I18nService {
     }
   }
 }
-
-// Exportar constantes dinámicas
-export const LOCALES = state.languageCodes;
-export const DEFAULT_LOCALE = state.defaultLanguage?.code || 'es';
-export const LANGUAGE_CONFIG = state.languageConfig;
 
 // Auto-inicialización en servidor
 if (typeof window === 'undefined') {

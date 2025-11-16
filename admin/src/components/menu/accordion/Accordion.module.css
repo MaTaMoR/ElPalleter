@@ -1,0 +1,30 @@
+.accordion {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.accordion:hover {
+  border-color: var(--primary);
+}
+
+/* Estados visuales */
+.accordion.new {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.accordion.edited {
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.accordion.deleted {
+  background-color: rgba(239, 68, 68, 0.05);
+  opacity: 0.6;
+}
+
+.accordion.expanded {
+  box-shadow: var(--shadow-md);
+}
+

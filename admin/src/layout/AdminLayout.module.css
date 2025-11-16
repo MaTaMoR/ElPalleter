@@ -1,3 +1,24 @@
+/* ==================== BASE STYLES ==================== */
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: 280px;
+}
+
+.pageContainer {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
 /* ==================== MÓVIL (max-width: 768px) ==================== */
 @media (max-width: 768px) {
   /* Sidebar en móvil - overlay mode */

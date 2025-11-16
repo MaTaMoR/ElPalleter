@@ -1,0 +1,53 @@
+.fieldContainer {
+  margin-bottom: 0;
+}
+
+.fieldContainer.hasError .inputWrapper input,
+.fieldContainer.hasError .inputWrapper textarea {
+  border-color: var(--error);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: var(--error);
+  margin-left: 0.25rem;
+}
+
+.inputWrapper {
+  width: 100%;
+}
+
+.helperText {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.errorText {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--error);
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .label {
+    font-size: 0.8125rem;
+  }
+
+  .helperText,
+  .errorText {
+    font-size: 0.6875rem;
+  }
+}

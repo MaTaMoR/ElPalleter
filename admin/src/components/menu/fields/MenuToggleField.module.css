@@ -1,0 +1,105 @@
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+  outline: none;
+}
+
+.toggle:hover:not(:disabled) {
+  border-color: var(--text-secondary);
+}
+
+.toggle:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.toggle.on {
+  background-color: var(--success);
+  border-color: var(--success);
+}
+
+.toggle.off {
+  background-color: var(--error);
+  border-color: var(--error);
+}
+
+.toggle.readOnly {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.toggleSwitch {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+  transition: transform 0.2s ease-in-out;
+}
+
+.toggle.on .toggleSwitch {
+  transform: translateX(24px);
+}
+
+.toggleLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .toggle {
+    width: 46px;
+    height: 24px;
+  }
+
+  .toggleSwitch {
+    width: 16px;
+    height: 16px;
+  }
+
+  .toggle.on .toggleSwitch {
+    transform: translateX(22px);
+  }
+
+  .toggleLabel {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggleContainer {
+    gap: 0.5rem;
+  }
+
+  .toggle {
+    width: 44px;
+    height: 22px;
+  }
+
+  .toggleSwitch {
+    width: 14px;
+    height: 14px;
+  }
+
+  .toggle.on .toggleSwitch {
+    transform: translateX(22px);
+  }
+}

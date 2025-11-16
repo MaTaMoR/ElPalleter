@@ -1,0 +1,68 @@
+.priceInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-tertiary);
+}
+
+.input:hover:not(:focus):not(.readOnly) {
+  border-color: var(--text-secondary);
+}
+
+.input.readOnly {
+  background-color: var(--bg-primary);
+  cursor: default;
+  opacity: 0.7;
+}
+
+.currency {
+  position: absolute;
+  right: 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .input {
+    padding: 0.5625rem 2.25rem 0.5625rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .currency {
+    right: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    padding: 0.5rem 2rem 0.5rem 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  .currency {
+    right: 0.625rem;
+    font-size: 0.875rem;
+  }
+}
