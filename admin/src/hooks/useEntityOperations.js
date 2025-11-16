@@ -137,25 +137,29 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
   /**
    * Generic UPDATE operation
+   * Now accepts explicit parentId and categoryId parameters instead of relying on navigation state
+   * - For subcategories: parentId should be the categoryId
+   * - For items: parentId should be the subcategoryId, categoryId should be the categoryId
    */
   const handleUpdate = (entityType, entityId, updates, parentId = null, categoryId = null) => {
     let hierarchicalId;
-    const navigation = getNavigation();
 
     if (entityType === 'category') {
       hierarchicalId = buildHierarchicalId(entityId);
     } else if (entityType === 'subcategory') {
-      const selectedCategoryHId = navigation?.selectedCategoryHId;
-      if (!selectedCategoryHId) return;
-      const { categoryId: catId } = parseHierarchicalId(selectedCategoryHId);
-      hierarchicalId = buildHierarchicalId(catId, entityId);
+      // For subcategories, parentId is the categoryId
+      if (!parentId) {
+        console.error('❌ No parentId (categoryId) provided for subcategory update');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(parentId, entityId);
     } else if (entityType === 'item') {
-      const selectedSubcategoryHId = navigation?.selectedSubcategoryHId;
-      if (!selectedSubcategoryHId) return;
-      const { categoryId: catId } = parseHierarchicalId(selectedSubcategoryHId);
-      const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
-      if (!subcategory) return;
-      hierarchicalId = buildHierarchicalId(catId, subcategory.id, entityId);
+      // For items, we need both categoryId and parentId (subcategoryId)
+      if (!categoryId || !parentId) {
+        console.error('❌ Missing categoryId or parentId (subcategoryId) for item update');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
     }
 
     const { map, setter } = getMapAndSetter(entityType);
@@ -256,25 +260,29 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
   /**
    * Generic UNDO DELETE operation
+   * Now accepts explicit parentId and categoryId parameters instead of relying on navigation state
+   * - For subcategories: parentId should be the categoryId
+   * - For items: parentId should be the subcategoryId, categoryId should be the categoryId
    */
   const handleUndoDelete = (entityType, entityId, parentId = null, categoryId = null) => {
     let hierarchicalId;
-    const navigation = getNavigation();
 
     if (entityType === 'category') {
       hierarchicalId = buildHierarchicalId(entityId);
     } else if (entityType === 'subcategory') {
-      const selectedCategoryHId = navigation?.selectedCategoryHId;
-      if (!selectedCategoryHId) return;
-      const { categoryId: catId } = parseHierarchicalId(selectedCategoryHId);
-      hierarchicalId = buildHierarchicalId(catId, entityId);
+      // For subcategories, parentId is the categoryId
+      if (!parentId) {
+        console.error('❌ No parentId (categoryId) provided for subcategory undo delete');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(parentId, entityId);
     } else if (entityType === 'item') {
-      const selectedSubcategoryHId = navigation?.selectedSubcategoryHId;
-      if (!selectedSubcategoryHId) return;
-      const { categoryId: catId } = parseHierarchicalId(selectedSubcategoryHId);
-      const subcategory = subcategoriesMap.get(selectedSubcategoryHId);
-      if (!subcategory) return;
-      hierarchicalId = buildHierarchicalId(catId, subcategory.id, entityId);
+      // For items, we need both categoryId and parentId (subcategoryId)
+      if (!categoryId || !parentId) {
+        console.error('❌ Missing categoryId or parentId (subcategoryId) for item undo delete');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
     }
 
     const { map, setter } = getMapAndSetter(entityType);
