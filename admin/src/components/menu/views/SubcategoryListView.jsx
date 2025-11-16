@@ -93,9 +93,9 @@ const SubcategoryListView = () => {
       onSubcategoryClick={handleSubcategoryClick}
       onAddSubcategory={isEditing ? handleAddSubcategory : undefined}
       onDeleteSubcategory={isEditing ? (subId) => entityOps.handleDelete('subcategory', subId, currentCategory.id) : undefined}
-      onUndoDeleteSubcategory={isEditing ? (id) => entityOps.handleUndoDelete('subcategory', id) : undefined}
+      onUndoDeleteSubcategory={isEditing ? (id) => entityOps.handleUndoDelete('subcategory', id, categoryId) : undefined}
       onUpdateCategory={isEditing ? (id, updates) => entityOps.handleUpdate('category', id, updates) : undefined}
-      onUpdateSubcategory={isEditing ? (id, updates) => entityOps.handleUpdate('subcategory', id, updates) : undefined}
+      onUpdateSubcategory={isEditing ? (id, updates) => entityOps.handleUpdate('subcategory', id, updates, categoryId) : undefined}
       onBack={handleBack}
       itemCounts={getItemCounts()}
       isEditing={isEditing}
