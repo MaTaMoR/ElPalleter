@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Edit3, Eye, Save, X } from 'lucide-react';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
-import MenuBreadcrumbs from '../../components/menu/navigation/MenuBreadcrumbs';
+import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
 import ItemListView from '../../components/menu/views/ItemListView';
@@ -228,16 +228,15 @@ const MenuContent = () => {
       <div className={styles.content}>
         <div className={styles.categoriesContainer}>
           <MenuHeader />
-          <MenuBreadcrumbs />
 
-          <div className={styles.viewContainer}>
-            <Routes>
+          <Routes>
+            <Route path="/" element={<MenuLayout />}>
               <Route index element={<Navigate to="categories" replace />} />
               <Route path="categories" element={<CategoryListView />} />
               <Route path="categories/:categoryId" element={<SubcategoryListView />} />
               <Route path="categories/:categoryId/:subcategoryId" element={<ItemListView />} />
-            </Routes>
-          </div>
+            </Route>
+          </Routes>
         </div>
       </div>
 
