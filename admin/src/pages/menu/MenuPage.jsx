@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Edit3, Eye, Save, X } from 'lucide-react';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import GlobalSearch from '../../components/menu/search/GlobalSearch';
-import NavigationBlocker from '../../components/menu/utils/NavigationBlocker';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -208,26 +207,7 @@ const MenuHeader = () => {
 // ============================================================================
 
 const MenuContent = () => {
-  const { loading, error, menuState, reload, confirmDialog, setConfirmDialog, isEditing } = useMenuEdit();
-
-  // Handle navigation blocking when there are unsaved changes
-  const handleNavigationBlock = ({ proceed, reset }) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Cambios sin guardar',
-      message: '¿Estás seguro de que quieres salir? Se perderán todos los cambios no guardados.',
-      type: 'warning',
-      onConfirm: () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        proceed(); // Allow navigation to proceed
-        reload(); // Reload to discard changes
-      },
-      onCancel: () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        reset(); // Cancel navigation
-      }
-    });
-  };
+  const { loading, error, menuState, reload, confirmDialog, setConfirmDialog } = useMenuEdit();
 
   if (loading) {
     return (
@@ -255,11 +235,6 @@ const MenuContent = () => {
 
   return (
     <>
-      <NavigationBlocker
-        when={isEditing && menuState.hasRealChanges()}
-        onBlock={handleNavigationBlock}
-      />
-
       <div className={styles.content}>
         <div className={styles.categoriesContainer}>
           <MenuHeader />
@@ -275,15 +250,17 @@ const MenuContent = () => {
         </div>
       </div>
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title={confirmDialog.title}
-        message={confirmDialog.message}
-        type={confirmDialog.type}
-        onConfirm={confirmDialog.onConfirm}
-        onCancel={confirmDialog.onCancel || (() => setConfirmDialog(prev => ({ ...prev, isOpen: false })))}
-        confirmText={confirmDialog.type === 'danger' ? 'Eliminar' : 'Confirmar'}
-      />
+      {confirmDialog.onConfirm && (
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          type={confirmDialog.type}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={confirmDialog.onCancel || (() => setConfirmDialog(prev => ({ ...prev, isOpen: false })))}
+          confirmText={confirmDialog.type === 'danger' ? 'Eliminar' : 'Confirmar'}
+        />
+      )}
     </>
   );
 };
