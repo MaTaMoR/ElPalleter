@@ -78,24 +78,29 @@
                 border-radius: 6px;
                 padding: 4px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                transition: all 0.3s ease;
-            }
-
-            /* Cuando el search tiene focus, el grupo crece */
-            .controls-group:focus-within {
-                flex: 1;
             }
 
             .search-container {
                 flex: 0 0 auto;
                 width: 250px;
-                transition: all 0.3s ease;
+                transition: width 0.3s ease, flex 0.3s ease;
             }
 
-            /* Cuando el search tiene focus, crece */
+            /* Cuando el search tiene focus, crece y oculta los demás */
             .search-container:focus-within {
                 flex: 1;
-                width: auto;
+                width: 100%;
+            }
+
+            /* Ocultar divisores y controles cuando el search está activo */
+            .controls-group:focus-within .control-divider,
+            .controls-group:focus-within .language-selector,
+            .controls-group:focus-within .edit-button {
+                opacity: 0;
+                pointer-events: none;
+                width: 0;
+                overflow: hidden;
+                transition: opacity 0.2s ease, width 0.3s ease;
             }
 
             .control-divider {
@@ -103,14 +108,17 @@
                 height: 28px;
                 background: #e0e0e0;
                 margin: 0 4px;
+                transition: opacity 0.2s ease, width 0.3s ease;
             }
 
             .language-selector {
                 flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease;
             }
 
             .edit-button {
                 flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease;
             }
         }
 
@@ -404,7 +412,12 @@
 
         <div class="demo-controls">
             <h3>🎯 Instrucciones de prueba</h3>
-            <p><strong>Interacción:</strong> Haz clic en el campo de búsqueda y observa cómo se expande suavemente para ocupar todo el espacio disponible. Al salir del campo, vuelve a su tamaño compacto.</p>
+            <p><strong>Interacción:</strong> Haz clic en el campo de búsqueda y observa cómo:</p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #856404;">
+                <li>El search se expande hacia la derecha ocupando todo el contenedor</li>
+                <li>Los controles de idioma y edición desaparecen suavemente</li>
+                <li>Al salir del campo, todo vuelve a su estado original</li>
+            </ul>
             <p style="margin-top: 12px;"><strong>Responsive:</strong> Redimensiona la ventana del navegador para ver cómo se adapta el diseño. Este diseño enfatiza la agrupación visual de controles con divisores y un contenedor unificado. El punto de quiebre de desktop es 1024px y el del selector de idioma compacto es 640px.</p>
         </div>
     </div>
