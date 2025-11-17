@@ -40,15 +40,42 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     const searchLower = searchTerm.toLowerCase().trim();
     const foundResults = [];
 
-    // Search through all items
+    // Search through categories, subcategories, and items
     categoriesMap.forEach((category, categoryHId) => {
       const categoryId = category.id;
+      const categoryNameMatch = (category.nameKey || '').toLowerCase().includes(searchLower);
+
+      // Check if category matches
+      if (categoryNameMatch) {
+        foundResults.push({
+          type: 'category',
+          category,
+          categoryId,
+          matchIn: 'name'
+        });
+      }
+
       const subcategoryHIds = childrenMap.get(categoryHId) || [];
 
       subcategoryHIds.forEach(subcategoryHId => {
         const subcategory = subcategoriesMap.get(subcategoryHId);
         if (!subcategory) return;
 
+        const subcategoryNameMatch = (subcategory.nameKey || '').toLowerCase().includes(searchLower);
+
+        // Check if subcategory matches
+        if (subcategoryNameMatch) {
+          foundResults.push({
+            type: 'subcategory',
+            subcategory,
+            category,
+            categoryId,
+            subcategoryId: subcategory.id,
+            matchIn: 'name'
+          });
+        }
+
+        // Search through items
         const itemHIds = childrenMap.get(subcategoryHId) || [];
 
         itemHIds.forEach(itemHId => {
@@ -93,10 +120,18 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     );
   };
 
-  // Navigate to item
+  // Navigate based on result type
   const handleResultClick = (result) => {
     const pathParts = location.pathname.split('/categories')[0];
-    navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
+
+    if (result.type === 'category') {
+      navigate(`${pathParts}/categories/${result.categoryId}`);
+    } else if (result.type === 'subcategory') {
+      navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
+    } else if (result.type === 'item') {
+      navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
+    }
+
     setSearchTerm('');
     setResults([]);
     setIsOpen(false);
@@ -147,27 +182,51 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
                 className={styles.resultItem}
                 onClick={() => handleResultClick(result)}
               >
-                <div className={styles.breadcrumb}>
-                  <span className={styles.breadcrumbItem}>{result.category.nameKey || 'Sin nombre'}</span>
-                  <ChevronRight size={14} className={styles.breadcrumbSeparator} />
-                  <span className={styles.breadcrumbItem}>{result.subcategory.nameKey || 'Sin nombre'}</span>
-                  <ChevronRight size={14} className={styles.breadcrumbSeparator} />
-                  <span className={styles.breadcrumbItemLast}>
-                    {highlightText(result.item.nameKey || 'Sin nombre', searchTerm)}
-                  </span>
-                </div>
-                {result.item.descriptionKey && (
-                  <div className={styles.itemDescription}>
-                    {highlightText(result.item.descriptionKey, searchTerm)}
+                {result.type === 'category' && (
+                  <div className={styles.breadcrumb}>
+                    <span className={styles.breadcrumbItemLast}>
+                      {highlightText(result.category.nameKey || 'Sin nombre', searchTerm)}
+                    </span>
+                    <span className={styles.resultType}>Categoría</span>
                   </div>
                 )}
-                {result.item.price && (
-                  <div className={styles.itemPrice}>
-                    {parseFloat(result.item.price).toLocaleString('es-ES', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}€
+
+                {result.type === 'subcategory' && (
+                  <div className={styles.breadcrumb}>
+                    <span className={styles.breadcrumbItem}>{result.category.nameKey || 'Sin nombre'}</span>
+                    <ChevronRight size={14} className={styles.breadcrumbSeparator} />
+                    <span className={styles.breadcrumbItemLast}>
+                      {highlightText(result.subcategory.nameKey || 'Sin nombre', searchTerm)}
+                    </span>
+                    <span className={styles.resultType}>Subcategoría</span>
                   </div>
+                )}
+
+                {result.type === 'item' && (
+                  <>
+                    <div className={styles.breadcrumb}>
+                      <span className={styles.breadcrumbItem}>{result.category.nameKey || 'Sin nombre'}</span>
+                      <ChevronRight size={14} className={styles.breadcrumbSeparator} />
+                      <span className={styles.breadcrumbItem}>{result.subcategory.nameKey || 'Sin nombre'}</span>
+                      <ChevronRight size={14} className={styles.breadcrumbSeparator} />
+                      <span className={styles.breadcrumbItemLast}>
+                        {highlightText(result.item.nameKey || 'Sin nombre', searchTerm)}
+                      </span>
+                    </div>
+                    {result.item.descriptionKey && (
+                      <div className={styles.itemDescription}>
+                        {highlightText(result.item.descriptionKey, searchTerm)}
+                      </div>
+                    )}
+                    {result.item.price && (
+                      <div className={styles.itemPrice}>
+                        {parseFloat(result.item.price).toLocaleString('es-ES', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}€
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             ))}

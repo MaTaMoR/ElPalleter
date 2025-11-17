@@ -59,19 +59,13 @@ const SubcategoryListView = () => {
 
   const currentCategory = getCurrentCategoryData();
 
-  // Helper to check if an ID is temporary (from a newly created entity)
-  const isTemporaryId = (id) => {
-    return id && id.startsWith('temp-');
-  };
-
-  // Redirect if category doesn't exist or is temporary (e.g., after canceling changes)
+  // Redirect if category doesn't exist (e.g., after canceling changes)
   useEffect(() => {
-    // If category doesn't exist OR is temporary (and likely deleted), go to categories list
-    if (!currentCategory || isTemporaryId(categoryId)) {
+    if (!currentCategory) {
       const pathParts = location.pathname.split('/categories')[0];
       navigate(`${pathParts}/categories`, { replace: true });
     }
-  }, [currentCategory, categoryId, navigate, location.pathname]);
+  }, [currentCategory, navigate, location.pathname]);
 
   if (!currentCategory) {
     return null;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X, Search } from 'lucide-react';
+import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X } from 'lucide-react';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
@@ -22,7 +22,6 @@ const ItemView = ({
   autoEditItemId
 }) => {
   const [editingItemId, setEditingItemId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const itemRefs = useRef({});
 
   const handleEdit = (itemId) => {
@@ -56,17 +55,6 @@ const ItemView = ({
       }, 100);
     }
   }, [autoEditItemId, isEditing]);
-
-  const getFilteredItems = () => {
-    if (!searchTerm) return items;
-
-    return items.filter(item =>
-      (item.nameKey || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.descriptionKey || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
-
-  const filteredItems = getFilteredItems();
 
   return (
     <div className={styles.container}>
@@ -107,44 +95,17 @@ const ItemView = ({
           </button>
         )}
         <span className={styles.count}>
-          {filteredItems.length} items
-          {searchTerm && ' (filtrados)'}
+          {items.length} items
         </span>
       </div>
 
-      {items.length > 0 && (
-        <div className={styles.searchBar}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Buscar items..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className={styles.clearSearch}
-              aria-label="Limpiar búsqueda"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-      )}
-
       <div className={styles.itemsList}>
-        {filteredItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className={styles.emptyState}>
-            <p>
-              {searchTerm
-                ? 'No se encontraron items con ese criterio'
-                : 'No hay items en esta subcategoría'}
-            </p>
+            <p>No hay items en esta subcategoría</p>
           </div>
         ) : (
-          filteredItems.map((item) => {
+          items.map((item) => {
             const isEditingItem = isEditing && editingItemId === item.id;
             const isDeleted = item._state === 'deleted';
 
