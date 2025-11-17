@@ -209,11 +209,12 @@
   color: white;
   border: none;
   border-radius: 0.25rem;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .editButton:hover {
@@ -221,14 +222,57 @@
   box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
 }
 
-.editButton.active {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--primary);
-  color: var(--primary);
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  color: var(--error);
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.editButton.active:hover {
-  background-color: var(--bg-card);
+.cancelButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.cancelButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #059669;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.saveButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .editingBar {

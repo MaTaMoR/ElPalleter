@@ -153,67 +153,59 @@ const MenuHeader = () => {
 
           <div className={styles.controlDivider}></div>
 
-          {/* Language Selector */}
-          <div className={styles.languageWrapper}>
-            <LanguageSelector
-              selectedLanguage={selectedLanguage}
-              onChange={handleLanguageChange}
-              disabled={isEditing}
-            />
-          </div>
+          {/* Conditional controls based on edit mode */}
+          {!isEditing ? (
+            <>
+              {/* Language Selector - Solo en modo visualización */}
+              <div className={styles.languageWrapper}>
+                <LanguageSelector
+                  selectedLanguage={selectedLanguage}
+                  onChange={handleLanguageChange}
+                  disabled={false}
+                />
+              </div>
 
-          <div className={styles.controlDivider}></div>
+              <div className={styles.controlDivider}></div>
 
-          {/* Edit Button */}
-          <button
-            type="button"
-            className={`${styles.editButton} ${isEditing ? styles.active : ''}`}
-            onClick={handleToggleEditMode}
-          >
-            {isEditing ? (
-              <>
-                <Eye size={18} />
-                <span>Visualizar</span>
-              </>
-            ) : (
-              <>
+              {/* Edit Button */}
+              <button
+                type="button"
+                className={styles.editButton}
+                onClick={handleToggleEditMode}
+              >
                 <Edit3 size={18} />
                 <span>Editar</span>
-              </>
-            )}
-          </button>
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Cancel Button - En modo edición */}
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleCancel}
+                disabled={!menuState.hasRealChanges() || isSaving}
+              >
+                <X size={18} strokeWidth={2.5} />
+                <span>Cancelar</span>
+              </button>
+
+              <div className={styles.controlDivider}></div>
+
+              {/* Save Button - En modo edición */}
+              <button
+                type="button"
+                className={styles.saveButton}
+                onClick={handleSave}
+                disabled={!menuState.hasRealChanges() || isSaving}
+              >
+                <Save size={18} />
+                <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
-
-      {isEditing && (
-        <div className={styles.editingBar}>
-          <div className={styles.editingInfo}>
-            <span className={menuState.hasRealChanges() ? styles.changesBadge : styles.editingBadge}>
-              {menuState.hasRealChanges() ? 'Cambios sin guardar' : 'Modo Edición'}
-            </span>
-          </div>
-          <div className={styles.editingActions}>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={handleCancel}
-              disabled={!menuState.hasRealChanges() || isSaving}
-            >
-              <X size={18} strokeWidth={2.5} />
-              <span>Cancelar</span>
-            </button>
-            <button
-              type="button"
-              className={styles.saveButton}
-              onClick={handleSave}
-              disabled={!menuState.hasRealChanges() || isSaving}
-            >
-              <Save size={18} />
-              <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
