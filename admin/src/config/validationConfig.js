@@ -2,6 +2,18 @@
  * Centralized validation configuration for menu entities
  * Edit these values to change validation requirements across the application
  */
+
+/**
+ * Locale configuration for number formatting
+ * Set to 'es-ES' for European Spanish (uses comma as decimal separator)
+ * Set to 'en-US' for US English (uses period as decimal separator)
+ */
+export const LOCALE_CONFIG = {
+  locale: 'es-ES', // Change to 'en-US' for US format
+  decimalSeparator: ',', // ',' for Europe, '.' for US
+  thousandsSeparator: '.', // '.' for Europe, ',' for US
+};
+
 export const VALIDATION_CONFIG = {
   category: {
     nameKey: {
