@@ -23,6 +23,20 @@
   cursor: pointer;
   transition: var(--transition);
   white-space: nowrap;
+  line-height: 1;
+  min-height: 0;
+  font-family: inherit;
+}
+
+/* Normalize button vs span behavior */
+button.breadcrumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+span.breadcrumb {
+  cursor: default;
 }
 
 .breadcrumb:hover:not(.active) {
