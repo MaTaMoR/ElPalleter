@@ -49,7 +49,7 @@
   }
   
   .pageContainer {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   /* Grids y componentes */
@@ -127,7 +127,7 @@
   }
   
   .pageContainer {
-    padding: 0.75rem;
+    padding: 0.75rem 0.5rem;
   }
 }
 
