@@ -83,6 +83,10 @@
   gap: 1rem;
 }
 
+.searchContainer {
+  padding: 0.75rem 0;
+}
+
 .editButton {
   display: flex;
   align-items: center;
