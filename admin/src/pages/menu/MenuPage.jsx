@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Edit3, Eye, Save, X } from 'lucide-react';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import GlobalSearch from '../../components/menu/search/GlobalSearch';
+import MenuBreadcrumbs from '../../components/menu/navigation/MenuBreadcrumbs';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -133,13 +134,37 @@ const MenuHeader = () => {
   return (
     <div className={styles.header}>
       <div className={styles.headerTop}>
-        <h1 className={styles.title}>Gestión de Carta</h1>
-        <div className={styles.headerActions}>
-          <LanguageSelector
-            selectedLanguage={selectedLanguage}
-            onChange={handleLanguageChange}
-            disabled={isEditing}
-          />
+        {/* Breadcrumbs Section */}
+        <div className={styles.breadcrumbsWrapper}>
+          <MenuBreadcrumbs />
+        </div>
+
+        {/* Controls Group */}
+        <div className={styles.controlsGroup}>
+          {/* Search */}
+          <div className={styles.searchWrapper}>
+            <GlobalSearch
+              categoriesMap={menuState.categoriesMap}
+              subcategoriesMap={menuState.subcategoriesMap}
+              itemsMap={menuState.itemsMap}
+              childrenMap={menuState.childrenMap}
+            />
+          </div>
+
+          <div className={styles.controlDivider}></div>
+
+          {/* Language Selector */}
+          <div className={styles.languageWrapper}>
+            <LanguageSelector
+              selectedLanguage={selectedLanguage}
+              onChange={handleLanguageChange}
+              disabled={isEditing}
+            />
+          </div>
+
+          <div className={styles.controlDivider}></div>
+
+          {/* Edit Button */}
           <button
             type="button"
             className={`${styles.editButton} ${isEditing ? styles.active : ''}`}
@@ -158,15 +183,6 @@ const MenuHeader = () => {
             )}
           </button>
         </div>
-      </div>
-
-      <div className={styles.searchContainer}>
-        <GlobalSearch
-          categoriesMap={menuState.categoriesMap}
-          subcategoriesMap={menuState.subcategoriesMap}
-          itemsMap={menuState.itemsMap}
-          childrenMap={menuState.childrenMap}
-        />
       </div>
 
       {isEditing && (
