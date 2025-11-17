@@ -1,4 +1,57 @@
 import { useState, useEffect } from 'react';
+import { VALIDATION_CONFIG, formatErrorMessage } from '../config/validationConfig';
+
+/**
+ * Helper function to validate a text field
+ */
+const validateTextField = (value, fieldConfig) => {
+  if (!value || value.trim().length === 0) {
+    if (fieldConfig.required) {
+      return fieldConfig.errorMessages.required;
+    }
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+
+  if (trimmedValue.length < fieldConfig.minLength) {
+    return formatErrorMessage(fieldConfig.errorMessages.minLength, fieldConfig);
+  }
+
+  if (fieldConfig.maxLength && trimmedValue.length > fieldConfig.maxLength) {
+    return formatErrorMessage(fieldConfig.errorMessages.maxLength, fieldConfig);
+  }
+
+  return null;
+};
+
+/**
+ * Helper function to validate a price field
+ */
+const validatePriceField = (value, fieldConfig) => {
+  if (value === undefined || value === null || value === '') {
+    if (fieldConfig.required) {
+      return fieldConfig.errorMessages.required;
+    }
+    return null;
+  }
+
+  const priceNum = parseFloat(value);
+
+  if (isNaN(priceNum)) {
+    return fieldConfig.errorMessages.invalid;
+  }
+
+  if (priceNum < fieldConfig.min) {
+    return formatErrorMessage(fieldConfig.errorMessages.min, fieldConfig);
+  }
+
+  if (fieldConfig.max && priceNum > fieldConfig.max) {
+    return formatErrorMessage(fieldConfig.errorMessages.max, fieldConfig);
+  }
+
+  return null;
+};
 
 /**
  * Hook to handle menu data validation
@@ -12,8 +65,10 @@ export const useMenuValidation = (categoriesMap, subcategoriesMap, itemsMap, chi
     categoriesMap.forEach((category, categoryHId) => {
       const categoryErrors = {};
 
-      if (!category.nameKey || category.nameKey.trim().length < 3) {
-        categoryErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
+      // Validate category name
+      const nameError = validateTextField(category.nameKey, VALIDATION_CONFIG.category.nameKey);
+      if (nameError) {
+        categoryErrors.nameKey = nameError;
       }
 
       const subcategoryHIds = childrenMap.get(categoryHId) || [];
@@ -25,8 +80,10 @@ export const useMenuValidation = (categoriesMap, subcategoriesMap, itemsMap, chi
 
         const subcategoryErrors = {};
 
-        if (!subcategory.nameKey || subcategory.nameKey.trim().length < 3) {
-          subcategoryErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
+        // Validate subcategory name
+        const subNameError = validateTextField(subcategory.nameKey, VALIDATION_CONFIG.subcategory.nameKey);
+        if (subNameError) {
+          subcategoryErrors.nameKey = subNameError;
         }
 
         const itemHIds = childrenMap.get(subcategoryHId) || [];
@@ -38,17 +95,22 @@ export const useMenuValidation = (categoriesMap, subcategoriesMap, itemsMap, chi
 
           const itemErrors = {};
 
-          if (!item.nameKey || item.nameKey.trim().length < 3) {
-            itemErrors.nameKey = 'El nombre debe tener al menos 3 caracteres';
+          // Validate item name
+          const itemNameError = validateTextField(item.nameKey, VALIDATION_CONFIG.item.nameKey);
+          if (itemNameError) {
+            itemErrors.nameKey = itemNameError;
           }
 
-          if (item.price === undefined || item.price === null || item.price === '') {
-            itemErrors.price = 'El precio es requerido';
-          } else {
-            const priceNum = parseFloat(item.price);
-            if (isNaN(priceNum) || priceNum < 0) {
-              itemErrors.price = 'El precio debe ser un número positivo';
-            }
+          // Validate item description (if configured as required)
+          const itemDescError = validateTextField(item.descriptionKey, VALIDATION_CONFIG.item.descriptionKey);
+          if (itemDescError) {
+            itemErrors.descriptionKey = itemDescError;
+          }
+
+          // Validate item price
+          const priceError = validatePriceField(item.price, VALIDATION_CONFIG.item.price);
+          if (priceError) {
+            itemErrors.price = priceError;
           }
 
           if (Object.keys(itemErrors).length > 0) {
