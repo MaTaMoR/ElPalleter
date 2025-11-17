@@ -11,6 +11,11 @@ export const useMenuState = (backendData, loading, error, mockData) => {
   const [itemsMap, setItemsMap] = useState(new Map());
   const [childrenMap, setChildrenMap] = useState(new Map());
 
+  // Original data (for comparison to detect real changes)
+  const [originalCategoriesMap, setOriginalCategoriesMap] = useState(new Map());
+  const [originalSubcategoriesMap, setOriginalSubcategoriesMap] = useState(new Map());
+  const [originalItemsMap, setOriginalItemsMap] = useState(new Map());
+
   // Change tracking
   const [changeTracking, setChangeTracking] = useState(new Map());
 
@@ -30,6 +35,12 @@ export const useMenuState = (backendData, loading, error, mockData) => {
       setSubcategoriesMap(flattened.subcategoriesMap);
       setItemsMap(flattened.itemsMap);
       setChildrenMap(flattened.childrenMap);
+
+      // Save original values for comparison
+      setOriginalCategoriesMap(new Map(flattened.categoriesMap));
+      setOriginalSubcategoriesMap(new Map(flattened.subcategoriesMap));
+      setOriginalItemsMap(new Map(flattened.itemsMap));
+
       setChangeTracking(new Map());
     }
   }, [backendData, loading, error, mockData]);
@@ -119,6 +130,10 @@ export const useMenuState = (backendData, loading, error, mockData) => {
     setSubcategoriesMap,
     setItemsMap,
     setChildrenMap,
+    // Original maps (for change detection)
+    originalCategoriesMap,
+    originalSubcategoriesMap,
+    originalItemsMap,
     // Change tracking
     changeTracking,
     trackChange,

@@ -64,6 +64,9 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     setSubcategoriesMap,
     setItemsMap,
     setChildrenMap,
+    originalCategoriesMap,
+    originalSubcategoriesMap,
+    originalItemsMap,
     trackChange,
     untrackChange
   } = menuState;
@@ -84,6 +87,16 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     }[config.setMapKey];
 
     return { map, setter };
+  };
+
+  // Get the appropriate original map based on entity type
+  const getOriginalMap = (entityType) => {
+    const config = ENTITY_CONFIG[entityType];
+    return {
+      categoriesMap: originalCategoriesMap,
+      subcategoriesMap: originalSubcategoriesMap,
+      itemsMap: originalItemsMap
+    }[config.mapKey];
   };
 
   /**
@@ -169,11 +182,57 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     const isNew = entity._state === 'new';
     const hasContentNow = updates.nameKey && updates.nameKey.trim().length > 0;
 
+    // Merge updates with current entity
+    const updatedEntity = {
+      ...entity,
+      ...updates
+    };
+
+    // For existing entities, compare with original to detect real changes
+    if (!isNew) {
+      const originalMap = getOriginalMap(entityType);
+      const originalEntity = originalMap.get(hierarchicalId);
+
+      if (originalEntity) {
+        // Define fields to compare based on entity type
+        let fieldsToCompare = ['nameKey'];
+        if (entityType === 'item') {
+          fieldsToCompare = ['nameKey', 'descriptionKey', 'price', 'available'];
+        }
+
+        // Check if updated entity matches original
+        const matchesOriginal = fieldsToCompare.every(field => {
+          const originalValue = originalEntity[field];
+          const updatedValue = updatedEntity[field];
+
+          // Handle empty strings and undefined/null as equivalent for comparison
+          const normalizedOriginal = (originalValue === undefined || originalValue === null) ? '' : originalValue;
+          const normalizedUpdated = (updatedValue === undefined || updatedValue === null) ? '' : updatedValue;
+
+          return normalizedOriginal === normalizedUpdated;
+        });
+
+        if (matchesOriginal) {
+          // Values match original - revert to normal state
+          setter(prev => {
+            const newMap = new Map(prev);
+            newMap.set(hierarchicalId, {
+              ...updatedEntity,
+              _state: 'normal'
+            });
+            return newMap;
+          });
+          untrackChange(hierarchicalId);
+          return;
+        }
+      }
+    }
+
+    // If we get here, either it's new or has real changes
     setter(prev => {
       const newMap = new Map(prev);
       newMap.set(hierarchicalId, {
-        ...entity,
-        ...updates,
+        ...updatedEntity,
         _state: isNew ? 'new' : 'edited'
       });
       return newMap;
