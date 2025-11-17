@@ -71,18 +71,31 @@
                 display: flex;
                 align-items: center;
                 gap: 0;
-                flex: 1;
+                flex: 0 0 auto;
                 justify-content: flex-end;
                 background: white;
                 border: 1px solid #ddd;
                 border-radius: 6px;
                 padding: 4px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                transition: all 0.3s ease;
+            }
+
+            /* Cuando el search tiene focus, el grupo crece */
+            .controls-group:focus-within {
+                flex: 1;
             }
 
             .search-container {
+                flex: 0 0 auto;
+                width: 250px;
+                transition: all 0.3s ease;
+            }
+
+            /* Cuando el search tiene focus, crece */
+            .search-container:focus-within {
                 flex: 1;
-                max-width: 400px;
+                width: auto;
             }
 
             .control-divider {
@@ -320,6 +333,8 @@
             <p><strong>Características:</strong></p>
             <ul style="margin-left: 20px; margin-top: 8px; color: #555;">
                 <li>Desktop: Una sola fila con controles visualmente agrupados en un contenedor blanco</li>
+                <li><strong>🔥 NUEVO:</strong> Search se expande al 100% cuando haces clic en él (transición suave)</li>
+                <li>Controles compactos por defecto, crecen solo cuando el search está activo</li>
                 <li>Mobile/Tablet: Dos filas con controles integrados en un solo contenedor</li>
                 <li>Search sin bordes, integrado en el grupo de controles</li>
                 <li>Divisores verticales entre controles para mejor separación visual</li>
@@ -389,7 +404,8 @@
 
         <div class="demo-controls">
             <h3>🎯 Instrucciones de prueba</h3>
-            <p>Redimensiona la ventana del navegador para ver cómo se adapta el diseño. Este diseño enfatiza la agrupación visual de controles con divisores y un contenedor unificado. El punto de quiebre de desktop es 1024px y el del selector de idioma compacto es 640px.</p>
+            <p><strong>Interacción:</strong> Haz clic en el campo de búsqueda y observa cómo se expande suavemente para ocupar todo el espacio disponible. Al salir del campo, vuelve a su tamaño compacto.</p>
+            <p style="margin-top: 12px;"><strong>Responsive:</strong> Redimensiona la ventana del navegador para ver cómo se adapta el diseño. Este diseño enfatiza la agrupación visual de controles con divisores y un contenedor unificado. El punto de quiebre de desktop es 1024px y el del selector de idioma compacto es 640px.</p>
         </div>
     </div>
 </body>
