@@ -19,8 +19,14 @@ const MenuPriceField = ({
   const [displayValue, setDisplayValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
-  // Convert internal value (always with period) to display value
+  // Update display value when external value changes or focus state changes
   useEffect(() => {
+    // If we're focused, don't update display value from external changes
+    // This allows the user to edit freely
+    if (isFocused) {
+      return;
+    }
+
     if (value === '' || value === null || value === undefined) {
       setDisplayValue('');
       return;
@@ -32,31 +38,30 @@ const MenuPriceField = ({
       return;
     }
 
-    // When not focused, show formatted with thousands separator
-    if (!isFocused) {
-      // Format with locale (thousands separator and comma for decimals)
-      const formatted = numValue.toLocaleString(LOCALE_CONFIG.locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-      setDisplayValue(formatted);
-    } else {
-      // When focused, show simple format without thousands separator
-      const formatted = numValue.toFixed(2).replace('.', LOCALE_CONFIG.decimalSeparator);
-      setDisplayValue(formatted);
-    }
+    // When not focused, show formatted with thousands separator and 2 decimals
+    const formatted = numValue.toLocaleString(LOCALE_CONFIG.locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    setDisplayValue(formatted);
   }, [value, isFocused]);
 
-  const handleFocus = () => {
+  const handleFocus = (e) => {
     setIsFocused(true);
-    // When focusing, show simple format for editing
+
+    // When focusing, convert formatted display to simple editable format
     if (value !== '' && value !== null && value !== undefined) {
       const numValue = parseFloat(String(value));
       if (!isNaN(numValue)) {
-        const formatted = numValue.toFixed(2).replace('.', LOCALE_CONFIG.decimalSeparator);
-        setDisplayValue(formatted);
+        // Show simple format without thousands separator for editing
+        // Just the number with comma as decimal separator
+        const simpleFormat = String(numValue).replace('.', LOCALE_CONFIG.decimalSeparator);
+        setDisplayValue(simpleFormat);
       }
     }
+
+    // Select all text on focus for easy replacement
+    e.target.select();
   };
 
   const handleChange = (e) => {
@@ -104,11 +109,11 @@ const MenuPriceField = ({
       if (numValue >= min && numValue <= max) {
         // Store with period internally (for Java backend)
         onChange(normalizedValue);
-        // Update display with comma
+        // Update display with what user typed (allows free editing)
         setDisplayValue(inputValue);
       }
     } else if (inputValue === '0' || inputValue === '0,' || normalizedValue.endsWith('.')) {
-      // Allow partial inputs like "0," or "1."
+      // Allow partial inputs like "0," or "1," while typing
       onChange(normalizedValue);
       setDisplayValue(inputValue);
     }
@@ -117,14 +122,20 @@ const MenuPriceField = ({
   const handleBlur = () => {
     setIsFocused(false);
 
-    if (!onChange || !value) return;
+    if (!value || value === '') {
+      setDisplayValue('');
+      return;
+    }
 
-    // Formatear el número a 2 decimales al perder foco
+    // Format the number when losing focus
     const numValue = parseFloat(String(value));
     if (!isNaN(numValue)) {
-      // Store with period (standard format for backend)
+      // Store with period (standard format for backend) and ensure 2 decimals
       const formatted = numValue.toFixed(2);
       onChange(formatted);
+
+      // Display will be updated by the useEffect
+      // which will show it with locale formatting (thousands separator + comma)
     }
   };
 
