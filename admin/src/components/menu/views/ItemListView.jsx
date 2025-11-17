@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useMenuEdit } from '../../../contexts/MenuEditContext';
 import { buildHierarchicalId } from '../../../utils/menuDataUtils';
@@ -44,10 +44,20 @@ const ItemListView = () => {
   const currentSubcategory = getCurrentSubcategoryData();
   const currentCategory = getCurrentCategoryData();
 
-  if (!currentSubcategory || !currentCategory) {
-    // Subcategory not found, navigate back to category
+  // Redirect if category or subcategory doesn't exist (e.g., after canceling changes)
+  useEffect(() => {
     const pathParts = location.pathname.split('/categories')[0];
-    navigate(`${pathParts}/categories/${categoryId}`);
+
+    if (!currentCategory) {
+      // Category doesn't exist, go back to categories list
+      navigate(`${pathParts}/categories`, { replace: true });
+    } else if (!currentSubcategory) {
+      // Category exists but subcategory doesn't, go back to subcategories list
+      navigate(`${pathParts}/categories/${categoryId}`, { replace: true });
+    }
+  }, [currentCategory, currentSubcategory, categoryId, navigate, location.pathname]);
+
+  if (!currentSubcategory || !currentCategory) {
     return null;
   }
 
