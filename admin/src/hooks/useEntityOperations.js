@@ -139,10 +139,8 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       });
     }
 
-    // Track change for items
-    if (entityType === 'item') {
-      trackChange(hierarchicalId, 'create');
-    }
+    // Track change for all new entities (categories, subcategories, items)
+    trackChange(hierarchicalId, 'create');
 
     // Return the new entity ID so views can navigate/handle it
     return newEntityId;
@@ -180,7 +178,6 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     if (!entity) return;
 
     const isNew = entity._state === 'new';
-    const hasContentNow = updates.nameKey && updates.nameKey.trim().length > 0;
 
     // Merge updates with current entity
     const updatedEntity = {
@@ -238,10 +235,10 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       return newMap;
     });
 
+    // Track changes only for existing entities being edited
+    // New entities are already tracked in handleAdd
     if (!isNew) {
       trackChange(hierarchicalId, 'edit');
-    } else if (hasContentNow && entityType !== 'category') {
-      trackChange(hierarchicalId, 'create');
     }
   };
 
