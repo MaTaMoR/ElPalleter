@@ -147,32 +147,50 @@
                 border-radius: 6px;
                 overflow: hidden;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                position: relative;
             }
 
             .search-container {
-                flex: 1;
-                min-width: 0;
-                border-right: 1px solid #e0e0e0;
+                width: 60%;
+                transition: width 0.3s ease;
+                position: relative;
+                z-index: 2;
             }
 
-            .controls-right {
-                display: flex;
-                align-items: center;
-                gap: 0;
+            /* Cuando el search tiene focus en mobile, se expande a 100% */
+            .search-container:focus-within {
+                width: 100%;
+            }
+
+            /* Ocultar divisores y controles cuando el SEARCH está activo en mobile */
+            .search-container:focus-within ~ .control-divider,
+            .search-container:focus-within ~ .language-selector,
+            .search-container:focus-within ~ .edit-button {
+                opacity: 0;
+                pointer-events: none;
+                width: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
 
             .control-divider {
                 width: 1px;
                 height: 100%;
                 background: #e0e0e0;
+                flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease;
             }
 
             .language-selector {
                 flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
 
             .edit-button {
                 flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
         }
 
