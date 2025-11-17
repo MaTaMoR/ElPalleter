@@ -1,10 +1,12 @@
 .container {
   display: flex;
   align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
-  padding: 0.625rem 0.75rem;
+  padding: 0.625rem 0.5rem;
   transition: var(--transition);
+  height: 100%;
 }
 
 .container:hover:not(.disabled) {
@@ -26,6 +28,7 @@
   outline: none;
   padding: 0;
   min-width: auto;
+  text-align: center;
 }
 
 .select:disabled {
@@ -36,6 +39,7 @@
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   padding: 0.5rem;
+  text-align: left;
 }
 
 .select option:hover,
@@ -43,31 +47,4 @@
 .select option:checked {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .select {
-    font-size: 0.875rem;
-    min-width: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 0.5rem 0.625rem;
-  }
-
-  .icon {
-    display: none;
-  }
-
-  .select {
-    font-size: 0.875rem;
-    min-width: 100px;
-  }
 }
