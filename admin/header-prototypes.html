@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipos de Header - ElPalleter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .prototype {
+            background: white;
+            margin-bottom: 3rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .prototype-title {
+            background: #2563eb;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .prototype-description {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.875rem;
+        }
+
+        .demo-container {
+            padding: 2rem;
+            background: white;
+        }
+
+        /* Common styles */
+        .header {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .breadcrumb-btn:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .breadcrumb-btn.active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .separator {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.625rem 2.5rem 0.625rem 2.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 0.625rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .search-input:not(:placeholder-shown) ~ .clear-btn {
+            display: block;
+        }
+
+        .clear-btn:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .language-selector:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .language-selector select {
+            border: none;
+            background: none;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .edit-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .edit-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* Option 1: Single row desktop, stacked mobile */
+        .option1 .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .option1 .breadcrumbs {
+            flex-shrink: 0;
+        }
+
+        .option1 .search-wrapper {
+            max-width: 500px;
+        }
+
+        .option1 .controls {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .option1 .header-content {
+                flex-wrap: wrap;
+            }
+
+            .option1 .search-wrapper {
+                order: 3;
+                width: 100%;
+                max-width: none;
+                margin-top: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .option1 .header-content {
+                gap: 1rem;
+                padding: 0.875rem;
+            }
+
+            .option1 .breadcrumbs {
+                width: 100%;
+                order: 1;
+            }
+
+            .option1 .controls {
+                width: 100%;
+                order: 2;
+                flex-wrap: wrap;
+            }
+
+            .option1 .search-wrapper {
+                order: 3;
+            }
+        }
+
+        /* Option 2: Compact breadcrumbs with dropdown */
+        .option2 .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .option2 .breadcrumbs-compact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option2 .breadcrumbs-compact:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option2 .search-wrapper {
+            max-width: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .option2 .header-content {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 0.875rem;
+            }
+
+            .option2 .breadcrumbs-compact {
+                width: 100%;
+            }
+
+            .option2 .search-wrapper {
+                width: 100%;
+                max-width: none;
+                order: 3;
+            }
+
+            .option2 .controls {
+                width: 100%;
+                order: 2;
+            }
+        }
+
+        /* Option 3: Expandable search */
+        .option3 .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .option3 .search-wrapper {
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+
+        .option3 .search-wrapper:focus-within {
+            max-width: 600px;
+        }
+
+        .option3 .controls {
+            margin-left: auto;
+        }
+
+        @media (max-width: 1024px) {
+            .option3 .header-content {
+                flex-wrap: wrap;
+            }
+
+            .option3 .search-wrapper {
+                order: 3;
+                width: 100%;
+                max-width: none !important;
+                margin-top: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .option3 .header-content {
+                gap: 1rem;
+                padding: 0.875rem;
+            }
+
+            .option3 .breadcrumbs {
+                width: 100%;
+            }
+
+            .option3 .controls {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+
+        /* Option 4: Prominent breadcrumbs */
+        .option4 .header-content {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .option4 .left-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option4 .breadcrumbs {
+            background: #f8fafc;
+            padding: 0.625rem 0.875rem;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .option4 .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        @media (max-width: 1024px) {
+            .option4 .header-content {
+                grid-template-columns: 1fr;
+            }
+
+            .option4 .right-section {
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .option4 .header-content {
+                padding: 0.875rem;
+            }
+
+            .option4 .controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Option 5: Minimalist */
+        .option5 .header-content {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            gap: 1rem;
+        }
+
+        .option5 .breadcrumbs {
+            font-size: 0.8125rem;
+        }
+
+        .option5 .search-wrapper {
+            max-width: 400px;
+        }
+
+        .option5 .search-input {
+            padding: 0.5rem 2rem 0.5rem 2rem;
+            font-size: 0.875rem;
+        }
+
+        .option5 .controls {
+            gap: 0.5rem;
+        }
+
+        .option5 .language-selector,
+        .option5 .edit-btn {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 1024px) {
+            .option5 .header-content {
+                flex-wrap: wrap;
+            }
+
+            .option5 .search-wrapper {
+                order: 3;
+                width: 100%;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .option5 .header-content {
+                padding: 0.75rem 0.875rem;
+            }
+
+            .option5 .breadcrumbs {
+                width: 100%;
+            }
+
+            .option5 .controls {
+                width: 100%;
+            }
+        }
+
+        /* Icons */
+        .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
+        .responsive-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 1rem;
+            text-align: center;
+            padding: 0.5rem;
+            background: #fef3c7;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-bottom: 2rem; color: #1e293b; font-size: 2rem;">Prototipos de Header - ElPalleter</h1>
+
+        <!-- Option 1 -->
+        <div class="prototype option1">
+            <div class="prototype-title">Opción 1: Layout Horizontal Balanceado</div>
+            <div class="prototype-description">
+                <strong>Desktop:</strong> Todo en una línea - Breadcrumbs (izq) | Búsqueda expandida (centro) | Controles (der)<br>
+                <strong>Mobile:</strong> Stack vertical - Breadcrumbs → Controles → Búsqueda<br>
+                <strong>Pros:</strong> Búsqueda prominente, balance visual<br>
+                <strong>Contras:</strong> Puede ser apretado con breadcrumbs largos
+            </div>
+            <div class="demo-container">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="breadcrumbs">
+                            <button class="breadcrumb-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <span>Inicio</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn">
+                                <span>Bebidas</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn active">
+                                <span>Cervezas</span>
+                            </button>
+                        </div>
+
+                        <div class="search-wrapper">
+                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                            <button class="clear-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="controls">
+                            <div class="language-selector">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                </svg>
+                                <select>
+                                    <option>Español</option>
+                                    <option>English</option>
+                                    <option>Valencià</option>
+                                </select>
+                            </div>
+                            <button class="edit-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>Editar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="responsive-label">💡 Redimensiona la ventana del navegador para ver el comportamiento responsive</p>
+            </div>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="prototype option2">
+            <div class="prototype-title">Opción 2: Breadcrumbs Compactos</div>
+            <div class="prototype-description">
+                <strong>Desktop:</strong> Breadcrumbs en un botón compacto | Búsqueda ancha (centro) | Controles (der)<br>
+                <strong>Mobile:</strong> Stack vertical completo<br>
+                <strong>Pros:</strong> Más espacio para búsqueda, limpio<br>
+                <strong>Contras:</strong> Breadcrumbs menos visibles, click extra para ver path completo
+            </div>
+            <div class="demo-container">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="breadcrumbs-compact">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            </svg>
+                            <span>Inicio › Bebidas › Cervezas</span>
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+
+                        <div class="search-wrapper">
+                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                            <button class="clear-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="controls">
+                            <div class="language-selector">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                </svg>
+                                <select>
+                                    <option>Español</option>
+                                    <option>English</option>
+                                    <option>Valencià</option>
+                                </select>
+                            </div>
+                            <button class="edit-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>Editar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="responsive-label">💡 Los breadcrumbs se mostrarían en un dropdown al hacer click</p>
+            </div>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="prototype option3">
+            <div class="prototype-title">Opción 3: Búsqueda Expandible</div>
+            <div class="prototype-description">
+                <strong>Desktop:</strong> Breadcrumbs | Búsqueda compacta que se expande al enfocar | Controles<br>
+                <strong>Mobile:</strong> Stack vertical<br>
+                <strong>Pros:</strong> Espacio eficiente, interacción moderna<br>
+                <strong>Contras:</strong> Comportamiento menos predecible para algunos usuarios
+            </div>
+            <div class="demo-container">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="breadcrumbs">
+                            <button class="breadcrumb-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <span>Inicio</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn">
+                                <span>Bebidas</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn active">
+                                <span>Cervezas</span>
+                            </button>
+                        </div>
+
+                        <div class="search-wrapper">
+                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" class="search-input" placeholder="Buscar...">
+                            <button class="clear-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="controls">
+                            <div class="language-selector">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                </svg>
+                                <select>
+                                    <option>Español</option>
+                                    <option>English</option>
+                                    <option>Valencià</option>
+                                </select>
+                            </div>
+                            <button class="edit-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>Editar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="responsive-label">💡 Haz click en el input de búsqueda para ver cómo se expande</p>
+            </div>
+        </div>
+
+        <!-- Option 4 -->
+        <div class="prototype option4">
+            <div class="prototype-title">Opción 4: Breadcrumbs Prominentes (Grid 2 filas)</div>
+            <div class="prototype-description">
+                <strong>Desktop:</strong> Grid con breadcrumbs arriba, búsqueda abajo a la izquierda, controles a la derecha<br>
+                <strong>Mobile:</strong> Stack vertical completo<br>
+                <strong>Pros:</strong> Jerarquía clara, breadcrumbs destacados<br>
+                <strong>Contras:</strong> Ocupa más altura vertical (2 filas)
+            </div>
+            <div class="demo-container">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="left-section">
+                            <div class="breadcrumbs">
+                                <button class="breadcrumb-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                    <span>Inicio</span>
+                                </button>
+                                <span class="separator">›</span>
+                                <button class="breadcrumb-btn">
+                                    <span>Bebidas</span>
+                                </button>
+                                <span class="separator">›</span>
+                                <button class="breadcrumb-btn active">
+                                    <span>Cervezas</span>
+                                </button>
+                            </div>
+                            <div class="search-wrapper">
+                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                                <button class="clear-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="right-section">
+                            <div class="controls">
+                                <div class="language-selector">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                    </svg>
+                                    <select>
+                                        <option>Español</option>
+                                        <option>English</option>
+                                        <option>Valencià</option>
+                                    </select>
+                                </div>
+                                <button class="edit-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <span>Editar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="responsive-label">💡 Este diseño mantiene 2 filas pero con mejor organización</p>
+            </div>
+        </div>
+
+        <!-- Option 5 -->
+        <div class="prototype option5">
+            <div class="prototype-title">Opción 5: Minimalista Compacto</div>
+            <div class="prototype-description">
+                <strong>Desktop:</strong> Todo en una línea con elementos más pequeños y compactos<br>
+                <strong>Mobile:</strong> Stack vertical<br>
+                <strong>Pros:</strong> Ahorra espacio vertical máximo, moderno<br>
+                <strong>Contras:</strong> Puede sentirse apretado, texto más pequeño
+            </div>
+            <div class="demo-container">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="breadcrumbs">
+                            <button class="breadcrumb-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <span>Inicio</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn">
+                                <span>Bebidas</span>
+                            </button>
+                            <span class="separator">›</span>
+                            <button class="breadcrumb-btn active">
+                                <span>Cervezas</span>
+                            </button>
+                        </div>
+
+                        <div class="search-wrapper">
+                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" class="search-input" placeholder="Buscar...">
+                            <button class="clear-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="controls">
+                            <div class="language-selector">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                </svg>
+                                <select>
+                                    <option>ES</option>
+                                    <option>EN</option>
+                                    <option>VAL</option>
+                                </select>
+                            </div>
+                            <button class="edit-btn">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>Editar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="responsive-label">💡 Diseño más compacto para maximizar el espacio de contenido</p>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 8px; margin-top: 2rem;">
+            <h2 style="color: #1e293b; margin-bottom: 1rem;">Comparación Rápida</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="padding: 0.75rem; text-align: left; border: 1px solid #e2e8f0;">Opción</th>
+                        <th style="padding: 0.75rem; text-align: left; border: 1px solid #e2e8f0;">Altura Desktop</th>
+                        <th style="padding: 0.75rem; text-align: left; border: 1px solid #e2e8f0;">Visibilidad Breadcrumbs</th>
+                        <th style="padding: 0.75rem; text-align: left; border: 1px solid #e2e8f0;">Espacio Búsqueda</th>
+                        <th style="padding: 0.75rem; text-align: left; border: 1px solid #e2e8f0;">Mejor Para</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;"><strong>1. Balanceado</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Compacto (1 fila)</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Uso general equilibrado</td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;"><strong>2. Compacto</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Compacto (1 fila)</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Prioriza búsqueda</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;"><strong>3. Expandible</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Compacto (1 fila)</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">UX moderna/interactiva</td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;"><strong>4. Prominente</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Medio (2 filas)</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Navegación compleja</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;"><strong>5. Minimalista</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Muy compacto (1 fila)</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">⭐⭐⭐</td>
+                        <td style="padding: 0.75rem; border: 1px solid #e2e8f0;">Maximizar contenido</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="background: #dbeafe; padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid #2563eb;">
+            <h3 style="color: #1e40af; margin-bottom: 0.5rem;">💡 Recomendación Personal</h3>
+            <p style="color: #1e3a8a; margin: 0;">
+                <strong>Opción 1 (Balanceado)</strong> ofrece el mejor compromiso entre visibilidad de breadcrumbs,
+                espacio de búsqueda y usabilidad. Es intuitivo, mantiene todo visible sin clicks adicionales,
+                y funciona bien tanto en desktop como mobile.
+            </p>
+        </div>
+
+        <div style="text-align: center; padding: 2rem; color: #64748b;">
+            <p>Prueba redimensionar la ventana del navegador para ver cómo se adapta cada diseño</p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Una vez elijas un diseño, lo implementaremos en React con los componentes reales</p>
+        </div>
+    </div>
+</body>
+</html>
