@@ -219,20 +219,48 @@
                 width: 100%;
             }
 
+            .breadcrumb-btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8125rem;
+                gap: 0.25rem;
+            }
+
+            .breadcrumb-btn .icon {
+                width: 14px;
+                height: 14px;
+            }
+
+            .separator {
+                font-size: 0.75rem;
+            }
+
             .search-wrapper {
                 flex: 1;
                 min-width: 0;
             }
 
             .search-input {
-                font-size: 0.875rem;
-                padding: 0.5rem 2rem 0.5rem 2rem;
+                font-size: 0.8125rem;
+                padding: 0.5rem 1.75rem 0.5rem 1.75rem;
+            }
+
+            .search-icon {
+                left: 0.5rem;
+            }
+
+            .clear-btn {
+                right: 0.375rem;
             }
 
             .language-selector {
                 padding: 0.5rem 0.625rem;
                 gap: 0.375rem;
                 flex-shrink: 0;
+            }
+
+            .language-selector .icon {
+                width: 14px;
+                height: 14px;
             }
 
             .language-selector select {
@@ -245,6 +273,11 @@
                 padding: 0.5rem;
                 min-width: auto;
                 flex-shrink: 0;
+            }
+
+            .edit-btn .icon {
+                width: 16px;
+                height: 16px;
             }
 
             .edit-btn .btn-text {
@@ -287,27 +320,29 @@
 
         @media (max-width: 768px) {
             .option1 .header-content {
-                gap: 0.75rem;
-                padding: 0.875rem;
+                gap: 0.5rem;
+                padding: 0.75rem;
+                flex-wrap: nowrap;
             }
 
             .option1 .breadcrumbs {
-                width: 100%;
+                flex-shrink: 1;
+                min-width: 0;
                 order: 1;
             }
 
             .option1 .search-wrapper {
                 order: 2;
-                flex: 1;
-                min-width: 0;
-                max-width: none;
-                margin-top: 0;
+                flex: 0 1 auto;
+                min-width: 120px;
+                max-width: 200px;
             }
 
             .option1 .controls {
-                order: 2;
+                order: 3;
                 flex-shrink: 0;
-                gap: 0.5rem;
+                gap: 0.375rem;
+                margin-left: auto;
             }
         }
 
@@ -342,27 +377,29 @@
 
         @media (max-width: 768px) {
             .option2 .header-content {
-                flex-wrap: wrap;
-                gap: 0.75rem;
-                padding: 0.875rem;
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+                padding: 0.75rem;
             }
 
             .option2 .breadcrumbs-compact {
-                width: 100%;
+                flex-shrink: 1;
+                min-width: 0;
                 order: 1;
             }
 
             .option2 .search-wrapper {
-                flex: 1;
-                min-width: 0;
-                max-width: none;
+                flex: 0 1 auto;
+                min-width: 120px;
+                max-width: 200px;
                 order: 2;
             }
 
             .option2 .controls {
-                order: 2;
+                order: 3;
                 flex-shrink: 0;
-                gap: 0.5rem;
+                gap: 0.375rem;
+                margin-left: auto;
             }
         }
 
@@ -402,26 +439,29 @@
 
         @media (max-width: 768px) {
             .option3 .header-content {
-                gap: 0.75rem;
-                padding: 0.875rem;
+                gap: 0.5rem;
+                padding: 0.75rem;
+                flex-wrap: nowrap;
             }
 
             .option3 .breadcrumbs {
-                width: 100%;
+                flex-shrink: 1;
+                min-width: 0;
                 order: 1;
             }
 
             .option3 .search-wrapper {
                 order: 2;
-                flex: 1;
-                min-width: 0;
+                flex: 0 1 auto;
+                min-width: 120px;
+                max-width: 200px;
             }
 
             .option3 .controls {
-                order: 2;
+                order: 3;
                 flex-shrink: 0;
-                margin-left: 0;
-                gap: 0.5rem;
+                margin-left: auto;
+                gap: 0.375rem;
             }
         }
 
@@ -465,38 +505,46 @@
 
         @media (max-width: 768px) {
             .option4 .header-content {
-                padding: 0.875rem;
+                padding: 0.75rem;
                 display: flex;
-                flex-wrap: wrap;
-                gap: 0.75rem;
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+                grid-template-columns: unset;
             }
 
             .option4 .left-section {
-                width: 100%;
+                flex-shrink: 1;
+                min-width: 0;
                 order: 1;
                 flex-direction: row;
                 align-items: center;
+                gap: 0;
             }
 
             .option4 .breadcrumbs {
-                width: 100%;
+                width: auto;
+                flex-shrink: 1;
+                min-width: 0;
             }
 
             .option4 .search-wrapper {
                 order: 2;
-                flex: 1;
-                min-width: 0;
+                flex: 0 1 auto;
+                min-width: 120px;
+                max-width: 200px;
             }
 
             .option4 .right-section {
-                order: 2;
+                order: 3;
                 flex-direction: row;
                 align-items: center;
                 flex-shrink: 0;
+                gap: 0;
+                margin-left: auto;
             }
 
             .option4 .controls {
-                gap: 0.5rem;
+                gap: 0.375rem;
             }
         }
 
@@ -545,26 +593,30 @@
 
         @media (max-width: 768px) {
             .option5 .header-content {
-                padding: 0.75rem 0.875rem;
-                gap: 0.75rem;
+                padding: 0.625rem 0.75rem;
+                gap: 0.375rem;
+                flex-wrap: nowrap;
             }
 
             .option5 .breadcrumbs {
-                width: 100%;
+                flex-shrink: 1;
+                min-width: 0;
                 order: 1;
+                font-size: 0.75rem;
             }
 
             .option5 .search-wrapper {
                 order: 2;
-                flex: 1;
-                min-width: 0;
-                max-width: none;
+                flex: 0 1 auto;
+                min-width: 100px;
+                max-width: 180px;
             }
 
             .option5 .controls {
-                order: 2;
+                order: 3;
                 flex-shrink: 0;
-                gap: 0.5rem;
+                gap: 0.25rem;
+                margin-left: auto;
             }
         }
 
@@ -595,8 +647,8 @@
             <div class="prototype-title">Opción 1: Layout Horizontal Balanceado</div>
             <div class="prototype-description">
                 <strong>Desktop:</strong> Todo en una línea - Breadcrumbs (izq) | Búsqueda expandida (centro) | Controles (der)<br>
-                <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
-                <strong>Pros:</strong> Búsqueda prominente, balance visual, compacto en móvil<br>
+                <strong>Mobile (1 fila):</strong> Breadcrumbs (izq, compacto) | Búsqueda compacta | Idioma (código) + Editar (ícono) (der)<br>
+                <strong>Pros:</strong> Búsqueda prominente, balance visual, todo visible sin scroll<br>
                 <strong>Contras:</strong> Puede ser apretado con breadcrumbs largos
             </div>
             <div class="demo-container">
@@ -660,8 +712,8 @@
             <div class="prototype-title">Opción 2: Breadcrumbs Compactos</div>
             <div class="prototype-description">
                 <strong>Desktop:</strong> Breadcrumbs en un botón compacto | Búsqueda ancha (centro) | Controles (der)<br>
-                <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs compactos | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
-                <strong>Pros:</strong> Más espacio para búsqueda, limpio, compacto en móvil<br>
+                <strong>Mobile (1 fila):</strong> Breadcrumbs compactos (izq) | Búsqueda | Idioma (código) + Editar (ícono) (der)<br>
+                <strong>Pros:</strong> Más espacio para búsqueda, limpio, todo visible<br>
                 <strong>Contras:</strong> Breadcrumbs menos visibles, click extra para ver path completo
             </div>
             <div class="demo-container">
@@ -718,8 +770,8 @@
             <div class="prototype-title">Opción 3: Búsqueda Expandible</div>
             <div class="prototype-description">
                 <strong>Desktop:</strong> Breadcrumbs | Búsqueda compacta que se expande al enfocar | Controles<br>
-                <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
-                <strong>Pros:</strong> Espacio eficiente, interacción moderna, compacto en móvil<br>
+                <strong>Mobile (1 fila):</strong> Breadcrumbs (izq) | Búsqueda compacta | Idioma (código) + Editar (ícono) (der)<br>
+                <strong>Pros:</strong> Espacio eficiente, interacción moderna, todo en una línea<br>
                 <strong>Contras:</strong> Comportamiento menos predecible para algunos usuarios
             </div>
             <div class="demo-container">
@@ -783,8 +835,8 @@
             <div class="prototype-title">Opción 4: Breadcrumbs Prominentes (Grid 2 filas)</div>
             <div class="prototype-description">
                 <strong>Desktop:</strong> Grid con breadcrumbs arriba, búsqueda abajo a la izquierda, controles a la derecha<br>
-                <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
-                <strong>Pros:</strong> Jerarquía clara, breadcrumbs destacados, compacto en móvil<br>
+                <strong>Mobile (1 fila):</strong> Breadcrumbs (izq) | Búsqueda | Idioma (código) + Editar (ícono) (der)<br>
+                <strong>Pros:</strong> Jerarquía clara, breadcrumbs destacados en desktop, compacto en móvil<br>
                 <strong>Contras:</strong> Ocupa más altura vertical (2 filas en desktop)
             </div>
             <div class="demo-container">
@@ -851,7 +903,7 @@
             <div class="prototype-title">Opción 5: Minimalista Compacto</div>
             <div class="prototype-description">
                 <strong>Desktop:</strong> Todo en una línea con elementos más pequeños y compactos<br>
-                <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
+                <strong>Mobile (1 fila):</strong> Breadcrumbs (izq, extra compacto) | Búsqueda mini | Idioma + Editar (ícono) (der)<br>
                 <strong>Pros:</strong> Ahorra espacio vertical máximo, moderno, ultra compacto<br>
                 <strong>Contras:</strong> Puede sentirse apretado, texto más pequeño
             </div>
@@ -974,7 +1026,7 @@
 
         <div style="text-align: center; padding: 2rem; color: #64748b;">
             <p><strong>Prueba redimensionar la ventana del navegador para ver el comportamiento móvil</strong></p>
-            <p style="font-size: 0.875rem; margin-top: 0.5rem;">En móvil: 2 filas máximo - Breadcrumbs arriba, Búsqueda + Controles compactos abajo</p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem;">En móvil: 1 fila única - Breadcrumbs (izq) | Búsqueda (centro) | Controles compactos (der)</p>
             <p style="font-size: 0.875rem; margin-top: 0.5rem;">Una vez elijas un diseño, lo implementaremos en React con los componentes reales</p>
         </div>
     </div>
