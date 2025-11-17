@@ -67,6 +67,11 @@ const ItemListView = () => {
     }
   };
 
+  // Extract item errors for current subcategory
+  const getItemErrors = () => {
+    return validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.items || {};
+  };
+
   return (
     <ItemView
       items={currentSubcategory.items || []}
@@ -79,7 +84,7 @@ const ItemListView = () => {
       onUndoDeleteItem={isEditing ? (id) => entityOps.handleUndoDelete('item', id, subcategoryId, categoryId) : undefined}
       onBack={handleBack}
       isEditing={isEditing}
-      errors={validationErrors}
+      errors={getItemErrors()}
       subcategoryError={validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.nameKey}
       autoEditItemId={autoEditItemId}
     />

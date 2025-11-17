@@ -10,7 +10,7 @@ import CategoryView from './CategoryView';
 const CategoryListView = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, menuState, entityOps } = useMenuEdit();
+  const { isEditing, menuState, entityOps, validationErrors } = useMenuEdit();
 
   // Get categories for view
   const getCategoriesForView = () => {
@@ -49,8 +49,10 @@ const CategoryListView = () => {
       onAddCategory={isEditing ? handleAddCategory : undefined}
       onDeleteCategory={isEditing ? (id) => entityOps.handleDelete('category', id) : undefined}
       onUndoDeleteCategory={isEditing ? (id) => entityOps.handleUndoDelete('category', id) : undefined}
+      onUpdateCategory={isEditing ? (id, updates) => entityOps.handleUpdate('category', id, updates) : undefined}
       subcategoryCounts={getSubcategoryCounts()}
       isEditing={isEditing}
+      categoryErrors={validationErrors}
     />
   );
 };
