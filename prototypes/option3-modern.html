@@ -71,36 +71,38 @@
                 display: flex;
                 align-items: center;
                 gap: 0;
-                flex: 0 0 auto;
-                justify-content: flex-end;
+                width: 500px;
                 background: white;
                 border: 1px solid #ddd;
                 border-radius: 6px;
                 padding: 4px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                position: relative;
             }
 
             .search-container {
-                flex: 0 0 auto;
                 width: 250px;
-                transition: width 0.3s ease, flex 0.3s ease;
+                transition: width 0.3s ease;
+                position: relative;
+                z-index: 2;
             }
 
-            /* Cuando el search tiene focus, crece y oculta los demás */
+            /* Cuando el search tiene focus, se expande a 100% del container */
             .search-container:focus-within {
-                flex: 1;
-                width: 100%;
+                width: calc(100% - 8px); /* 100% menos el padding del controls-group */
             }
 
-            /* Ocultar divisores y controles cuando el search está activo */
-            .controls-group:focus-within .control-divider,
-            .controls-group:focus-within .language-selector,
-            .controls-group:focus-within .edit-button {
+            /* Ocultar divisores y controles cuando el SEARCH está activo (no el container) */
+            .search-container:focus-within ~ .control-divider,
+            .search-container:focus-within ~ .language-selector,
+            .search-container:focus-within ~ .edit-button {
                 opacity: 0;
                 pointer-events: none;
                 width: 0;
+                margin: 0;
+                padding: 0;
                 overflow: hidden;
-                transition: opacity 0.2s ease, width 0.3s ease;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
 
             .control-divider {
@@ -108,17 +110,18 @@
                 height: 28px;
                 background: #e0e0e0;
                 margin: 0 4px;
-                transition: opacity 0.2s ease, width 0.3s ease;
+                flex-shrink: 0;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease;
             }
 
             .language-selector {
                 flex-shrink: 0;
-                transition: opacity 0.2s ease, width 0.3s ease;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
 
             .edit-button {
                 flex-shrink: 0;
-                transition: opacity 0.2s ease, width 0.3s ease;
+                transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             }
         }
 
