@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Globe } from 'lucide-react';
 import styles from './LanguageSelector.module.css';
 
 const LANGUAGES = [
@@ -20,7 +19,6 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
 
   return (
     <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
-      <Globe className={styles.icon} size={20} />
       <select
         value={selectedLanguage}
         onChange={handleChange}
@@ -30,7 +28,7 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
       >
         {LANGUAGES.map(lang => (
           <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.name}
+            {lang.flag} {lang.code.toUpperCase()}
           </option>
         ))}
       </select>

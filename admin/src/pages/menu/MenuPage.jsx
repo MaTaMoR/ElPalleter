@@ -173,7 +173,7 @@ const MenuHeader = () => {
             {isEditing ? (
               <>
                 <Eye size={18} />
-                <span>Volver a visualización</span>
+                <span>Visualizar</span>
               </>
             ) : (
               <>

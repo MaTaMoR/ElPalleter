@@ -138,7 +138,8 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
   };
 
   // Clear search
-  const handleClear = () => {
+  const handleClear = (e) => {
+    e.stopPropagation(); // Evitar que se propague el evento
     setSearchTerm('');
     setResults([]);
     setIsOpen(false);
@@ -151,7 +152,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Buscar en toda la carta..."
+          placeholder="Buscar..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => {
