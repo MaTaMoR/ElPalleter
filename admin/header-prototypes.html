@@ -256,11 +256,20 @@
         .option1 .header-content {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 1.5rem;
             padding: 1rem 1.5rem;
         }
 
         .option1 .breadcrumbs {
+            flex-shrink: 1;
+            min-width: 0;
+        }
+
+        .option1 .right-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             flex-shrink: 0;
         }
 
@@ -272,21 +281,9 @@
             flex-shrink: 0;
         }
 
-        @media (max-width: 1024px) {
-            .option1 .header-content {
-                flex-wrap: wrap;
-            }
-
-            .option1 .search-wrapper {
-                order: 3;
-                width: 100%;
-                max-width: none;
-                margin-top: 0.5rem;
-            }
-        }
-
         @media (max-width: 768px) {
             .option1 .header-content {
+                flex-wrap: wrap;
                 gap: 0.75rem;
                 padding: 0.875rem;
             }
@@ -296,18 +293,15 @@
                 order: 1;
             }
 
-            .option1 .search-wrapper {
+            .option1 .right-group {
+                width: 100%;
                 order: 2;
-                flex: 1;
-                min-width: 0;
-                max-width: none;
-                margin-top: 0;
+                gap: 0.75rem;
             }
 
-            .option1 .controls {
-                order: 2;
-                flex-shrink: 0;
-                gap: 0.5rem;
+            .option1 .search-wrapper {
+                flex: 1;
+                max-width: none;
             }
         }
 
@@ -315,6 +309,7 @@
         .option2 .header-content {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 1rem;
             padding: 1rem 1.5rem;
         }
@@ -328,12 +323,20 @@
             border-radius: 8px;
             background: #f8fafc;
             cursor: pointer;
-            flex-shrink: 0;
+            flex-shrink: 1;
+            min-width: 0;
         }
 
         .option2 .breadcrumbs-compact:hover {
             background: #f1f5f9;
             border-color: #cbd5e1;
+        }
+
+        .option2 .right-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
         }
 
         .option2 .search-wrapper {
@@ -352,17 +355,15 @@
                 order: 1;
             }
 
-            .option2 .search-wrapper {
-                flex: 1;
-                min-width: 0;
-                max-width: none;
+            .option2 .right-group {
+                width: 100%;
                 order: 2;
+                gap: 0.75rem;
             }
 
-            .option2 .controls {
-                order: 2;
-                flex-shrink: 0;
-                gap: 0.5rem;
+            .option2 .search-wrapper {
+                flex: 1;
+                max-width: none;
             }
         }
 
@@ -370,8 +371,21 @@
         .option3 .header-content {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 1.5rem;
             padding: 1rem 1.5rem;
+        }
+
+        .option3 .breadcrumbs {
+            flex-shrink: 1;
+            min-width: 0;
+        }
+
+        .option3 .right-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
         }
 
         .option3 .search-wrapper {
@@ -383,25 +397,9 @@
             max-width: 600px;
         }
 
-        .option3 .controls {
-            margin-left: auto;
-        }
-
-        @media (max-width: 1024px) {
-            .option3 .header-content {
-                flex-wrap: wrap;
-            }
-
-            .option3 .search-wrapper {
-                order: 3;
-                width: 100%;
-                max-width: none !important;
-                margin-top: 0.5rem;
-            }
-        }
-
         @media (max-width: 768px) {
             .option3 .header-content {
+                flex-wrap: wrap;
                 gap: 0.75rem;
                 padding: 0.875rem;
             }
@@ -411,17 +409,15 @@
                 order: 1;
             }
 
-            .option3 .search-wrapper {
+            .option3 .right-group {
+                width: 100%;
                 order: 2;
-                flex: 1;
-                min-width: 0;
+                gap: 0.75rem;
             }
 
-            .option3 .controls {
-                order: 2;
-                flex-shrink: 0;
-                margin-left: 0;
-                gap: 0.5rem;
+            .option3 .search-wrapper {
+                flex: 1;
+                max-width: none !important;
             }
         }
 
@@ -453,6 +449,12 @@
             align-items: flex-end;
         }
 
+        .option4 .right-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         @media (max-width: 1024px) {
             .option4 .header-content {
                 grid-template-columns: 1fr;
@@ -474,29 +476,24 @@
             .option4 .left-section {
                 width: 100%;
                 order: 1;
-                flex-direction: row;
-                align-items: center;
             }
 
             .option4 .breadcrumbs {
                 width: 100%;
             }
 
-            .option4 .search-wrapper {
-                order: 2;
-                flex: 1;
-                min-width: 0;
-            }
-
             .option4 .right-section {
+                width: 100%;
                 order: 2;
-                flex-direction: row;
-                align-items: center;
-                flex-shrink: 0;
             }
 
-            .option4 .controls {
-                gap: 0.5rem;
+            .option4 .right-group {
+                width: 100%;
+                gap: 0.75rem;
+            }
+
+            .option4 .search-wrapper {
+                flex: 1;
             }
         }
 
@@ -504,12 +501,22 @@
         .option5 .header-content {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0.75rem 1.5rem;
             gap: 1rem;
         }
 
         .option5 .breadcrumbs {
             font-size: 0.8125rem;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+
+        .option5 .right-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
         }
 
         .option5 .search-wrapper {
@@ -531,20 +538,9 @@
             font-size: 0.875rem;
         }
 
-        @media (max-width: 1024px) {
-            .option5 .header-content {
-                flex-wrap: wrap;
-            }
-
-            .option5 .search-wrapper {
-                order: 3;
-                width: 100%;
-                max-width: none;
-            }
-        }
-
         @media (max-width: 768px) {
             .option5 .header-content {
+                flex-wrap: wrap;
                 padding: 0.75rem 0.875rem;
                 gap: 0.75rem;
             }
@@ -554,17 +550,15 @@
                 order: 1;
             }
 
-            .option5 .search-wrapper {
+            .option5 .right-group {
+                width: 100%;
                 order: 2;
-                flex: 1;
-                min-width: 0;
-                max-width: none;
+                gap: 0.75rem;
             }
 
-            .option5 .controls {
-                order: 2;
-                flex-shrink: 0;
-                gap: 0.5rem;
+            .option5 .search-wrapper {
+                flex: 1;
+                max-width: none;
             }
         }
 
@@ -594,7 +588,7 @@
         <div class="prototype option1">
             <div class="prototype-title">Opción 1: Layout Horizontal Balanceado</div>
             <div class="prototype-description">
-                <strong>Desktop:</strong> Todo en una línea - Breadcrumbs (izq) | Búsqueda expandida (centro) | Controles (der)<br>
+                <strong>Desktop:</strong> 1 fila con 2 grupos (space-between) - Breadcrumbs (izq) | Búsqueda + Controles (der)<br>
                 <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
                 <strong>Pros:</strong> Búsqueda prominente, balance visual, compacto en móvil<br>
                 <strong>Contras:</strong> Puede ser apretado con breadcrumbs largos
@@ -619,35 +613,37 @@
                             </button>
                         </div>
 
-                        <div class="search-wrapper">
-                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
-                            <button class="clear-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <div class="right-group">
+                            <div class="search-wrapper">
+                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                            </button>
-                        </div>
-
-                        <div class="controls">
-                            <div class="language-selector">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                                </svg>
-                                <select>
-                                    <option>ES</option>
-                                    <option>EN</option>
-                                    <option>VAL</option>
-                                </select>
+                                <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                                <button class="clear-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <button class="edit-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                                <span class="btn-text">Editar</span>
-                            </button>
+
+                            <div class="controls">
+                                <div class="language-selector">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                    </svg>
+                                    <select>
+                                        <option>ES</option>
+                                        <option>EN</option>
+                                        <option>VAL</option>
+                                    </select>
+                                </div>
+                                <button class="edit-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <span class="btn-text">Editar</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -659,7 +655,7 @@
         <div class="prototype option2">
             <div class="prototype-title">Opción 2: Breadcrumbs Compactos</div>
             <div class="prototype-description">
-                <strong>Desktop:</strong> Breadcrumbs en un botón compacto | Búsqueda ancha (centro) | Controles (der)<br>
+                <strong>Desktop:</strong> 1 fila con 2 grupos (space-between) - Breadcrumbs compactos (izq) | Búsqueda + Controles (der)<br>
                 <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs compactos | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
                 <strong>Pros:</strong> Más espacio para búsqueda, limpio, compacto en móvil<br>
                 <strong>Contras:</strong> Breadcrumbs menos visibles, click extra para ver path completo
@@ -677,35 +673,37 @@
                             </svg>
                         </div>
 
-                        <div class="search-wrapper">
-                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
-                            <button class="clear-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <div class="right-group">
+                            <div class="search-wrapper">
+                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                            </button>
-                        </div>
-
-                        <div class="controls">
-                            <div class="language-selector">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                                </svg>
-                                <select>
-                                    <option>ES</option>
-                                    <option>EN</option>
-                                    <option>VAL</option>
-                                </select>
+                                <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                                <button class="clear-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <button class="edit-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                                <span class="btn-text">Editar</span>
-                            </button>
+
+                            <div class="controls">
+                                <div class="language-selector">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                    </svg>
+                                    <select>
+                                        <option>ES</option>
+                                        <option>EN</option>
+                                        <option>VAL</option>
+                                    </select>
+                                </div>
+                                <button class="edit-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <span class="btn-text">Editar</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -717,7 +715,7 @@
         <div class="prototype option3">
             <div class="prototype-title">Opción 3: Búsqueda Expandible</div>
             <div class="prototype-description">
-                <strong>Desktop:</strong> Breadcrumbs | Búsqueda compacta que se expande al enfocar | Controles<br>
+                <strong>Desktop:</strong> 1 fila con 2 grupos (space-between) - Breadcrumbs (izq) | Búsqueda expandible + Controles (der)<br>
                 <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
                 <strong>Pros:</strong> Espacio eficiente, interacción moderna, compacto en móvil<br>
                 <strong>Contras:</strong> Comportamiento menos predecible para algunos usuarios
@@ -742,35 +740,37 @@
                             </button>
                         </div>
 
-                        <div class="search-wrapper">
-                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <input type="text" class="search-input" placeholder="Buscar...">
-                            <button class="clear-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <div class="right-group">
+                            <div class="search-wrapper">
+                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                            </button>
-                        </div>
-
-                        <div class="controls">
-                            <div class="language-selector">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                                </svg>
-                                <select>
-                                    <option>ES</option>
-                                    <option>EN</option>
-                                    <option>VAL</option>
-                                </select>
+                                <input type="text" class="search-input" placeholder="Buscar...">
+                                <button class="clear-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <button class="edit-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                                <span class="btn-text">Editar</span>
-                            </button>
+
+                            <div class="controls">
+                                <div class="language-selector">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                    </svg>
+                                    <select>
+                                        <option>ES</option>
+                                        <option>EN</option>
+                                        <option>VAL</option>
+                                    </select>
+                                </div>
+                                <button class="edit-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <span class="btn-text">Editar</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -807,37 +807,40 @@
                                     <span>Cervezas</span>
                                 </button>
                             </div>
-                            <div class="search-wrapper">
-                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
-                                <button class="clear-btn">
-                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
                         </div>
 
                         <div class="right-section">
-                            <div class="controls">
-                                <div class="language-selector">
-                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                            <div class="right-group">
+                                <div class="search-wrapper">
+                                    <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
-                                    <select>
-                                        <option>Español</option>
-                                        <option>English</option>
-                                        <option>Valencià</option>
-                                    </select>
+                                    <input type="text" class="search-input" placeholder="Buscar en toda la carta...">
+                                    <button class="clear-btn">
+                                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
                                 </div>
-                                <button class="edit-btn">
-                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    <span>Editar</span>
-                                </button>
+
+                                <div class="controls">
+                                    <div class="language-selector">
+                                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                        </svg>
+                                        <select>
+                                            <option>ES</option>
+                                            <option>EN</option>
+                                            <option>VAL</option>
+                                        </select>
+                                    </div>
+                                    <button class="edit-btn">
+                                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        <span class="btn-text">Editar</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -850,7 +853,7 @@
         <div class="prototype option5">
             <div class="prototype-title">Opción 5: Minimalista Compacto</div>
             <div class="prototype-description">
-                <strong>Desktop:</strong> Todo en una línea con elementos más pequeños y compactos<br>
+                <strong>Desktop:</strong> 1 fila con 2 grupos (space-between) - Breadcrumbs (izq) | Búsqueda + Controles (der, compacto)<br>
                 <strong>Mobile (2 filas):</strong> Fila 1: Breadcrumbs | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)<br>
                 <strong>Pros:</strong> Ahorra espacio vertical máximo, moderno, ultra compacto<br>
                 <strong>Contras:</strong> Puede sentirse apretado, texto más pequeño
@@ -875,35 +878,37 @@
                             </button>
                         </div>
 
-                        <div class="search-wrapper">
-                            <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <input type="text" class="search-input" placeholder="Buscar...">
-                            <button class="clear-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <div class="right-group">
+                            <div class="search-wrapper">
+                                <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                            </button>
-                        </div>
-
-                        <div class="controls">
-                            <div class="language-selector">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                                </svg>
-                                <select>
-                                    <option>ES</option>
-                                    <option>EN</option>
-                                    <option>VAL</option>
-                                </select>
+                                <input type="text" class="search-input" placeholder="Buscar...">
+                                <button class="clear-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <button class="edit-btn">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                                <span class="btn-text">Editar</span>
-                            </button>
+
+                            <div class="controls">
+                                <div class="language-selector">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                    </svg>
+                                    <select>
+                                        <option>ES</option>
+                                        <option>EN</option>
+                                        <option>VAL</option>
+                                    </select>
+                                </div>
+                                <button class="edit-btn">
+                                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <span class="btn-text">Editar</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -974,7 +979,7 @@
 
         <div style="text-align: center; padding: 2rem; color: #64748b;">
             <p><strong>Prueba redimensionar la ventana del navegador para ver el comportamiento responsive</strong></p>
-            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Desktop:</strong> Breadcrumbs (izq) | Búsqueda (centro) | Controles (der) - Todo en 1 fila</p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Desktop:</strong> 1 fila con 2 grupos (space-between) - Breadcrumbs (izq) | Búsqueda + Controles (der)</p>
             <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Móvil:</strong> 2 filas - Fila 1: Breadcrumbs completos | Fila 2: Búsqueda + Idioma (código) + Editar (ícono)</p>
             <p style="font-size: 0.875rem; margin-top: 0.5rem;">Una vez elijas un diseño, lo implementaremos en React con los componentes reales</p>
         </div>
