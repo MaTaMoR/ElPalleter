@@ -339,11 +339,11 @@
   }
 
   .cardContent {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .cardTitle {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 
   .cardIcon {
@@ -358,11 +358,11 @@
   }
 
   .cardContent {
-    padding: 0.875rem;
+    padding: 1rem;
   }
 
   .cardTitle {
-    font-size: 0.9375rem;
+    font-size: 1rem;
   }
 
   .cardSubtitle {
