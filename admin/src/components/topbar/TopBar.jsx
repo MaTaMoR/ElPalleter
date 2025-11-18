@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
-import { 
-  Menu, 
-  Settings, 
-  LogOut, 
+import {
+  Menu,
+  Settings,
+  LogOut,
   ChevronDown,
 } from 'lucide-react';
+import logoLight from '/src/assets/mini-logo-light.svg';
 import styles from './TopBar.module.css';
 
 const TopBar = ({ onMenuClick, title }) => {
@@ -16,20 +17,26 @@ const TopBar = ({ onMenuClick, title }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    setShowUserMenu(false);
     logout();
     navigate('/admin/login');
+  };
+
+  const handleNavigateSettings = () => {
+    setShowUserMenu(false);
+    navigate('/admin/settings');
   };
 
   return (
     <header className={styles.topbar}>
       <div className={styles.topbarLeft}>
-        <button 
+        <button
           className={styles.menuButton}
           onClick={onMenuClick}
         >
           <Menu size={24} />
         </button>
-        <h1 className={styles.pageTitle}>{title}</h1>
+        <img src={logoLight} alt="El Palleter" className={styles.logo} />
       </div>
 
       <div className={styles.topbarRight}>
@@ -47,7 +54,7 @@ const TopBar = ({ onMenuClick, title }) => {
 
           {showUserMenu && (
             <div className={styles.userDropdown}>
-              <button onClick={() => navigate('/admin/settings')}>
+              <button onClick={handleNavigateSettings}>
                 <Settings size={16} />
                 Configuración
               </button>

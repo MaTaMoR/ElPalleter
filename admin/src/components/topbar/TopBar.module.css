@@ -38,6 +38,11 @@
   color: var(--text-primary);
 }
 
+.logo {
+  height: 40px;
+  width: auto;
+}
+
 .topbarRight {
   display: flex;
   align-items: center;
