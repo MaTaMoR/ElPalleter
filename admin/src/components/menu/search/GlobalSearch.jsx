@@ -124,6 +124,9 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
   const handleResultClick = (result) => {
     const pathParts = location.pathname.split('/categories')[0];
 
+    // Cerrar el dropdown inmediatamente
+    setIsOpen(false);
+
     if (result.type === 'category') {
       navigate(`${pathParts}/categories/${result.categoryId}`);
     } else if (result.type === 'subcategory') {
@@ -131,9 +134,6 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     } else if (result.type === 'item') {
       navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
     }
-
-    // No cerramos el dropdown aquí - se cerrará cuando el componente se desmonte
-    // o cuando el usuario haga clic fuera, evitando el efecto de aplastamiento visual
   };
 
   // Clear search
@@ -147,7 +147,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
 
   return (
     <div className={styles.globalSearch} ref={searchRef}>
-      <div className={`${styles.searchInputWrapper} ${isOpen ? styles.expanded : ''}`}>
+      <div className={styles.searchInputWrapper}>
         <Search className={styles.searchIcon} size={18} />
         <input
           type="text"
