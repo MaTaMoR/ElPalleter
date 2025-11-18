@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X } from 'lucide-react';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
+import MenuCard from '../common/MenuCard';
 import styles from './ItemView.module.css';
 
 const ItemView = ({
@@ -168,56 +169,32 @@ const ItemView = ({
                   </div>
                 ) : (
                   // Modo vista
-                  <div className={styles.itemContent}>
-                    <div className={styles.itemInfo}>
-                      <h3 className={styles.itemName}>{item.nameKey || 'Sin nombre'}</h3>
-                      {item.descriptionKey && (
-                        <p className={styles.itemDescription}>{item.descriptionKey}</p>
-                      )}
-                      <div className={styles.itemMeta}>
-                        <span className={styles.itemPrice}>{item.price || '0.00'}€</span>
-                        {item.available !== undefined && (
-                          <span className={`${styles.availabilityBadge} ${item.available ? styles.available : styles.unavailable}`}>
-                            {item.available ? '✓ Disponible' : '✗ No disponible'}
-                          </span>
+                  <MenuCard
+                    title={item.nameKey || 'Sin nombre'}
+                    content={
+                      <div className={styles.itemContentArea}>
+                        {item.descriptionKey && (
+                          <p className={styles.itemDescription}>{item.descriptionKey}</p>
                         )}
+                        <div className={styles.itemMeta}>
+                          <span className={styles.itemPrice}>{item.price || '0.00'}€</span>
+                          {item.available !== undefined && (
+                            <span className={`${styles.availabilityBadge} ${item.available ? styles.available : styles.unavailable}`}>
+                              {item.available ? '✓ Disponible' : '✗ No disponible'}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-
-                    {isEditing && (
-                      <div className={styles.itemActions}>
-                        {isDeleted ? (
-                          <button
-                            type="button"
-                            onClick={() => onUndoDeleteItem(item.id)}
-                            className={`${styles.actionButton} ${styles.undoButton}`}
-                            title="Deshacer eliminación"
-                          >
-                            <Undo2 size={18} />
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(item.id)}
-                              className={`${styles.actionButton} ${styles.editButton}`}
-                              title="Editar item"
-                            >
-                              <Edit3 size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onDeleteItem(item.id)}
-                              className={`${styles.actionButton} ${styles.deleteButton}`}
-                              title="Eliminar item"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                    }
+                    state={item._state === 'normal' ? null : item._state}
+                    isDeleted={isDeleted}
+                    onClick={null}
+                    onEdit={() => handleEdit(item.id)}
+                    onDelete={() => onDeleteItem(item.id)}
+                    onUndo={() => onUndoDeleteItem(item.id)}
+                    showArrow={false}
+                    isEditing={isEditing}
+                  />
                 )}
               </div>
             );

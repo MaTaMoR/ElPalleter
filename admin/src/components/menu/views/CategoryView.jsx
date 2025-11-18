@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, ChevronRight, Trash2, Undo2, Edit3, Check, X } from 'lucide-react';
+import { Plus, Check, X } from 'lucide-react';
 import MenuTextField from '../fields/MenuTextField';
+import MenuCard from '../common/MenuCard';
+import MenuBadge from '../common/MenuBadge';
 import styles from './CategoryView.module.css';
 
 const CategoryView = ({
@@ -94,62 +96,23 @@ const CategoryView = ({
                 </div>
               ) : (
                 // Modo vista
-                <div className={styles.cardLayout}>
-                  <button
-                    onClick={() => onCategoryClick(category)}
-                    className={styles.cardContent}
-                    disabled={isDeleted}
-                  >
-                    <div className={styles.cardInfo}>
-                      <h3 className={styles.cardTitle}>{category.nameKey || 'Sin nombre'}</h3>
-                      <p className={styles.cardSubtitle}>
-                        {subcategoryCounts[category.id] || 0} subcategorías
-                      </p>
-                    </div>
-                  </button>
-
-                  <div className={styles.cardActions}>
-                    {isEditing && (
-                      isDeleted ? (
-                        <button
-                          type="button"
-                          onClick={() => onUndoDeleteCategory(category.id)}
-                          className={`${styles.actionButton} ${styles.undoButton}`}
-                          title="Deshacer eliminación"
-                        >
-                          <Undo2 size={18} />
-                        </button>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(category.id)}
-                            className={`${styles.actionButton} ${styles.editButton}`}
-                            title="Editar categoría"
-                          >
-                            <Edit3 size={18} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteCategory(category.id)}
-                            className={`${styles.actionButton} ${styles.deleteButton}`}
-                            title="Eliminar categoría"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </>
-                      )
-                    )}
-                    <button
-                      onClick={() => onCategoryClick(category)}
-                      className={styles.arrowButton}
-                      disabled={isDeleted}
-                      title="Ver subcategorías"
-                    >
-                      <ChevronRight size={18} className={styles.cardIcon} />
-                    </button>
-                  </div>
-                </div>
+                <MenuCard
+                  title={category.nameKey || 'Sin nombre'}
+                  content={
+                    <MenuBadge
+                      count={subcategoryCounts[category.id] || 0}
+                      label="subcategorías"
+                    />
+                  }
+                  state={category._state === 'normal' ? null : category._state}
+                  isDeleted={isDeleted}
+                  onClick={() => onCategoryClick(category)}
+                  onEdit={() => handleEdit(category.id)}
+                  onDelete={() => onDeleteCategory(category.id)}
+                  onUndo={() => onUndoDeleteCategory(category.id)}
+                  showArrow={true}
+                  isEditing={isEditing}
+                />
               )}
             </div>
           );
