@@ -1,16 +1,9 @@
 .container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  padding: 0.625rem 0.5rem;
-  transition: var(--transition);
   height: 100%;
-}
-
-.container:hover:not(.disabled) {
-  background: var(--bg-tertiary);
 }
 
 .container.disabled {
@@ -18,33 +11,114 @@
   cursor: not-allowed;
 }
 
-.select {
-  background: none;
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
   border: none;
   color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  outline: none;
-  padding: 0;
-  min-width: auto;
-  text-align: center;
+  border-radius: 0.25rem;
+  transition: var(--transition);
+  height: 100%;
 }
 
-.select:disabled {
+.trigger:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+}
+
+.trigger:disabled {
   cursor: not-allowed;
 }
 
-.select option {
-  background-color: var(--bg-secondary);
+.flag {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.code {
+  font-size: 0.875rem;
+  font-weight: 500;
   color: var(--text-primary);
-  padding: 0.5rem;
+}
+
+.chevron {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition);
   text-align: left;
 }
 
-.select option:hover,
-.select option:focus,
-.select option:checked {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+.option:hover {
+  background: var(--bg-tertiary);
+}
+
+.option:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.optionSelected {
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.optionSelected:hover {
+  background: rgba(217, 119, 6, 0.15);
+}
+
+.name {
+  flex: 1;
+}
+
+.checkmark {
+  color: var(--primary);
+  font-weight: bold;
+  font-size: 1rem;
 }

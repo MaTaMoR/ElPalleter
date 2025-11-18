@@ -132,8 +132,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
       navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
     }
 
-    setSearchTerm('');
-    setResults([]);
+    // Solo cerramos el dropdown, mantenemos el searchTerm
     setIsOpen(false);
   };
 
@@ -156,7 +155,10 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => {
-            if (results.length > 0) setIsOpen(true);
+            // Si hay un término de búsqueda y hay resultados, abrir el dropdown
+            if (searchTerm && searchTerm.trim().length > 0 && results.length > 0) {
+              setIsOpen(true);
+            }
           }}
         />
         {searchTerm && (
