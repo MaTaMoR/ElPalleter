@@ -9,7 +9,6 @@
   align-items: center;
   background: transparent;
   border: none;
-  transition: background 0.15s;
 }
 
 .searchInputWrapper:focus-within {

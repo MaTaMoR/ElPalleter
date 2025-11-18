@@ -184,7 +184,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
               <div
                 key={index}
                 className={styles.resultItem}
-                onClick={() => handleResultClick(result)}
+                onMouseDown={() => handleResultClick(result)}
               >
                 {result.type === 'category' && (
                   <div className={styles.breadcrumb}>
