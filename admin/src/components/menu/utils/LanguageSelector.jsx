@@ -1,19 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from 'lucide-react';
+import I18nService from '@services/I18nService.js';
 import styles from './LanguageSelector.module.css';
-
-const LANGUAGES = [
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'val', name: 'Valencià', flag: '🇪🇸' }
-];
 
 const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [languages, setLanguages] = useState([]);
   const dropdownRef = useRef(null);
 
-  const selectedLang = LANGUAGES.find(lang => lang.code === selectedLanguage) || LANGUAGES[0];
+  // Load languages from I18nService
+  useEffect(() => {
+    const availableLanguages = I18nService.getAvailableLanguages();
+    setLanguages(availableLanguages);
+  }, []);
+
+  const selectedLang = languages.find(lang => lang.code === selectedLanguage) || languages[0];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -40,6 +42,25 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
     }
   };
 
+  // Render flag image from backend SVG
+  const renderFlag = (lang) => {
+    if (!lang?.flag?.value) {
+      return null;
+    }
+    return (
+      <img
+        src={lang.flag.value}
+        alt={lang.name}
+        className={styles.flagImage}
+        aria-hidden="true"
+      />
+    );
+  };
+
+  if (languages.length === 0) {
+    return null; // Don't render until languages are loaded
+  }
+
   return (
     <div className={`${styles.container} ${disabled ? styles.disabled : ''}`} ref={dropdownRef}>
       <button
@@ -49,22 +70,22 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
         disabled={disabled}
         aria-label="Seleccionar idioma"
       >
-        <span className={styles.flag}>{selectedLang.flag}</span>
-        <span className={styles.code}>{selectedLang.code.toUpperCase()}</span>
+        {renderFlag(selectedLang)}
+        <span className={styles.code}>{selectedLang?.shortName || selectedLang?.code?.toUpperCase()}</span>
         <ChevronDown size={16} className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} />
       </button>
 
       {isOpen && (
         <div className={styles.dropdown}>
-          {LANGUAGES.map(lang => (
+          {languages.map(lang => (
             <button
               key={lang.code}
               type="button"
               className={`${styles.option} ${lang.code === selectedLanguage ? styles.optionSelected : ''}`}
               onClick={() => handleSelect(lang.code)}
             >
-              <span className={styles.flag}>{lang.flag}</span>
-              <span className={styles.name}>{lang.name}</span>
+              {renderFlag(lang)}
+              <span className={styles.name}>{lang.nativeName || lang.name}</span>
               {lang.code === selectedLanguage && (
                 <span className={styles.checkmark}>✓</span>
               )}
@@ -77,7 +98,7 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
 };
 
 LanguageSelector.propTypes = {
-  selectedLanguage: PropTypes.oneOf(['es', 'en', 'val']).isRequired,
+  selectedLanguage: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool
 };
