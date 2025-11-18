@@ -198,7 +198,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  min-height: 41px;
   background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
   color: white;
   border: none;
@@ -221,7 +224,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  min-height: 41px;
   background: transparent;
   color: var(--error);
   border: none;
@@ -248,7 +254,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  min-height: 41px;
   background: var(--success);
   color: white;
   border: none;
