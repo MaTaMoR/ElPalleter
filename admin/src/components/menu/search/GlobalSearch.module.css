@@ -25,12 +25,13 @@
 
 .searchInput {
   width: 100%;
-  padding: 10px 40px 10px 40px;
+  padding: 0.625rem 2.5rem 0.625rem 2.5rem;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 0.875rem;
   background: transparent;
   color: var(--text-primary);
+  line-height: 1.5;
 }
 
 .searchInput::placeholder {
