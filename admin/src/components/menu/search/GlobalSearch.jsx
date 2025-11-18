@@ -132,10 +132,8 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
       navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
     }
 
-    // Cerrar el dropdown con un pequeño delay para evitar el colapso visual
-    setTimeout(() => {
-      setIsOpen(false);
-    }, 100);
+    // No cerramos el dropdown aquí - se cerrará cuando el componente se desmonte
+    // o cuando el usuario haga clic fuera, evitando el efecto de aplastamiento visual
   };
 
   // Clear search
