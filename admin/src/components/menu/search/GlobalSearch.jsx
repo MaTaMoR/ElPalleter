@@ -132,13 +132,16 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
       navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
     }
 
-    // Solo cerramos el dropdown, mantenemos el searchTerm
-    setIsOpen(false);
+    // Cerrar el dropdown con un pequeño delay para evitar el colapso visual
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 100);
   };
 
   // Clear search
   const handleClear = (e) => {
-    e.stopPropagation(); // Evitar que se propague el evento
+    e.preventDefault();
+    e.stopPropagation();
     setSearchTerm('');
     setResults([]);
     setIsOpen(false);
@@ -165,7 +168,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
           <button
             type="button"
             className={styles.clearButton}
-            onClick={handleClear}
+            onMouseDown={handleClear}
             aria-label="Limpiar búsqueda"
           >
             <X size={16} />
