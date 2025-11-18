@@ -40,8 +40,11 @@ const CategoryView = ({
 
   return (
     <div className={styles.container}>
+      <div className={styles.pageTitle}>
+        <h1 className={styles.pageTitleName}>Categorías</h1>
+      </div>
+
       <div className={styles.header}>
-        <h2 className={styles.title}>Categorías</h2>
         {isEditing && (
           <button
             type="button"

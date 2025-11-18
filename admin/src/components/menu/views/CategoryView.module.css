@@ -2,6 +2,19 @@
   padding: 1.5rem;
 }
 
+.pageTitle {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.pageTitleName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
 .header {
   display: flex;
   align-items: center;
