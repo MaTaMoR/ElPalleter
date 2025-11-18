@@ -52,23 +52,29 @@
   margin: 0;
 }
 
+/* Botón de añadir usando el mismo patrón que los header buttons */
 .addButtonHeader {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background-color: var(--primary);
-  color: white;
+  gap: 0.5rem;
+  padding: 0 1.25rem;
+  height: 41px;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: 0.25rem;
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1.5;
   cursor: pointer;
   transition: var(--transition);
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+  color: white;
 }
 
 .addButtonHeader:hover {
-  background-color: var(--primary-dark);
+  background: linear-gradient(to bottom, var(--primary-dark), var(--primary));
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
 }
 
 .count {
@@ -297,6 +303,15 @@
 
   .title {
     font-size: 1.25rem;
+  }
+
+  .addButtonHeader span {
+    display: none;
+  }
+
+  .addButtonHeader {
+    padding: 0.625rem;
+    justify-content: center;
   }
 
   .cardContent {
