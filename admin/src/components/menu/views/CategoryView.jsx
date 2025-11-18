@@ -106,12 +106,11 @@ const CategoryView = ({
                         {subcategoryCounts[category.id] || 0} subcategorías
                       </p>
                     </div>
-                    <ChevronRight size={24} className={styles.cardIcon} />
                   </button>
 
-                  {isEditing && (
-                    <div className={styles.cardActions}>
-                      {isDeleted ? (
+                  <div className={styles.cardActions}>
+                    {isEditing && (
+                      isDeleted ? (
                         <button
                           type="button"
                           onClick={() => onUndoDeleteCategory(category.id)}
@@ -139,9 +138,17 @@ const CategoryView = ({
                             <Trash2 size={18} />
                           </button>
                         </>
-                      )}
-                    </div>
-                  )}
+                      )
+                    )}
+                    <button
+                      onClick={() => onCategoryClick(category)}
+                      className={styles.arrowButton}
+                      disabled={isDeleted}
+                      title="Ver subcategorías"
+                    >
+                      <ChevronRight size={24} className={styles.cardIcon} />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
