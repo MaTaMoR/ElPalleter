@@ -62,13 +62,13 @@ const MenuBreadcrumbs = () => {
         className={`${styles.breadcrumb} ${currentLevel === 'categories' ? styles.active : ''}`}
         onClick={handleNavigateToCategories}
       >
-        <Home size={18} />
+        <Home size={20} />
         <span>Inicio</span>
       </button>
 
       {categoryName && (
         <>
-          <ChevronRight size={18} className={styles.separator} />
+          <ChevronRight size={20} className={styles.separator} />
           <button
             type="button"
             className={`${styles.breadcrumb} ${currentLevel === 'subcategories' ? styles.active : ''}`}
@@ -81,7 +81,7 @@ const MenuBreadcrumbs = () => {
 
       {subcategoryName && (
         <>
-          <ChevronRight size={18} className={styles.separator} />
+          <ChevronRight size={20} className={styles.separator} />
           <span className={`${styles.breadcrumb} ${styles.active}`}>
             {subcategoryName}
           </span>
