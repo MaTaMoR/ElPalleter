@@ -157,6 +157,7 @@
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 0.375rem 0;
+  line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
