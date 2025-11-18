@@ -199,7 +199,7 @@ const MenuHeader = () => {
                 onClick={handleCancel}
                 disabled={isSaving}
               >
-                <X size={18} strokeWidth={2.5} />
+                <X size={18} />
                 <span>Cancelar</span>
               </button>
             </>
