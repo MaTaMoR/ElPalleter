@@ -257,6 +257,17 @@
     font-size: 1.25rem;
   }
 
+  .addButtonHeader {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    gap: 0.25rem;
+  }
+
+  .addButtonHeader svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .cardContent {
     padding: 1.25rem;
   }
