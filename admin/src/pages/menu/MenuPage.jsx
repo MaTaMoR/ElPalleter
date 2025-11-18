@@ -170,7 +170,7 @@ const MenuHeader = () => {
               {/* Edit Button */}
               <button
                 type="button"
-                className={styles.editButton}
+                className={`${styles.headerButton} ${styles.headerButtonPrimary}`}
                 onClick={handleToggleEditMode}
               >
                 <Edit3 size={18} />
@@ -182,7 +182,7 @@ const MenuHeader = () => {
               {/* Save Button - En modo edición */}
               <button
                 type="button"
-                className={styles.saveButton}
+                className={`${styles.headerButton} ${styles.headerButtonSuccess}`}
                 onClick={handleSave}
                 disabled={!menuState.hasRealChanges() || isSaving}
               >
@@ -195,7 +195,7 @@ const MenuHeader = () => {
               {/* Cancel Button - En modo edición */}
               <button
                 type="button"
-                className={styles.cancelButton}
+                className={`${styles.headerButton} ${styles.headerButtonDanger}`}
                 onClick={handleCancel}
                 disabled={isSaving}
               >

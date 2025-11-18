@@ -102,9 +102,7 @@
   /* Ocultar divisores y controles cuando el search está activo */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .editButton,
-  .searchWrapper:focus-within ~ .cancelButton,
-  .searchWrapper:focus-within ~ .saveButton {
+  .searchWrapper:focus-within ~ .headerButton {
     opacity: 0;
     pointer-events: none;
     width: 0;
@@ -167,9 +165,7 @@
   /* Ocultar divisores y controles cuando el search está activo en mobile */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .editButton,
-  .searchWrapper:focus-within ~ .cancelButton,
-  .searchWrapper:focus-within ~ .saveButton {
+  .searchWrapper:focus-within ~ .headerButton {
     opacity: 0;
     pointer-events: none;
     width: 0;
@@ -194,16 +190,13 @@
   }
 }
 
-.editButton {
+/* Clase base común para todos los botones del header */
+.headerButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  min-height: 41px;
-  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-  color: white;
+  padding: 0 1.25rem;
+  height: 41px;
   border: none;
   border-radius: 0.25rem;
   font-size: 0.875rem;
@@ -215,70 +208,41 @@
   white-space: nowrap;
 }
 
-.editButton:hover {
+.headerButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Variante primaria (Editar) */
+.headerButtonPrimary {
+  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+  color: white;
+}
+
+.headerButtonPrimary:hover:not(:disabled) {
   background: linear-gradient(to bottom, var(--primary-dark), var(--primary));
   box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
 }
 
-.cancelButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  min-height: 41px;
-  background: transparent;
-  color: var(--error);
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5;
-  cursor: pointer;
-  transition: var(--transition);
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.cancelButton:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.cancelButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.saveButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  min-height: 41px;
+/* Variante éxito (Guardar) */
+.headerButtonSuccess {
   background: var(--success);
   color: white;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5;
-  cursor: pointer;
-  transition: var(--transition);
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
-.saveButton:hover:not(:disabled) {
+.headerButtonSuccess:hover:not(:disabled) {
   background: #059669;
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 
-.saveButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* Variante peligro (Cancelar) */
+.headerButtonDanger {
+  background: transparent;
+  color: var(--error);
+}
+
+.headerButtonDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .editingBar {
@@ -318,51 +282,6 @@
 .editingActions {
   display: flex;
   gap: 0.75rem;
-}
-
-.cancelButton,
-.saveButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.375rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  border: none;
-}
-
-.cancelButton {
-  background-color: var(--bg-secondary);
-  color: rgb(239, 68, 68);
-  border: 2px solid rgba(239, 68, 68, 0.4);
-}
-
-.cancelButton:hover:not(:disabled) {
-  background-color: var(--bg-tertiary);
-  border-color: var(--error);
-  color: var(--error);
-}
-
-.cancelButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.saveButton {
-  background-color: var(--success);
-  color: white;
-}
-
-.saveButton:hover:not(:disabled) {
-  background-color: #059669;
-}
-
-.saveButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
 
 .content {
@@ -479,10 +398,6 @@
     gap: 0.75rem;
   }
 
-  .editButton {
-    width: fit-content;
-  }
-
   .editingBar {
     gap: 1rem;
   }
@@ -496,14 +411,12 @@
     flex-wrap: wrap;
   }
 
-  .cancelButton span,
-  .saveButton span,
+  .headerButton span,
   .addCategoryButton span {
     display: none;
   }
 
-  .cancelButton,
-  .saveButton,
+  .headerButton,
   .addCategoryButton {
     padding: 0.625rem;
     justify-content: center;
@@ -538,11 +451,6 @@
 
   .headerActions {
     gap: 0.5rem;
-  }
-
-  .editButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
   }
 
   .editingBar {
