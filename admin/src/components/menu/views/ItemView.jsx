@@ -69,6 +69,16 @@ const ItemView = ({
 
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
+        {isEditing && (
+          <button
+            type="button"
+            onClick={onAddItem}
+            className={styles.addButtonHeader}
+          >
+            <Plus size={18} />
+            <span>Añadir</span>
+          </button>
+        )}
       </div>
 
       {isEditing && subcategory && onUpdateSubcategory && (
@@ -83,23 +93,6 @@ const ItemView = ({
           />
         </div>
       )}
-
-      <div className={styles.header}>
-        <h2 className={styles.title}>Items</h2>
-        {isEditing && (
-          <button
-            type="button"
-            onClick={onAddItem}
-            className={styles.addButtonHeader}
-          >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
-        )}
-        <span className={styles.count}>
-          {items.length} items
-        </span>
-      </div>
 
       <div className={styles.itemsList}>
         {items.length === 0 ? (

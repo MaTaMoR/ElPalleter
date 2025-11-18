@@ -54,6 +54,16 @@ const SubcategoryView = ({
 
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
+        {isEditing && (
+          <button
+            type="button"
+            onClick={onAddSubcategory}
+            className={styles.addButtonHeader}
+          >
+            <Plus size={18} />
+            <span>Añadir</span>
+          </button>
+        )}
       </div>
 
       {isEditing && category && onUpdateCategory && (
@@ -68,21 +78,6 @@ const SubcategoryView = ({
           />
         </div>
       )}
-
-      <div className={styles.header}>
-        <h2 className={styles.title}>Subcategorías</h2>
-        {isEditing && (
-          <button
-            type="button"
-            onClick={onAddSubcategory}
-            className={styles.addButtonHeader}
-          >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
-        )}
-        <span className={styles.count}>{subcategories.length} subcategorías</span>
-      </div>
 
       <div className={styles.grid}>
         {subcategories.map((subcategory) => {

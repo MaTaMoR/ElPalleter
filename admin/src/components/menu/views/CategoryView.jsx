@@ -42,9 +42,6 @@ const CategoryView = ({
     <div className={styles.container}>
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>Categorías</h1>
-      </div>
-
-      <div className={styles.header}>
         {isEditing && (
           <button
             type="button"
@@ -55,7 +52,6 @@ const CategoryView = ({
             <span>Añadir</span>
           </button>
         )}
-        <span className={styles.count}>{categories.length} categorías</span>
       </div>
 
       <div className={styles.grid}>

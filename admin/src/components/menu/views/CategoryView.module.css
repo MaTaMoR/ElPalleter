@@ -3,6 +3,9 @@
 }
 
 .pageTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid var(--border-color);
@@ -10,20 +13,6 @@
 
 .pageTitleName {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.title {
-  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -54,12 +43,6 @@
   box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
 }
 
-.count {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-}
-
 .grid {
   display: grid;
   gap: 1rem;
@@ -70,14 +53,6 @@
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
-  }
-
-  .header {
-    margin-bottom: 1rem;
-  }
-
-  .title {
-    font-size: 1.25rem;
   }
 
   .addButtonHeader span {
