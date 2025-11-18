@@ -175,7 +175,7 @@ const SubcategoryView = ({
                       disabled={isDeleted}
                       title="Ver items"
                     >
-                      <ChevronRight size={24} className={styles.cardIcon} />
+                      <ChevronRight size={18} className={styles.cardIcon} />
                     </button>
                   </div>
                 </div>
