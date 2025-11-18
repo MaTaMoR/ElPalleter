@@ -147,7 +147,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
 
   return (
     <div className={styles.globalSearch} ref={searchRef}>
-      <div className={styles.searchInputWrapper}>
+      <div className={`${styles.searchInputWrapper} ${isOpen ? styles.expanded : ''}`}>
         <Search className={styles.searchIcon} size={18} />
         <input
           type="text"

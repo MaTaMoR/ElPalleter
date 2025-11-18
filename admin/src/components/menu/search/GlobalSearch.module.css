@@ -12,7 +12,8 @@
   transition: all 0.2s;
 }
 
-.searchInputWrapper:focus-within {
+.searchInputWrapper:focus-within,
+.searchInputWrapper.expanded {
   background: var(--bg-tertiary);
 }
 
