@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Edit3, Eye, Save, X } from 'lucide-react';
-import LanguageSelector from '../../components/menu/utils/LanguageSelector';
-import GlobalSearch from '../../components/menu/search/GlobalSearch';
-import MenuBreadcrumbs from '../../components/menu/navigation/MenuBreadcrumbs';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -116,101 +112,6 @@ const MOCK_MENU_DATA = [
 ];
 
 // ============================================================================
-// MENU HEADER COMPONENT
-// ============================================================================
-
-const MenuHeader = () => {
-  const {
-    isEditing,
-    isSaving,
-    selectedLanguage,
-    menuState,
-    handleLanguageChange,
-    handleToggleEditMode,
-    handleSave,
-    handleCancel
-  } = useMenuEdit();
-
-  return (
-    <div className={styles.header}>
-      <div className={styles.headerTop}>
-        {/* Breadcrumbs Section */}
-        <div className={styles.breadcrumbsWrapper}>
-          <MenuBreadcrumbs />
-        </div>
-
-        {/* Controls Group */}
-        <div className={styles.controlsGroup}>
-          {/* Search */}
-          <div className={styles.searchWrapper}>
-            <GlobalSearch
-              categoriesMap={menuState.categoriesMap}
-              subcategoriesMap={menuState.subcategoriesMap}
-              itemsMap={menuState.itemsMap}
-              childrenMap={menuState.childrenMap}
-            />
-          </div>
-
-          <div className={styles.controlDivider}></div>
-
-          {/* Conditional controls based on edit mode */}
-          {!isEditing ? (
-            <>
-              {/* Language Selector - Solo en modo visualización */}
-              <div className={styles.languageWrapper}>
-                <LanguageSelector
-                  selectedLanguage={selectedLanguage}
-                  onChange={handleLanguageChange}
-                  disabled={false}
-                />
-              </div>
-
-              <div className={styles.controlDivider}></div>
-
-              {/* Edit Button */}
-              <button
-                type="button"
-                className={`${styles.headerButton} ${styles.headerButtonPrimary}`}
-                onClick={handleToggleEditMode}
-              >
-                <Edit3 size={18} />
-                <span>Editar</span>
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Save Button - En modo edición */}
-              <button
-                type="button"
-                className={`${styles.headerButton} ${styles.headerButtonSuccess}`}
-                onClick={handleSave}
-                disabled={!menuState.hasRealChanges() || isSaving}
-              >
-                <Save size={18} />
-                <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
-              </button>
-
-              <div className={styles.controlDivider}></div>
-
-              {/* Cancel Button - En modo edición */}
-              <button
-                type="button"
-                className={`${styles.headerButton} ${styles.headerButtonDanger}`}
-                onClick={handleCancel}
-                disabled={isSaving}
-              >
-                <X size={18} />
-                <span>Cancelar</span>
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ============================================================================
 // MENU CONTENT COMPONENT
 // ============================================================================
 
@@ -245,8 +146,6 @@ const MenuContent = () => {
     <>
       <div className={styles.content}>
         <div className={styles.categoriesContainer}>
-          <MenuHeader />
-
           <Routes>
             <Route path="/" element={<MenuLayout />}>
               <Route index element={<Navigate to="categories" replace />} />

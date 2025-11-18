@@ -237,12 +237,13 @@
 
 /* Variante peligro (Cancelar) */
 .headerButtonDanger {
-  background: transparent;
-  color: var(--error);
+  background: var(--error);
+  color: white;
 }
 
 .headerButtonDanger:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.1);
+  background: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .editingBar {
