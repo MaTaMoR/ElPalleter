@@ -335,7 +335,6 @@
 }
 
 .viewContainer {
-  background-color: var(--bg-card);
   border-radius: var(--border-radius);
   overflow: hidden;
 }
