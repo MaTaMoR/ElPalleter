@@ -5,10 +5,12 @@ import styles from './MenuCard.module.css';
 /**
  * Unified card component for Category, Subcategory, and Item views
  * Ensures consistent styling and dimensions across all menu entities
+ * Supports both view and edit modes
  */
 const MenuCard = ({
   title,
   content,
+  editForm = null, // Optional: JSX for edit mode form
   state = null, // 'new', 'edited', or null
   isDeleted = false,
   onClick,
@@ -28,6 +30,16 @@ const MenuCard = ({
     isDeleted && styles.deleted
   ].filter(Boolean).join(' ');
 
+  // If editForm is provided, render edit mode
+  if (editForm) {
+    return (
+      <div className={cardClasses}>
+        {editForm}
+      </div>
+    );
+  }
+
+  // Otherwise, render view mode
   return (
     <div className={cardClasses}>
       <div className={styles.cardLayout}>

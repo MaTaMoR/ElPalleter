@@ -5,6 +5,7 @@ import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
 import MenuBadge from '../common/MenuBadge';
 import styles from './CategoryView.module.css';
+import cardStyles from '../common/MenuCard.module.css';
 
 const CategoryView = ({
   categories,
@@ -60,61 +61,56 @@ const CategoryView = ({
           const isDeleted = category._state === 'deleted';
 
           return (
-            <div
+            <MenuCard
               key={category.id}
-              className={`${styles.card} ${category._state ? styles[category._state] : ''}`}
-            >
-              {isEditingCategory ? (
-                // Modo edición
-                <div className={styles.editForm}>
-                  <MenuTextField
-                    label="Nombre de la categoría"
-                    value={category.nameKey || ''}
-                    onChange={(value) => handleFieldChange(category.id, 'nameKey', value)}
-                    required
-                    error={categoryErrors[category.id]?.nameKey}
-                    helperText="Mínimo 3 caracteres"
-                  />
-                  <div className={styles.editActions}>
-                    <button
-                      type="button"
-                      onClick={handleCancelEdit}
-                      className={styles.cancelEditButton}
-                    >
-                      <X size={18} />
-                      <span>Cancelar</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveEdit}
-                      className={styles.saveEditButton}
-                    >
-                      <Check size={18} />
-                      <span>Guardar</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // Modo vista
-                <MenuCard
-                  title={category.nameKey || 'Sin nombre'}
-                  content={
-                    <MenuBadge
-                      count={subcategoryCounts[category.id] || 0}
-                      label="subcategorías"
-                    />
-                  }
-                  state={category._state === 'normal' ? null : category._state}
-                  isDeleted={isDeleted}
-                  onClick={() => onCategoryClick(category)}
-                  onEdit={() => handleEdit(category.id)}
-                  onDelete={() => onDeleteCategory(category.id)}
-                  onUndo={() => onUndoDeleteCategory(category.id)}
-                  showArrow={true}
-                  isEditing={isEditing}
+              title={category.nameKey || 'Sin nombre'}
+              content={
+                <MenuBadge
+                  count={subcategoryCounts[category.id] || 0}
+                  label="subcategorías"
                 />
-              )}
-            </div>
+              }
+              editForm={
+                isEditingCategory ? (
+                  <div className={cardStyles.editForm}>
+                    <MenuTextField
+                      label="Nombre de la categoría"
+                      value={category.nameKey || ''}
+                      onChange={(value) => handleFieldChange(category.id, 'nameKey', value)}
+                      required
+                      error={categoryErrors[category.id]?.nameKey}
+                      helperText="Mínimo 3 caracteres"
+                    />
+                    <div className={cardStyles.editActions}>
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        className={cardStyles.cancelEditButton}
+                      >
+                        <X size={18} />
+                        <span>Cancelar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        className={cardStyles.saveEditButton}
+                      >
+                        <Check size={18} />
+                        <span>Guardar</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : null
+              }
+              state={category._state === 'normal' ? null : category._state}
+              isDeleted={isDeleted}
+              onClick={() => onCategoryClick(category)}
+              onEdit={() => handleEdit(category.id)}
+              onDelete={() => onDeleteCategory(category.id)}
+              onUndo={() => onUndoDeleteCategory(category.id)}
+              showArrow={true}
+              isEditing={isEditing}
+            />
           );
         })}
       </div>

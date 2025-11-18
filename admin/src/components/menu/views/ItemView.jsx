@@ -6,6 +6,7 @@ import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
 import MenuCard from '../common/MenuCard';
 import styles from './ItemView.module.css';
+import cardStyles from '../common/MenuCard.module.css';
 
 const ItemView = ({
   items,
@@ -114,88 +115,86 @@ const ItemView = ({
               <div
                 key={item.id}
                 ref={(el) => { itemRefs.current[item.id] = el; }}
-                className={`${styles.itemCard} ${item._state ? styles[item._state] : ''}`}
               >
-                {isEditingItem ? (
-                  // Modo edición
-                  <div className={styles.editForm}>
-                    <div className={styles.fieldsGrid}>
-                      <MenuTextField
-                        label="Nombre del item"
-                        value={item.nameKey || ''}
-                        onChange={(value) => handleFieldChange(item.id, 'nameKey', value)}
-                        required
-                        error={errors[item.id]?.nameKey}
-                        helperText="Mínimo 3 caracteres"
-                      />
-                      <MenuPriceField
-                        label="Precio"
-                        value={item.price || ''}
-                        onChange={(value) => handleFieldChange(item.id, 'price', value)}
-                        min={0}
-                        required
-                        error={errors[item.id]?.price}
-                      />
-                    </div>
-                    <MenuTextField
-                      label="Descripción"
-                      value={item.descriptionKey || ''}
-                      onChange={(value) => handleFieldChange(item.id, 'descriptionKey', value)}
-                      multiline
-                    />
-                    <MenuCheckbox
-                      label="Disponible"
-                      checked={item.available !== false}
-                      onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
-                    />
-                    <div className={styles.editActions}>
-                      <button
-                        type="button"
-                        onClick={handleCancelEdit}
-                        className={styles.cancelEditButton}
-                      >
-                        <X size={18} />
-                        <span>Cancelar</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSaveEdit}
-                        className={styles.saveEditButton}
-                      >
-                        <Check size={18} />
-                        <span>Guardar</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Modo vista
-                  <MenuCard
-                    title={item.nameKey || 'Sin nombre'}
-                    content={
-                      <div className={styles.itemContentArea}>
-                        {item.descriptionKey && (
-                          <p className={styles.itemDescription}>{item.descriptionKey}</p>
+                <MenuCard
+                  title={item.nameKey || 'Sin nombre'}
+                  content={
+                    <div className={styles.itemContentArea}>
+                      {item.descriptionKey && (
+                        <p className={styles.itemDescription}>{item.descriptionKey}</p>
+                      )}
+                      <div className={styles.itemMeta}>
+                        <span className={styles.itemPrice}>{item.price || '0.00'}€</span>
+                        {item.available !== undefined && (
+                          <span className={`${styles.availabilityBadge} ${item.available ? styles.available : styles.unavailable}`}>
+                            {item.available ? '✓ Disponible' : '✗ No disponible'}
+                          </span>
                         )}
-                        <div className={styles.itemMeta}>
-                          <span className={styles.itemPrice}>{item.price || '0.00'}€</span>
-                          {item.available !== undefined && (
-                            <span className={`${styles.availabilityBadge} ${item.available ? styles.available : styles.unavailable}`}>
-                              {item.available ? '✓ Disponible' : '✗ No disponible'}
-                            </span>
-                          )}
+                      </div>
+                    </div>
+                  }
+                  editForm={
+                    isEditingItem ? (
+                      <div className={cardStyles.editForm}>
+                        <div className={styles.fieldsGrid}>
+                          <MenuTextField
+                            label="Nombre del item"
+                            value={item.nameKey || ''}
+                            onChange={(value) => handleFieldChange(item.id, 'nameKey', value)}
+                            required
+                            error={errors[item.id]?.nameKey}
+                            helperText="Mínimo 3 caracteres"
+                          />
+                          <MenuPriceField
+                            label="Precio"
+                            value={item.price || ''}
+                            onChange={(value) => handleFieldChange(item.id, 'price', value)}
+                            min={0}
+                            required
+                            error={errors[item.id]?.price}
+                          />
+                        </div>
+                        <MenuTextField
+                          label="Descripción"
+                          value={item.descriptionKey || ''}
+                          onChange={(value) => handleFieldChange(item.id, 'descriptionKey', value)}
+                          multiline
+                        />
+                        <MenuCheckbox
+                          label="Disponible"
+                          checked={item.available !== false}
+                          onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
+                        />
+                        <div className={cardStyles.editActions}>
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className={cardStyles.cancelEditButton}
+                          >
+                            <X size={18} />
+                            <span>Cancelar</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleSaveEdit}
+                            className={cardStyles.saveEditButton}
+                          >
+                            <Check size={18} />
+                            <span>Guardar</span>
+                          </button>
                         </div>
                       </div>
-                    }
-                    state={item._state === 'normal' ? null : item._state}
-                    isDeleted={isDeleted}
-                    onClick={null}
-                    onEdit={() => handleEdit(item.id)}
-                    onDelete={() => onDeleteItem(item.id)}
-                    onUndo={() => onUndoDeleteItem(item.id)}
-                    showArrow={false}
-                    isEditing={isEditing}
-                  />
-                )}
+                    ) : null
+                  }
+                  state={item._state === 'normal' ? null : item._state}
+                  isDeleted={isDeleted}
+                  onClick={null}
+                  onEdit={() => handleEdit(item.id)}
+                  onDelete={() => onDeleteItem(item.id)}
+                  onUndo={() => onUndoDeleteItem(item.id)}
+                  showArrow={false}
+                  isEditing={isEditing}
+                />
               </div>
             );
           })

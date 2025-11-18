@@ -5,6 +5,7 @@ import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
 import MenuBadge from '../common/MenuBadge';
 import styles from './SubcategoryView.module.css';
+import cardStyles from '../common/MenuCard.module.css';
 
 const SubcategoryView = ({
   subcategories,
@@ -89,61 +90,56 @@ const SubcategoryView = ({
           const isDeleted = subcategory._state === 'deleted';
 
           return (
-            <div
+            <MenuCard
               key={subcategory.id}
-              className={`${styles.card} ${subcategory._state ? styles[subcategory._state] : ''}`}
-            >
-              {isEditingSubcategory ? (
-                // Modo edición
-                <div className={styles.editForm}>
-                  <MenuTextField
-                    label="Nombre de la subcategoría"
-                    value={subcategory.nameKey || ''}
-                    onChange={(value) => handleFieldChange(subcategory.id, 'nameKey', value)}
-                    required
-                    error={subcategoryErrors[subcategory.id]?.nameKey}
-                    helperText="Mínimo 3 caracteres"
-                  />
-                  <div className={styles.editActions}>
-                    <button
-                      type="button"
-                      onClick={handleCancelEdit}
-                      className={styles.cancelEditButton}
-                    >
-                      <X size={18} />
-                      <span>Cancelar</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveEdit}
-                      className={styles.saveEditButton}
-                    >
-                      <Check size={18} />
-                      <span>Guardar</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // Modo vista
-                <MenuCard
-                  title={subcategory.nameKey || 'Sin nombre'}
-                  content={
-                    <MenuBadge
-                      count={itemCounts[subcategory.id] || 0}
-                      label="items"
-                    />
-                  }
-                  state={subcategory._state === 'normal' ? null : subcategory._state}
-                  isDeleted={isDeleted}
-                  onClick={() => onSubcategoryClick(subcategory)}
-                  onEdit={() => handleEdit(subcategory.id)}
-                  onDelete={() => onDeleteSubcategory(subcategory.id)}
-                  onUndo={() => onUndoDeleteSubcategory(subcategory.id)}
-                  showArrow={true}
-                  isEditing={isEditing}
+              title={subcategory.nameKey || 'Sin nombre'}
+              content={
+                <MenuBadge
+                  count={itemCounts[subcategory.id] || 0}
+                  label="items"
                 />
-              )}
-            </div>
+              }
+              editForm={
+                isEditingSubcategory ? (
+                  <div className={cardStyles.editForm}>
+                    <MenuTextField
+                      label="Nombre de la subcategoría"
+                      value={subcategory.nameKey || ''}
+                      onChange={(value) => handleFieldChange(subcategory.id, 'nameKey', value)}
+                      required
+                      error={subcategoryErrors[subcategory.id]?.nameKey}
+                      helperText="Mínimo 3 caracteres"
+                    />
+                    <div className={cardStyles.editActions}>
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        className={cardStyles.cancelEditButton}
+                      >
+                        <X size={18} />
+                        <span>Cancelar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        className={cardStyles.saveEditButton}
+                      >
+                        <Check size={18} />
+                        <span>Guardar</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : null
+              }
+              state={subcategory._state === 'normal' ? null : subcategory._state}
+              isDeleted={isDeleted}
+              onClick={() => onSubcategoryClick(subcategory)}
+              onEdit={() => handleEdit(subcategory.id)}
+              onDelete={() => onDeleteSubcategory(subcategory.id)}
+              onUndo={() => onUndoDeleteSubcategory(subcategory.id)}
+              showArrow={true}
+              isEditing={isEditing}
+            />
           );
         })}
       </div>

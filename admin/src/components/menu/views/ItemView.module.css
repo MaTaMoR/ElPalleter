@@ -140,10 +140,7 @@
   margin-bottom: 1.5rem;
 }
 
-.itemCard {
-  min-height: 90px;
-}
-
+/* Item-specific content styles */
 .itemContentArea {
   display: flex;
   flex-direction: column;
@@ -190,85 +187,17 @@
   background-color: rgba(239, 68, 68, 0.15);
 }
 
-
-.editForm {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
+/* Item-specific edit mode styles */
 .fieldsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.875rem;
 }
 
-.editActions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.cancelEditButton,
-.saveEditButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.cancelEditButton {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.cancelEditButton:hover {
-  background-color: var(--bg-secondary);
-}
-
-.saveEditButton {
-  background-color: var(--primary);
-  color: white;
-}
-
-.saveEditButton:hover {
-  background-color: var(--primary-dark);
-}
-
 .emptyState {
   text-align: center;
   padding: 3rem 1rem;
   color: var(--text-secondary);
-}
-
-.addButton {
-  width: 100%;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: var(--transition);
-}
-
-.addButton:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-1px);
 }
 
 /* Responsive */
@@ -310,10 +239,5 @@
 
   .itemPrice {
     font-size: 0.8125rem;
-  }
-
-  .addButton {
-    padding: 0.875rem 1rem;
-    font-size: 0.9375rem;
   }
 }
