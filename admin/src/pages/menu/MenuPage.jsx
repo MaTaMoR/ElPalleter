@@ -179,19 +179,6 @@ const MenuHeader = () => {
             </>
           ) : (
             <>
-              {/* Cancel Button - En modo edición */}
-              <button
-                type="button"
-                className={styles.cancelButton}
-                onClick={handleCancel}
-                disabled={!menuState.hasRealChanges() || isSaving}
-              >
-                <X size={18} strokeWidth={2.5} />
-                <span>Cancelar</span>
-              </button>
-
-              <div className={styles.controlDivider}></div>
-
               {/* Save Button - En modo edición */}
               <button
                 type="button"
@@ -201,6 +188,19 @@ const MenuHeader = () => {
               >
                 <Save size={18} />
                 <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
+              </button>
+
+              <div className={styles.controlDivider}></div>
+
+              {/* Cancel Button - En modo edición */}
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                <X size={18} strokeWidth={2.5} />
+                <span>Cancelar</span>
               </button>
             </>
           )}

@@ -107,7 +107,9 @@
   /* Ocultar divisores y controles cuando el search está activo */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .editButton {
+  .searchWrapper:focus-within ~ .editButton,
+  .searchWrapper:focus-within ~ .cancelButton,
+  .searchWrapper:focus-within ~ .saveButton {
     opacity: 0;
     pointer-events: none;
     width: 0;
@@ -175,7 +177,9 @@
   /* Ocultar divisores y controles cuando el search está activo en mobile */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .editButton {
+  .searchWrapper:focus-within ~ .editButton,
+  .searchWrapper:focus-within ~ .cancelButton,
+  .searchWrapper:focus-within ~ .saveButton {
     opacity: 0;
     pointer-events: none;
     width: 0;
