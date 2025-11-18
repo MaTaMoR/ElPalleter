@@ -383,7 +383,7 @@
   }
 
   .itemActions {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .itemName {
