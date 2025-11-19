@@ -20,7 +20,7 @@
 .cardHeader {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
   background: var(--bg-secondary);
@@ -29,6 +29,18 @@
 
 .cardHeaderReadOnly {
   justify-content: flex-start;
+}
+
+.cardHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .cardIcon {
@@ -103,30 +115,42 @@
   display: none;
 }
 
-.uploadButton {
+/* Upload button in header */
+.uploadButtonHeader {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
   background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  width: fit-content;
+  white-space: nowrap;
 }
 
-.uploadButton:hover {
+.uploadButtonHeader:hover {
   background-color: var(--primary-dark);
   box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
 }
 
-.uploadButton:active {
+.uploadButtonHeader:active {
   transform: translateY(1px);
+}
+
+.uploadButtonText {
+  display: inline;
+}
+
+/* File Info Section */
+.fileInfoSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
 }
 
 /* File Info */
@@ -192,6 +216,15 @@
   .imagePreview {
     max-width: 100%;
   }
+
+  /* Show only icon on tablet */
+  .uploadButtonText {
+    display: none;
+  }
+
+  .uploadButtonHeader {
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -200,9 +233,12 @@
     gap: 1rem;
   }
 
-  .uploadButton {
-    font-size: 0.875rem;
-    padding: 0.625rem 1rem;
+  .uploadButtonHeader {
+    padding: 0.5rem;
+  }
+
+  .uploadButtonText {
+    display: none;
   }
 
   .imagePreview {

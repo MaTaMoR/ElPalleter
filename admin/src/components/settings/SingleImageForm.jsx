@@ -118,10 +118,46 @@ const SingleImageForm = ({
     <div className={styles.section}>
       <div className={styles.imageCard}>
         <div className={styles.cardHeader}>
-          <ImageIcon size={20} className={styles.cardIcon} />
-          <h3 className={styles.cardTitle}>{title}</h3>
+          <div className={styles.cardHeaderLeft}>
+            <ImageIcon size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>{title}</h3>
+          </div>
+          <div className={styles.cardHeaderRight}>
+            {/* Hidden file input */}
+            <input
+              type="file"
+              id={`image-upload-${imageName}`}
+              accept="image/*"
+              onChange={handleFileSelect}
+              className={styles.fileInput}
+            />
+            {/* Upload button in header */}
+            <label
+              htmlFor={`image-upload-${imageName}`}
+              className={styles.uploadButtonHeader}
+            >
+              <Upload size={18} />
+              <span className={styles.uploadButtonText}>Subir imagen</span>
+            </label>
+          </div>
         </div>
         <div className={styles.cardContent}>
+          {/* File Info - show if file selected */}
+          {selectedFile && (
+            <div className={styles.fileInfoSection}>
+              <div className={styles.fileInfo}>
+                <span className={styles.fileName}>{selectedFile.name}</span>
+                <button
+                  type="button"
+                  onClick={handleClearSelection}
+                  className={styles.clearButton}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Current Image Preview */}
           <div className={styles.currentImageSection}>
             <label className={styles.sectionLabel}>Imagen actual:</label>
@@ -131,39 +167,6 @@ const SingleImageForm = ({
                 alt={`${title} actual`}
                 className={styles.previewImage}
               />
-            </div>
-          </div>
-
-          {/* File Upload Section */}
-          <div className={styles.uploadSection}>
-            <label className={styles.sectionLabel}>Nueva imagen:</label>
-            <div className={styles.uploadArea}>
-              <input
-                type="file"
-                id={`image-upload-${imageName}`}
-                accept="image/*"
-                onChange={handleFileSelect}
-                className={styles.fileInput}
-              />
-              <label
-                htmlFor={`image-upload-${imageName}`}
-                className={styles.uploadButton}
-              >
-                <Upload size={20} />
-                <span>Seleccionar imagen</span>
-              </label>
-              {selectedFile && (
-                <div className={styles.fileInfo}>
-                  <span className={styles.fileName}>{selectedFile.name}</span>
-                  <button
-                    type="button"
-                    onClick={handleClearSelection}
-                    className={styles.clearButton}
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
