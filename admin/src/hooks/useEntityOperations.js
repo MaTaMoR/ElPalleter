@@ -410,6 +410,10 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         });
         return newMap;
       });
+
+      // Track changes for both moved entities
+      if (current._state !== 'new') trackChange(currentHId);
+      if (target._state !== 'new') trackChange(targetHId);
     } else {
       const currentHId = itemsList[index];
       const targetHId = itemsList[targetIndex];
@@ -432,6 +436,10 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         });
         return newMap;
       });
+
+      // Track changes for both moved entities
+      if (current._state !== 'new') trackChange(currentHId);
+      if (target._state !== 'new') trackChange(targetHId);
 
       // Update children order
       if (entityType === 'subcategory' || entityType === 'item') {
