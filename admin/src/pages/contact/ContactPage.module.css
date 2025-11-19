@@ -145,6 +145,7 @@
     align-items: center;
     gap: 0;
     width: 100%;
+    justify-content: flex-end;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -215,13 +216,6 @@
   padding: 1.25rem;
 }
 
-/* Section Divider */
-.sectionDivider {
-  height: 1px;
-  background: var(--border-color);
-  margin: 2rem 0;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .contactContainer {
@@ -235,10 +229,6 @@
   .formsContainer {
     gap: 0;
     padding: 1rem;
-  }
-
-  .sectionDivider {
-    margin: 1.5rem 0;
   }
 }
 
@@ -278,9 +268,5 @@
 
   .formsContainer {
     padding: 0.75rem;
-  }
-
-  .sectionDivider {
-    margin: 1rem 0;
   }
 }

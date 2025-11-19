@@ -287,30 +287,22 @@ const ContactContent = () => {
               <div className={styles.formsContainer}>
                 {/* Contact Info Section */}
                 {contactData.contactInfo && (
-                  <>
-                    <ContactInfoForm
-                      contactInfo={contactData.contactInfo}
-                      onChange={handleContactInfoChange}
-                      errors={validationErrors.contactInfo || {}}
-                      isEditing={isEditing}
-                    />
-
-                    <div className={styles.sectionDivider}></div>
-                  </>
+                  <ContactInfoForm
+                    contactInfo={contactData.contactInfo}
+                    onChange={handleContactInfoChange}
+                    errors={validationErrors.contactInfo || {}}
+                    isEditing={isEditing}
+                  />
                 )}
 
                 {/* Schedules Section */}
                 {contactData.schedules && (
-                  <>
-                    <ScheduleForm
-                      schedules={contactData.schedules}
-                      onChange={handleSchedulesChange}
-                      errors={validationErrors.schedules || {}}
-                      isEditing={isEditing}
-                    />
-
-                    <div className={styles.sectionDivider}></div>
-                  </>
+                  <ScheduleForm
+                    schedules={contactData.schedules}
+                    onChange={handleSchedulesChange}
+                    errors={validationErrors.schedules || {}}
+                    isEditing={isEditing}
+                  />
                 )}
 
                 {/* Social Medias Section */}

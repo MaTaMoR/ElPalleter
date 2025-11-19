@@ -13,8 +13,6 @@
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: 0.5rem;
 }
 
 /* Read-only grid */
