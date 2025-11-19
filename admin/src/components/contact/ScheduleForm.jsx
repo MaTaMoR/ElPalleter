@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Clock } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import Button from '../common/Button';
 import ConfirmDialog from '../menu/utils/ConfirmDialog';
@@ -185,7 +185,15 @@ const ScheduleForm = ({
     return (
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Horarios</h2>
-        <WeeklyCalendar schedules={sortedSchedules} />
+        <div className={styles.scheduleCard}>
+          <div className={styles.cardHeader}>
+            <Clock size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>Horario semanal</h3>
+          </div>
+          <div className={styles.cardContent}>
+            <WeeklyCalendar schedules={sortedSchedules} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -512,8 +520,14 @@ const ScheduleForm = ({
   return (
     <div className={styles.section}>
       <h2 className={styles.sectionTitle}>Horarios</h2>
-      <div className={styles.patternsContainer}>
-        {patterns.map((pattern, patternIndex) => {
+      <div className={styles.scheduleCard}>
+        <div className={styles.cardHeader}>
+          <Clock size={20} className={styles.cardIcon} />
+          <h3 className={styles.cardTitle}>Patrones de horario</h3>
+        </div>
+        <div className={styles.cardContent}>
+          <div className={styles.patternsContainer}>
+            {patterns.map((pattern, patternIndex) => {
           const firstDayWithPattern = pattern.days[0];
           const dayErrors = errors[firstDayWithPattern] || {};
           const rangeErrors = dayErrors.ranges || {};
@@ -584,15 +598,17 @@ const ScheduleForm = ({
           );
         })}
 
-        {/* Add new pattern button */}
-        <Button
-          variant="secondary"
-          icon={Plus}
-          onClick={handleAddNewPattern}
-          className={styles.addPatternButton}
-        >
-          Añadir patrón de horario
-        </Button>
+            {/* Add new pattern button */}
+            <Button
+              variant="secondary"
+              icon={Plus}
+              onClick={handleAddNewPattern}
+              className={styles.addPatternButton}
+            >
+              Añadir patrón de horario
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Confirmation dialog for pattern reassignment */}
