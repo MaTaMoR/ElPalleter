@@ -15,11 +15,46 @@
   margin-bottom: 1.5rem;
 }
 
+/* Social Media Card - similar to ContactInfoForm and ScheduleForm */
+.socialMediaCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardContent {
+  padding: 1.25rem;
+}
+
 .emptyMessage {
   color: var(--text-secondary);
   font-style: italic;
   text-align: center;
   padding: 2rem;
+  margin: 0;
 }
 
 /* Read-only styles */
@@ -32,9 +67,9 @@
 .socialCard {
   display: flex;
   padding: 1rem;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 6px;
   gap: 1rem;
   transition: var(--transition);
 }
@@ -89,9 +124,9 @@
 
 .socialItem {
   padding: 1.5rem;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .socialHeader {
@@ -129,6 +164,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .cardHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .cardContent {
+    padding: 1rem;
+  }
+
   .socialGrid {
     grid-template-columns: 1fr;
   }
@@ -141,5 +184,20 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardHeader {
+    padding: 0.75rem 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .cardTitle {
+    font-size: 0.9375rem;
+  }
+
+  .cardContent {
+    padding: 0.875rem;
   }
 }
