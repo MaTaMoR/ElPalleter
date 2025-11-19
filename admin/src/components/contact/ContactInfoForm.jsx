@@ -38,22 +38,27 @@ const ContactInfoForm = ({
             </div>
             <div className={styles.cardContent}>
               <div className={styles.infoItem}>
-                <strong>Calle:</strong> {contactInfo.street}
+                <strong>Calle</strong>
+                <span>{contactInfo.street}</span>
               </div>
               <div className={styles.infoRow}>
                 <div className={styles.infoItem}>
-                  <strong>Código Postal:</strong> {contactInfo.postalCode}
+                  <strong>Código Postal</strong>
+                  <span>{contactInfo.postalCode}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <strong>Ciudad:</strong> {contactInfo.city}
+                  <strong>Ciudad</strong>
+                  <span>{contactInfo.city}</span>
                 </div>
               </div>
               <div className={styles.infoRow}>
                 <div className={styles.infoItem}>
-                  <strong>Provincia:</strong> {contactInfo.province}
+                  <strong>Provincia</strong>
+                  <span>{contactInfo.province}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <strong>País:</strong> {contactInfo.country}
+                  <strong>País</strong>
+                  <span>{contactInfo.country}</span>
                 </div>
               </div>
             </div>
@@ -67,16 +72,25 @@ const ContactInfoForm = ({
             </div>
             <div className={styles.cardContent}>
               <div className={styles.infoItem}>
-                <Mail size={16} className={styles.inlineIcon} />
-                <strong>Teléfono:</strong> {contactInfo.phoneMain}
+                <strong>
+                  <Phone size={16} className={styles.inlineIcon} />
+                  Teléfono
+                </strong>
+                <span>{contactInfo.phoneMain}</span>
               </div>
               <div className={styles.infoItem}>
-                <Mail size={16} className={styles.inlineIcon} />
-                <strong>Email:</strong> {contactInfo.emailMain}
+                <strong>
+                  <Mail size={16} className={styles.inlineIcon} />
+                  Email
+                </strong>
+                <span>{contactInfo.emailMain}</span>
               </div>
               <div className={styles.infoItem}>
-                <Globe size={16} className={styles.inlineIcon} />
-                <strong>Sitio Web:</strong> {contactInfo.website || 'No especificado'}
+                <strong>
+                  <Globe size={16} className={styles.inlineIcon} />
+                  Sitio Web
+                </strong>
+                <span>{contactInfo.website || 'No especificado'}</span>
               </div>
             </div>
           </div>
