@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Edit3, Save, X } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
+import ToastContainer from '../../components/common/ToastContainer';
 import ContactInfoForm from '../../components/contact/ContactInfoForm';
 import ScheduleForm from '../../components/contact/ScheduleForm';
 import SocialMediaForm from '../../components/contact/SocialMediaForm';
@@ -27,6 +28,9 @@ const ContactContent = () => {
   // Current editing data
   const [contactData, setContactData] = useState(null);
 
+  // Toast state
+  const [toasts, setToasts] = useState([]);
+
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
@@ -38,6 +42,16 @@ const ContactContent = () => {
 
   // Validation
   const { validationErrors, hasErrors } = useContactValidation(contactData, isEditing);
+
+  // Toast handlers
+  const showToast = useCallback((message, type = 'success', duration = 3000) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type, duration }]);
+  }, []);
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
 
   // Load data from backend
   useEffect(() => {
@@ -106,16 +120,8 @@ const ContactContent = () => {
           setIsEditing(false);
           setIsSaving(false);
 
-          // Show success dialog
-          setConfirmDialog({
-            isOpen: true,
-            title: 'Cambios guardados',
-            message: 'Los cambios se han guardado correctamente.',
-            type: 'info',
-            onConfirm: () => {
-              setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-            }
-          });
+          // Show success toast
+          showToast('Los cambios se han guardado correctamente', 'success', 4000);
         } catch (err) {
           console.error('Error saving contact data:', err);
           setIsSaving(false);
@@ -334,6 +340,9 @@ const ContactContent = () => {
           confirmText={confirmDialog.type === 'danger' ? 'Confirmar' : 'Aceptar'}
         />
       )}
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </>
   );
 };
