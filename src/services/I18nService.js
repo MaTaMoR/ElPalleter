@@ -426,8 +426,8 @@ export class I18nService {
     try {
       const request = {
         languageCode,
-        key,
-        value
+        trnaslationKey: key,
+        translationValue: value
       };
 
       const updatedTranslation = await I18nRepository.updateTranslation(request);
