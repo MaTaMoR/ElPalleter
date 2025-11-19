@@ -244,16 +244,12 @@ export class CartaRepository extends BaseRepository {
      */
     static async updateMenu(menuData, language = 'es', token = null) {
         try {
-            // Obtener token de AuthService si no se proporciona
-            const authToken = token || AuthService.getToken();
-
-            // Usar getAuthHeaders de BaseRepository para obtener headers con token
-            const headers = authToken ? this.getAuthHeaders(authToken) : this.getBaseHeaders();
-
             // POST usa el endpoint directamente, agregamos params a la URL
             const endpoint = `/carta/update?language=${encodeURIComponent(language)}`;
 
-            const response = await this.post(endpoint, menuData, { headers });
+            const response = await this.post(endpoint, menuData, { 
+                 headers: this.getAuthHeaders(token)
+            });
 
             return response;
         } catch (error) {

@@ -160,14 +160,14 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     } else if (entityType === 'subcategory') {
       // For subcategories, parentId is the categoryId
       if (!parentId) {
-        console.error('❌ No parentId (categoryId) provided for subcategory update');
+        console.error('No parentId (categoryId) provided for subcategory update');
         return;
       }
       hierarchicalId = buildHierarchicalId(parentId, entityId);
     } else if (entityType === 'item') {
       // For items, we need both categoryId and parentId (subcategoryId)
       if (!categoryId || !parentId) {
-        console.error('❌ Missing categoryId or parentId (subcategoryId) for item update');
+        console.error('Missing categoryId or parentId (subcategoryId) for item update');
         return;
       }
       hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
@@ -347,14 +347,14 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     } else if (entityType === 'subcategory') {
       // For subcategories, parentId is the categoryId
       if (!parentId) {
-        console.error('❌ No parentId (categoryId) provided for subcategory undo delete');
+        console.error('No parentId (categoryId) provided for subcategory undo delete');
         return;
       }
       hierarchicalId = buildHierarchicalId(parentId, entityId);
     } else if (entityType === 'item') {
       // For items, we need both categoryId and parentId (subcategoryId)
       if (!categoryId || !parentId) {
-        console.error('❌ Missing categoryId or parentId (subcategoryId) for item undo delete');
+        console.error('Missing categoryId or parentId (subcategoryId) for item undo delete');
         return;
       }
       hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
@@ -560,14 +560,14 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       hierarchicalId = buildHierarchicalId(entityId);
     } else if (entityType === 'subcategory') {
       if (!parentId) {
-        console.error('❌ No parentId (categoryId) provided for subcategory cancel');
+        console.error('No parentId (categoryId) provided for subcategory cancel');
         return;
       }
       hierarchicalId = buildHierarchicalId(parentId, entityId);
       parentHId = buildHierarchicalId(parentId);
     } else if (entityType === 'item') {
       if (!categoryId || !parentId) {
-        console.error('❌ Missing categoryId or parentId (subcategoryId) for item cancel');
+        console.error('Missing categoryId or parentId (subcategoryId) for item cancel');
         return;
       }
       hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);

@@ -1,6 +1,7 @@
 // src/services/CartaService.js
 
 import { CartaRepository } from '../repositories/CartaRepository.js';
+import { AuthService } from '../services/AuthService.js';
 
 /**
  * Servicio de Carta actualizado para usar el backend Spring Boot
@@ -407,9 +408,9 @@ export class CartaService {
      * @param {string} token - Token de autenticación (opcional)
      * @returns {Promise<Object>} Respuesta del backend
      */
-    static async saveMenu(menuData, language = 'es', token = null) {
+    static async saveMenu(menuData, language = 'es') {
         try {
-            return await CartaRepository.updateMenu(menuData, language, token);
+            return await CartaRepository.updateMenu(menuData, language, AuthService.getToken());
         } catch (error) {
             console.error('CartaService: Error saving menu:', error);
             throw error;
