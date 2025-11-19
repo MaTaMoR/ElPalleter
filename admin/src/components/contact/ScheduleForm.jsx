@@ -1,35 +1,123 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2, Clock } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import MenuCheckbox from '../menu/fields/MenuCheckbox';
 import Button from '../common/Button';
 import styles from './ScheduleForm.module.css';
 
 /**
- * Badge component for displaying time ranges
+ * Weekly Calendar component for displaying schedules in a grid format
+ * Columns: Days of the week (Mon-Sun)
+ * Rows: Hours where the restaurant has any activity
  */
-const TimeBadges = ({ ranges }) => {
+const WeeklyCalendar = ({ schedules }) => {
+  const dayNames = {
+    monday: 'Lun',
+    tuesday: 'Mar',
+    wednesday: 'Mié',
+    thursday: 'Jue',
+    friday: 'Vie',
+    saturday: 'Sáb',
+    sunday: 'Dom'
+  };
+
+  const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+  // Get all unique hours from all schedules
+  const getAllHours = () => {
+    const hoursSet = new Set();
+
+    schedules.forEach(schedule => {
+      if (schedule.isOpen && schedule.scheduleRanges) {
+        schedule.scheduleRanges.forEach(range => {
+          const startHour = parseInt(range.startTime.split(':')[0]);
+          const endHour = parseInt(range.endTime.split(':')[0]);
+
+          // Add all hours in the range
+          for (let hour = startHour; hour <= endHour; hour++) {
+            hoursSet.add(hour);
+          }
+        });
+      }
+    });
+
+    return Array.from(hoursSet).sort((a, b) => a - b);
+  };
+
+  // Check if a specific hour is within any open range for a day
+  const isHourOpen = (dayOfWeek, hour) => {
+    const schedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
+
+    if (!schedule || !schedule.isOpen || !schedule.scheduleRanges) {
+      return false;
+    }
+
+    return schedule.scheduleRanges.some(range => {
+      const [startHour, startMinute] = range.startTime.split(':').map(Number);
+      const [endHour, endMinute] = range.endTime.split(':').map(Number);
+
+      // Convert times to minutes since midnight for accurate comparison
+      const rangeStartMinutes = startHour * 60 + startMinute;
+      const rangeEndMinutes = endHour * 60 + endMinute;
+      const hourStartMinutes = hour * 60;
+      const hourEndMinutes = (hour + 1) * 60;
+
+      // Check if the hour overlaps with the range
+      return rangeStartMinutes < hourEndMinutes && rangeEndMinutes > hourStartMinutes;
+    });
+  };
+
+  const hours = getAllHours();
+
+  if (hours.length === 0) {
+    return <span className={styles.closed}>Cerrado toda la semana</span>;
+  }
+
   return (
-    <div className={styles.badgesContainer}>
-      {ranges.map((range, index) => (
-        <div key={index} className={styles.timeBadge}>
-          <Clock size={14} className={styles.badgeIcon} />
-          <span className={styles.badgeTime}>
-            {range.startTime} - {range.endTime}
-          </span>
+    <div className={styles.calendarContainer}>
+      <div className={styles.calendar}>
+        {/* Header row with days */}
+        <div className={styles.calendarHeader}>
+          <div className={styles.timeLabel}></div>
+          {dayOrder.map(day => (
+            <div key={day} className={styles.dayLabel}>
+              {dayNames[day]}
+            </div>
+          ))}
         </div>
-      ))}
+
+        {/* Hour rows */}
+        {hours.map(hour => (
+          <div key={hour} className={styles.calendarRow}>
+            <div className={styles.timeLabel}>
+              {hour.toString().padStart(2, '0')}:00
+            </div>
+            {dayOrder.map(day => (
+              <div
+                key={`${day}-${hour}`}
+                className={`${styles.calendarCell} ${isHourOpen(day, hour) ? styles.cellOpen : styles.cellClosed}`}
+              >
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-TimeBadges.propTypes = {
-  ranges: PropTypes.arrayOf(
+WeeklyCalendar.propTypes = {
+  schedules: PropTypes.arrayOf(
     PropTypes.shape({
-      startTime: PropTypes.string.isRequired,
-      endTime: PropTypes.string.isRequired,
-      nameKey: PropTypes.string
+      dayOfWeek: PropTypes.string.isRequired,
+      isOpen: PropTypes.bool.isRequired,
+      scheduleRanges: PropTypes.arrayOf(
+        PropTypes.shape({
+          startTime: PropTypes.string.isRequired,
+          endTime: PropTypes.string.isRequired
+        })
+      )
     })
   ).isRequired
 };
@@ -115,66 +203,12 @@ const ScheduleForm = ({
     return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
   });
 
-  // Group consecutive days with the same schedule
-  const groupSchedules = () => {
-    const groups = [];
-    let currentGroup = null;
-
-    sortedSchedules.forEach((schedule, index) => {
-      const scheduleKey = schedule.isOpen
-        ? JSON.stringify(schedule.scheduleRanges?.map(r => ({ s: r.startTime, e: r.endTime })) || [])
-        : 'closed';
-
-      if (currentGroup && currentGroup.scheduleKey === scheduleKey) {
-        // Add to current group
-        currentGroup.days.push(schedule.dayOfWeek);
-        currentGroup.endDay = schedule.dayOfWeek;
-      } else {
-        // Start new group
-        currentGroup = {
-          scheduleKey,
-          days: [schedule.dayOfWeek],
-          startDay: schedule.dayOfWeek,
-          endDay: schedule.dayOfWeek,
-          schedule: schedule
-        };
-        groups.push(currentGroup);
-      }
-    });
-
-    return groups;
-  };
-
-  const getDayRangeLabel = (group) => {
-    if (group.days.length === 1) {
-      return dayNames[group.startDay];
-    }
-    return `${dayNames[group.startDay]} - ${dayNames[group.endDay]}`;
-  };
-
   if (!isEditing) {
-    // Read-only display with grouped days
-    const groupedSchedules = groupSchedules();
-
+    // Read-only display with weekly calendar grid
     return (
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Horarios</h2>
-        <div className={styles.scheduleList}>
-          {groupedSchedules.map((group, index) => (
-            <div key={index} className={styles.scheduleDay}>
-              <div className={styles.dayName}>
-                <strong>{getDayRangeLabel(group)}:</strong>
-              </div>
-              <div className={styles.daySchedule}>
-                {!group.schedule.isOpen || !group.schedule.scheduleRanges || group.schedule.scheduleRanges.length === 0 ? (
-                  <span className={styles.closed}>Cerrado</span>
-                ) : (
-                  <TimeBadges ranges={group.schedule.scheduleRanges} />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        <WeeklyCalendar schedules={sortedSchedules} />
       </div>
     );
   }
