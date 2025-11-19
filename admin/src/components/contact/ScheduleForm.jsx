@@ -204,6 +204,42 @@ const ScheduleForm = ({
   };
 
   const handlePatternDayToggle = (pattern, dayOfWeek, isChecked) => {
+    if (isChecked) {
+      // Check if this day already has a different pattern assigned
+      const currentSchedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
+      const isDayAlreadyAssigned = currentSchedule && currentSchedule.isOpen && currentSchedule.scheduleRanges.length > 0;
+
+      if (isDayAlreadyAssigned) {
+        // Check if it's a different pattern
+        const currentPatternKey = JSON.stringify(
+          [...currentSchedule.scheduleRanges]
+            .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
+            .sort((a, b) => {
+              if (a.s !== b.s) return a.s.localeCompare(b.s);
+              return a.e.localeCompare(b.e);
+            })
+        );
+
+        if (currentPatternKey !== pattern.patternKey) {
+          const currentRanges = currentSchedule.scheduleRanges
+            .map(r => `${r.startTime}-${r.endTime}`)
+            .join(', ');
+          const newRanges = pattern.ranges
+            .map(r => `${r.startTime}-${r.endTime}`)
+            .join(', ');
+
+          const confirmed = window.confirm(
+            `${dayNames[dayOfWeek]} ya tiene el horario: ${currentRanges}\n\n` +
+            `¿Deseas cambiarlo a: ${newRanges}?`
+          );
+
+          if (!confirmed) {
+            return; // User cancelled, don't make the change
+          }
+        }
+      }
+    }
+
     const updatedSchedules = schedules.map(schedule => {
       if (schedule.dayOfWeek === dayOfWeek) {
         if (isChecked) {
