@@ -2,7 +2,7 @@ import { useEffect, useContext } from 'react';
 import { UNSAFE_NavigationContext as NavigationContext, useLocation } from 'react-router-dom';
 
 /**
- * Hook to block navigation when there are unsaved changes
+ * Hook to block navigation when there are unsaved changes or validation errors
  *
  * Note: Uses UNSAFE_NavigationContext because the app uses BrowserRouter.
  * useBlocker requires a "data router" (createBrowserRouter), which would require
@@ -11,9 +11,10 @@ import { UNSAFE_NavigationContext as NavigationContext, useLocation } from 'reac
  * the internal API won't change in future versions.
  *
  * @param {boolean} shouldBlock - Whether to block navigation
- * @param {function} onBlock - Callback when navigation is blocked (proceed, cancel)
+ * @param {function} onBlock - Callback when navigation is blocked (proceed, cancel, currentPathname)
+ * @param {function} getCurrentRouteErrors - Function to check if current route has errors
  */
-export const useNavigationBlocker = (shouldBlock, onBlock) => {
+export const useNavigationBlocker = (shouldBlock, onBlock, getCurrentRouteErrors) => {
   const navigator = useContext(NavigationContext).navigator;
   const location = useLocation();
 
@@ -45,20 +46,30 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
       const currentBase = getCurrentBase(location.pathname);
       const nextBase = getCurrentBase(nextPathname);
 
-      // Only block if navigating to a DIFFERENT base section
-      // Allow all navigation within the same section (e.g., /admin/menu/*)
+      // Block if navigating to a DIFFERENT base section
       return currentBase !== nextBase;
+    };
+
+    // Helper to check if we should block navigation within the same section
+    const shouldBlockInternalNavigation = () => {
+      // If we have a validation checker function, check for errors
+      if (getCurrentRouteErrors) {
+        const currentErrors = getCurrentRouteErrors(location.pathname);
+        return currentErrors !== null; // Block if current route has errors
+      }
+      return false;
     };
 
     // Override push to intercept navigation
     navigator.push = (...args) => {
       const [to] = args;
 
-      // Only block if actually leaving the page
-      if (isLeavingPage(to)) {
+      // Block if leaving the page OR if current route has validation errors
+      if (isLeavingPage(to) || shouldBlockInternalNavigation()) {
         onBlock(
           () => push.apply(navigator, args), // proceed callback
-          () => {} // cancel callback (do nothing)
+          () => {}, // cancel callback (do nothing)
+          location.pathname // current pathname for validation
         );
       } else {
         // Allow internal navigation (same page, different query params)
@@ -70,11 +81,12 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
     navigator.replace = (...args) => {
       const [to] = args;
 
-      // Only block if actually leaving the page
-      if (isLeavingPage(to)) {
+      // Block if leaving the page OR if current route has validation errors
+      if (isLeavingPage(to) || shouldBlockInternalNavigation()) {
         onBlock(
           () => replace.apply(navigator, args), // proceed callback
-          () => {} // cancel callback (do nothing)
+          () => {}, // cancel callback (do nothing)
+          location.pathname // current pathname for validation
         );
       } else {
         // Allow internal navigation (same page, different query params)
@@ -87,5 +99,5 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
       navigator.push = push;
       navigator.replace = replace;
     };
-  }, [shouldBlock, navigator, location.pathname, onBlock]);
+  }, [shouldBlock, navigator, location.pathname, onBlock, getCurrentRouteErrors]);
 };
