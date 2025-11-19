@@ -6,7 +6,7 @@ import { useMenuValidation } from '../hooks/useMenuValidation';
 import { useEntityOperations } from '../hooks/useEntityOperations';
 import { useNavigationBlocker } from '../hooks/useNavigationBlocker';
 import { unflattenMenuData, processMenuDataForBackend } from '../utils/menuDataUtils';
-import { MenuService } from '../services/MenuService';
+import { CartaService } from '@services/CartaService';
 
 const MenuEditContext = createContext(null);
 
@@ -187,7 +187,7 @@ export const MenuEditProvider = ({
             acc + (cat.subcategories?.reduce((subAcc, sub) => subAcc + (sub.items?.length || 0), 0) || 0), 0)}`);
           console.log('='.repeat(80));
 
-          await MenuService.saveMenu(processedData, selectedLanguage);
+          await CartaService.saveMenu(processedData, selectedLanguage);
           await reload();
           setIsEditing(false);
           setIsSaving(false);
