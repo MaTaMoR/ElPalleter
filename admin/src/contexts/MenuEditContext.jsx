@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useMenuState } from '../hooks/useMenuState';
 import { useMenuNavigation } from '../hooks/useMenuNavigation';
 import { useMenuValidation } from '../hooks/useMenuValidation';
 import { useEntityOperations } from '../hooks/useEntityOperations';
+import { useNavigationBlocker } from '../hooks/useNavigationBlocker';
 import { unflattenMenuData, processMenuDataForBackend } from '../utils/menuDataUtils';
 import { MenuService } from '../services/MenuService';
 
@@ -63,6 +64,37 @@ export const MenuEditProvider = ({
   // Entity operations (unified CRUD)
   const getNavigation = () => navigation;
   const entityOps = useEntityOperations(menuState, getNavigation, setConfirmDialog);
+
+  // ============================================================================
+  // NAVIGATION BLOCKER
+  // ============================================================================
+
+  // Block navigation when there are unsaved changes
+  const handleNavigationBlock = useCallback((proceedCallback, cancelCallback) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cambios sin guardar',
+      message: '¿Estás seguro de que quieres salir? Se perderán todos los cambios no guardados.',
+      type: 'warning',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // Proceed with navigation
+        if (proceedCallback) {
+          proceedCallback();
+        }
+      },
+      onCancel: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // Cancel navigation
+        if (cancelCallback) {
+          cancelCallback();
+        }
+      }
+    });
+  }, []);
+
+  // Use navigation blocker only when there are real changes
+  useNavigationBlocker(menuState.hasRealChanges(), handleNavigationBlock);
 
   // ============================================================================
   // HANDLERS
