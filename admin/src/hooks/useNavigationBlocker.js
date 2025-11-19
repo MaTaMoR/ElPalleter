@@ -1,66 +1,53 @@
-import { useEffect, useContext, useCallback } from 'react';
-import { UNSAFE_NavigationContext as NavigationContext, useLocation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useBlocker } from 'react-router-dom';
 
 /**
  * Hook to block navigation when there are unsaved changes
+ * Uses React Router's official useBlocker API (v6.4+)
+ *
  * @param {boolean} shouldBlock - Whether to block navigation
  * @param {function} onBlock - Callback when navigation is blocked (proceed, cancel)
  */
 export const useNavigationBlocker = (shouldBlock, onBlock) => {
-  const navigator = useContext(NavigationContext).navigator;
-  const location = useLocation();
+  const proceedRef = useRef(null);
+  const resetRef = useRef(null);
 
-  useEffect(() => {
-    if (!shouldBlock) {
-      return;
+  // Use React Router's official blocker API
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => {
+      // Only block if shouldBlock is true and we're navigating to a different path
+      return shouldBlock && currentLocation.pathname !== nextLocation.pathname;
     }
+  );
 
-    // Store original methods
-    const push = navigator.push;
-    const replace = navigator.replace;
+  // When navigation is blocked, show confirmation dialog
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      // Store the proceed and reset functions
+      proceedRef.current = blocker.proceed;
+      resetRef.current = blocker.reset;
 
-    // Override push
-    navigator.push = (...args) => {
-      const [to] = args;
+      // Call the onBlock callback with proceed and cancel functions
+      onBlock(
+        () => {
+          // User confirmed - proceed with navigation
+          if (proceedRef.current) {
+            proceedRef.current();
+            proceedRef.current = null;
+            resetRef.current = null;
+          }
+        },
+        () => {
+          // User cancelled - stay on current page
+          if (resetRef.current) {
+            resetRef.current();
+            proceedRef.current = null;
+            resetRef.current = null;
+          }
+        }
+      );
+    }
+  }, [blocker.state, blocker.proceed, blocker.reset, onBlock]);
 
-      // Get the path from 'to' (can be string or object)
-      const nextPath = typeof to === 'string' ? to : to.pathname;
-
-      // Only block if navigating to a different path
-      if (nextPath !== location.pathname) {
-        // Call onBlock with proceed and cancel callbacks
-        onBlock(
-          () => push.apply(navigator, args), // proceed
-          () => {} // cancel (do nothing)
-        );
-      } else {
-        push.apply(navigator, args);
-      }
-    };
-
-    // Override replace
-    navigator.replace = (...args) => {
-      const [to] = args;
-
-      // Get the path from 'to' (can be string or object)
-      const nextPath = typeof to === 'string' ? to : to.pathname;
-
-      // Only block if navigating to a different path
-      if (nextPath !== location.pathname) {
-        // Call onBlock with proceed and cancel callbacks
-        onBlock(
-          () => replace.apply(navigator, args), // proceed
-          () => {} // cancel (do nothing)
-        );
-      } else {
-        replace.apply(navigator, args);
-      }
-    };
-
-    // Cleanup: restore original methods
-    return () => {
-      navigator.push = push;
-      navigator.replace = replace;
-    };
-  }, [shouldBlock, navigator, location.pathname, onBlock]);
+  return blocker;
 };
