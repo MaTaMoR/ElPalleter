@@ -1,6 +1,7 @@
 // src/repositories/ContactRepository.js
 import { BaseRepository } from './BaseRepository.js';
 import { I18nService } from '../services/I18nService.js';
+import { AuthService } from '../services/AuthService.js';
 
 /**
  * Repositorio para operaciones de información de contacto
@@ -348,7 +349,7 @@ export class ContactRepository extends BaseRepository {
     static async updateRestaurantInfo(restaurantData, language = 'es', token = null) {
         try {
             // Obtener token de AuthService si no se proporciona
-            const authToken = token || (await import('../services/AuthService.js')).AuthService.getToken();
+            const authToken = token || AuthService.getToken();
 
             // Usar getAuthHeaders de BaseRepository para obtener headers con token
             const headers = authToken ? this.getAuthHeaders(authToken) : this.getBaseHeaders();
