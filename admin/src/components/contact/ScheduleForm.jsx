@@ -178,16 +178,33 @@ const ScheduleForm = ({
 
       const patternKey = JSON.stringify(normalizedRanges);
 
+      console.log(`Day: ${schedule.dayOfWeek}, Pattern Key: ${patternKey}`);
+      console.log(`Schedule ranges:`, schedule.scheduleRanges);
+
       if (!daysByPattern[patternKey]) {
+        // Create sorted ranges for consistent display
+        const sortedRanges = [...schedule.scheduleRanges].sort((a, b) => {
+          const timeA = a.startTime.trim();
+          const timeB = b.startTime.trim();
+          if (timeA !== timeB) return timeA.localeCompare(timeB);
+          return a.endTime.trim().localeCompare(b.endTime.trim());
+        });
+
         daysByPattern[patternKey] = {
-          ranges: schedule.scheduleRanges,
+          ranges: sortedRanges,
           days: []
         };
         patterns.push(patternKey);
+        console.log(`Created new pattern for key: ${patternKey}`);
+      } else {
+        console.log(`Using existing pattern for key: ${patternKey}`);
       }
 
       daysByPattern[patternKey].days.push(schedule.dayOfWeek);
     });
+
+    console.log('Final patterns:', patterns.length);
+    console.log('Days by pattern:', daysByPattern);
 
     return patterns.map(key => ({
       patternKey: key,
