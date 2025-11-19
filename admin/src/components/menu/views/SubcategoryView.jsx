@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, ArrowLeft, Check, X, Trash2, Undo2 } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X, Trash2 } from 'lucide-react';
 import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
@@ -21,7 +21,6 @@ const SubcategoryView = ({
   onMoveSubcategory,
   onCancelEditSubcategory,
   onDeleteCategory,
-  onUndoDeleteCategory,
   onBack,
   itemCounts,
   isEditing,
@@ -137,19 +136,14 @@ const SubcategoryView = ({
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
         {isEditing && (
           <div className={styles.actionButtons}>
-            {category && category._state === 'deleted' && onUndoDeleteCategory ? (
-              <Button
-                variant="secondary"
-                icon={Undo2}
-                onClick={() => onUndoDeleteCategory(category.id)}
-              >
-                Deshacer
-              </Button>
-            ) : category && onDeleteCategory && (
+            {category && onDeleteCategory && (
               <Button
                 variant="danger"
                 icon={Trash2}
-                onClick={() => onDeleteCategory(category.id)}
+                onClick={() => {
+                  onDeleteCategory(category.id);
+                  onBack();
+                }}
               >
                 Borrar
               </Button>
@@ -277,7 +271,6 @@ SubcategoryView.propTypes = {
   onMoveSubcategory: PropTypes.func,
   onCancelEditSubcategory: PropTypes.func,
   onDeleteCategory: PropTypes.func,
-  onUndoDeleteCategory: PropTypes.func,
   onBack: PropTypes.func,
   itemCounts: PropTypes.object,
   isEditing: PropTypes.bool,
