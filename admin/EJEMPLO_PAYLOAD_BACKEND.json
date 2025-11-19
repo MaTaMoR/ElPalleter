@@ -1,0 +1,163 @@
+{
+  "descripcion": "Este es un ejemplo REAL de los datos que se envían al endpoint POST /carta/update?language=es",
+  "url": "http://92.186.195.152:8080/carta/update?language=es",
+  "metodo": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "body": [
+    {
+      "id": "cat-1",
+      "nameKey": "Entrantes",
+      "orderIndex": 0,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T15:30:00Z",
+      "subcategories": [
+        {
+          "id": "sub-1",
+          "nameKey": "Ensaladas",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-1",
+              "nameKey": "Ensalada César",
+              "descriptionKey": "Lechuga, pollo, parmesano, crutones y salsa césar",
+              "price": 8.5,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            },
+            {
+              "id": "item-2",
+              "nameKey": "Ensalada Mediterránea",
+              "descriptionKey": "Lechuga, tomate, pepino, cebolla, aceitunas y queso feta",
+              "price": 7.5,
+              "available": true,
+              "orderIndex": 1,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        },
+        {
+          "id": "sub-2",
+          "nameKey": "Tapas Frías",
+          "orderIndex": 1,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-3",
+              "nameKey": "Jamón Ibérico",
+              "descriptionKey": "Jamón ibérico de bellota con pan con tomate",
+              "price": 12,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat-2",
+      "nameKey": "Platos Principales",
+      "orderIndex": 1,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T15:30:00Z",
+      "subcategories": [
+        {
+          "id": "sub-3",
+          "nameKey": "Arroces",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-4",
+              "nameKey": "Paella Valenciana",
+              "descriptionKey": "Arroz con pollo, conejo y verduras de temporada",
+              "price": 15,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            },
+            {
+              "id": "item-5",
+              "nameKey": "Arroz del Senyoret",
+              "descriptionKey": "Arroz con marisco pelado",
+              "price": 18,
+              "available": false,
+              "orderIndex": 1,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": null,
+      "nameKey": "Postres",
+      "orderIndex": 2,
+      "createdAt": "2025-11-19T10:30:00Z",
+      "updatedAt": "2025-11-19T10:30:00Z",
+      "subcategories": [
+        {
+          "id": null,
+          "nameKey": "Postres Caseros",
+          "orderIndex": 0,
+          "createdAt": "2025-11-19T10:30:00Z",
+          "updatedAt": "2025-11-19T10:30:00Z",
+          "items": [
+            {
+              "id": null,
+              "nameKey": "Tarta de Queso",
+              "descriptionKey": "Tarta de queso casera con mermelada de frutos rojos",
+              "price": 5.5,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2025-11-19T10:30:00Z",
+              "updatedAt": "2025-11-19T10:30:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notas_importantes": [
+    "1. ELEMENTOS NUEVOS: Cuando 'id' es null, significa que es un elemento nuevo que NO existe en BD",
+    "2. ELEMENTOS ELIMINADOS: Los elementos con _state='deleted' se FILTRAN y NO se envían",
+    "3. ELEMENTOS EXISTENTES: Cuando 'id' tiene un valor (ej: 'cat-1'), es un elemento que ya existe en BD",
+    "4. PRECIOS: Siempre son números (float), nunca strings",
+    "5. AVAILABLE: Boolean que indica si el item está disponible",
+    "6. ORDER_INDEX: Define el orden de visualización (0, 1, 2...)",
+    "7. TIMESTAMPS: Formato ISO 8601 (YYYY-MM-DDTHH:mm:ssZ)",
+    "8. IDIOMA: Se envía como query parameter 'language' en la URL"
+  ],
+  "logica_backend_sugerida": {
+    "paso_1": "Recibir el array de categorías",
+    "paso_2": "Para cada categoría:",
+    "paso_2_1": "Si id es null -> INSERT nueva categoría",
+    "paso_2_2": "Si id existe -> UPDATE categoría existente",
+    "paso_2_3": "Comparar subcategorías enviadas vs BD -> DELETE las que faltan",
+    "paso_3": "Para cada subcategoría:",
+    "paso_3_1": "Si id es null -> INSERT nueva subcategoría",
+    "paso_3_2": "Si id existe -> UPDATE subcategoría existente",
+    "paso_3_3": "Comparar items enviados vs BD -> DELETE los que faltan",
+    "paso_4": "Para cada item:",
+    "paso_4_1": "Si id es null -> INSERT nuevo item",
+    "paso_4_2": "Si id existe -> UPDATE item existente",
+    "paso_5": "Devolver la estructura completa actualizada desde BD"
+  },
+  "respuesta_esperada": {
+    "descripcion": "El backend debe devolver la misma estructura pero con todos los IDs reales (sin nulls)",
+    "ejemplo": "La categoría con id=null debería tener ahora id='cat-3' asignado por la BD"
+  }
+}

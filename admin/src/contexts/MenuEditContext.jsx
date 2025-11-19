@@ -137,6 +137,25 @@ export const MenuEditProvider = ({
             menuState.childrenMap
           );
           const processedData = processMenuDataForBackend(nestedData);
+
+          // DEBUG: Mostrar datos que se enviarán al backend
+          console.log('='.repeat(80));
+          console.log('📤 DATOS QUE SE ENVÍAN AL BACKEND:');
+          console.log('='.repeat(80));
+          console.log('Idioma:', selectedLanguage);
+          console.log('URL:', `${import.meta.env.VITE_API_URL || 'http://92.186.195.152:8080'}/carta/update?language=${selectedLanguage}`);
+          console.log('Método:', 'POST');
+          console.log('Headers:', { 'Content-Type': 'application/json' });
+          console.log('\nBody (estructura completa):');
+          console.log(JSON.stringify(processedData, null, 2));
+          console.log('='.repeat(80));
+          console.log('📊 ESTADÍSTICAS:');
+          console.log(`- Total categorías: ${processedData.length}`);
+          console.log(`- Total subcategorías: ${processedData.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}`);
+          console.log(`- Total items: ${processedData.reduce((acc, cat) =>
+            acc + (cat.subcategories?.reduce((subAcc, sub) => subAcc + (sub.items?.length || 0), 0) || 0), 0)}`);
+          console.log('='.repeat(80));
+
           await MenuService.saveMenu(processedData, selectedLanguage);
           await reload();
           setIsEditing(false);
