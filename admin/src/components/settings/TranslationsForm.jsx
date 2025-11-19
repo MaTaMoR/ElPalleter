@@ -215,6 +215,7 @@ const TranslationsForm = ({
                       error={errors[key]}
                       placeholder="Ingresa la traducción..."
                       multiline
+                      autoResize
                     />
                   </div>
                 </div>

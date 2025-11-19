@@ -10,6 +10,9 @@
   font-family: inherit;
   transition: var(--transition);
   outline: none;
+}
+
+.input {
   min-height: 2.8125rem;
 }
 
@@ -38,6 +41,8 @@
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  min-height: 2.8125rem;
+  overflow: hidden;
 }
 
 /* Responsive */

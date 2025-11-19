@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import MenuField from './MenuField';
 import styles from './MenuTextField.module.css';
@@ -15,8 +15,22 @@ const MenuTextField = ({
   placeholder = '',
   helperText,
   minLength = 3,
-  maxLength = null
+  maxLength = null,
+  autoResize = false
 }) => {
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    if (autoResize && multiline && textareaRef.current) {
+      const textarea = textareaRef.current;
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set height to scrollHeight to fit content
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [value, autoResize, multiline]);
+
   const handleChange = (e) => {
     if (onChange) {
       onChange(e.target.value);
@@ -52,6 +66,7 @@ const MenuTextField = ({
       {multiline ? (
         <textarea
           {...inputProps}
+          ref={textareaRef}
           rows={1}
           className={`${styles.textarea} ${readOnly ? styles.readOnly : ''}`}
         />
@@ -77,7 +92,8 @@ MenuTextField.propTypes = {
   placeholder: PropTypes.string,
   helperText: PropTypes.string,
   minLength: PropTypes.number,
-  maxLength: PropTypes.number
+  maxLength: PropTypes.number,
+  autoResize: PropTypes.bool
 };
 
 export default MenuTextField;
