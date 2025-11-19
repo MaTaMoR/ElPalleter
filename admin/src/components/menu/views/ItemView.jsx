@@ -22,9 +22,11 @@ const ItemView = ({
   isEditing,
   errors = {},
   subcategoryError,
-  autoEditItemId
+  autoEditItemId,
+  onValidationError
 }) => {
   const [editingItemId, setEditingItemId] = useState(null);
+  const [shakingItemId, setShakingItemId] = useState(null);
   const itemRefs = useRef({});
 
   const handleEdit = (itemId) => {
@@ -35,7 +37,32 @@ const ItemView = ({
     setEditingItemId(null);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (itemId) => {
+    // Verificar si el item tiene errores de validación
+    const itemErrors = errors[itemId];
+    const hasErrors = itemErrors && Object.values(itemErrors).some(error => error);
+
+    if (hasErrors) {
+      // Disparar animación de vibración
+      setShakingItemId(itemId);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingItemId(null);
+      }, 500);
+
+      // Llamar al callback de error si existe (para mostrar toast/mensaje)
+      if (onValidationError) {
+        const errorMessages = Object.entries(itemErrors)
+          .filter(([, error]) => error)
+          .map(([field, error]) => error);
+        onValidationError(errorMessages);
+      }
+
+      return; // No cerrar el formulario si hay errores
+    }
+
+    // Si no hay errores, cerrar el formulario
     setEditingItemId(null);
   };
 
@@ -104,10 +131,13 @@ const ItemView = ({
             const isEditingItem = isEditing && editingItemId === item.id;
             const isDeleted = item._state === 'deleted';
 
+            const isShaking = shakingItemId === item.id;
+
             return (
               <div
                 key={item.id}
                 ref={(el) => { itemRefs.current[item.id] = el; }}
+                className={isShaking ? styles.itemShake : ''}
               >
                 <MenuCard
                   title={item.nameKey || 'Sin nombre'}
@@ -169,7 +199,7 @@ const ItemView = ({
                           </button>
                           <button
                             type="button"
-                            onClick={handleSaveEdit}
+                            onClick={() => handleSaveEdit(item.id)}
                             className={cardStyles.saveEditButton}
                           >
                             <Check size={18} />
@@ -220,7 +250,8 @@ ItemView.propTypes = {
   isEditing: PropTypes.bool,
   errors: PropTypes.object,
   subcategoryError: PropTypes.string,
-  autoEditItemId: PropTypes.string
+  autoEditItemId: PropTypes.string,
+  onValidationError: PropTypes.func
 };
 
 export default ItemView;

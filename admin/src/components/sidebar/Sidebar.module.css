@@ -134,7 +134,7 @@
   /* Tablet y móvil: sidebar completamente oculto por defecto */
   .sidebar {
     left: 1rem;
-    top: 86px;
+    top: 102px;
     bottom: 1rem;
     border-radius: 20px;
     width: 280px;

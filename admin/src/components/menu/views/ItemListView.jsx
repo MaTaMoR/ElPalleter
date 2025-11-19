@@ -11,7 +11,7 @@ const ItemListView = () => {
   const { categoryId, subcategoryId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, menuState, entityOps, validationErrors } = useMenuEdit();
+  const { isEditing, menuState, entityOps, validationErrors, showToast } = useMenuEdit();
   const [autoEditItemId, setAutoEditItemId] = useState(null);
 
   // Get current subcategory and category data
@@ -82,6 +82,16 @@ const ItemListView = () => {
     return validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.items || {};
   };
 
+  // Handle validation error - show toast with error messages
+  const handleValidationError = (errorMessages) => {
+    // Mostrar un toast por cada error (máximo 2 para no saturar la pantalla)
+    errorMessages.slice(0, 2).forEach((error, index) => {
+      setTimeout(() => {
+        showToast(error, 'error', 4000);
+      }, index * 150); // Pequeño delay entre toasts para que se vean bien
+    });
+  };
+
   return (
     <ItemView
       items={currentSubcategory.items || []}
@@ -97,6 +107,7 @@ const ItemListView = () => {
       errors={getItemErrors()}
       subcategoryError={validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.nameKey}
       autoEditItemId={autoEditItemId}
+      onValidationError={handleValidationError}
     />
   );
 };

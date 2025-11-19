@@ -5,7 +5,7 @@ import { useMenuNavigation } from '../hooks/useMenuNavigation';
 import { useMenuValidation } from '../hooks/useMenuValidation';
 import { useEntityOperations } from '../hooks/useEntityOperations';
 import { useNavigationBlocker } from '../hooks/useNavigationBlocker';
-import { unflattenMenuData, processMenuDataForBackend } from '../utils/menuDataUtils';
+import { unflattenMenuData, processMenuDataForBackend, buildHierarchicalId } from '../utils/menuDataUtils';
 import { CartaService } from '@services/CartaService';
 import ToastContainer from '../components/common/ToastContainer';
 
@@ -72,32 +72,223 @@ export const MenuEditProvider = ({
   // NAVIGATION BLOCKER
   // ============================================================================
 
-  // Block navigation when there are unsaved changes
-  const handleNavigationBlock = useCallback((proceedCallback, cancelCallback) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Cambios sin guardar',
-      message: '¿Estás seguro de que quieres salir? Se perderán todos los cambios no guardados.',
-      type: 'warning',
-      onConfirm: () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        // Proceed with navigation
-        if (proceedCallback) {
-          proceedCallback();
+  // Helper to get errors for current route
+  const getCurrentRouteErrors = useCallback((pathname) => {
+    // Parse the current route to extract IDs
+    // Routes can be:
+    // /admin/menu/categories -> no specific entity
+    // /admin/menu/categories/:categoryId -> category
+    // /admin/menu/categories/:categoryId/:subcategoryId -> subcategory (and its items)
+
+    const match = pathname.match(/\/admin\/menu\/categories(?:\/([^/]+))?(?:\/([^/]+))?/);
+    if (!match) return null;
+
+    const [, categoryId, subcategoryId] = match;
+
+    // If no categoryId, we're at the root - no validation needed
+    if (!categoryId) return null;
+
+    const categoryErrors = validationErrors[categoryId];
+    if (!categoryErrors) return null;
+
+    // If we're viewing a subcategory/items view
+    if (subcategoryId) {
+      const subcategoryErrors = categoryErrors.subcategories?.[subcategoryId];
+      if (subcategoryErrors) {
+        return {
+          type: 'subcategory',
+          categoryId,
+          subcategoryId,
+          errors: subcategoryErrors
+        };
+      }
+    }
+
+    // If we're viewing a category (subcategories list)
+    if (categoryErrors.nameKey || categoryErrors.subcategories) {
+      return {
+        type: 'category',
+        categoryId,
+        errors: categoryErrors
+      };
+    }
+
+    return null;
+  }, [validationErrors]);
+
+  // Helper to revert invalid changes in current route
+  const revertInvalidChanges = useCallback((routeInfo) => {
+    if (!routeInfo) return;
+
+    const { type, categoryId, subcategoryId } = routeInfo;
+
+    // Helper to revert an entity to its original state or delete if new
+    const revertEntity = (entityType, entityId, parentId = null, grandParentId = null) => {
+      let hierarchicalId;
+      let map, setter, originalMap;
+
+      if (entityType === 'category') {
+        hierarchicalId = buildHierarchicalId(entityId);
+        map = menuState.categoriesMap;
+        setter = menuState.setCategoriesMap;
+        originalMap = menuState.originalCategoriesMap;
+      } else if (entityType === 'subcategory') {
+        hierarchicalId = buildHierarchicalId(parentId, entityId);
+        map = menuState.subcategoriesMap;
+        setter = menuState.setSubcategoriesMap;
+        originalMap = menuState.originalSubcategoriesMap;
+      } else if (entityType === 'item') {
+        hierarchicalId = buildHierarchicalId(grandParentId, parentId, entityId);
+        map = menuState.itemsMap;
+        setter = menuState.setItemsMap;
+        originalMap = menuState.originalItemsMap;
+      }
+
+      const entity = map.get(hierarchicalId);
+      if (!entity) return;
+
+      // If it's new, delete it completely
+      if (entity._state === 'new') {
+        setter(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(hierarchicalId);
+          return newMap;
+        });
+
+        // Update childrenMap
+        if (entityType !== 'category') {
+          const parentHId = entityType === 'subcategory'
+            ? buildHierarchicalId(parentId)
+            : buildHierarchicalId(grandParentId, parentId);
+
+          menuState.setChildrenMap(prev => {
+            const newMap = new Map(prev);
+            const children = newMap.get(parentHId) || [];
+            newMap.set(parentHId, children.filter(id => id !== hierarchicalId));
+            return newMap;
+          });
         }
-      },
-      onCancel: () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        // Cancel navigation
-        if (cancelCallback) {
-          cancelCallback();
+
+        menuState.untrackChange(hierarchicalId);
+      }
+      // If it's edited, revert to original values
+      else if (entity._state === 'edited') {
+        const original = originalMap.get(hierarchicalId);
+        if (original) {
+          setter(prev => {
+            const newMap = new Map(prev);
+            newMap.set(hierarchicalId, {
+              ...original,
+              _state: 'normal'
+            });
+            return newMap;
+          });
+          menuState.untrackChange(hierarchicalId);
         }
       }
-    });
-  }, []);
+    };
 
-  // Use navigation blocker only when there are real changes
-  useNavigationBlocker(menuState.hasRealChanges(), handleNavigationBlock);
+    // Revert based on route type
+    if (type === 'subcategory') {
+      const subcategoryErrors = routeInfo.errors;
+
+      // Revert subcategory name if has error
+      if (subcategoryErrors.nameKey) {
+        revertEntity('subcategory', subcategoryId, categoryId);
+      }
+
+      // Revert all items with errors
+      if (subcategoryErrors.items) {
+        Object.keys(subcategoryErrors.items).forEach(itemId => {
+          revertEntity('item', itemId, subcategoryId, categoryId);
+        });
+      }
+    } else if (type === 'category') {
+      const categoryErrors = routeInfo.errors;
+
+      // Revert category name if has error
+      if (categoryErrors.nameKey) {
+        revertEntity('category', categoryId);
+      }
+
+      // Revert all subcategories with errors
+      if (categoryErrors.subcategories) {
+        Object.keys(categoryErrors.subcategories).forEach(subId => {
+          const subErrors = categoryErrors.subcategories[subId];
+
+          if (subErrors.nameKey) {
+            revertEntity('subcategory', subId, categoryId);
+          }
+
+          // Revert all items in this subcategory with errors
+          if (subErrors.items) {
+            Object.keys(subErrors.items).forEach(itemId => {
+              revertEntity('item', itemId, subId, categoryId);
+            });
+          }
+        });
+      }
+    }
+  }, [menuState, validationErrors]);
+
+  // Block navigation when there are validation errors OR unsaved changes
+  const handleNavigationBlock = useCallback((proceedCallback, cancelCallback, currentPathname) => {
+    // First check if current route has validation errors
+    const currentRouteErrors = getCurrentRouteErrors(currentPathname);
+
+    if (currentRouteErrors) {
+      // Current route has validation errors - show specific dialog
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Cambios inválidos',
+        message: 'La página actual tiene errores de validación. Si sales, se perderán estos cambios inválidos.\n\n¿Deseas descartar los cambios inválidos y continuar?',
+        type: 'danger',
+        onConfirm: () => {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          // Revert invalid changes
+          revertInvalidChanges(currentRouteErrors);
+          // Proceed with navigation after a tiny delay to let state update
+          setTimeout(() => {
+            if (proceedCallback) {
+              proceedCallback();
+            }
+          }, 50);
+        },
+        onCancel: () => {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          // Cancel navigation
+          if (cancelCallback) {
+            cancelCallback();
+          }
+        }
+      });
+    } else {
+      // No validation errors, just unsaved changes - show normal dialog
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Cambios sin guardar',
+        message: '¿Estás seguro de que quieres salir? Se perderán todos los cambios no guardados.',
+        type: 'warning',
+        onConfirm: () => {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          // Proceed with navigation
+          if (proceedCallback) {
+            proceedCallback();
+          }
+        },
+        onCancel: () => {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          // Cancel navigation
+          if (cancelCallback) {
+            cancelCallback();
+          }
+        }
+      });
+    }
+  }, [getCurrentRouteErrors, revertInvalidChanges]);
+
+  // Use navigation blocker when there are real changes or in editing mode
+  useNavigationBlocker(isEditing && menuState.hasRealChanges(), handleNavigationBlock, getCurrentRouteErrors);
 
   // ============================================================================
   // TOAST HELPERS
