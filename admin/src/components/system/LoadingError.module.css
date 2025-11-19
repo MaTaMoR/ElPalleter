@@ -1,0 +1,270 @@
+/* ============================================================================
+   LOADING ERROR - GLASSMORPHISM DESIGN
+   ============================================================================ */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background pattern */
+.container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 107, 107, 0.06) 0%, transparent 50%);
+  animation: drift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-5%, 5%) rotate(2deg); }
+  66% { transform: translate(5%, -5%) rotate(-2deg); }
+}
+
+/* ============================================================================
+   ERROR CARD
+   ============================================================================ */
+
+.card {
+  position: relative;
+  max-width: 600px;
+  width: 100%;
+  padding: 48px 40px;
+  text-align: center;
+
+  /* Glassmorphism effect */
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+
+  z-index: 1;
+}
+
+/* ============================================================================
+   ICON CONTAINER
+   ============================================================================ */
+
+.iconContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 24px;
+  background: rgba(255, 107, 107, 0.15);
+  border: 2px solid rgba(255, 107, 107, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px 10px rgba(255, 107, 107, 0);
+  }
+}
+
+.errorIcon {
+  width: 40px;
+  height: 40px;
+  color: #ff6b6b;
+}
+
+/* ============================================================================
+   TEXT CONTENT
+   ============================================================================ */
+
+.title {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.message {
+  margin: 0 0 32px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================================
+   ERROR DETAILS
+   ============================================================================ */
+
+.errorDetails {
+  margin: 24px 0 32px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.errorDetailsTitle {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.errorDetailsMessage {
+  display: block;
+  padding: 12px;
+  margin: 0;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ff6b6b;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.retryButton,
+.reloadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.retryButton {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.retryButton:hover {
+  background: rgba(255, 107, 107, 0.3);
+  border-color: rgba(255, 107, 107, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+
+.retryButton:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.2);
+}
+
+.reloadButton {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.reloadButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.reloadButton:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.retryIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .card {
+    padding: 36px 24px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .message {
+    font-size: 15px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .retryButton,
+  .reloadButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .iconContainer {
+    width: 64px;
+    height: 64px;
+  }
+
+  .errorIcon {
+    width: 32px;
+    height: 32px;
+  }
+}
