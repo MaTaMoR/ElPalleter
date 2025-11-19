@@ -26,7 +26,7 @@ const ContactInfoForm = ({
     // Read-only display
     return (
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Información de Contacto</h2>
+        <h2 className={styles.sectionTitle}>Direcciones</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
             <strong>Calle:</strong> {contactInfo.street}
@@ -60,7 +60,7 @@ const ContactInfoForm = ({
   // Editable form
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Información de Contacto</h2>
+      <h2 className={styles.sectionTitle}>Direcciones</h2>
       <div className={styles.formGrid}>
         <div className={styles.fullWidth}>
           <MenuTextField

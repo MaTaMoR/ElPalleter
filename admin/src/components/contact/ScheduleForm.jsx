@@ -213,19 +213,20 @@ const ScheduleForm = ({
     );
   }
 
-  // Editable form
+  // Editable form - compact table-like layout
   return (
     <div className={styles.section}>
       <h2 className={styles.sectionTitle}>Horarios</h2>
-      <div className={styles.scheduleEditor}>
+      <div className={styles.scheduleTable}>
         {sortedSchedules.map(schedule => {
           const dayErrors = errors[schedule.dayOfWeek] || {};
           const rangeErrors = dayErrors.ranges || {};
 
           return (
-            <div key={schedule.dayOfWeek} className={styles.dayEditor}>
-              <div className={styles.dayHeader}>
-                <h3 className={styles.dayTitle}>{dayNames[schedule.dayOfWeek]}</h3>
+            <div key={schedule.dayOfWeek} className={styles.scheduleRow}>
+              {/* Day name and open checkbox */}
+              <div className={styles.dayColumn}>
+                <span className={styles.dayName}>{dayNames[schedule.dayOfWeek]}</span>
                 <MenuCheckbox
                   label="Abierto"
                   checked={schedule.isOpen}
@@ -233,23 +234,24 @@ const ScheduleForm = ({
                 />
               </div>
 
-              {schedule.isOpen && (
-                <div className={styles.rangesEditor}>
-                  {schedule.scheduleRanges && schedule.scheduleRanges.map((range, rangeIndex) => {
-                    const rangeError = rangeErrors[rangeIndex] || {};
+              {/* Time ranges */}
+              <div className={styles.rangesColumn}>
+                {schedule.isOpen ? (
+                  <>
+                    {schedule.scheduleRanges && schedule.scheduleRanges.map((range, rangeIndex) => {
+                      const rangeError = rangeErrors[rangeIndex] || {};
 
-                    return (
-                      <div key={rangeIndex} className={styles.rangeEditor}>
-                        <div className={styles.rangeFields}>
+                      return (
+                        <div key={rangeIndex} className={styles.rangeRow}>
                           <MenuTextField
-                            label="Nombre (opcional)"
+                            label="Nombre"
                             value={range.nameKey}
                             onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'nameKey', value)}
                             error={rangeError.nameKey}
-                            placeholder="ej: Almuerzo, Cena"
+                            placeholder="Almuerzo"
                           />
                           <MenuTextField
-                            label="Hora inicio"
+                            label="Inicio"
                             value={range.startTime}
                             onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'startTime', value)}
                             error={rangeError.startTime}
@@ -257,7 +259,7 @@ const ScheduleForm = ({
                             required
                           />
                           <MenuTextField
-                            label="Hora fin"
+                            label="Fin"
                             value={range.endTime}
                             onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'endTime', value)}
                             error={rangeError.endTime}
@@ -266,27 +268,29 @@ const ScheduleForm = ({
                           />
                           <button
                             type="button"
-                            className={styles.deleteButton}
+                            className={styles.deleteRangeButton}
                             onClick={() => handleDeleteRange(schedule.dayOfWeek, rangeIndex)}
                             aria-label="Eliminar rango horario"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                  <Button
-                    variant="secondary"
-                    icon={Plus}
-                    onClick={() => handleAddRange(schedule.dayOfWeek)}
-                    className={styles.addRangeButton}
-                  >
-                    Añadir rango horario
-                  </Button>
-                </div>
-              )}
+                    <Button
+                      variant="secondary"
+                      icon={Plus}
+                      onClick={() => handleAddRange(schedule.dayOfWeek)}
+                      className={styles.addRangeBtn}
+                    >
+                      Añadir rango
+                    </Button>
+                  </>
+                ) : (
+                  <span className={styles.closedLabel}>Cerrado</span>
+                )}
+              </div>
             </div>
           );
         })}

@@ -139,63 +139,58 @@
   opacity: 0.5;
 }
 
-/* Editable styles */
-.scheduleEditor {
+/* Editable styles - Compact table layout */
+.scheduleTable {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
-.dayEditor {
-  padding: 1rem;
+.scheduleRow {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 6px;
+  align-items: flex-start;
 }
 
-.dayHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.dayTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.rangesEditor {
+.dayColumn {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 140px;
+  flex-shrink: 0;
 }
 
-.rangeEditor {
-  padding: 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+.dayName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--primary);
 }
 
-.rangeFields {
+.rangesColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rangeRow {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
-  gap: 0.75rem;
+  grid-template-columns: 1.5fr 1fr 1fr auto;
+  gap: 0.5rem;
   align-items: start;
 }
 
-.deleteButton {
+.deleteRangeButton {
   background: none;
   border: none;
   color: var(--error);
   cursor: pointer;
   padding: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -203,12 +198,19 @@
   transition: var(--transition);
 }
 
-.deleteButton:hover {
+.deleteRangeButton:hover {
   background: var(--error-light);
 }
 
-.addRangeButton {
+.addRangeBtn {
   align-self: flex-start;
+  font-size: 0.875rem;
+}
+
+.closedLabel {
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 0.5rem 0;
 }
 
 /* Responsive */
@@ -216,10 +218,6 @@
   .scheduleDay {
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .dayName {
-    min-width: unset;
   }
 
   .calendarContainer {
@@ -249,11 +247,25 @@
     min-width: 36px;
   }
 
-  .rangeFields {
-    grid-template-columns: 1fr;
+  /* Compact schedule editor */
+  .scheduleRow {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .deleteButton {
+  .dayColumn {
+    min-width: unset;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .rangeRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .deleteRangeButton {
     margin-top: 0;
     align-self: flex-end;
   }
