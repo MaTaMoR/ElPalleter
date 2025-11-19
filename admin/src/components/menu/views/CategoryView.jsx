@@ -72,6 +72,32 @@ const CategoryView = ({
     }
   };
 
+  // Helper function to check if category has validation errors (in itself or its children)
+  const categoryHasValidationErrors = (categoryId) => {
+    const errors = categoryErrors[categoryId];
+    if (!errors) return false;
+
+    // Check if category itself has name error
+    if (errors.nameKey) return true;
+
+    // Check if any subcategory or item has errors
+    if (errors.subcategories) {
+      for (const subcategoryErrors of Object.values(errors.subcategories)) {
+        // Check subcategory name error
+        if (subcategoryErrors.nameKey) return true;
+
+        // Check items errors
+        if (subcategoryErrors.items) {
+          for (const itemErrors of Object.values(subcategoryErrors.items)) {
+            if (Object.values(itemErrors).some(error => error)) return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.pageTitle}>
@@ -147,6 +173,7 @@ const CategoryView = ({
               onUndo={() => onUndoDeleteCategory(category.id)}
               showArrow={true}
               isEditing={isEditing}
+              hasValidationErrors={categoryHasValidationErrors(category.id)}
             />
             </div>
           );

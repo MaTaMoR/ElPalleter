@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Edit3, Trash2, Undo2 } from 'lucide-react';
+import { ChevronRight, Edit3, Trash2, Undo2, AlertCircle } from 'lucide-react';
 import styles from './MenuCard.module.css';
 
 /**
@@ -20,7 +20,8 @@ const MenuCard = ({
   showArrow = true,
   isEditing = false,
   disabled = false,
-  icon = null
+  icon = null,
+  hasValidationErrors = false // Show warning icon if true
 }) => {
   // Build card class names based on state
   const cardClasses = [
@@ -57,6 +58,11 @@ const MenuCard = ({
         </button>
 
         <div className={styles.cardActions}>
+          {hasValidationErrors && (
+            <div className={styles.warningIcon} title="Hay errores de validación">
+              <AlertCircle size={20} />
+            </div>
+          )}
           {isEditing && (
             isDeleted ? (
               <button

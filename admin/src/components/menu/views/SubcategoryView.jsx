@@ -103,6 +103,24 @@ const SubcategoryView = ({
     }
   };
 
+  // Helper function to check if subcategory has validation errors (in itself or its items)
+  const subcategoryHasValidationErrors = (subcategoryId) => {
+    const errors = subcategoryErrors[subcategoryId];
+    if (!errors) return false;
+
+    // Check if subcategory itself has name error
+    if (errors.nameKey) return true;
+
+    // Check if any item has errors
+    if (errors.items) {
+      for (const itemErrors of Object.values(errors.items)) {
+        if (Object.values(itemErrors).some(error => error)) return true;
+      }
+    }
+
+    return false;
+  };
+
   return (
     <div className={styles.container}>
       {onBack && (
@@ -198,6 +216,7 @@ const SubcategoryView = ({
               onUndo={() => onUndoDeleteSubcategory(subcategory.id)}
               showArrow={true}
               isEditing={isEditing}
+              hasValidationErrors={subcategoryHasValidationErrors(subcategory.id)}
             />
             </div>
           );
