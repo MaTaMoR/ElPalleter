@@ -553,7 +553,7 @@ const ScheduleForm = ({
             <h3 className={styles.cardTitle}>Patrones de horario</h3>
           </div>
           <Button
-            variant="secondary"
+            variant="primary"
             icon={Plus}
             onClick={handleAddNewPattern}
             className={styles.addPatternButtonHeader}
