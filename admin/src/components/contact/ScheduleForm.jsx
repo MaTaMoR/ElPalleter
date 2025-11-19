@@ -401,6 +401,19 @@ const ScheduleForm = ({
       return schedule;
     });
 
+    // Check if we need to preserve a pattern that's losing its last day (when unchecking)
+    if (!isChecked && pattern.days.length === 1 && pattern.days[0] === dayOfWeek) {
+      // This pattern is losing its last day, preserve it as orphan
+      const isAlreadyOrphan = orphanPatterns.some(o => o.patternKey === pattern.patternKey);
+      if (!isAlreadyOrphan) {
+        setOrphanPatterns(prev => [...prev, {
+          patternKey: pattern.patternKey,
+          ranges: pattern.ranges,
+          days: []
+        }]);
+      }
+    }
+
     onChange(updatedSchedules);
   };
 
