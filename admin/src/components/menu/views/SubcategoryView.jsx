@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X, Trash2 } from 'lucide-react';
 import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
@@ -18,23 +18,59 @@ const SubcategoryView = ({
   onUndoDeleteSubcategory,
   onUpdateCategory,
   onUpdateSubcategory,
+  onMoveSubcategory,
+  onCancelEditSubcategory,
+  onDeleteCategory,
   onBack,
   itemCounts,
   isEditing,
   categoryError,
-  subcategoryErrors = {}
+  subcategoryErrors = {},
+  onValidationError
 }) => {
   const [editingSubcategoryId, setEditingSubcategoryId] = useState(null);
+  const [shakingSubcategoryId, setShakingSubcategoryId] = useState(null);
+  const [shakingCategoryField, setShakingCategoryField] = useState(false);
+  const subcategoryRefs = useRef({});
 
   const handleEdit = (subcategoryId) => {
     setEditingSubcategoryId(subcategoryId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (subcategoryId) => {
+    // Revert changes before closing
+    if (onCancelEditSubcategory) {
+      onCancelEditSubcategory(subcategoryId);
+    }
     setEditingSubcategoryId(null);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (subcategoryId) => {
+    // Verificar si la subcategoría tiene errores de validación
+    const errors = subcategoryErrors[subcategoryId];
+    const hasErrors = errors && Object.values(errors).some(error => error);
+
+    if (hasErrors) {
+      // Disparar animación de vibración
+      setShakingSubcategoryId(subcategoryId);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingSubcategoryId(null);
+      }, 500);
+
+      // Llamar al callback de error si existe (para mostrar toast/mensaje)
+      if (onValidationError) {
+        const errorMessages = Object.entries(errors)
+          .filter(([, error]) => error)
+          .map(([field, error]) => error);
+        onValidationError(errorMessages);
+      }
+
+      return; // No cerrar el formulario si hay errores
+    }
+
+    // Si no hay errores, cerrar el formulario
     setEditingSubcategoryId(null);
   };
 
@@ -42,6 +78,49 @@ const SubcategoryView = ({
     if (onUpdateSubcategory) {
       onUpdateSubcategory(subcategoryId, { [field]: value });
     }
+  };
+
+  const handleAddSubcategoryClick = () => {
+    // Verificar si la categoría padre tiene errores
+    if (categoryError) {
+      // Disparar animación de vibración en el campo de categoría
+      setShakingCategoryField(true);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingCategoryField(false);
+      }, 500);
+
+      // Mostrar toast con el error
+      if (onValidationError) {
+        onValidationError(['Se requiere un nombre de categoría válido']);
+      }
+
+      return; // No permitir añadir
+    }
+
+    // Si no hay errores, ejecutar la acción normal
+    if (onAddSubcategory) {
+      onAddSubcategory();
+    }
+  };
+
+  // Helper function to check if subcategory has validation errors (in itself or its items)
+  const subcategoryHasValidationErrors = (subcategoryId) => {
+    const errors = subcategoryErrors[subcategoryId];
+    if (!errors) return false;
+
+    // Check if subcategory itself has name error
+    if (errors.nameKey) return true;
+
+    // Check if any item has errors
+    if (errors.items) {
+      for (const itemErrors of Object.values(errors.items)) {
+        if (Object.values(itemErrors).some(error => error)) return true;
+      }
+    }
+
+    return false;
   };
 
   return (
@@ -56,18 +135,29 @@ const SubcategoryView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
         {isEditing && (
-          <Button
-            variant="primary"
-            icon={Plus}
-            onClick={onAddSubcategory}
-          >
-            Añadir
-          </Button>
+          <div className={styles.actionButtons}>
+            {category && onDeleteCategory && (
+              <Button
+                variant="danger"
+                icon={Trash2}
+                onClick={() => onDeleteCategory(category.id, onBack)}
+              >
+                Borrar
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              icon={Plus}
+              onClick={handleAddSubcategoryClick}
+            >
+              Añadir
+            </Button>
+          </div>
         )}
       </div>
 
       {isEditing && category && onUpdateCategory && (
-        <div className={styles.categoryEditSection}>
+        <div className={`${styles.categoryEditSection} ${shakingCategoryField ? styles.fieldShake : ''}`}>
           <MenuTextField
             label="Nombre de la categoría"
             value={category.nameKey || ''}
@@ -80,13 +170,18 @@ const SubcategoryView = ({
       )}
 
       <div className={styles.grid}>
-        {subcategories.map((subcategory) => {
+        {subcategories.map((subcategory, index) => {
           const isEditingSubcategory = isEditing && editingSubcategoryId === subcategory.id;
           const isDeleted = subcategory._state === 'deleted';
+          const isShaking = shakingSubcategoryId === subcategory.id;
 
           return (
-            <MenuCard
+            <div
               key={subcategory.id}
+              ref={(el) => { subcategoryRefs.current[subcategory.id] = el; }}
+              className={isShaking ? styles.subcategoryShake : ''}
+            >
+              <MenuCard
               title={subcategory.nameKey || 'Sin nombre'}
               content={
                 <MenuBadge
@@ -108,7 +203,7 @@ const SubcategoryView = ({
                     <div className={cardStyles.editActions}>
                       <button
                         type="button"
-                        onClick={handleCancelEdit}
+                        onClick={() => handleCancelEdit(subcategory.id)}
                         className={cardStyles.cancelEditButton}
                       >
                         <X size={18} />
@@ -116,7 +211,7 @@ const SubcategoryView = ({
                       </button>
                       <button
                         type="button"
-                        onClick={handleSaveEdit}
+                        onClick={() => handleSaveEdit(subcategory.id)}
                         className={cardStyles.saveEditButton}
                       >
                         <Check size={18} />
@@ -132,9 +227,15 @@ const SubcategoryView = ({
               onEdit={() => handleEdit(subcategory.id)}
               onDelete={() => onDeleteSubcategory(subcategory.id)}
               onUndo={() => onUndoDeleteSubcategory(subcategory.id)}
+              onMoveUp={index > 0 && onMoveSubcategory ? () => onMoveSubcategory(subcategory.id, 'up') : undefined}
+              onMoveDown={index < subcategories.length - 1 && onMoveSubcategory ? () => onMoveSubcategory(subcategory.id, 'down') : undefined}
+              canMoveUp={index > 0}
+              canMoveDown={index < subcategories.length - 1}
               showArrow={true}
               isEditing={isEditing}
+              hasValidationErrors={subcategoryHasValidationErrors(subcategory.id)}
             />
+            </div>
           );
         })}
       </div>
@@ -164,11 +265,15 @@ SubcategoryView.propTypes = {
   onUndoDeleteSubcategory: PropTypes.func,
   onUpdateCategory: PropTypes.func,
   onUpdateSubcategory: PropTypes.func,
+  onMoveSubcategory: PropTypes.func,
+  onCancelEditSubcategory: PropTypes.func,
+  onDeleteCategory: PropTypes.func,
   onBack: PropTypes.func,
   itemCounts: PropTypes.object,
   isEditing: PropTypes.bool,
   categoryError: PropTypes.string,
-  subcategoryErrors: PropTypes.object
+  subcategoryErrors: PropTypes.object,
+  onValidationError: PropTypes.func
 };
 
 export default SubcategoryView;

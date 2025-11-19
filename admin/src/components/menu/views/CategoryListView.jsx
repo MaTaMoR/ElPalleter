@@ -10,7 +10,7 @@ import CategoryView from './CategoryView';
 const CategoryListView = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, menuState, entityOps, validationErrors } = useMenuEdit();
+  const { isEditing, menuState, entityOps, validationErrors, showToast } = useMenuEdit();
 
   // Get categories for view
   const getCategoriesForView = () => {
@@ -42,6 +42,16 @@ const CategoryListView = () => {
     }
   };
 
+  // Handle validation error - show toast with error messages
+  const handleValidationError = (errorMessages) => {
+    // Mostrar un toast por cada error (máximo 2 para no saturar la pantalla)
+    errorMessages.slice(0, 2).forEach((error, index) => {
+      setTimeout(() => {
+        showToast(error, 'error', 4000);
+      }, index * 150); // Pequeño delay entre toasts para que se vean bien
+    });
+  };
+
   return (
     <CategoryView
       categories={getCategoriesForView()}
@@ -50,9 +60,12 @@ const CategoryListView = () => {
       onDeleteCategory={isEditing ? (id) => entityOps.handleDelete('category', id) : undefined}
       onUndoDeleteCategory={isEditing ? (id) => entityOps.handleUndoDelete('category', id) : undefined}
       onUpdateCategory={isEditing ? (id, updates) => entityOps.handleUpdate('category', id, updates) : undefined}
+      onMoveCategory={isEditing ? (id, direction) => entityOps.handleMove('category', id, direction) : undefined}
+      onCancelEditCategory={isEditing ? (id) => entityOps.handleCancelEdit('category', id) : undefined}
       subcategoryCounts={getSubcategoryCounts()}
       isEditing={isEditing}
       categoryErrors={validationErrors}
+      onValidationError={handleValidationError}
     />
   );
 };

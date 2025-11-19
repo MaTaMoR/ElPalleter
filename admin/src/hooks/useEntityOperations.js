@@ -206,7 +206,20 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
           const normalizedOriginal = (originalValue === undefined || originalValue === null) ? '' : originalValue;
           const normalizedUpdated = (updatedValue === undefined || updatedValue === null) ? '' : updatedValue;
 
-          return normalizedOriginal === normalizedUpdated;
+          // For numeric fields, ensure both are compared as numbers
+          if (field === 'price') {
+            const originalNum = normalizedOriginal === '' ? 0 : Number(normalizedOriginal);
+            const updatedNum = normalizedUpdated === '' ? 0 : Number(normalizedUpdated);
+            return originalNum === updatedNum;
+          }
+
+          // For boolean fields, ensure proper comparison
+          if (field === 'available') {
+            return Boolean(normalizedOriginal) === Boolean(normalizedUpdated);
+          }
+
+          // For string fields, compare as strings
+          return String(normalizedOriginal) === String(normalizedUpdated);
         });
 
         if (matchesOriginal) {
@@ -244,8 +257,9 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
   /**
    * Generic DELETE operation
+   * @param {Function} onDeleteConfirmed - Optional callback to execute after deletion is confirmed
    */
-  const handleDelete = (entityType, entityId, parentId = null, categoryId = null) => {
+  const handleDelete = (entityType, entityId, parentId = null, categoryId = null, onDeleteConfirmed = null) => {
     setConfirmDialog({
       isOpen: true,
       title: `Eliminar ${entityType === 'category' ? 'categoría' : entityType === 'subcategory' ? 'subcategoría' : 'item'}`,
@@ -307,6 +321,11 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
             return newMap;
           });
           trackChange(hierarchicalId, 'delete');
+        }
+
+        // Execute callback after deletion is confirmed
+        if (onDeleteConfirmed) {
+          onDeleteConfirmed();
         }
 
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
@@ -391,47 +410,125 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     if (targetIndex < 0 || targetIndex >= itemsList.length) return;
 
     const { map, setter } = getMapAndSetter(entityType);
+    const originalMap = getOriginalMap(entityType);
 
     if (entityType === 'category') {
-      const [currentHId, current] = itemsList[index];
-      const [targetHId, target] = itemsList[targetIndex];
+      const [currentHId] = itemsList[index];
+      const [targetHId] = itemsList[targetIndex];
+
+      // Get current entities BEFORE the setter
+      const current = map.get(currentHId);
+      const target = map.get(targetHId);
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
+
+      // Calculate new orderIndex values
+      const newCurrentOrderIndex = target.orderIndex;
+      const newTargetOrderIndex = current.orderIndex;
+
+      // Determine if the new orderIndex matches the original
+      const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+      const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
+      // Determine new states
+      const newCurrentState = current._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited');
+      const newTargetState = target._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited');
 
       setter(prev => {
         const newMap = new Map(prev);
+        const prevCurrent = newMap.get(currentHId);
+        const prevTarget = newMap.get(targetHId);
+
         newMap.set(currentHId, {
-          ...current,
-          orderIndex: target.orderIndex,
-          _state: current._state !== 'new' ? 'edited' : current._state
+          ...prevCurrent,
+          orderIndex: newCurrentOrderIndex,
+          _state: newCurrentState
         });
         newMap.set(targetHId, {
-          ...target,
-          orderIndex: current.orderIndex,
-          _state: target._state !== 'new' ? 'edited' : target._state
+          ...prevTarget,
+          orderIndex: newTargetOrderIndex,
+          _state: newTargetState
         });
         return newMap;
       });
+
+      // Track/untrack changes based on new state
+      if (current._state !== 'new') {
+        if (currentMatchesOriginal) {
+          untrackChange(currentHId);
+        } else {
+          trackChange(currentHId, 'edit');
+        }
+      }
+
+      if (target._state !== 'new') {
+        if (targetMatchesOriginal) {
+          untrackChange(targetHId);
+        } else {
+          trackChange(targetHId, 'edit');
+        }
+      }
     } else {
       const currentHId = itemsList[index];
       const targetHId = itemsList[targetIndex];
+
+      // Get current entities BEFORE the setter
       const current = map.get(currentHId);
       const target = map.get(targetHId);
 
       if (!current || !target) return;
 
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
+
+      // Calculate new orderIndex values
+      const newCurrentOrderIndex = target.orderIndex;
+      const newTargetOrderIndex = current.orderIndex;
+
+      // Determine if the new orderIndex matches the original
+      const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+      const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
+      // Determine new states
+      const newCurrentState = current._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited');
+      const newTargetState = target._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited');
+
       setter(prev => {
         const newMap = new Map(prev);
+        const prevCurrent = newMap.get(currentHId);
+        const prevTarget = newMap.get(targetHId);
+
+        if (!prevCurrent || !prevTarget) return newMap;
+
         newMap.set(currentHId, {
-          ...current,
-          orderIndex: target.orderIndex,
-          _state: current._state !== 'new' ? 'edited' : current._state
+          ...prevCurrent,
+          orderIndex: newCurrentOrderIndex,
+          _state: newCurrentState
         });
         newMap.set(targetHId, {
-          ...target,
-          orderIndex: current.orderIndex,
-          _state: target._state !== 'new' ? 'edited' : target._state
+          ...prevTarget,
+          orderIndex: newTargetOrderIndex,
+          _state: newTargetState
         });
         return newMap;
       });
+
+      // Track/untrack changes based on new state
+      if (current._state !== 'new') {
+        if (currentMatchesOriginal) {
+          untrackChange(currentHId);
+        } else {
+          trackChange(currentHId, 'edit');
+        }
+      }
+
+      if (target._state !== 'new') {
+        if (targetMatchesOriginal) {
+          untrackChange(targetHId);
+        } else {
+          trackChange(targetHId, 'edit');
+        }
+      }
 
       // Update children order
       if (entityType === 'subcategory' || entityType === 'item') {
@@ -450,11 +547,87 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     }
   };
 
+  /**
+   * Generic CANCEL EDIT operation
+   * Reverts changes made during editing:
+   * - For new entities (_state === 'new'): completely removes them
+   * - For edited entities (_state === 'edited'): restores original values
+   */
+  const handleCancelEdit = (entityType, entityId, parentId = null, categoryId = null) => {
+    let hierarchicalId, parentHId;
+
+    if (entityType === 'category') {
+      hierarchicalId = buildHierarchicalId(entityId);
+    } else if (entityType === 'subcategory') {
+      if (!parentId) {
+        console.error('❌ No parentId (categoryId) provided for subcategory cancel');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(parentId, entityId);
+      parentHId = buildHierarchicalId(parentId);
+    } else if (entityType === 'item') {
+      if (!categoryId || !parentId) {
+        console.error('❌ Missing categoryId or parentId (subcategoryId) for item cancel');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
+      parentHId = buildHierarchicalId(categoryId, parentId);
+    }
+
+    const { map, setter } = getMapAndSetter(entityType);
+    const entity = map.get(hierarchicalId);
+    if (!entity) return;
+
+    // If it's new, delete it completely
+    if (entity._state === 'new') {
+      setter(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(hierarchicalId);
+        return newMap;
+      });
+
+      // Update childrenMap
+      if (parentHId) {
+        setChildrenMap(prev => {
+          const newMap = new Map(prev);
+          const children = newMap.get(parentHId) || [];
+          newMap.set(parentHId, children.filter(id => id !== hierarchicalId));
+          return newMap;
+        });
+      } else if (entityType === 'category') {
+        setChildrenMap(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(hierarchicalId);
+          return newMap;
+        });
+      }
+
+      untrackChange(hierarchicalId);
+    }
+    // If it's edited, revert to original values
+    else if (entity._state === 'edited') {
+      const originalMap = getOriginalMap(entityType);
+      const original = originalMap.get(hierarchicalId);
+      if (original) {
+        setter(prev => {
+          const newMap = new Map(prev);
+          newMap.set(hierarchicalId, {
+            ...original,
+            _state: 'normal'
+          });
+          return newMap;
+        });
+        untrackChange(hierarchicalId);
+      }
+    }
+  };
+
   return {
     handleAdd,
     handleUpdate,
     handleDelete,
     handleUndoDelete,
-    handleMove
+    handleMove,
+    handleCancelEdit
   };
 };

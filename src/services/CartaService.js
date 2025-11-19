@@ -9,13 +9,56 @@ import { CartaRepository } from '../repositories/CartaRepository.js';
 export class CartaService {
 
     /**
+     * Ordena categorías, subcategorías e items por orderIndex
+     * @param {Array} categories - Array de categorías
+     * @returns {Array} Array de categorías ordenadas
+     * @private
+     */
+    static sortByOrderIndex(categories) {
+        if (!categories || !Array.isArray(categories)) {
+            return categories;
+        }
+
+        // Ordenar categorías
+        const sortedCategories = [...categories].sort((a, b) => {
+            const orderA = a.orderIndex ?? Number.MAX_SAFE_INTEGER;
+            const orderB = b.orderIndex ?? Number.MAX_SAFE_INTEGER;
+            return orderA - orderB;
+        });
+
+        // Ordenar subcategorías e items dentro de cada categoría
+        return sortedCategories.map(category => ({
+            ...category,
+            subcategories: category.subcategories ?
+                [...category.subcategories]
+                    .sort((a, b) => {
+                        const orderA = a.orderIndex ?? Number.MAX_SAFE_INTEGER;
+                        const orderB = b.orderIndex ?? Number.MAX_SAFE_INTEGER;
+                        return orderA - orderB;
+                    })
+                    .map(subcategory => ({
+                        ...subcategory,
+                        items: subcategory.items ?
+                            [...subcategory.items].sort((a, b) => {
+                                const orderA = a.orderIndex ?? Number.MAX_SAFE_INTEGER;
+                                const orderB = b.orderIndex ?? Number.MAX_SAFE_INTEGER;
+                                return orderA - orderB;
+                            })
+                            : subcategory.items
+                    }))
+                : category.subcategories
+        }));
+    }
+
+    /**
      * Obtiene las categorías del menú traducidas
      * @param {string} language - Código de idioma (es, en, val)
-     * @returns {Promise<Array>} Array de categorías con subcategorías e items
+     * @returns {Promise<Array>} Array de categorías con subcategorías e items ordenadas por orderIndex
      */
     static async getCategories(language = 'es') {
         try {
-            return await CartaRepository.getTranslatedCategories(language);
+            const categories = await CartaRepository.getTranslatedCategories(language);
+            return this.sortByOrderIndex(categories);
         } catch (error) {
             console.error('CartaService: Error getting categories:', error);
             throw error;
@@ -25,11 +68,12 @@ export class CartaService {
     /**
      * Obtiene categorías con fallback automático a español
      * @param {string} language - Código de idioma preferido
-     * @returns {Promise<Array>} Array de categorías
+     * @returns {Promise<Array>} Array de categorías ordenadas por orderIndex
      */
     static async getCategoriesWithFallback(language = 'es') {
         try {
-            return await CartaRepository.getCategoriesWithFallback(language);
+            const categories = await CartaRepository.getCategoriesWithFallback(language);
+            return this.sortByOrderIndex(categories);
         } catch (error) {
             console.error('CartaService: Error getting categories with fallback:', error);
             throw error;
@@ -39,11 +83,12 @@ export class CartaService {
     /**
      * Obtiene solo las categorías y items disponibles
      * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de categorías filtradas por disponibilidad
+     * @returns {Promise<Array>} Array de categorías filtradas por disponibilidad y ordenadas por orderIndex
      */
     static async getAvailableCategories(language = 'es') {
         try {
-            return await CartaRepository.getAvailableCategories(language, true);
+            const categories = await CartaRepository.getAvailableCategories(language, true);
+            return this.sortByOrderIndex(categories);
         } catch (error) {
             console.error('CartaService: Error getting available categories:', error);
             throw error;
@@ -97,12 +142,13 @@ export class CartaService {
     /**
      * MÉTODO LEGACY - Mantiene compatibilidad con código existente
      * @deprecated Usar getCategories() en su lugar
-     * @returns {Promise<Object>} Datos de carta en formato legacy
+     * @returns {Promise<Object>} Datos de carta en formato legacy ordenados por orderIndex
      */
     static async getCartaData(language = 'es') {
         try {
+            // getCategories ya devuelve datos ordenados
             const categories = await this.getCategories(language);
-            
+
             // Convertir al formato legacy esperado por algunos componentes
             return {
                 categories: categories,
@@ -126,12 +172,13 @@ export class CartaService {
     /**
      * Organiza items por categorías principales (sin subcategorías)
      * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de categorías con items directos
+     * @returns {Promise<Array>} Array de categorías con items directos ordenados
      */
     static async getFlatCategories(language = 'es') {
         try {
             const categories = await this.getCategories(language);
-            
+
+            // getCategories ya devuelve datos ordenados
             return categories.map(category => ({
                 ...category,
                 items: category.subcategories?.reduce((allItems, subcategory) => {
@@ -321,10 +368,11 @@ export class CartaService {
      * Método de conveniencia para obtener datos con traducción personalizada
      * @param {string} language - Código de idioma
      * @param {Function} translateFn - Función de traducción personalizada
-     * @returns {Promise<Object>} Datos con traducciones aplicadas
+     * @returns {Promise<Object>} Datos con traducciones aplicadas y ordenados por orderIndex
      */
     static async getTranslatedData(language = 'es', translateFn = null) {
         try {
+            // getCategories ya devuelve datos ordenados
             const categories = await this.getCategories(language);
 
             if (!translateFn) {

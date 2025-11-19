@@ -92,9 +92,11 @@ export const MenuEditProvider = ({
     if (!categoryErrors) return null;
 
     // If we're viewing a subcategory/items view
+    // Only block if the subcategory ITSELF has a nameKey error
+    // Don't block for item errors - user needs to be able to navigate away from items with errors
     if (subcategoryId) {
       const subcategoryErrors = categoryErrors.subcategories?.[subcategoryId];
-      if (subcategoryErrors) {
+      if (subcategoryErrors?.nameKey) {
         return {
           type: 'subcategory',
           categoryId,
@@ -105,7 +107,9 @@ export const MenuEditProvider = ({
     }
 
     // If we're viewing a category (subcategories list)
-    if (categoryErrors.nameKey || categoryErrors.subcategories) {
+    // Only block if the category ITSELF has a nameKey error
+    // Don't block for subcategory errors - user needs to navigate to them to fix them
+    if (categoryErrors.nameKey) {
       return {
         type: 'category',
         categoryId,
@@ -147,29 +151,49 @@ export const MenuEditProvider = ({
       const entity = map.get(hierarchicalId);
       if (!entity) return;
 
-      // If it's new, delete it completely
+      // If it's new, check if it has children before deleting
       if (entity._state === 'new') {
-        setter(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(hierarchicalId);
-          return newMap;
-        });
+        // Check if this entity has children
+        const hasChildren = (menuState.childrenMap.get(hierarchicalId) || []).length > 0;
 
-        // Update childrenMap
-        if (entityType !== 'category') {
-          const parentHId = entityType === 'subcategory'
-            ? buildHierarchicalId(parentId)
-            : buildHierarchicalId(grandParentId, parentId);
-
-          menuState.setChildrenMap(prev => {
+        // For categories and subcategories with children, preserve them by resetting nameKey
+        if (hasChildren && (entityType === 'category' || entityType === 'subcategory')) {
+          // Reset the invalid nameKey to empty string
+          // This keeps the entity and its children, but validation will fail (empty < 3 chars)
+          setter(prev => {
             const newMap = new Map(prev);
-            const children = newMap.get(parentHId) || [];
-            newMap.set(parentHId, children.filter(id => id !== hierarchicalId));
+            newMap.set(hierarchicalId, {
+              ...entity,
+              nameKey: '', // Empty string will fail validation
+              _state: 'new' // Keep as new
+            });
             return newMap;
           });
-        }
+          // Note: We don't untrack the change, it should still be tracked
+        } else {
+          // No children (or is an item), delete it completely
+          setter(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(hierarchicalId);
+            return newMap;
+          });
 
-        menuState.untrackChange(hierarchicalId);
+          // Update childrenMap
+          if (entityType !== 'category') {
+            const parentHId = entityType === 'subcategory'
+              ? buildHierarchicalId(parentId)
+              : buildHierarchicalId(grandParentId, parentId);
+
+            menuState.setChildrenMap(prev => {
+              const newMap = new Map(prev);
+              const children = newMap.get(parentHId) || [];
+              newMap.set(parentHId, children.filter(id => id !== hierarchicalId));
+              return newMap;
+            });
+          }
+
+          menuState.untrackChange(hierarchicalId);
+        }
       }
       // If it's edited, revert to original values
       else if (entity._state === 'edited') {

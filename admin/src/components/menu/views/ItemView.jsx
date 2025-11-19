@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X, Trash2 } from 'lucide-react';
 import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
@@ -16,8 +16,11 @@ const ItemView = ({
   onAddItem,
   onUpdateItem,
   onUpdateSubcategory,
+  onMoveItem,
   onDeleteItem,
   onUndoDeleteItem,
+  onCancelEditItem,
+  onDeleteSubcategory,
   onBack,
   isEditing,
   errors = {},
@@ -27,13 +30,18 @@ const ItemView = ({
 }) => {
   const [editingItemId, setEditingItemId] = useState(null);
   const [shakingItemId, setShakingItemId] = useState(null);
+  const [shakingSubcategoryField, setShakingSubcategoryField] = useState(false);
   const itemRefs = useRef({});
 
   const handleEdit = (itemId) => {
     setEditingItemId(itemId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (itemId) => {
+    // Revert changes before closing
+    if (onCancelEditItem) {
+      onCancelEditItem(itemId);
+    }
     setEditingItemId(null);
   };
 
@@ -72,6 +80,31 @@ const ItemView = ({
     }
   };
 
+  const handleAddItemClick = () => {
+    // Verificar si la subcategoría padre tiene errores
+    if (subcategoryError) {
+      // Disparar animación de vibración en el campo de subcategoría
+      setShakingSubcategoryField(true);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingSubcategoryField(false);
+      }, 500);
+
+      // Mostrar toast con el error
+      if (onValidationError) {
+        onValidationError(['Se requiere un nombre de subcategoría válido']);
+      }
+
+      return; // No permitir añadir
+    }
+
+    // Si no hay errores, ejecutar la acción normal
+    if (onAddItem) {
+      onAddItem();
+    }
+  };
+
   // Handle auto-edit and auto-scroll for newly created items
   useEffect(() => {
     if (autoEditItemId && isEditing) {
@@ -98,18 +131,29 @@ const ItemView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
         {isEditing && (
-          <Button
-            variant="primary"
-            icon={Plus}
-            onClick={onAddItem}
-          >
-            Añadir
-          </Button>
+          <div className={styles.actionButtons}>
+            {subcategory && onDeleteSubcategory && (
+              <Button
+                variant="danger"
+                icon={Trash2}
+                onClick={() => onDeleteSubcategory(subcategory.id, onBack)}
+              >
+                Borrar
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              icon={Plus}
+              onClick={handleAddItemClick}
+            >
+              Añadir
+            </Button>
+          </div>
         )}
       </div>
 
       {isEditing && subcategory && onUpdateSubcategory && (
-        <div className={styles.subcategoryEditSection}>
+        <div className={`${styles.subcategoryEditSection} ${shakingSubcategoryField ? styles.fieldShake : ''}`}>
           <MenuTextField
             label="Nombre de la subcategoría"
             value={subcategory.nameKey || ''}
@@ -127,7 +171,7 @@ const ItemView = ({
             <p>No hay items en esta subcategoría</p>
           </div>
         ) : (
-          items.map((item) => {
+          items.map((item, index) => {
             const isEditingItem = isEditing && editingItemId === item.id;
             const isDeleted = item._state === 'deleted';
 
@@ -191,7 +235,7 @@ const ItemView = ({
                         <div className={cardStyles.editActions}>
                           <button
                             type="button"
-                            onClick={handleCancelEdit}
+                            onClick={() => handleCancelEdit(item.id)}
                             className={cardStyles.cancelEditButton}
                           >
                             <X size={18} />
@@ -215,6 +259,10 @@ const ItemView = ({
                   onEdit={() => handleEdit(item.id)}
                   onDelete={() => onDeleteItem(item.id)}
                   onUndo={() => onUndoDeleteItem(item.id)}
+                  onMoveUp={index > 0 && onMoveItem ? () => onMoveItem(item.id, 'up') : undefined}
+                  onMoveDown={index < items.length - 1 && onMoveItem ? () => onMoveItem(item.id, 'down') : undefined}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < items.length - 1}
                   showArrow={false}
                   isEditing={isEditing}
                 />
@@ -244,8 +292,11 @@ ItemView.propTypes = {
   onAddItem: PropTypes.func,
   onUpdateItem: PropTypes.func,
   onUpdateSubcategory: PropTypes.func,
+  onMoveItem: PropTypes.func,
   onDeleteItem: PropTypes.func,
   onUndoDeleteItem: PropTypes.func,
+  onCancelEditItem: PropTypes.func,
+  onDeleteSubcategory: PropTypes.func,
   onBack: PropTypes.func,
   isEditing: PropTypes.bool,
   errors: PropTypes.object,

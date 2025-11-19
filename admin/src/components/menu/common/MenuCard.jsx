@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Edit3, Trash2, Undo2 } from 'lucide-react';
+import { ChevronRight, Edit3, Trash2, Undo2, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import styles from './MenuCard.module.css';
 
 /**
@@ -17,10 +17,15 @@ const MenuCard = ({
   onEdit,
   onDelete,
   onUndo,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
   showArrow = true,
   isEditing = false,
   disabled = false,
-  icon = null
+  icon = null,
+  hasValidationErrors = false // Show warning icon if true
 }) => {
   // Build card class names based on state
   const cardClasses = [
@@ -57,6 +62,37 @@ const MenuCard = ({
         </button>
 
         <div className={styles.cardActions}>
+          {hasValidationErrors && (
+            <div className={styles.warningIcon} title="Hay errores de validación">
+              <AlertCircle size={20} />
+            </div>
+          )}
+          {isEditing && !isDeleted && (onMoveUp || onMoveDown) && (
+            <div className={styles.moveButtonsContainer}>
+              {onMoveUp && (
+                <button
+                  type="button"
+                  className={`${styles.actionButton} ${styles.moveButton}`}
+                  onClick={onMoveUp}
+                  disabled={!canMoveUp}
+                  title="Mover arriba"
+                >
+                  <ChevronUp size={18} />
+                </button>
+              )}
+              {onMoveDown && (
+                <button
+                  type="button"
+                  className={`${styles.actionButton} ${styles.moveButton}`}
+                  onClick={onMoveDown}
+                  disabled={!canMoveDown}
+                  title="Mover abajo"
+                >
+                  <ChevronDown size={18} />
+                </button>
+              )}
+            </div>
+          )}
           {isEditing && (
             isDeleted ? (
               <button
