@@ -75,7 +75,6 @@ const ItemView = ({
             variant="primary"
             icon={Plus}
             onClick={onAddItem}
-            className={styles.addButtonHeader}
           >
             Añadir
           </Button>

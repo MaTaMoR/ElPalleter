@@ -60,7 +60,6 @@ const SubcategoryView = ({
             variant="primary"
             icon={Plus}
             onClick={onAddSubcategory}
-            className={styles.addButtonHeader}
           >
             Añadir
           </Button>

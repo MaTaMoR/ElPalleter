@@ -48,7 +48,6 @@ const CategoryView = ({
             variant="primary"
             icon={Plus}
             onClick={onAddCategory}
-            className={styles.addButtonHeader}
           >
             Añadir
           </Button>
