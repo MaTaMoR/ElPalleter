@@ -4,8 +4,38 @@ import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [react()],
-   build: {
+  build: {
     sourcemap: process.env.NODE_ENV === 'development' ? false : false,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Vendor chunks - separa las dependencias node_modules
+          if (id.includes('node_modules')) {
+            // React y React Router en un chunk separado
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            // Lucide icons en su propio chunk (suelen ser grandes)
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            // Resto de vendors
+            return 'vendor-libs';
+          }
+
+          // Servicios compartidos en un chunk separado
+          if (id.includes('/src/services/')) {
+            return 'shared-services';
+          }
+
+          // Repositorios compartidos en un chunk separado
+          if (id.includes('/src/repositories/')) {
+            return 'shared-repositories';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 800, // Aumentar el límite a 800 KB (más realista para apps modernas)
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
