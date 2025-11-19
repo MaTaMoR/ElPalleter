@@ -37,6 +37,7 @@ import MobileSidebar from "./MobileSidebar.astro";
         height: 100%;
         background: transparent;
         backdrop-filter: var(--backdrop-blur) saturate(200%);
+        -webkit-backdrop-filter: var(--backdrop-blur) saturate(200%);
         border-bottom: var(--border-1) solid var(--glass-border);
         z-index: 1;
         transition: var(--transition-base);
@@ -101,37 +102,72 @@ import MobileSidebar from "./MobileSidebar.astro";
         const fullscreenMenu = document.getElementById("fullscreenMenu");
         const closeMenu = document.getElementById("closeMenu");
 
-        hamburger?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            fullscreenMenu?.classList.add("active");
-            document.body.style.overflow = "hidden";
-        });
+        const handlers = new Map();
 
         const closeMenuFunction = () => {
             fullscreenMenu?.classList.remove("active");
             document.body.style.overflow = "";
         };
 
-        closeMenu?.addEventListener("click", closeMenuFunction);
+        if (hamburger) {
+            const hamburgerClickHandler = (e) => {
+                e.stopPropagation();
+                fullscreenMenu?.classList.add("active");
+                document.body.style.overflow = "hidden";
+            };
+            hamburger.addEventListener("click", hamburgerClickHandler);
+            handlers.set('hamburger', { element: hamburger, event: 'click', handler: hamburgerClickHandler });
+        }
+
+        if (closeMenu) {
+            closeMenu.addEventListener("click", closeMenuFunction);
+            handlers.set('closeMenu', { element: closeMenu, event: 'click', handler: closeMenuFunction });
+        }
 
         const menuLinks = fullscreenMenu?.querySelectorAll("a");
+        const menuLinkHandlers = [];
         menuLinks?.forEach((link) => {
             link.addEventListener("click", closeMenuFunction);
+            menuLinkHandlers.push({ element: link, event: 'click', handler: closeMenuFunction });
         });
+        if (menuLinkHandlers.length > 0) {
+            handlers.set('menuLinks', menuLinkHandlers);
+        }
 
-        document.addEventListener("keydown", (e) => {
+        const keydownHandler = (e) => {
             if (
                 e.key === "Escape" &&
                 fullscreenMenu?.classList.contains("active")
             ) {
                 closeMenuFunction();
             }
-        });
+        };
+        document.addEventListener("keydown", keydownHandler);
+        handlers.set('keydown', { element: document, event: 'keydown', handler: keydownHandler });
 
-        fullscreenMenu?.addEventListener("click", (e) => {
-            if (e.target === fullscreenMenu) {
-                closeMenuFunction();
-            }
+        if (fullscreenMenu) {
+            const fullscreenClickHandler = (e) => {
+                if (e.target === fullscreenMenu) {
+                    closeMenuFunction();
+                }
+            };
+            fullscreenMenu.addEventListener("click", fullscreenClickHandler);
+            handlers.set('fullscreen', { element: fullscreenMenu, event: 'click', handler: fullscreenClickHandler });
+        }
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            handlers.forEach((value, key) => {
+                if (Array.isArray(value)) {
+                    value.forEach(({ element, event, handler }) => {
+                        element.removeEventListener(event, handler);
+                    });
+                } else {
+                    const { element, event, handler } = value;
+                    element.removeEventListener(event, handler);
+                }
+            });
+            handlers.clear();
         });
     });
 </script>
