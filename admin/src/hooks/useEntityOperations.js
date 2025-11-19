@@ -451,7 +451,7 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         if (currentMatchesOriginal) {
           untrackChange(currentHId);
         } else {
-          trackChange(currentHId);
+          trackChange(currentHId, 'edit');
         }
       }
 
@@ -459,7 +459,7 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         if (targetMatchesOriginal) {
           untrackChange(targetHId);
         } else {
-          trackChange(targetHId);
+          trackChange(targetHId, 'edit');
         }
       }
     } else {
@@ -512,7 +512,7 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         if (currentMatchesOriginal) {
           untrackChange(currentHId);
         } else {
-          trackChange(currentHId);
+          trackChange(currentHId, 'edit');
         }
       }
 
@@ -520,7 +520,7 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
         if (targetMatchesOriginal) {
           untrackChange(targetHId);
         } else {
-          trackChange(targetHId);
+          trackChange(targetHId, 'edit');
         }
       }
 
