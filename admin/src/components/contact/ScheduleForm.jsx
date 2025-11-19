@@ -7,57 +7,27 @@ import Button from '../common/Button';
 import styles from './ScheduleForm.module.css';
 
 /**
- * Timeline visual component for displaying time ranges
+ * Badge component for displaying time ranges
  */
-const TimelineBar = ({ ranges }) => {
-  const totalMinutes = 24 * 60; // 24 hours in minutes
-
-  const timeToMinutes = (timeStr) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
+const TimeBadges = ({ ranges }) => {
   return (
-    <div className={styles.timeline}>
-      <div className={styles.timelineBar}>
-        {ranges.map((range, index) => {
-          const startMinutes = timeToMinutes(range.startTime);
-          const endMinutes = timeToMinutes(range.endTime);
-          const leftPercent = (startMinutes / totalMinutes) * 100;
-          const widthPercent = ((endMinutes - startMinutes) / totalMinutes) * 100;
-
-          return (
-            <div
-              key={index}
-              className={styles.timelineBlock}
-              style={{
-                left: `${leftPercent}%`,
-                width: `${widthPercent}%`
-              }}
-              title={`${range.startTime} - ${range.endTime}`}
-            >
-              <div className={styles.timelineBlockContent}>
-                <Clock size={12} />
-                <span className={styles.timelineBlockText}>
-                  {range.startTime} - {range.endTime}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className={styles.timelineLabels}>
-        <span>00:00</span>
-        <span>06:00</span>
-        <span>12:00</span>
-        <span>18:00</span>
-        <span>24:00</span>
-      </div>
+    <div className={styles.badgesContainer}>
+      {ranges.map((range, index) => (
+        <div key={index} className={styles.timeBadge}>
+          <Clock size={14} className={styles.badgeIcon} />
+          <span className={styles.badgeTime}>
+            {range.startTime} - {range.endTime}
+          </span>
+          {range.nameKey && (
+            <span className={styles.badgeLabel}>({range.nameKey})</span>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
 
-TimelineBar.propTypes = {
+TimeBadges.propTypes = {
   ranges: PropTypes.arrayOf(
     PropTypes.shape({
       startTime: PropTypes.string.isRequired,
@@ -202,9 +172,7 @@ const ScheduleForm = ({
                 {!group.schedule.isOpen || !group.schedule.scheduleRanges || group.schedule.scheduleRanges.length === 0 ? (
                   <span className={styles.closed}>Cerrado</span>
                 ) : (
-                  <div className={styles.timelineContainer}>
-                    <TimelineBar ranges={group.schedule.scheduleRanges} />
-                  </div>
+                  <TimeBadges ranges={group.schedule.scheduleRanges} />
                 )}
               </div>
             </div>
