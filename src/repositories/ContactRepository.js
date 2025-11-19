@@ -337,6 +337,35 @@ export class ContactRepository extends BaseRepository {
     }
 
     /**
+     * Actualiza/guarda cambios en la información del restaurante
+     * POST /contact/update?language={language}
+     * REQUIERE AUTENTICACIÓN
+     * @param {Object} restaurantData - Datos completos del restaurante
+     * @param {string} language - Código de idioma
+     * @param {string} token - Token de autenticación (opcional)
+     * @returns {Promise<Object>} Respuesta del backend
+     */
+    static async updateRestaurantInfo(restaurantData, language = 'es', token = null) {
+        try {
+            // Obtener token de AuthService si no se proporciona
+            const authToken = token || (await import('../services/AuthService.js')).AuthService.getToken();
+
+            // Usar getAuthHeaders de BaseRepository para obtener headers con token
+            const headers = authToken ? this.getAuthHeaders(authToken) : this.getBaseHeaders();
+
+            // POST usa el endpoint directamente, agregamos params a la URL
+            const endpoint = `/contact/update?language=${encodeURIComponent(language)}`;
+
+            const response = await this.post(endpoint, restaurantData, { headers });
+
+            return response;
+        } catch (error) {
+            console.error('ContactRepository: Error updating restaurant info:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Obtiene la configuración del repositorio
      * @returns {Object} Configuración actual
      */
@@ -344,7 +373,8 @@ export class ContactRepository extends BaseRepository {
         return {
             baseUrl: this.getBaseUrl(),
             endpoints: {
-                translatedRestaurantInfo: '/contact/translated-restaurant-info'
+                translatedRestaurantInfo: '/contact/translated-restaurant-info',
+                updateRestaurantInfo: '/contact/update'
             },
             supportedLanguages: ['es', 'en', 'val'],
             defaultLanguage: 'es'

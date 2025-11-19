@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
   FileText,
+  Phone,
   Users,
   Settings
 } from 'lucide-react';
@@ -15,6 +16,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, isMobile }) =
   const menuItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: Home },
     { path: '/admin/menu', label: 'Carta', icon: FileText },
+    { path: '/admin/contact', label: 'Contacto', icon: Phone },
     { path: '/admin/users', label: 'Usuarios', icon: Users },
     { path: '/admin/settings', label: 'Configuración', icon: Settings },
   ];

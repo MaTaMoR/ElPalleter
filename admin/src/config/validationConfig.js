@@ -1,6 +1,9 @@
 /**
  * Centralized validation configuration for menu entities
  * Edit these values to change validation requirements across the application
+ *
+ * NOTE: This file now uses the generic validation utilities from validationUtils.js
+ * The actual validation functions are imported in useMenuValidation.js
  */
 
 /**
@@ -14,6 +17,12 @@ export const LOCALE_CONFIG = {
   thousandsSeparator: '.', // '.' for Europe, ',' for US
 };
 
+/**
+ * Menu validation configuration
+ * Uses generic validators from validationUtils.js:
+ * - validateTextField() for nameKey fields
+ * - validatePriceField() for price fields
+ */
 export const VALIDATION_CONFIG = {
   category: {
     nameKey: {
@@ -76,11 +85,8 @@ export const VALIDATION_CONFIG = {
 
 /**
  * Helper function to format error messages with dynamic values
+ * NOTE: This function is now available in validationUtils.js
+ * Kept here for backward compatibility
  */
-export const formatErrorMessage = (message, config) => {
-  return message
-    .replace('{minLength}', config.minLength)
-    .replace('{maxLength}', config.maxLength)
-    .replace('{min}', config.min)
-    .replace('{max}', config.max);
-};
+import { formatErrorMessage as formatErrorMessageUtil } from '../utils/validationUtils';
+export const formatErrorMessage = formatErrorMessageUtil;
