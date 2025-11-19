@@ -167,34 +167,34 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   overflow: hidden;
+  position: relative;
   animation: fadeIn 0.6s ease-out 0.4s backwards;
 }
 
 .progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
+  width: 30%;
   background: linear-gradient(
     90deg,
-    rgba(104, 109, 224, 0.8) 0%,
+    transparent 0%,
+    rgba(104, 109, 224, 0.4) 20%,
     rgba(72, 219, 251, 0.8) 50%,
-    rgba(104, 109, 224, 0.8) 100%
+    rgba(104, 109, 224, 0.4) 80%,
+    transparent 100%
   );
-  background-size: 200% 100%;
-  animation: progress 2s ease-in-out infinite;
   border-radius: 2px;
+  animation: progress 1.5s ease-in-out infinite;
 }
 
 @keyframes progress {
   0% {
-    width: 0%;
-    background-position: 0% 0%;
-  }
-  50% {
-    width: 70%;
-    background-position: 100% 0%;
+    transform: translateX(-100%);
   }
   100% {
-    width: 0%;
-    background-position: 0% 0%;
+    transform: translateX(333%);
   }
 }
 
