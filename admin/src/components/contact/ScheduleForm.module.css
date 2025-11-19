@@ -184,13 +184,35 @@
   align-items: start;
 }
 
+.rangeActions {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1.25rem;
+}
+
+.addRangeButton {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.addRangeButton:hover {
+  background: var(--primary-light);
+}
+
 .deleteRangeButton {
   background: none;
   border: none;
   color: var(--error);
   cursor: pointer;
   padding: 0.5rem;
-  margin-top: 1.25rem;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -200,11 +222,6 @@
 
 .deleteRangeButton:hover {
   background: var(--error-light);
-}
-
-.addRangeBtn {
-  align-self: flex-start;
-  font-size: 0.875rem;
 }
 
 .closedLabel {
@@ -265,7 +282,7 @@
     gap: 0.5rem;
   }
 
-  .deleteRangeButton {
+  .rangeActions {
     margin-top: 0;
     align-self: flex-end;
   }

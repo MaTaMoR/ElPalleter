@@ -266,26 +266,29 @@ const ScheduleForm = ({
                             placeholder="17:00"
                             required
                           />
-                          <button
-                            type="button"
-                            className={styles.deleteRangeButton}
-                            onClick={() => handleDeleteRange(schedule.dayOfWeek, rangeIndex)}
-                            aria-label="Eliminar rango horario"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <div className={styles.rangeActions}>
+                            <button
+                              type="button"
+                              className={styles.addRangeButton}
+                              onClick={() => handleAddRange(schedule.dayOfWeek)}
+                              aria-label="Añadir rango horario"
+                              title="Añadir rango horario"
+                            >
+                              <Plus size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.deleteRangeButton}
+                              onClick={() => handleDeleteRange(schedule.dayOfWeek, rangeIndex)}
+                              aria-label="Eliminar rango horario"
+                              title="Eliminar rango horario"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
-
-                    <Button
-                      variant="secondary"
-                      icon={Plus}
-                      onClick={() => handleAddRange(schedule.dayOfWeek)}
-                      className={styles.addRangeBtn}
-                    >
-                      Añadir rango
-                    </Button>
                   </>
                 ) : (
                   <span className={styles.closedLabel}>Cerrado</span>
