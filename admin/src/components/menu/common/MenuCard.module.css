@@ -249,7 +249,8 @@
 
   /* Reduce padding of action buttons in tablets */
   .actionButton,
-  .warningIcon {
+  .warningIcon,
+  .arrowButton {
     padding: 0.5rem;
   }
 }
@@ -265,7 +266,8 @@
 
   /* Further reduce padding in mobile */
   .actionButton,
-  .warningIcon {
+  .warningIcon,
+  .arrowButton {
     padding: 0.4rem;
   }
 
