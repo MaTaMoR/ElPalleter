@@ -29,7 +29,7 @@ const DashboardPage = () => {
       action: 'Gestionar',
       icon: Menu,
       className: 'carta',
-      path: '/menu'
+      path: '/admin/menu'
     },
     {
       id: 'contacto',
@@ -38,7 +38,7 @@ const DashboardPage = () => {
       action: 'Editar',
       icon: Phone,
       className: 'contacto',
-      path: '/contact'
+      path: '/admin/contact'
     },
     {
       id: 'historia',
