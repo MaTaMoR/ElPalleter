@@ -398,15 +398,18 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
       setter(prev => {
         const newMap = new Map(prev);
+        const prevCurrent = newMap.get(currentHId);
+        const prevTarget = newMap.get(targetHId);
+
         newMap.set(currentHId, {
-          ...current,
+          ...prevCurrent,
           orderIndex: target.orderIndex,
-          _state: current._state !== 'new' ? 'edited' : current._state
+          _state: prevCurrent._state !== 'new' ? 'edited' : prevCurrent._state
         });
         newMap.set(targetHId, {
-          ...target,
+          ...prevTarget,
           orderIndex: current.orderIndex,
-          _state: target._state !== 'new' ? 'edited' : target._state
+          _state: prevTarget._state !== 'new' ? 'edited' : prevTarget._state
         });
         return newMap;
       });
@@ -424,15 +427,18 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
       setter(prev => {
         const newMap = new Map(prev);
+        const prevCurrent = newMap.get(currentHId);
+        const prevTarget = newMap.get(targetHId);
+
         newMap.set(currentHId, {
-          ...current,
+          ...prevCurrent,
           orderIndex: target.orderIndex,
-          _state: current._state !== 'new' ? 'edited' : current._state
+          _state: prevCurrent._state !== 'new' ? 'edited' : prevCurrent._state
         });
         newMap.set(targetHId, {
-          ...target,
+          ...prevTarget,
           orderIndex: current.orderIndex,
-          _state: target._state !== 'new' ? 'edited' : target._state
+          _state: prevTarget._state !== 'new' ? 'edited' : prevTarget._state
         });
         return newMap;
       });
