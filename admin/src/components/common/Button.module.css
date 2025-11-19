@@ -21,7 +21,7 @@
 
 /* Variante primaria */
 .buttonPrimary {
-  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+  background: var(--primary);
   color: white;
 }
 
@@ -33,7 +33,7 @@
 
 /* Variante éxito */
 .buttonSuccess {
-  background: linear-gradient(to bottom, #10b981, #059669);
+  background: #10b981;
   color: white;
 }
 
@@ -45,7 +45,7 @@
 
 /* Variante peligro */
 .buttonDanger {
-  background: linear-gradient(to bottom, #ef4444, #dc2626);
+  background: #ef4444;
   color: white;
 }
 
