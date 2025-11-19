@@ -91,7 +91,7 @@ const SubcategoryView = ({
 
       // Mostrar toast con el error
       if (onValidationError) {
-        onValidationError(['No puedes añadir subcategorías hasta que corrijas el nombre de la categoría']);
+        onValidationError(['Se requiere un nombre de categoría válido']);
       }
 
       return; // No permitir añadir

@@ -91,7 +91,7 @@ const ItemView = ({
 
       // Mostrar toast con el error
       if (onValidationError) {
-        onValidationError(['No puedes añadir items hasta que corrijas el nombre de la subcategoría']);
+        onValidationError(['Se requiere un nombre de subcategoría válido']);
       }
 
       return; // No permitir añadir
