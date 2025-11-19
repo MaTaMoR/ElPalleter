@@ -168,7 +168,15 @@ const ScheduleForm = ({
         return; // Skip closed days
       }
 
-      const patternKey = JSON.stringify(schedule.scheduleRanges.map(r => ({ s: r.startTime, e: r.endTime })));
+      // Create a normalized pattern key by sorting ranges and using only time values
+      const normalizedRanges = [...schedule.scheduleRanges]
+        .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
+        .sort((a, b) => {
+          if (a.s !== b.s) return a.s.localeCompare(b.s);
+          return a.e.localeCompare(b.e);
+        });
+
+      const patternKey = JSON.stringify(normalizedRanges);
 
       if (!daysByPattern[patternKey]) {
         daysByPattern[patternKey] = {
