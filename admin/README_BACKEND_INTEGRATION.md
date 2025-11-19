@@ -141,6 +141,151 @@ He creado un archivo de ejemplo con la estructura completa:
 
 ---
 
+## 🌍 Sistema Multi-Idioma (MUY IMPORTANTE)
+
+### Concepto Fundamental
+La carta debe tener la **MISMA ESTRUCTURA** en todos los idiomas, pero los **TEXTOS** son específicos de cada idioma.
+
+### Ejemplo de Flujo Completo
+
+#### Paso 1: Usuario crea categoría en español
+```
+Usuario selecciona: language = 'es'
+Usuario crea categoría: "Postres"
+Frontend envía: POST /carta/update?language=es
+{
+  "id": null,
+  "nameKey": "Postres",
+  "orderIndex": 2
+}
+```
+
+#### Paso 2: Backend crea en TODOS los idiomas
+```sql
+-- Crear entidad
+INSERT INTO categories (id, orderIndex) VALUES ('cat-3', 2);
+
+-- Crear traducciones para TODOS los idiomas
+INSERT INTO category_translations VALUES ('cat-3', 'es', 'Postres');
+INSERT INTO category_translations VALUES ('cat-3', 'en', 'Postres'); -- Mismo texto inicialmente
+INSERT INTO category_translations VALUES ('cat-3', 'ca', 'Postres'); -- Mismo texto inicialmente
+```
+
+**Nota**: El texto inicial ("Postres") se copia a todos los idiomas. Luego el usuario lo traducirá.
+
+#### Paso 3: Usuario traduce a inglés
+```
+Usuario cambia selector a: language = 'en'
+Usuario ve la categoría con nombre: "Postres" (aún sin traducir)
+Usuario edita y cambia el nombre a: "Desserts"
+Frontend envía: POST /carta/update?language=en
+{
+  "id": "cat-3",
+  "nameKey": "Desserts",
+  "orderIndex": 2
+}
+```
+
+#### Paso 4: Backend actualiza SOLO el idioma inglés
+```sql
+-- NO tocar la entidad
+-- SOLO actualizar la traducción del idioma especificado
+UPDATE category_translations
+SET name = 'Desserts'
+WHERE categoryId = 'cat-3' AND language = 'en';
+```
+
+#### Paso 5: Usuario traduce a catalán
+```
+Usuario cambia selector a: language = 'ca'
+Usuario ve la categoría con nombre: "Postres" (aún sin traducir)
+Usuario edita y cambia el nombre a: "Postres" (igual en catalán)
+Frontend envía: POST /carta/update?language=ca
+{
+  "id": "cat-3",
+  "nameKey": "Postres",
+  "orderIndex": 2
+}
+```
+
+### Resultado Final en Base de Datos
+
+**Tabla: categories**
+| id    | orderIndex | createdAt           | updatedAt           |
+|-------|------------|---------------------|---------------------|
+| cat-3 | 2          | 2025-11-19 10:00:00 | 2025-11-19 10:00:00 |
+
+**Tabla: category_translations**
+| categoryId | language | name     |
+|------------|----------|----------|
+| cat-3      | es       | Postres  |
+| cat-3      | en       | Desserts |
+| cat-3      | ca       | Postres  |
+
+### Campos Afectados por Traducciones
+
+| Entidad      | Campos traducibles          |
+|--------------|-----------------------------|
+| Categoría    | `nameKey`                   |
+| Subcategoría | `nameKey`                   |
+| Item         | `nameKey`, `descriptionKey` |
+
+### Campos NO Afectados (Iguales en todos los idiomas)
+
+- `id`
+- `orderIndex`
+- `price`
+- `available`
+- `createdAt`
+- `updatedAt`
+
+### Lógica de Eliminación Multi-Idioma
+
+Cuando eliminas un elemento, se eliminan TODAS sus traducciones:
+
+```sql
+-- Usuario elimina la categoría "Postres" (desde cualquier idioma)
+-- Backend detecta que cat-3 ya no está en el payload
+
+-- Eliminar la entidad
+DELETE FROM categories WHERE id = 'cat-3';
+
+-- Eliminar TODAS las traducciones (en cascada o manualmente)
+DELETE FROM category_translations WHERE categoryId = 'cat-3';
+```
+
+### Modelo Sugerido para Spring Boot
+
+```java
+@Entity
+@Table(name = "categories")
+public class Category {
+    @Id
+    private String id;
+    private Integer orderIndex;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryTranslation> translations;
+}
+
+@Entity
+@Table(name = "category_translations")
+public class CategoryTranslation {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    private String language; // 'es', 'en', 'ca'
+    private String name;
+}
+```
+
+---
+
 ## 🔧 Endpoint Requerido en Backend
 
 ### Request

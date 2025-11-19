@@ -139,8 +139,111 @@
     "5. AVAILABLE: Boolean que indica si el item está disponible",
     "6. ORDER_INDEX: Define el orden de visualización (0, 1, 2...)",
     "7. TIMESTAMPS: Formato ISO 8601 (YYYY-MM-DDTHH:mm:ssZ)",
-    "8. IDIOMA: Se envía como query parameter 'language' en la URL"
+    "8. IDIOMA: Se envía como query parameter 'language' en la URL",
+    "9. MULTI-IDIOMA: Ver sección 'sistema_multiidioma' para la lógica de traducciones"
   ],
+  "sistema_multiidioma": {
+    "concepto": "La carta debe tener la MISMA ESTRUCTURA en todos los idiomas, pero los TEXTOS son específicos de cada idioma",
+    "ejemplo_flujo": {
+      "paso_1": "Usuario crea categoría 'Postres' en español (language=es)",
+      "paso_2": "Backend crea la categoría con id='cat-3' y copia la estructura a TODOS los idiomas (es, en, ca, etc.)",
+      "paso_3": "Usuario cambia a inglés (language=en) en el selector del frontend",
+      "paso_4": "Usuario edita y traduce 'Postres' -> 'Desserts'",
+      "paso_5": "Backend actualiza solo el texto del idioma inglés, pero el id='cat-3' es el mismo"
+    },
+    "logica_backend": {
+      "modelo_sugerido": "Separar entidades de traducciones",
+      "tablas_ejemplo": {
+        "categories": {
+          "id": "cat-1",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z"
+        },
+        "category_translations": [
+          {
+            "categoryId": "cat-1",
+            "language": "es",
+            "name": "Entrantes"
+          },
+          {
+            "categoryId": "cat-1",
+            "language": "en",
+            "name": "Starters"
+          },
+          {
+            "categoryId": "cat-1",
+            "language": "ca",
+            "name": "Entrants"
+          }
+        ]
+      },
+      "cuando_crear_nuevo_elemento": {
+        "descripcion": "Cuando id=null y es un elemento nuevo",
+        "accion": "Crear la entidad Y crear traducciones para TODOS los idiomas",
+        "idiomas_soportados": ["es", "en", "ca"],
+        "traduccion_inicial": "Copiar el texto recibido a todos los idiomas",
+        "ejemplo": {
+          "recibe": {
+            "id": null,
+            "nameKey": "Postres",
+            "language": "es"
+          },
+          "backend_crea": {
+            "category": {
+              "id": "cat-3",
+              "orderIndex": 2
+            },
+            "translations": [
+              {"categoryId": "cat-3", "language": "es", "name": "Postres"},
+              {"categoryId": "cat-3", "language": "en", "name": "Postres"},
+              {"categoryId": "cat-3", "language": "ca", "name": "Postres"}
+            ]
+          },
+          "nota": "Después el usuario cambiará a 'en' y traducirá 'Postres' a 'Desserts'"
+        }
+      },
+      "cuando_editar_elemento_existente": {
+        "descripcion": "Cuando id tiene valor (ej: 'cat-1')",
+        "accion": "Actualizar SOLO la traducción del idioma especificado",
+        "ejemplo": {
+          "recibe": {
+            "id": "cat-3",
+            "nameKey": "Desserts",
+            "language": "en"
+          },
+          "backend_actualiza": {
+            "tabla": "category_translations",
+            "where": "categoryId='cat-3' AND language='en'",
+            "set": "name='Desserts'"
+          },
+          "nota": "NO toca las traducciones de 'es' ni 'ca'"
+        }
+      },
+      "cuando_eliminar_elemento": {
+        "descripcion": "Cuando un elemento falta en el payload enviado",
+        "accion": "Eliminar la entidad Y todas sus traducciones en TODOS los idiomas",
+        "ejemplo": {
+          "antes_tenia": ["cat-1", "cat-2", "cat-3"],
+          "ahora_recibe": ["cat-1", "cat-2"],
+          "backend_elimina": {
+            "categories": "DELETE FROM categories WHERE id='cat-3'",
+            "translations": "DELETE FROM category_translations WHERE categoryId='cat-3'"
+          },
+          "nota": "Elimina la categoría y TODAS sus traducciones (es, en, ca)"
+        }
+      }
+    },
+    "campos_afectados": {
+      "Categoría": ["nameKey"],
+      "Subcategoría": ["nameKey"],
+      "Item": ["nameKey", "descriptionKey"]
+    },
+    "campos_NO_afectados": {
+      "descripcion": "Estos campos son iguales en todos los idiomas",
+      "campos": ["id", "orderIndex", "price", "available", "createdAt", "updatedAt"]
+    }
+  },
   "logica_backend_sugerida": {
     "paso_1": "Recibir el array de categorías",
     "paso_2": "Para cada categoría:",
