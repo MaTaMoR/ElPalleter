@@ -179,7 +179,7 @@
 
 .rangeRow {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
   gap: 0.5rem;
   align-items: start;
 }
@@ -278,13 +278,12 @@
   }
 
   .rangeRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr auto;
     gap: 0.5rem;
   }
 
   .rangeActions {
-    margin-top: 0;
-    align-self: flex-end;
+    margin-top: 1.25rem;
   }
 }
 

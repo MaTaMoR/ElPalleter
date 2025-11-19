@@ -244,13 +244,6 @@ const ScheduleForm = ({
                       return (
                         <div key={rangeIndex} className={styles.rangeRow}>
                           <MenuTextField
-                            label="Nombre"
-                            value={range.nameKey}
-                            onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'nameKey', value)}
-                            error={rangeError.nameKey}
-                            placeholder="Almuerzo"
-                          />
-                          <MenuTextField
                             label="Inicio"
                             value={range.startTime}
                             onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'startTime', value)}
