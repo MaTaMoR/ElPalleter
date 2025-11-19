@@ -257,8 +257,9 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
   /**
    * Generic DELETE operation
+   * @param {Function} onDeleteConfirmed - Optional callback to execute after deletion is confirmed
    */
-  const handleDelete = (entityType, entityId, parentId = null, categoryId = null) => {
+  const handleDelete = (entityType, entityId, parentId = null, categoryId = null, onDeleteConfirmed = null) => {
     setConfirmDialog({
       isOpen: true,
       title: `Eliminar ${entityType === 'category' ? 'categoría' : entityType === 'subcategory' ? 'subcategoría' : 'item'}`,
@@ -320,6 +321,11 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
             return newMap;
           });
           trackChange(hierarchicalId, 'delete');
+        }
+
+        // Execute callback after deletion is confirmed
+        if (onDeleteConfirmed) {
+          onDeleteConfirmed();
         }
 
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));

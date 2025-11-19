@@ -136,10 +136,7 @@ const ItemView = ({
               <Button
                 variant="danger"
                 icon={Trash2}
-                onClick={() => {
-                  onDeleteSubcategory(subcategory.id);
-                  onBack();
-                }}
+                onClick={() => onDeleteSubcategory(subcategory.id, onBack)}
               >
                 Borrar
               </Button>
