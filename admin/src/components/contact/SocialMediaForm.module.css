@@ -1,0 +1,147 @@
+/* SocialMediaForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+}
+
+.emptyMessage {
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Read-only styles */
+.socialGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.socialCard {
+  display: flex;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.socialCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.socialIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.socialInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.platform {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+  margin-bottom: 0.25rem;
+}
+
+.handle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.socialLink {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.socialLink:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Editable styles */
+.socialEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.socialItem {
+  padding: 1.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.socialHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.socialHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.socialIconLarge {
+  font-size: 2rem;
+}
+
+.socialPlatform {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.socialFields {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .socialGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .socialFields {
+    grid-template-columns: 1fr;
+  }
+
+  .socialHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

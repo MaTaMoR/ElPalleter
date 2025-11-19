@@ -3,6 +3,9 @@ import { Edit3, Save, X } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
+import ContactInfoForm from '../../components/contact/ContactInfoForm';
+import ScheduleForm from '../../components/contact/ScheduleForm';
+import SocialMediaForm from '../../components/contact/SocialMediaForm';
 import { ContactRepository } from '../../repositories/ContactRepository';
 import { useContactValidation } from '../../hooks/useContactValidation';
 import styles from './ContactPage.module.css';
@@ -81,8 +84,29 @@ const ContactPage = () => {
 
   const handleCancel = () => {
     // Reset to original data
-    setContactData(originalData);
+    setContactData(JSON.parse(JSON.stringify(originalData)));
     setIsEditing(false);
+  };
+
+  const handleContactInfoChange = (newContactInfo) => {
+    setContactData({
+      ...contactData,
+      contactInfo: newContactInfo
+    });
+  };
+
+  const handleSchedulesChange = (newSchedules) => {
+    setContactData({
+      ...contactData,
+      schedules: newSchedules
+    });
+  };
+
+  const handleSocialMediasChange = (newSocialMedias) => {
+    setContactData({
+      ...contactData,
+      socialMedias: newSocialMedias
+    });
   };
 
   // Show loading state
@@ -187,29 +211,38 @@ const ContactPage = () => {
         {/* Content area */}
         <div className={styles.content}>
           <div className={styles.contentCard}>
-            {/* TODO: Add contact info form components here */}
-            <div className={styles.section}>
-              <h2>Información de Contacto</h2>
-              {contactData && contactData.contactInfo && (
-                <div className={styles.infoGrid}>
-                  <div><strong>Calle:</strong> {contactData.contactInfo.street}</div>
-                  <div><strong>Código Postal:</strong> {contactData.contactInfo.postalCode}</div>
-                  <div><strong>Ciudad:</strong> {contactData.contactInfo.city}</div>
-                  <div><strong>Provincia:</strong> {contactData.contactInfo.province}</div>
-                  <div><strong>País:</strong> {contactData.contactInfo.country}</div>
-                  <div><strong>Teléfono:</strong> {contactData.contactInfo.phoneMain}</div>
-                  <div><strong>Email:</strong> {contactData.contactInfo.emailMain}</div>
-                  <div><strong>Web:</strong> {contactData.contactInfo.website}</div>
-                </div>
-              )}
-            </div>
+            {contactData && (
+              <>
+                {/* Contact Info Section */}
+                {contactData.contactInfo && (
+                  <ContactInfoForm
+                    contactInfo={contactData.contactInfo}
+                    onChange={handleContactInfoChange}
+                    errors={validationErrors.contactInfo || {}}
+                    isEditing={isEditing}
+                  />
+                )}
 
-            {/* Validation errors display (for testing) */}
-            {isEditing && hasErrors() && (
-              <div className={styles.validationSummary}>
-                <h3>Errores de validación:</h3>
-                <pre>{JSON.stringify(validationErrors, null, 2)}</pre>
-              </div>
+                {/* Schedules Section */}
+                {contactData.schedules && (
+                  <ScheduleForm
+                    schedules={contactData.schedules}
+                    onChange={handleSchedulesChange}
+                    errors={validationErrors.schedules || {}}
+                    isEditing={isEditing}
+                  />
+                )}
+
+                {/* Social Medias Section */}
+                {contactData.socialMedias && (
+                  <SocialMediaForm
+                    socialMedias={contactData.socialMedias}
+                    onChange={handleSocialMediasChange}
+                    errors={validationErrors.socialMedias || {}}
+                    isEditing={isEditing}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>

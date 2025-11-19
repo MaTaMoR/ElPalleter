@@ -72,63 +72,8 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-}
-
-.section {
-  margin-bottom: 2rem;
-}
-
-.section:last-child {
-  margin-bottom: 0;
-}
-
-.section h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: 0.5rem;
-}
-
-.infoGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.infoGrid > div {
-  padding: 0.75rem;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-}
-
-.infoGrid strong {
-  color: var(--primary);
-  margin-right: 0.5rem;
-}
-
-/* Validation Summary */
-.validationSummary {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: var(--error-light);
-  border: 1px solid var(--error);
-  border-radius: 4px;
-}
-
-.validationSummary h3 {
-  color: var(--error);
-  margin: 0 0 0.5rem 0;
-}
-
-.validationSummary pre {
-  margin: 0;
-  overflow-x: auto;
-  font-size: 0.875rem;
 }
 
 /* Loading State */
