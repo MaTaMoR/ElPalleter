@@ -1,4 +1,5 @@
 import { BaseRepository } from './BaseRepository.js';
+import { AuthService } from '../services/AuthService.js';
 
 /**
  * Repositorio para operaciones de carta/menú
