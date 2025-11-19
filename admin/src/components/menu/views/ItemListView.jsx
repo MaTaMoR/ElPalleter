@@ -11,7 +11,7 @@ const ItemListView = () => {
   const { categoryId, subcategoryId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, menuState, entityOps, validationErrors } = useMenuEdit();
+  const { isEditing, menuState, entityOps, validationErrors, setConfirmDialog } = useMenuEdit();
   const [autoEditItemId, setAutoEditItemId] = useState(null);
 
   // Get current subcategory and category data
@@ -82,6 +82,19 @@ const ItemListView = () => {
     return validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.items || {};
   };
 
+  // Handle validation error - show dialog with error messages
+  const handleValidationError = (errorMessages) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Errores de validación',
+      message: `No se puede guardar el item porque tiene los siguientes errores:\n\n${errorMessages.join('\n')}`,
+      type: 'danger',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
   return (
     <ItemView
       items={currentSubcategory.items || []}
@@ -97,6 +110,7 @@ const ItemListView = () => {
       errors={getItemErrors()}
       subcategoryError={validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.nameKey}
       autoEditItemId={autoEditItemId}
+      onValidationError={handleValidationError}
     />
   );
 };
