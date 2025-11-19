@@ -37,6 +37,36 @@ const render = (component) => {
 };
 
 /**
+ * Retry initialization by reloading I18n completely
+ */
+const retryInit = async () => {
+  // Show loading spinner
+  render(<LoadingSpinner />);
+
+  try {
+    // Reload I18n (resets state and loads again)
+    await Promise.race([
+      I18nService.reload(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout: El servidor no responde después de 15 segundos')), 15000)
+      )
+    ]);
+
+    // Success - show the app
+    render(<App />);
+  } catch (error) {
+    // Error - show error page with retry
+    console.error('Failed to reload I18n:', error);
+    render(
+      <LoadingError
+        error={error}
+        onRetry={retryInit}
+      />
+    );
+  }
+};
+
+/**
  * Initialize the application
  */
 const initApp = async () => {
@@ -55,7 +85,7 @@ const initApp = async () => {
     render(
       <LoadingError
         error={error}
-        onRetry={initApp}
+        onRetry={retryInit}
       />
     );
   }
