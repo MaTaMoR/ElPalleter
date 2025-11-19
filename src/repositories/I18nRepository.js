@@ -219,6 +219,26 @@ export class I18nRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Actualiza una traducción específica
+     * PUT /i18n/translations
+     * @param {Object} request - Objeto con languageCode, key y value
+     * @returns {Promise<Object>} Translation actualizada
+     */
+    static async updateTranslation(request) {
+        if (!request || !request.languageCode || !request.key) {
+            throw new Error('Language code and translation key are required');
+        }
+
+        try {
+            const response = await this.put('/i18n/translations', request);
+            return response;
+        } catch (error) {
+            console.error('I18nRepository: Error updating translation:', error);
+            throw error;
+        }
+    }
+
     // ===============================================
     // UTILIDADES
     // ===============================================
