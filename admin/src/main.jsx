@@ -5,8 +5,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import LoadingError from './components/system/LoadingError.jsx';
+import LoadingSpinner from './components/system/LoadingSpinner.jsx';
 
 import I18nService from '@services/I18nService.js';
+
+// Create root once
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
 /**
  * Initialize I18n with timeout protection
@@ -22,45 +26,38 @@ const initI18nWithTimeout = (timeoutMs = 5000) => {
 };
 
 /**
- * Render the app or error page based on I18n initialization result
+ * Render content based on state
  */
-const renderApp = (error = null) => {
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-
-  if (error) {
-    // Show error page with retry option
-    root.render(
-      <React.StrictMode>
-        <LoadingError
-          error={error}
-          onRetry={() => {
-            // Clear the root and try again
-            root.unmount();
-            initApp();
-          }}
-        />
-      </React.StrictMode>
-    );
-  } else {
-    // Show normal app
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-  }
+const render = (component) => {
+  root.render(
+    <React.StrictMode>
+      {component}
+    </React.StrictMode>
+  );
 };
 
 /**
  * Initialize the application
  */
 const initApp = async () => {
+  // Show loading spinner
+  render(<LoadingSpinner />);
+
   try {
+    // Wait for I18n to initialize
     await initI18nWithTimeout();
-    renderApp();
+
+    // Success - show the app
+    render(<App />);
   } catch (error) {
+    // Error - show error page with retry
     console.error('Failed to initialize I18n:', error);
-    renderApp(error);
+    render(
+      <LoadingError
+        error={error}
+        onRetry={initApp}
+      />
+    );
   }
 };
 
