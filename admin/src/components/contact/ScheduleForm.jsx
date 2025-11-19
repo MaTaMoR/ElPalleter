@@ -4,6 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import Button from '../common/Button';
 import ConfirmDialog from '../menu/utils/ConfirmDialog';
+import BadgeToggle from '../common/BadgeToggle';
 import styles from './ScheduleForm.module.css';
 
 /**
@@ -569,14 +570,12 @@ const ScheduleForm = ({
                   {dayOrder.map(day => {
                     const isSelected = pattern.days.includes(day);
                     return (
-                      <label key={day} className={styles.dayCheckbox}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={(e) => handlePatternDayToggle(pattern, day, e.target.checked)}
-                        />
-                        <span className={styles.dayCheckboxLabel}>{dayNames[day]}</span>
-                      </label>
+                      <BadgeToggle
+                        key={day}
+                        label={dayNames[day]}
+                        checked={isSelected}
+                        onChange={(checked) => handlePatternDayToggle(pattern, day, checked)}
+                      />
                     );
                   })}
                 </div>

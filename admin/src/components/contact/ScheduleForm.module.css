@@ -277,54 +277,9 @@
 }
 
 .daysGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.5rem;
-}
-
-.dayCheckbox {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 0.5rem;
-  background: #e5e7eb;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: var(--transition);
-  user-select: none;
-}
-
-.dayCheckbox:hover {
-  border-color: #9ca3af;
-  transform: translateY(-1px);
-}
-
-.dayCheckbox input[type="checkbox"] {
-  display: none;
-}
-
-.dayCheckbox input[type="checkbox"]:checked + .dayCheckboxLabel {
-  color: white;
-}
-
-.dayCheckbox input[type="checkbox"]:checked ~ * {
-  /* Selector for when checkbox is checked */
-}
-
-.dayCheckbox:has(input[type="checkbox"]:checked) {
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-color: #059669;
-  color: white;
-}
-
-.dayCheckboxLabel {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-  cursor: pointer;
-  user-select: none;
-  transition: var(--transition);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .addPatternButton {
