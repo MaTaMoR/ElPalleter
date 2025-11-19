@@ -404,61 +404,124 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     if (targetIndex < 0 || targetIndex >= itemsList.length) return;
 
     const { map, setter } = getMapAndSetter(entityType);
+    const originalMap = getOriginalMap(entityType);
 
     if (entityType === 'category') {
-      const [currentHId, current] = itemsList[index];
-      const [targetHId, target] = itemsList[targetIndex];
+      const [currentHId] = itemsList[index];
+      const [targetHId] = itemsList[targetIndex];
 
       setter(prev => {
         const newMap = new Map(prev);
         const prevCurrent = newMap.get(currentHId);
         const prevTarget = newMap.get(targetHId);
 
+        // Get original entities to compare orderIndex
+        const originalCurrent = originalMap.get(currentHId);
+        const originalTarget = originalMap.get(targetHId);
+
+        // Swap orderIndex values
+        const newCurrentOrderIndex = prevTarget.orderIndex;
+        const newTargetOrderIndex = prevCurrent.orderIndex;
+
+        // Check if new orderIndex matches original for each entity
+        const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+        const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
         newMap.set(currentHId, {
           ...prevCurrent,
-          orderIndex: target.orderIndex,
-          _state: prevCurrent._state !== 'new' ? 'edited' : prevCurrent._state
+          orderIndex: newCurrentOrderIndex,
+          _state: prevCurrent._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited')
         });
         newMap.set(targetHId, {
           ...prevTarget,
-          orderIndex: current.orderIndex,
-          _state: prevTarget._state !== 'new' ? 'edited' : prevTarget._state
+          orderIndex: newTargetOrderIndex,
+          _state: prevTarget._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited')
         });
         return newMap;
       });
 
-      // Track changes for both moved entities
-      if (current._state !== 'new') trackChange(currentHId);
-      if (target._state !== 'new') trackChange(targetHId);
-    } else {
-      const currentHId = itemsList[index];
-      const targetHId = itemsList[targetIndex];
+      // Track/untrack changes based on whether orderIndex matches original
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
       const current = map.get(currentHId);
       const target = map.get(targetHId);
 
-      if (!current || !target) return;
+      if (current && current._state !== 'new') {
+        const newOrderIndex = target.orderIndex;
+        if (originalCurrent && newOrderIndex === originalCurrent.orderIndex) {
+          untrackChange(currentHId);
+        } else {
+          trackChange(currentHId);
+        }
+      }
+
+      if (target && target._state !== 'new') {
+        const newOrderIndex = current.orderIndex;
+        if (originalTarget && newOrderIndex === originalTarget.orderIndex) {
+          untrackChange(targetHId);
+        } else {
+          trackChange(targetHId);
+        }
+      }
+    } else {
+      const currentHId = itemsList[index];
+      const targetHId = itemsList[targetIndex];
 
       setter(prev => {
         const newMap = new Map(prev);
         const prevCurrent = newMap.get(currentHId);
         const prevTarget = newMap.get(targetHId);
 
+        if (!prevCurrent || !prevTarget) return newMap;
+
+        // Get original entities to compare orderIndex
+        const originalCurrent = originalMap.get(currentHId);
+        const originalTarget = originalMap.get(targetHId);
+
+        // Swap orderIndex values
+        const newCurrentOrderIndex = prevTarget.orderIndex;
+        const newTargetOrderIndex = prevCurrent.orderIndex;
+
+        // Check if new orderIndex matches original for each entity
+        const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+        const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
         newMap.set(currentHId, {
           ...prevCurrent,
-          orderIndex: target.orderIndex,
-          _state: prevCurrent._state !== 'new' ? 'edited' : prevCurrent._state
+          orderIndex: newCurrentOrderIndex,
+          _state: prevCurrent._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited')
         });
         newMap.set(targetHId, {
           ...prevTarget,
-          orderIndex: current.orderIndex,
-          _state: prevTarget._state !== 'new' ? 'edited' : prevTarget._state
+          orderIndex: newTargetOrderIndex,
+          _state: prevTarget._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited')
         });
         return newMap;
       });
 
-      // Track changes for both moved entities
-      if (current._state !== 'new') trackChange(currentHId);
-      if (target._state !== 'new') trackChange(targetHId);
+      // Track/untrack changes based on whether orderIndex matches original
+      const current = map.get(currentHId);
+      const target = map.get(targetHId);
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
+
+      if (current && current._state !== 'new') {
+        const newOrderIndex = target.orderIndex;
+        if (originalCurrent && newOrderIndex === originalCurrent.orderIndex) {
+          untrackChange(currentHId);
+        } else {
+          trackChange(currentHId);
+        }
+      }
+
+      if (target && target._state !== 'new') {
+        const newOrderIndex = current.orderIndex;
+        if (originalTarget && newOrderIndex === originalTarget.orderIndex) {
+          untrackChange(targetHId);
+        } else {
+          trackChange(targetHId);
+        }
+      }
 
       // Update children order
       if (entityType === 'subcategory' || entityType === 'item') {
