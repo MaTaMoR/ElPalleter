@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Trash2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import Button from '../common/Button';
+import ConfirmDialog from '../menu/utils/ConfirmDialog';
 import styles from './ScheduleForm.module.css';
 
 /**
@@ -131,6 +132,14 @@ const ScheduleForm = ({
   errors = {},
   isEditing = false
 }) => {
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    dayOfWeek: null,
+    pattern: null,
+    currentRanges: '',
+    newRanges: ''
+  });
+
   const dayNames = {
     monday: 'Lunes',
     tuesday: 'Martes',
@@ -228,18 +237,24 @@ const ScheduleForm = ({
             .map(r => `${r.startTime}-${r.endTime}`)
             .join(', ');
 
-          const confirmed = window.confirm(
-            `${dayNames[dayOfWeek]} ya tiene el horario: ${currentRanges}\n\n` +
-            `¿Deseas cambiarlo a: ${newRanges}?`
-          );
-
-          if (!confirmed) {
-            return; // User cancelled, don't make the change
-          }
+          // Show confirmation dialog
+          setConfirmDialog({
+            isOpen: true,
+            dayOfWeek,
+            pattern,
+            currentRanges,
+            newRanges
+          });
+          return; // Wait for user confirmation
         }
       }
     }
 
+    // Apply the change
+    applyPatternToDay(pattern, dayOfWeek, isChecked);
+  };
+
+  const applyPatternToDay = (pattern, dayOfWeek, isChecked) => {
     const updatedSchedules = schedules.map(schedule => {
       if (schedule.dayOfWeek === dayOfWeek) {
         if (isChecked) {
@@ -261,6 +276,16 @@ const ScheduleForm = ({
       return schedule;
     });
     onChange(updatedSchedules);
+  };
+
+  const handleConfirmDialogConfirm = () => {
+    const { pattern, dayOfWeek } = confirmDialog;
+    applyPatternToDay(pattern, dayOfWeek, true);
+    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '' });
+  };
+
+  const handleConfirmDialogCancel = () => {
+    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '' });
   };
 
   const handlePatternRangeChange = (pattern, rangeIndex, field, value) => {
@@ -437,6 +462,18 @@ const ScheduleForm = ({
           </Button>
         )}
       </div>
+
+      {/* Confirmation dialog for pattern reassignment */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Cambiar horario del día"
+        message={`${confirmDialog.dayOfWeek ? dayNames[confirmDialog.dayOfWeek] : ''} ya tiene el horario: ${confirmDialog.currentRanges}\n\n¿Deseas cambiarlo a: ${confirmDialog.newRanges}?`}
+        confirmText="Cambiar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDialogConfirm}
+        onCancel={handleConfirmDialogCancel}
+        type="warning"
+      />
     </div>
   );
 };
