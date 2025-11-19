@@ -2,10 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
-    sourcemap: process.env.NODE_ENV === 'development' ? false : false,
+    sourcemap: false, // Deshabilitar source maps en producción
+    minify: 'esbuild', // Asegurar minificación con esbuild
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -42,7 +43,14 @@ export default defineConfig({
   },
   server: {
     host: '192.168.1.14',
-    port: 3001
+    port: 3001,
+    sourcemapIgnoreList: () => true, // Ignorar warnings de source maps en desarrollo
+  },
+  // Configuración para development - solo inline sourcemaps en dev
+  esbuild: mode === 'development' ? {
+    sourcemap: 'inline', // Source maps inline en desarrollo para evitar archivos .map rotos
+  } : {
+    drop: ['console', 'debugger'], // Eliminar console.log en producción
   },
   base: '/admin',
   resolve: {
@@ -55,4 +63,4 @@ export default defineConfig({
       '@assets': fileURLToPath(new URL('../src/assets', import.meta.url))
     }
   }
-});
+}));
