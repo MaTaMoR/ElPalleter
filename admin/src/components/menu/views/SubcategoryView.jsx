@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X, Trash2, Undo2 } from 'lucide-react';
 import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
@@ -20,6 +20,8 @@ const SubcategoryView = ({
   onUpdateSubcategory,
   onMoveSubcategory,
   onCancelEditSubcategory,
+  onDeleteCategory,
+  onUndoDeleteCategory,
   onBack,
   itemCounts,
   isEditing,
@@ -134,13 +136,32 @@ const SubcategoryView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
         {isEditing && (
-          <Button
-            variant="primary"
-            icon={Plus}
-            onClick={handleAddSubcategoryClick}
-          >
-            Añadir
-          </Button>
+          <div className={styles.actionButtons}>
+            {category && category._state === 'deleted' && onUndoDeleteCategory ? (
+              <Button
+                variant="secondary"
+                icon={Undo2}
+                onClick={() => onUndoDeleteCategory(category.id)}
+              >
+                Deshacer
+              </Button>
+            ) : category && onDeleteCategory && (
+              <Button
+                variant="danger"
+                icon={Trash2}
+                onClick={() => onDeleteCategory(category.id)}
+              >
+                Borrar
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              icon={Plus}
+              onClick={handleAddSubcategoryClick}
+            >
+              Añadir
+            </Button>
+          </div>
         )}
       </div>
 
@@ -255,6 +276,8 @@ SubcategoryView.propTypes = {
   onUpdateSubcategory: PropTypes.func,
   onMoveSubcategory: PropTypes.func,
   onCancelEditSubcategory: PropTypes.func,
+  onDeleteCategory: PropTypes.func,
+  onUndoDeleteCategory: PropTypes.func,
   onBack: PropTypes.func,
   itemCounts: PropTypes.object,
   isEditing: PropTypes.bool,
