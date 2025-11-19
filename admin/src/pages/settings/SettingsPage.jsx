@@ -9,6 +9,7 @@ import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
 import { I18nRepository } from '@repositories/I18nRepository';
 import { ImageRepository } from '@repositories/ImageRepository';
+import { AuthService } from '@services/AuthService';
 import styles from './SettingsPage.module.css';
 
 // ============================================================================
@@ -132,6 +133,7 @@ const SettingsContent = () => {
 
         try {
           const updatePromises = [];
+          const token = AuthService.getToken();
 
           // Update all changed translations
           if (changedTranslations.length > 0) {
@@ -140,7 +142,7 @@ const SettingsContent = () => {
                 languageCode: selectedLanguage,
                 key,
                 value: newValue
-              })
+              }, token)
             );
             updatePromises.push(...translationPromises);
           }
@@ -148,7 +150,7 @@ const SettingsContent = () => {
           // Update all changed images
           if (changedImages.length > 0) {
             const imagePromises = changedImages.map(imageName =>
-              ImageRepository.updateImage(imageName, modifiedImages[imageName])
+              ImageRepository.updateImage(imageName, modifiedImages[imageName], token)
             );
             updatePromises.push(...imagePromises);
           }

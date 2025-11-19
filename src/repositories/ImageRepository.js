@@ -22,9 +22,10 @@ export class ImageRepository extends BaseRepository {
      * PUT /image/update/{name}
      * @param {string} name - Nombre de la imagen a actualizar
      * @param {File} file - Archivo de imagen a subir
+     * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} Imagen actualizada
      */
-    static async updateImage(name, file) {
+    static async updateImage(name, file, token) {
         if (!name) {
             throw new Error('Image name is required');
         }
@@ -37,7 +38,9 @@ export class ImageRepository extends BaseRepository {
             const formData = new FormData();
             formData.append('image', file);
 
-            const response = await this.putFormData(`/image/update/${name}`, formData);
+            const response = await this.putFormData(`/image/update/${name}`, formData, {
+                headers: this.getAuthHeaders(token)
+            });
             return response;
         } catch (error) {
             console.error(`ImageRepository: Error updating image ${name}:`, error);

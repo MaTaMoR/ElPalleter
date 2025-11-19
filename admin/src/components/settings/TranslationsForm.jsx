@@ -40,20 +40,15 @@ const TranslationsForm = ({
 
     const lowerSearch = searchTerm.toLowerCase().trim();
 
-    // Filter matching translations
-    const filtered = translationsArray.filter(({ key, value }) => {
-      return (
-        key.toLowerCase().includes(lowerSearch) ||
-        value.toLowerCase().includes(lowerSearch)
-      );
+    // Filter matching translations by key only (not value to avoid disappearing during edit)
+    const filtered = translationsArray.filter(({ key }) => {
+      return key.toLowerCase().includes(lowerSearch);
     });
 
     // Sort by relevance when searching
     return filtered.sort((a, b) => {
       const aKeyLower = a.key.toLowerCase();
       const bKeyLower = b.key.toLowerCase();
-      const aValueLower = a.value.toLowerCase();
-      const bValueLower = b.value.toLowerCase();
 
       // 1. Exact key match has highest priority
       const aExactKey = aKeyLower === lowerSearch;
@@ -67,32 +62,12 @@ const TranslationsForm = ({
       if (aKeyStarts && !bKeyStarts) return -1;
       if (!aKeyStarts && bKeyStarts) return 1;
 
-      // 3. Key contains search term (already filtered)
-      const aKeyContains = aKeyLower.includes(lowerSearch);
-      const bKeyContains = bKeyLower.includes(lowerSearch);
-      if (aKeyContains && !bKeyContains) return -1;
-      if (!aKeyContains && bKeyContains) return 1;
-
-      // 4. Within key matches, prefer lower level (less dots)
-      if (aKeyContains && bKeyContains) {
-        if (a.level !== b.level) {
-          return a.level - b.level;
-        }
+      // 3. Within key matches, prefer lower level (less dots)
+      if (a.level !== b.level) {
+        return a.level - b.level;
       }
 
-      // 5. Value exact match
-      const aExactValue = aValueLower === lowerSearch;
-      const bExactValue = bValueLower === lowerSearch;
-      if (aExactValue && !bExactValue) return -1;
-      if (!aExactValue && bExactValue) return 1;
-
-      // 6. Value starts with search
-      const aValueStarts = aValueLower.startsWith(lowerSearch);
-      const bValueStarts = bValueLower.startsWith(lowerSearch);
-      if (aValueStarts && !bValueStarts) return -1;
-      if (!aValueStarts && bValueStarts) return 1;
-
-      // 7. Default: alphabetical by key
+      // 4. Default: alphabetical by key
       return a.key.localeCompare(b.key);
     });
   }, [translations, searchTerm]);
