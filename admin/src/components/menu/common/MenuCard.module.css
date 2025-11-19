@@ -149,6 +149,16 @@
   background-color: rgba(59, 130, 246, 0.1);
 }
 
+.moveButton:hover:not(:disabled) {
+  color: var(--primary);
+  background-color: rgba(217, 119, 6, 0.1);
+}
+
+.moveButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 /* Warning icon for validation errors */
 .warningIcon {
   display: flex;

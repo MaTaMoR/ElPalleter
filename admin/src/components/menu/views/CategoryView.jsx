@@ -15,6 +15,7 @@ const CategoryView = ({
   onDeleteCategory,
   onUndoDeleteCategory,
   onUpdateCategory,
+  onMoveCategory,
   onCancelEditCategory,
   subcategoryCounts,
   isEditing,
@@ -114,7 +115,7 @@ const CategoryView = ({
       </div>
 
       <div className={styles.grid}>
-        {categories.map((category) => {
+        {categories.map((category, index) => {
           const isEditingCategory = isEditing && editingCategoryId === category.id;
           const isDeleted = category._state === 'deleted';
           const isShaking = shakingCategoryId === category.id;
@@ -171,6 +172,10 @@ const CategoryView = ({
               onEdit={() => handleEdit(category.id)}
               onDelete={() => onDeleteCategory(category.id)}
               onUndo={() => onUndoDeleteCategory(category.id)}
+              onMoveUp={index > 0 && onMoveCategory ? () => onMoveCategory(category.id, 'up') : undefined}
+              onMoveDown={index < categories.length - 1 && onMoveCategory ? () => onMoveCategory(category.id, 'down') : undefined}
+              canMoveUp={index > 0}
+              canMoveDown={index < categories.length - 1}
               showArrow={true}
               isEditing={isEditing}
               hasValidationErrors={categoryHasValidationErrors(category.id)}
@@ -196,6 +201,7 @@ CategoryView.propTypes = {
   onDeleteCategory: PropTypes.func,
   onUndoDeleteCategory: PropTypes.func,
   onUpdateCategory: PropTypes.func,
+  onMoveCategory: PropTypes.func,
   onCancelEditCategory: PropTypes.func,
   subcategoryCounts: PropTypes.object,
   isEditing: PropTypes.bool,

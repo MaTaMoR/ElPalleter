@@ -16,6 +16,7 @@ const ItemView = ({
   onAddItem,
   onUpdateItem,
   onUpdateSubcategory,
+  onMoveItem,
   onDeleteItem,
   onUndoDeleteItem,
   onCancelEditItem,
@@ -158,7 +159,7 @@ const ItemView = ({
             <p>No hay items en esta subcategoría</p>
           </div>
         ) : (
-          items.map((item) => {
+          items.map((item, index) => {
             const isEditingItem = isEditing && editingItemId === item.id;
             const isDeleted = item._state === 'deleted';
 
@@ -246,6 +247,10 @@ const ItemView = ({
                   onEdit={() => handleEdit(item.id)}
                   onDelete={() => onDeleteItem(item.id)}
                   onUndo={() => onUndoDeleteItem(item.id)}
+                  onMoveUp={index > 0 && onMoveItem ? () => onMoveItem(item.id, 'up') : undefined}
+                  onMoveDown={index < items.length - 1 && onMoveItem ? () => onMoveItem(item.id, 'down') : undefined}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < items.length - 1}
                   showArrow={false}
                   isEditing={isEditing}
                 />
@@ -275,6 +280,7 @@ ItemView.propTypes = {
   onAddItem: PropTypes.func,
   onUpdateItem: PropTypes.func,
   onUpdateSubcategory: PropTypes.func,
+  onMoveItem: PropTypes.func,
   onDeleteItem: PropTypes.func,
   onUndoDeleteItem: PropTypes.func,
   onCancelEditItem: PropTypes.func,

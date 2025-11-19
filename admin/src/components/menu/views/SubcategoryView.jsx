@@ -18,6 +18,7 @@ const SubcategoryView = ({
   onUndoDeleteSubcategory,
   onUpdateCategory,
   onUpdateSubcategory,
+  onMoveSubcategory,
   onCancelEditSubcategory,
   onBack,
   itemCounts,
@@ -157,7 +158,7 @@ const SubcategoryView = ({
       )}
 
       <div className={styles.grid}>
-        {subcategories.map((subcategory) => {
+        {subcategories.map((subcategory, index) => {
           const isEditingSubcategory = isEditing && editingSubcategoryId === subcategory.id;
           const isDeleted = subcategory._state === 'deleted';
           const isShaking = shakingSubcategoryId === subcategory.id;
@@ -214,6 +215,10 @@ const SubcategoryView = ({
               onEdit={() => handleEdit(subcategory.id)}
               onDelete={() => onDeleteSubcategory(subcategory.id)}
               onUndo={() => onUndoDeleteSubcategory(subcategory.id)}
+              onMoveUp={index > 0 && onMoveSubcategory ? () => onMoveSubcategory(subcategory.id, 'up') : undefined}
+              onMoveDown={index < subcategories.length - 1 && onMoveSubcategory ? () => onMoveSubcategory(subcategory.id, 'down') : undefined}
+              canMoveUp={index > 0}
+              canMoveDown={index < subcategories.length - 1}
               showArrow={true}
               isEditing={isEditing}
               hasValidationErrors={subcategoryHasValidationErrors(subcategory.id)}
@@ -248,6 +253,7 @@ SubcategoryView.propTypes = {
   onUndoDeleteSubcategory: PropTypes.func,
   onUpdateCategory: PropTypes.func,
   onUpdateSubcategory: PropTypes.func,
+  onMoveSubcategory: PropTypes.func,
   onCancelEditSubcategory: PropTypes.func,
   onBack: PropTypes.func,
   itemCounts: PropTypes.object,
