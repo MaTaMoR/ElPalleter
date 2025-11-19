@@ -340,25 +340,10 @@
 @media (max-width: 768px) {
   .cardHeader {
     padding: 0.875rem 1rem;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .cardHeader:not(.cardHeaderReadOnly) .cardHeaderLeft {
-    justify-content: center;
-  }
-
-  .cardHeaderReadOnly {
-    flex-direction: row;
-    align-items: center;
   }
 
   .cardHeaderReadOnly .cardHeaderLeft {
     justify-content: flex-start;
-  }
-
-  .addPatternButtonHeader {
-    width: 100%;
   }
 
   .cardContent {
