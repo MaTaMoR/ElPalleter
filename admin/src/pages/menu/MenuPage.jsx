@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import PageContainer from '../../components/common/PageContainer';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -192,9 +193,11 @@ const MenuPage = () => {
       selectedLanguage={selectedLanguage}
       onLanguageChange={setSelectedLanguage}
     >
-      <div className={styles.menuPage}>
-        <MenuContent />
-      </div>
+      <PageContainer>
+        <div className={styles.menuPage}>
+          <MenuContent />
+        </div>
+      </PageContainer>
     </MenuEditProvider>
   );
 };
