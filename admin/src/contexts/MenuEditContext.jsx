@@ -7,6 +7,7 @@ import { useEntityOperations } from '../hooks/useEntityOperations';
 import { useNavigationBlocker } from '../hooks/useNavigationBlocker';
 import { unflattenMenuData, processMenuDataForBackend } from '../utils/menuDataUtils';
 import { CartaService } from '@services/CartaService';
+import ToastContainer from '../components/common/ToastContainer';
 
 const MenuEditContext = createContext(null);
 
@@ -36,7 +37,10 @@ export const MenuEditProvider = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Confirm dialog state
+  // Toast notifications state
+  const [toasts, setToasts] = useState([]);
+
+  // Confirm dialog state (for warnings/errors that need user decision)
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -94,6 +98,19 @@ export const MenuEditProvider = ({
 
   // Use navigation blocker only when there are real changes
   useNavigationBlocker(menuState.hasRealChanges(), handleNavigationBlock);
+
+  // ============================================================================
+  // TOAST HELPERS
+  // ============================================================================
+
+  const showToast = useCallback((message, type = 'success', duration = 3000) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type, duration }]);
+  }, []);
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
 
   // ============================================================================
   // HANDLERS
@@ -192,15 +209,8 @@ export const MenuEditProvider = ({
           setIsEditing(false);
           setIsSaving(false);
 
-          setConfirmDialog({
-            isOpen: true,
-            title: 'Guardado exitoso',
-            message: 'Los cambios se han guardado correctamente en la carta.',
-            type: 'info',
-            onConfirm: () => {
-              setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-            }
-          });
+          // Show success toast
+          showToast('Los cambios se han guardado correctamente', 'success', 4000);
         } catch (error) {
           console.error('Error al guardar:', error);
           setIsSaving(false);
@@ -286,6 +296,11 @@ export const MenuEditProvider = ({
     confirmDialog,
     setConfirmDialog,
 
+    // Toasts
+    toasts,
+    showToast,
+    removeToast,
+
     // Reload
     reload
   };
@@ -293,6 +308,7 @@ export const MenuEditProvider = ({
   return (
     <MenuEditContext.Provider value={value}>
       {children}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </MenuEditContext.Provider>
   );
 };
