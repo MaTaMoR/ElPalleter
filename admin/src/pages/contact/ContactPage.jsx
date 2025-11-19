@@ -220,7 +220,7 @@ const ContactContent = () => {
               <div className={styles.headerTop}>
                 {/* Title Section */}
                 <div className={styles.titleWrapper}>
-                  <h1 className={styles.pageTitle}>Información de Contacto</h1>
+                  <h1 className={styles.pageTitle}>Información del restaurante</h1>
                 </div>
 
                 {/* Controls Group */}
