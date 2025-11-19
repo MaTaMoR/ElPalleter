@@ -269,18 +269,18 @@
     @media (max-width: 1024px) {
       /* Tablet y móvil: sidebar completamente oculto por defecto */
       .sidebar {
-        left: 2rem;
+        left: 1rem;
         top: 86px;
         bottom: 1rem;
         border-radius: 20px;
         width: 280px;
-        transform: translateX(calc(-100% - 2rem));
+        transform: translateX(calc(-100% - 1rem));
       }
 
       /* En mobile, ignoramos el estado collapsed - siempre se oculta completamente */
       .sidebar.collapsed {
         width: 280px;
-        transform: translateX(calc(-100% - 2rem));
+        transform: translateX(calc(-100% - 1rem));
       }
 
       .sidebar.mobile-open {
