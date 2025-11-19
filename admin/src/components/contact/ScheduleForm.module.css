@@ -121,7 +121,7 @@
 }
 
 .cellOpen {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(135deg, #10b981, #059669);
   opacity: 0.8;
 }
 
