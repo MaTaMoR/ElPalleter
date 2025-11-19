@@ -514,6 +514,34 @@ const ScheduleForm = ({
     setOrphanPatterns(prev => prev.filter(orphan => orphan.patternKey !== patternKey));
   };
 
+  // Format time on blur - add :00 if only hours are provided
+  const handleTimeBlur = (pattern, rangeIndex, field, value) => {
+    if (!value) return;
+
+    let formattedValue = value.trim();
+
+    // If only digits (like "9" or "16"), format to "09:00" or "16:00"
+    if (/^\d{1,2}$/.test(formattedValue)) {
+      const hours = parseInt(formattedValue, 10);
+      if (hours >= 0 && hours <= 23) {
+        formattedValue = `${hours.toString().padStart(2, '0')}:00`;
+      }
+    }
+    // If format is "9:30" or "16:45", ensure hours have 2 digits
+    else if (/^\d{1,2}:\d{2}$/.test(formattedValue)) {
+      const [hours, minutes] = formattedValue.split(':');
+      const h = parseInt(hours, 10);
+      if (h >= 0 && h <= 23) {
+        formattedValue = `${h.toString().padStart(2, '0')}:${minutes}`;
+      }
+    }
+
+    // Only update if the format changed
+    if (formattedValue !== value) {
+      handlePatternRangeChange(pattern, rangeIndex, field, formattedValue);
+    }
+  };
+
   // Editable form - pattern-based layout
   const patterns = groupSchedulesByPattern();
 
@@ -522,8 +550,18 @@ const ScheduleForm = ({
       <h2 className={styles.sectionTitle}>Horarios</h2>
       <div className={styles.scheduleCard}>
         <div className={styles.cardHeader}>
-          <Clock size={20} className={styles.cardIcon} />
-          <h3 className={styles.cardTitle}>Patrones de horario</h3>
+          <div className={styles.cardHeaderLeft}>
+            <Clock size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>Patrones de horario</h3>
+          </div>
+          <Button
+            variant="secondary"
+            icon={Plus}
+            onClick={handleAddNewPattern}
+            className={styles.addPatternButtonHeader}
+          >
+            Añadir patrón
+          </Button>
         </div>
         <div className={styles.cardContent}>
           <div className={styles.patternsContainer}>
@@ -560,16 +598,18 @@ const ScheduleForm = ({
                 <div className={styles.rangeRow}>
                   <MenuTextField
                     label="Inicio"
-                    value={pattern.ranges[0]?.startTime || '09:00'}
+                    value={pattern.ranges[0]?.startTime || ''}
                     onChange={(value) => handlePatternRangeChange(pattern, 0, 'startTime', value)}
+                    onBlur={(value) => handleTimeBlur(pattern, 0, 'startTime', value)}
                     error={rangeErrors[0]?.startTime}
                     placeholder="09:00"
                     required
                   />
                   <MenuTextField
                     label="Fin"
-                    value={pattern.ranges[0]?.endTime || '17:00'}
+                    value={pattern.ranges[0]?.endTime || ''}
                     onChange={(value) => handlePatternRangeChange(pattern, 0, 'endTime', value)}
+                    onBlur={(value) => handleTimeBlur(pattern, 0, 'endTime', value)}
                     error={rangeErrors[0]?.endTime}
                     placeholder="17:00"
                     required
@@ -597,16 +637,6 @@ const ScheduleForm = ({
             </div>
           );
         })}
-
-            {/* Add new pattern button */}
-            <Button
-              variant="secondary"
-              icon={Plus}
-              onClick={handleAddNewPattern}
-              className={styles.addPatternButton}
-            >
-              Añadir patrón de horario
-            </Button>
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ const MenuTextField = ({
   label,
   value,
   onChange,
+  onBlur,
   error,
   readOnly = false,
   required = false,
@@ -22,9 +23,16 @@ const MenuTextField = ({
     }
   };
 
+  const handleBlur = (e) => {
+    if (onBlur) {
+      onBlur(e.target.value);
+    }
+  };
+
   const inputProps = {
     value: value || '',
     onChange: handleChange,
+    onBlur: handleBlur,
     readOnly,
     placeholder,
     className: `${styles.input} ${readOnly ? styles.readOnly : ''}`,
@@ -61,6 +69,7 @@ MenuTextField.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  onBlur: PropTypes.func,
   error: PropTypes.string,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
