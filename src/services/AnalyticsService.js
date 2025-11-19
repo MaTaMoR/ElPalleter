@@ -1,5 +1,3 @@
-// src/services/AnalyticsService.js
-
 import { AnalyticsRepository } from '../repositories/AnalyticsRepository.js';
 import { AuthService } from './AuthService.js';
 

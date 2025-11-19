@@ -1,7 +1,5 @@
-// src/services/CartaService.js
-
 import { CartaRepository } from '../repositories/CartaRepository.js';
-import { AuthService } from '../services/AuthService.js';
+import { AuthService } from './AuthService.js';
 
 /**
  * Servicio de Carta actualizado para usar el backend Spring Boot

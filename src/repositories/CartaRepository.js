@@ -1,5 +1,3 @@
-// src/repositories/CartaRepository.js
-
 import { BaseRepository } from './BaseRepository.js';
 
 /**
