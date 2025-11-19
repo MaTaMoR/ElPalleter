@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Unlink } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import MenuCheckbox from '../menu/fields/MenuCheckbox';
 import Button from '../common/Button';
@@ -305,6 +305,33 @@ const ScheduleForm = ({
     onChange(updatedSchedules);
   };
 
+  const handleUnlinkGroup = (group) => {
+    // To unlink a group, we slightly modify the time of each day except the first
+    // This breaks the grouping so each day becomes editable independently
+    const updatedSchedules = schedules.map(schedule => {
+      if (group.days.includes(schedule.dayOfWeek) && schedule.dayOfWeek !== group.startDay) {
+        // Add one minute to the first range's start time to make it unique
+        if (schedule.scheduleRanges && schedule.scheduleRanges.length > 0) {
+          const firstRange = schedule.scheduleRanges[0];
+          const [hours, minutes] = firstRange.startTime.split(':').map(Number);
+          const newMinutes = (minutes + 1) % 60;
+          const newHours = minutes === 59 ? (hours + 1) % 24 : hours;
+          const newStartTime = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+
+          return {
+            ...schedule,
+            scheduleRanges: [
+              { ...firstRange, startTime: newStartTime },
+              ...schedule.scheduleRanges.slice(1)
+            ]
+          };
+        }
+      }
+      return schedule;
+    });
+    onChange(updatedSchedules);
+  };
+
   // Editable form - compact table-like layout with grouped days
   const groupedSchedules = groupSchedulesForEdit();
 
@@ -324,7 +351,18 @@ const ScheduleForm = ({
                 <div className={styles.dayNameGroup}>
                   <span className={styles.dayName}>{getDayRangeLabel(group)}</span>
                   {isGrouped && (
-                    <span className={styles.groupBadge}>{group.days.length} días</span>
+                    <>
+                      <span className={styles.groupBadge}>{group.days.length} días</span>
+                      <button
+                        type="button"
+                        className={styles.unlinkButton}
+                        onClick={() => handleUnlinkGroup(group)}
+                        aria-label="Desvincular días"
+                        title="Desvincular días para editar individualmente"
+                      >
+                        <Unlink size={14} />
+                      </button>
+                    </>
                   )}
                 </div>
                 <MenuCheckbox

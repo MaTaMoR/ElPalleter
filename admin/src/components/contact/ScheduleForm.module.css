@@ -186,6 +186,24 @@
   font-weight: 500;
 }
 
+.unlinkButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.unlinkButton:hover {
+  background: var(--bg-secondary);
+  color: var(--primary);
+}
+
 .rangesColumn {
   flex: 1;
   display: flex;
