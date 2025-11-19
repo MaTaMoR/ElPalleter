@@ -26,16 +26,28 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
     const push = navigator.push;
     const replace = navigator.replace;
 
-    // Helper to check if navigation is leaving the current page
+    // Helper to check if navigation is leaving the current page section
     const isLeavingPage = (nextPath) => {
-      const currentBasePath = location.pathname;
-      const nextBasePath = typeof nextPath === 'string'
-        ? nextPath.split('?')[0]  // Extract pathname without query params
+      // Extract pathname from string or object
+      const nextPathname = typeof nextPath === 'string'
+        ? nextPath.split('?')[0]  // Remove query params if present
         : nextPath.pathname;
 
-      // Only block if navigating to a DIFFERENT base path
-      // Allow navigation within the same page (e.g., /menu -> /menu?category=X)
-      return nextBasePath !== currentBasePath;
+      // Get base route (e.g., /admin/menu from /admin/menu/categories/cat-1)
+      // This finds the common parent route that contains all sub-routes
+      const getCurrentBase = (path) => {
+        const segments = path.split('/').filter(Boolean);
+        // For /admin/menu/categories/... we want /admin/menu
+        // Take first 2 segments for admin routes
+        return '/' + segments.slice(0, 2).join('/');
+      };
+
+      const currentBase = getCurrentBase(location.pathname);
+      const nextBase = getCurrentBase(nextPathname);
+
+      // Only block if navigating to a DIFFERENT base section
+      // Allow all navigation within the same section (e.g., /admin/menu/*)
+      return currentBase !== nextBase;
     };
 
     // Override push to intercept navigation
