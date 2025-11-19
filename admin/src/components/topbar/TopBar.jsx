@@ -7,7 +7,7 @@ import {
   LogOut,
   ChevronDown,
 } from 'lucide-react';
-import logoLight from '/src/assets/mini-logo-light.svg';
+import logoLight from '@assets/mini-logo-light.svg';
 import styles from './TopBar.module.css';
 
 const TopBar = ({ onMenuClick, title }) => {
