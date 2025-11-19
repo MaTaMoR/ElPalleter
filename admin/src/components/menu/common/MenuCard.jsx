@@ -67,27 +67,31 @@ const MenuCard = ({
               <AlertCircle size={20} />
             </div>
           )}
-          {isEditing && !isDeleted && onMoveUp && (
-            <button
-              type="button"
-              className={`${styles.actionButton} ${styles.moveButton}`}
-              onClick={onMoveUp}
-              disabled={!canMoveUp}
-              title="Mover arriba"
-            >
-              <ChevronUp size={18} />
-            </button>
-          )}
-          {isEditing && !isDeleted && onMoveDown && (
-            <button
-              type="button"
-              className={`${styles.actionButton} ${styles.moveButton}`}
-              onClick={onMoveDown}
-              disabled={!canMoveDown}
-              title="Mover abajo"
-            >
-              <ChevronDown size={18} />
-            </button>
+          {isEditing && !isDeleted && (onMoveUp || onMoveDown) && (
+            <div className={styles.moveButtonsContainer}>
+              {onMoveUp && (
+                <button
+                  type="button"
+                  className={`${styles.actionButton} ${styles.moveButton}`}
+                  onClick={onMoveUp}
+                  disabled={!canMoveUp}
+                  title="Mover arriba"
+                >
+                  <ChevronUp size={18} />
+                </button>
+              )}
+              {onMoveDown && (
+                <button
+                  type="button"
+                  className={`${styles.actionButton} ${styles.moveButton}`}
+                  onClick={onMoveDown}
+                  disabled={!canMoveDown}
+                  title="Mover abajo"
+                >
+                  <ChevronDown size={18} />
+                </button>
+              )}
+            </div>
           )}
           {isEditing && (
             isDeleted ? (
