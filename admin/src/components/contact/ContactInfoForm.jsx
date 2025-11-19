@@ -27,8 +27,6 @@ const ContactInfoForm = ({
     // Read-only display
     return (
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Información de contacto</h2>
-
         <div className={styles.readOnlyContainer}>
           {/* Address Section */}
           <div className={styles.infoCard}>
@@ -102,8 +100,6 @@ const ContactInfoForm = ({
   // Editable form
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Información de contacto</h2>
-
       <div className={styles.editableContainer}>
         {/* Address Section */}
         <div className={styles.formCard}>

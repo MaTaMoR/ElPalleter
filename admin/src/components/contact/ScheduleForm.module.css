@@ -34,6 +34,10 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.cardHeaderReadOnly {
+  justify-content: flex-start;
+}
+
 .cardHeaderLeft {
   display: flex;
   align-items: center;
@@ -340,8 +344,17 @@
     align-items: stretch;
   }
 
-  .cardHeaderLeft {
+  .cardHeader:not(.cardHeaderReadOnly) .cardHeaderLeft {
     justify-content: center;
+  }
+
+  .cardHeaderReadOnly {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .cardHeaderReadOnly .cardHeaderLeft {
+    justify-content: flex-start;
   }
 
   .addPatternButtonHeader {
