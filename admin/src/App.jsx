@@ -13,6 +13,7 @@ import AdminLayout from './layout/AdminLayout';
 
 import DashboardPage from './pages/dashboard/DashboardPage';
 import MenuPage from './pages/menu/MenuPage';
+import ContactPage from './pages/contact/ContactPage';
 import UsersPage from './pages/users/UsersPage';
 import SettingsPage from './pages/settings/SettingsPage';
 
@@ -30,6 +31,7 @@ export default function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="menu/*" element={<MenuPage />} />
+            <Route path="contact" element={<ContactPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
