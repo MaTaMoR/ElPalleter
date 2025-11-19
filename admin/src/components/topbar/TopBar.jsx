@@ -29,41 +29,43 @@ const TopBar = ({ onMenuClick, title }) => {
 
   return (
     <header className={styles.topbar}>
-      <div className={styles.topbarLeft}>
-        <button
-          className={styles.menuButton}
-          onClick={onMenuClick}
-        >
-          <Menu size={24} />
-        </button>
-        <img src={logoLight} alt="El Palleter" className={styles.logo} />
-      </div>
-
-      <div className={styles.topbarRight}>
-        <div className={styles.userMenuContainer}>
-          <button 
-            className={styles.userMenuButton}
-            onClick={() => setShowUserMenu(!showUserMenu)}
+      <div className={styles.topbarCard}>
+        <div className={styles.topbarLeft}>
+          <button
+            className={styles.menuButton}
+            onClick={onMenuClick}
           >
-            <div className={styles.userAvatarSmall}>
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
-            <span className={styles.userNameTopbar}>{user?.name}</span>
-            <ChevronDown size={16} />
+            <Menu size={24} />
           </button>
+          <img src={logoLight} alt="El Palleter" className={styles.logo} />
+        </div>
 
-          {showUserMenu && (
-            <div className={styles.userDropdown}>
-              <button onClick={handleNavigateSettings}>
-                <Settings size={16} />
-                Configuración
-              </button>
-              <button onClick={handleLogout}>
-                <LogOut size={16} />
-                Cerrar Sesión
-              </button>
-            </div>
-          )}
+        <div className={styles.topbarRight}>
+          <div className={styles.userMenuContainer}>
+            <button
+              className={styles.userMenuButton}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <div className={styles.userAvatarSmall}>
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <span className={styles.userNameTopbar}>{user?.name}</span>
+              <ChevronDown size={16} />
+            </button>
+
+            {showUserMenu && (
+              <div className={styles.userDropdown}>
+                <button onClick={handleNavigateSettings}>
+                  <Settings size={16} />
+                  Configuración
+                </button>
+                <button onClick={handleLogout}>
+                  <LogOut size={16} />
+                  Cerrar Sesión
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

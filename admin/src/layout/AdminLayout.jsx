@@ -6,15 +6,17 @@ import styles from './AdminLayout.module.css';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Colapsado por defecto
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   const location = useLocation();
-  
+
   useEffect(() => {
     const handleResize = () => {
-      const desktop = window.innerWidth > 768;
-      setIsDesktop(desktop);
-      
-      if (desktop) {
+      const mobile = window.innerWidth <= 1024;
+      setIsMobile(mobile);
+
+      // Si cambiamos a desktop, cerrar el sidebar móvil
+      if (!mobile) {
         setSidebarOpen(false);
       }
     };
@@ -23,12 +25,13 @@ const AdminLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Cerrar sidebar móvil al cambiar de ruta
   useEffect(() => {
-    if (!isDesktop) {
+    if (isMobile) {
       setSidebarOpen(false);
     }
-  }, [location.pathname, isDesktop]);
-  
+  }, [location.pathname, isMobile]);
+
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('dashboard')) return 'Dashboard';
@@ -39,25 +42,42 @@ const AdminLayout = () => {
   };
 
   const handleMenuClick = () => {
-    if (!isDesktop) {
+    if (isMobile) {
+      // En móvil: toggle sidebar abierto/cerrado
       setSidebarOpen(!sidebarOpen);
+    } else {
+      // En desktop: toggle sidebar colapsado/expandido
+      setSidebarCollapsed(!sidebarCollapsed);
     }
   };
 
   const handleSidebarClose = () => {
-    if (!isDesktop) {
+    if (isMobile) {
       setSidebarOpen(false);
+    }
+  };
+
+  const handleToggleCollapse = () => {
+    if (!isMobile) {
+      setSidebarCollapsed(!sidebarCollapsed);
     }
   };
 
   return (
     <div className={styles.adminLayout}>
-      <Sidebar 
-        isOpen={isDesktop || sidebarOpen}
-        onClose={handleSidebarClose} 
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={handleSidebarClose}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={handleToggleCollapse}
+        isMobile={isMobile}
       />
-      <div className={styles.mainContent}>
-        <TopBar 
+      <div
+        className={`${styles.mainContent} ${
+          !isMobile && sidebarCollapsed ? styles.mainContentCollapsed : ''
+        }`}
+      >
+        <TopBar
           onMenuClick={handleMenuClick}
           title={getPageTitle()}
         />
