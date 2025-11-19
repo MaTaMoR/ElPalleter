@@ -6,7 +6,9 @@ import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import ToastContainer from '../../components/common/ToastContainer';
 import TranslationsForm from '../../components/settings/TranslationsForm';
+import SingleImageForm from '../../components/settings/SingleImageForm';
 import { I18nRepository } from '@repositories/I18nRepository';
+import { ImageRepository } from '@repositories/ImageRepository';
 import styles from './SettingsPage.module.css';
 
 // ============================================================================
@@ -24,6 +26,9 @@ const SettingsContent = () => {
   const [originalTranslations, setOriginalTranslations] = useState(null);
   // Current editing data
   const [translations, setTranslations] = useState(null);
+
+  // Images state - stores File objects for modified images
+  const [modifiedImages, setModifiedImages] = useState({});
 
   // Toast state
   const [toasts, setToasts] = useState([]);
@@ -79,7 +84,9 @@ const SettingsContent = () => {
   };
 
   const hasChanges = () => {
-    return JSON.stringify(translations) !== JSON.stringify(originalTranslations);
+    const hasTranslationChanges = JSON.stringify(translations) !== JSON.stringify(originalTranslations);
+    const hasImageChanges = Object.keys(modifiedImages).length > 0;
+    return hasTranslationChanges || hasImageChanges;
   };
 
   const getChangedTranslations = () => {
@@ -96,47 +103,79 @@ const SettingsContent = () => {
 
   const handleSave = () => {
     const changedTranslations = getChangedTranslations();
+    const changedImages = Object.keys(modifiedImages);
 
-    if (changedTranslations.length === 0) {
+    if (changedTranslations.length === 0 && changedImages.length === 0) {
       showToast('No hay cambios para guardar', 'info');
       return;
     }
+
+    // Build confirmation message
+    const messageParts = [];
+    if (changedTranslations.length > 0) {
+      messageParts.push(`${changedTranslations.length} traducción(es)`);
+    }
+    if (changedImages.length > 0) {
+      messageParts.push(`${changedImages.length} imagen(es)`);
+    }
+    const message = `¿Estás seguro de que quieres guardar los cambios en ${messageParts.join(' y ')}?`;
 
     // Mostrar confirmaci�n antes de guardar
     setConfirmDialog({
       isOpen: true,
       title: 'Guardar cambios',
-      message: `�Est�s seguro de que quieres guardar ${changedTranslations.length} traducci�n(es) modificada(s)?`,
+      message,
       type: 'info',
       onConfirm: async () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
         setIsSaving(true);
 
         try {
+          const updatePromises = [];
+
           // Update all changed translations
-          const updatePromises = changedTranslations.map(({ key, newValue }) =>
-            I18nRepository.updateTranslation({
-              languageCode: selectedLanguage,
-              key,
-              value: newValue
-            })
-          );
+          if (changedTranslations.length > 0) {
+            const translationPromises = changedTranslations.map(({ key, newValue }) =>
+              I18nRepository.updateTranslation({
+                languageCode: selectedLanguage,
+                key,
+                value: newValue
+              })
+            );
+            updatePromises.push(...translationPromises);
+          }
+
+          // Update all changed images
+          if (changedImages.length > 0) {
+            const imagePromises = changedImages.map(imageName =>
+              ImageRepository.updateImage(imageName, modifiedImages[imageName])
+            );
+            updatePromises.push(...imagePromises);
+          }
 
           await Promise.all(updatePromises);
 
           // Reload data from backend
           await loadTranslations();
+          setModifiedImages({});
           setIsEditing(false);
           setIsSaving(false);
 
           // Show success toast
+          const successParts = [];
+          if (changedTranslations.length > 0) {
+            successParts.push(`${changedTranslations.length} traducción(es)`);
+          }
+          if (changedImages.length > 0) {
+            successParts.push(`${changedImages.length} imagen(es)`);
+          }
           showToast(
-            `${changedTranslations.length} traducci�n(es) actualizada(s) correctamente`,
+            `${successParts.join(' y ')} actualizada(s) correctamente`,
             'success',
             4000
           );
         } catch (err) {
-          console.error('Error saving translations:', err);
+          console.error('Error saving changes:', err);
           setIsSaving(false);
 
           // Show error dialog
@@ -158,6 +197,7 @@ const SettingsContent = () => {
     // Si no hay cambios, salir directamente del modo edici�n
     if (!hasChanges()) {
       setIsEditing(false);
+      setModifiedImages({});
       return;
     }
 
@@ -165,19 +205,36 @@ const SettingsContent = () => {
     setConfirmDialog({
       isOpen: true,
       title: 'Cancelar cambios',
-      message: '�Est�s seguro de que quieres cancelar? Se perder�n todos los cambios realizados.',
+      message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
       type: 'danger',
       onConfirm: () => {
         setIsEditing(false);
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
         // Reset to original data
         setTranslations(JSON.parse(JSON.stringify(originalTranslations)));
+        setModifiedImages({});
       }
     });
   };
 
   const handleTranslationsChange = (newTranslations) => {
     setTranslations(newTranslations);
+  };
+
+  const handleImageChange = (imageName, file) => {
+    setModifiedImages(prev => {
+      if (!file) {
+        // Remove the image from modified images
+        const newModified = { ...prev };
+        delete newModified[imageName];
+        return newModified;
+      }
+      // Add or update the image
+      return {
+        ...prev,
+        [imageName]: file
+      };
+    });
   };
 
   // Show loading state
@@ -288,6 +345,14 @@ const SettingsContent = () => {
                   errors={{}}
                   isEditing={isEditing}
                   language={selectedLanguage}
+                />
+
+                {/* Images Section */}
+                <SingleImageForm
+                  imageName="logo"
+                  title="Logo"
+                  onChange={(file) => handleImageChange('logo', file)}
+                  isEditing={isEditing}
                 />
               </div>
             )}
