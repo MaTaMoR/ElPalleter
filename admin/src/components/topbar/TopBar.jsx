@@ -27,6 +27,10 @@ const TopBar = ({ onMenuClick, title }) => {
     navigate('/admin/settings');
   };
 
+  const handleLogoClick = () => {
+    navigate('/admin/dashboard');
+  };
+
   return (
     <header className={styles.topbar}>
       <div className={styles.topbarCard}>
@@ -37,7 +41,13 @@ const TopBar = ({ onMenuClick, title }) => {
           >
             <Menu size={24} />
           </button>
-          <img src={logoLight} alt="El Palleter" className={styles.logo} />
+          <button
+            className={styles.logoButton}
+            onClick={handleLogoClick}
+            aria-label="Ir al inicio"
+          >
+            <img src={logoLight} alt="El Palleter" className={styles.logo} />
+          </button>
         </div>
 
         <div className={styles.topbarRight}>

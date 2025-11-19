@@ -51,6 +51,20 @@
   border-color: #d97706;
 }
 
+.logoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.logoButton:hover {
+  opacity: 0.8;
+}
+
 .logo {
   height: 36px;
   width: auto;
