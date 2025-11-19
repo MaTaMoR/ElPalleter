@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
 import MenuBadge from '../common/MenuBadge';
@@ -55,14 +56,14 @@ const SubcategoryView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{categoryName}</h1>
         {isEditing && (
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            icon={Plus}
             onClick={onAddSubcategory}
             className={styles.addButtonHeader}
           >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
+            Añadir
+          </Button>
         )}
       </div>
 

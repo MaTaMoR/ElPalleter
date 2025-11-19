@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PageContainer from '../../components/common/PageContainer';
+import Button from '../../components/common/Button';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -132,13 +133,13 @@ const MenuContent = () => {
     return (
       <div className={styles.errorContainer}>
         <p className={styles.errorText}>Error al cargar la carta: {error}</p>
-        <button
-          type="button"
-          className={styles.retryButton}
+        <Button
+          variant="primary"
           onClick={reload}
+          className={styles.retryButton}
         >
           Reintentar
-        </button>
+        </Button>
       </div>
     );
   }

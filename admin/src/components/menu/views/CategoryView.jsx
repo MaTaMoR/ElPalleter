@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Check, X } from 'lucide-react';
+import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuCard from '../common/MenuCard';
 import MenuBadge from '../common/MenuBadge';
@@ -43,14 +44,14 @@ const CategoryView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>Categorías</h1>
         {isEditing && (
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            icon={Plus}
             onClick={onAddCategory}
             className={styles.addButtonHeader}
           >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
+            Añadir
+          </Button>
         )}
       </div>
 

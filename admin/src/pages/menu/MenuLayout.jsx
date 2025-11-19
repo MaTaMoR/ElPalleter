@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Edit3, Save, X } from 'lucide-react';
+import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import GlobalSearch from '../../components/menu/search/GlobalSearch';
 import MenuBreadcrumbs from '../../components/menu/navigation/MenuBreadcrumbs';
@@ -62,40 +63,37 @@ const MenuLayout = () => {
                 <div className={styles.controlDivider}></div>
 
                 {/* Edit Button */}
-                <button
-                  type="button"
-                  className={`${styles.headerButton} ${styles.headerButtonPrimary}`}
+                <Button
+                  variant="primary"
+                  icon={Edit3}
                   onClick={handleToggleEditMode}
                 >
-                  <Edit3 size={18} />
-                  <span>Editar</span>
-                </button>
+                  Editar
+                </Button>
               </>
             ) : (
               <>
                 {/* Save Button - En modo edición */}
-                <button
-                  type="button"
-                  className={`${styles.headerButton} ${styles.headerButtonSuccess}`}
+                <Button
+                  variant="success"
+                  icon={Save}
                   onClick={handleSave}
                   disabled={!menuState.hasRealChanges() || isSaving}
                 >
-                  <Save size={18} />
-                  <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
-                </button>
+                  {isSaving ? 'Guardando...' : 'Guardar'}
+                </Button>
 
                 <div className={styles.controlDivider}></div>
 
                 {/* Cancel Button - En modo edición */}
-                <button
-                  type="button"
-                  className={`${styles.headerButton} ${styles.headerButtonDanger}`}
+                <Button
+                  variant="danger"
+                  icon={X}
                   onClick={handleCancel}
                   disabled={isSaving}
                 >
-                  <X size={18} />
-                  <span>Cancelar</span>
-                </button>
+                  Cancelar
+                </Button>
               </>
             )}
           </div>

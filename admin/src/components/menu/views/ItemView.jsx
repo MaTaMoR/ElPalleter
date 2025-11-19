@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
@@ -70,14 +71,14 @@ const ItemView = ({
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
         {isEditing && (
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            icon={Plus}
             onClick={onAddItem}
             className={styles.addButtonHeader}
           >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
+            Añadir
+          </Button>
         )}
       </div>
 
