@@ -181,27 +181,24 @@
   margin: 0;
 }
 
-/* Content Area */
+/* Content Area - Similar to MenuPage */
 .content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
 }
 
-.contentCard {
+/* Contact Container - Equivalente a categoriesContainer en MenuPage */
+.contactContainer {
   background: rgba(26, 26, 26, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-}
-
-.sectionDivider {
-  height: 1px;
-  background: var(--border-color);
-  margin: 1.5rem 0;
 }
 
 /* View Container */
@@ -210,32 +207,51 @@
   overflow: hidden;
 }
 
+/* Forms Container - Contenedor de los formularios */
+.formsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 1rem;
+}
+
+/* Section Divider */
+.sectionDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 2rem 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .contactContainer {
+    padding: 0.75rem;
+  }
+
   .pageTitle {
     font-size: 1.5rem;
   }
 
-  .content {
-    gap: 1.5rem;
+  .formsContainer {
+    gap: 0;
   }
 
-  .contentCard {
-    padding: 1.5rem;
+  .sectionDivider {
+    margin: 1.5rem 0;
   }
 }
 
 @media (max-width: 480px) {
-  .pageTitle {
-    font-size: 1.25rem;
+  .contactContainer {
+    padding: 0.5rem;
   }
 
-  .content {
+  .contactPage {
     gap: 1rem;
   }
 
-  .contentCard {
-    padding: 1rem;
+  .pageTitle {
+    font-size: 1.25rem;
   }
 
   .controlDivider {
@@ -257,5 +273,9 @@
   .languageWrapper > *,
   .buttonWrapper > * {
     width: 100%;
+  }
+
+  .sectionDivider {
+    margin: 1rem 0;
   }
 }
