@@ -26,18 +26,30 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
     const push = navigator.push;
     const replace = navigator.replace;
 
+    // Helper to check if navigation is leaving the current page
+    const isLeavingPage = (nextPath) => {
+      const currentBasePath = location.pathname;
+      const nextBasePath = typeof nextPath === 'string'
+        ? nextPath.split('?')[0]  // Extract pathname without query params
+        : nextPath.pathname;
+
+      // Only block if navigating to a DIFFERENT base path
+      // Allow navigation within the same page (e.g., /menu -> /menu?category=X)
+      return nextBasePath !== currentBasePath;
+    };
+
     // Override push to intercept navigation
     navigator.push = (...args) => {
       const [to] = args;
-      const nextPath = typeof to === 'string' ? to : to.pathname;
 
-      // Only block if navigating to a different path
-      if (nextPath !== location.pathname) {
+      // Only block if actually leaving the page
+      if (isLeavingPage(to)) {
         onBlock(
           () => push.apply(navigator, args), // proceed callback
           () => {} // cancel callback (do nothing)
         );
       } else {
+        // Allow internal navigation (same page, different query params)
         push.apply(navigator, args);
       }
     };
@@ -45,15 +57,15 @@ export const useNavigationBlocker = (shouldBlock, onBlock) => {
     // Override replace to intercept navigation
     navigator.replace = (...args) => {
       const [to] = args;
-      const nextPath = typeof to === 'string' ? to : to.pathname;
 
-      // Only block if navigating to a different path
-      if (nextPath !== location.pathname) {
+      // Only block if actually leaving the page
+      if (isLeavingPage(to)) {
         onBlock(
           () => replace.apply(navigator, args), // proceed callback
           () => {} // cancel callback (do nothing)
         );
       } else {
+        // Allow internal navigation (same page, different query params)
         replace.apply(navigator, args);
       }
     };
