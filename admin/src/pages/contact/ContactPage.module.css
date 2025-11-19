@@ -250,20 +250,11 @@
   }
 
   .controlsGroup {
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
     gap: 0.5rem;
     padding: 0.5rem;
-  }
-
-  .languageWrapper,
-  .buttonWrapper {
-    width: 100%;
-  }
-
-  .languageWrapper > *,
-  .buttonWrapper > * {
-    width: 100%;
+    justify-content: center;
   }
 
   .formsContainer {

@@ -67,7 +67,7 @@
   gap: 1rem;
 }
 
-/* Desktop: Una sola fila con título y controles */
+/* Desktop: Una sola fila con tï¿½tulo y controles */
 @media (min-width: 1024px) {
   .headerTop {
     display: flex;
@@ -250,20 +250,11 @@
   }
 
   .controlsGroup {
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
     gap: 0.5rem;
     padding: 0.5rem;
-  }
-
-  .languageWrapper,
-  .buttonWrapper {
-    width: 100%;
-  }
-
-  .languageWrapper > *,
-  .buttonWrapper > * {
-    width: 100%;
+    justify-content: center;
   }
 
   .formsContainer {

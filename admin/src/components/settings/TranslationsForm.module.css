@@ -245,11 +245,15 @@
 
   .translationItem,
   .translationItemEdit {
-    padding: 0.875rem;
+    padding: 0.75rem;
   }
 
   .translationValue {
-    padding: 0.75rem 0.875rem;
+    padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
+  }
+
+  .translationsList {
+    max-height: 300px;
   }
 }
