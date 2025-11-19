@@ -30,7 +30,6 @@ export const MenuEditProvider = ({
   loading,
   error,
   reload,
-  mockData,
   selectedLanguage,
   onLanguageChange
 }) => {
@@ -47,7 +46,7 @@ export const MenuEditProvider = ({
   });
 
   // Menu state management (Maps, change tracking)
-  const menuState = useMenuState(backendData, loading, error, mockData);
+  const menuState = useMenuState(backendData, loading, error);
 
   // Navigation management (now URL-based)
   const navigation = useMenuNavigation(menuState);
@@ -304,7 +303,6 @@ MenuEditProvider.propTypes = {
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
   reload: PropTypes.func.isRequired,
-  mockData: PropTypes.array,
   selectedLanguage: PropTypes.string.isRequired,
   onLanguageChange: PropTypes.func.isRequired
 };
