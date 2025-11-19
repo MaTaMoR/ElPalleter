@@ -102,11 +102,11 @@ const SettingsContent = () => {
       return;
     }
 
-    // Mostrar confirmación antes de guardar
+    // Mostrar confirmaciï¿½n antes de guardar
     setConfirmDialog({
       isOpen: true,
       title: 'Guardar cambios',
-      message: `¿Estás seguro de que quieres guardar ${changedTranslations.length} traducción(es) modificada(s)?`,
+      message: `ï¿½Estï¿½s seguro de que quieres guardar ${changedTranslations.length} traducciï¿½n(es) modificada(s)?`,
       type: 'info',
       onConfirm: async () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
@@ -131,7 +131,7 @@ const SettingsContent = () => {
 
           // Show success toast
           showToast(
-            `${changedTranslations.length} traducción(es) actualizada(s) correctamente`,
+            `${changedTranslations.length} traducciï¿½n(es) actualizada(s) correctamente`,
             'success',
             4000
           );
@@ -155,17 +155,17 @@ const SettingsContent = () => {
   };
 
   const handleCancel = () => {
-    // Si no hay cambios, salir directamente del modo edición
+    // Si no hay cambios, salir directamente del modo ediciï¿½n
     if (!hasChanges()) {
       setIsEditing(false);
       return;
     }
 
-    // Si hay cambios, mostrar confirmación
+    // Si hay cambios, mostrar confirmaciï¿½n
     setConfirmDialog({
       isOpen: true,
       title: 'Cancelar cambios',
-      message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
+      message: 'ï¿½Estï¿½s seguro de que quieres cancelar? Se perderï¿½n todos los cambios realizados.',
       type: 'danger',
       onConfirm: () => {
         setIsEditing(false);
@@ -216,14 +216,14 @@ const SettingsContent = () => {
               <div className={styles.headerTop}>
                 {/* Title Section */}
                 <div className={styles.titleWrapper}>
-                  <h1 className={styles.pageTitle}>Configuración</h1>
+                  <h1 className={styles.pageTitle}>ConfiguraciÃ³n</h1>
                 </div>
 
                 {/* Controls Group */}
                 <div className={styles.controlsGroup}>
                   {!isEditing ? (
                     <>
-                      {/* Language Selector - Solo en modo visualización */}
+                      {/* Language Selector - Solo en modo visualizaciï¿½n */}
                       <div className={styles.languageWrapper}>
                         <LanguageSelector
                           selectedLanguage={selectedLanguage}
@@ -247,7 +247,7 @@ const SettingsContent = () => {
                     </>
                   ) : (
                     <>
-                      {/* Save Button - En modo edición */}
+                      {/* Save Button - En modo ediciï¿½n */}
                       <div className={styles.buttonWrapper}>
                         <Button
                           variant="success"
@@ -261,7 +261,7 @@ const SettingsContent = () => {
 
                       <div className={styles.controlDivider}></div>
 
-                      {/* Cancel Button - En modo edición */}
+                      {/* Cancel Button - En modo ediciï¿½n */}
                       <div className={styles.buttonWrapper}>
                         <Button
                           variant="danger"
