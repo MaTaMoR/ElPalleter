@@ -203,6 +203,43 @@ const ScheduleForm = ({
     return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
   });
 
+  // Group consecutive days with the same schedule for editing
+  const groupSchedulesForEdit = () => {
+    const groups = [];
+    let currentGroup = null;
+
+    sortedSchedules.forEach((schedule) => {
+      const scheduleKey = schedule.isOpen
+        ? JSON.stringify(schedule.scheduleRanges?.map(r => ({ s: r.startTime, e: r.endTime })) || [])
+        : 'closed';
+
+      if (currentGroup && currentGroup.scheduleKey === scheduleKey) {
+        // Add to current group
+        currentGroup.days.push(schedule.dayOfWeek);
+        currentGroup.endDay = schedule.dayOfWeek;
+      } else {
+        // Start new group
+        currentGroup = {
+          scheduleKey,
+          days: [schedule.dayOfWeek],
+          startDay: schedule.dayOfWeek,
+          endDay: schedule.dayOfWeek,
+          schedule: schedule
+        };
+        groups.push(currentGroup);
+      }
+    });
+
+    return groups;
+  };
+
+  const getDayRangeLabel = (group) => {
+    if (group.days.length === 1) {
+      return dayNames[group.startDay];
+    }
+    return `${dayNames[group.startDay]} - ${dayNames[group.endDay]}`;
+  };
+
   if (!isEditing) {
     // Read-only display with weekly calendar grid
     return (
@@ -213,32 +250,95 @@ const ScheduleForm = ({
     );
   }
 
-  // Editable form - compact table-like layout
+  // Handler for group changes (updates all days in the group)
+  const handleGroupDayOpenChange = (group, isOpen) => {
+    const updatedSchedules = schedules.map(schedule =>
+      group.days.includes(schedule.dayOfWeek)
+        ? { ...schedule, isOpen }
+        : schedule
+    );
+    onChange(updatedSchedules);
+  };
+
+  const handleGroupRangeChange = (group, rangeIndex, field, value) => {
+    const updatedSchedules = schedules.map(schedule => {
+      if (group.days.includes(schedule.dayOfWeek)) {
+        const updatedRanges = [...schedule.scheduleRanges];
+        updatedRanges[rangeIndex] = {
+          ...updatedRanges[rangeIndex],
+          [field]: value
+        };
+        return { ...schedule, scheduleRanges: updatedRanges };
+      }
+      return schedule;
+    });
+    onChange(updatedSchedules);
+  };
+
+  const handleGroupAddRange = (group) => {
+    const updatedSchedules = schedules.map(schedule => {
+      if (group.days.includes(schedule.dayOfWeek)) {
+        const newRange = {
+          id: Date.now(),
+          nameKey: '',
+          startTime: '09:00',
+          endTime: '17:00'
+        };
+        return {
+          ...schedule,
+          scheduleRanges: [...(schedule.scheduleRanges || []), newRange]
+        };
+      }
+      return schedule;
+    });
+    onChange(updatedSchedules);
+  };
+
+  const handleGroupDeleteRange = (group, rangeIndex) => {
+    const updatedSchedules = schedules.map(schedule => {
+      if (group.days.includes(schedule.dayOfWeek)) {
+        const updatedRanges = schedule.scheduleRanges.filter((_, index) => index !== rangeIndex);
+        return { ...schedule, scheduleRanges: updatedRanges };
+      }
+      return schedule;
+    });
+    onChange(updatedSchedules);
+  };
+
+  // Editable form - compact table-like layout with grouped days
+  const groupedSchedules = groupSchedulesForEdit();
+
   return (
     <div className={styles.section}>
       <h2 className={styles.sectionTitle}>Horarios</h2>
       <div className={styles.scheduleTable}>
-        {sortedSchedules.map(schedule => {
-          const dayErrors = errors[schedule.dayOfWeek] || {};
+        {groupedSchedules.map((group, groupIndex) => {
+          const dayErrors = errors[group.startDay] || {};
           const rangeErrors = dayErrors.ranges || {};
+          const isGrouped = group.days.length > 1;
 
           return (
-            <div key={schedule.dayOfWeek} className={styles.scheduleRow}>
-              {/* Day name and open checkbox */}
+            <div key={groupIndex} className={styles.scheduleRow}>
+              {/* Day name(s) and open checkbox */}
               <div className={styles.dayColumn}>
-                <span className={styles.dayName}>{dayNames[schedule.dayOfWeek]}</span>
+                <div className={styles.dayNameGroup}>
+                  <span className={styles.dayName}>{getDayRangeLabel(group)}</span>
+                  {isGrouped && (
+                    <span className={styles.groupBadge}>{group.days.length} días</span>
+                  )}
+                </div>
                 <MenuCheckbox
                   label="Abierto"
-                  checked={schedule.isOpen}
-                  onChange={(checked) => handleDayOpenChange(schedule.dayOfWeek, checked)}
+                  checked={group.schedule.isOpen}
+                  onChange={(checked) => handleGroupDayOpenChange(group, checked)}
                 />
               </div>
 
               {/* Time ranges */}
               <div className={styles.rangesColumn}>
-                {schedule.isOpen ? (
+                {group.schedule.isOpen ? (
                   <>
-                    {schedule.scheduleRanges && schedule.scheduleRanges.map((range, rangeIndex) => {
+                    {group.schedule.scheduleRanges && group.schedule.scheduleRanges.map((range, rangeIndex) => {
                       const rangeError = rangeErrors[rangeIndex] || {};
 
                       return (
@@ -246,7 +346,7 @@ const ScheduleForm = ({
                           <MenuTextField
                             label="Inicio"
                             value={range.startTime}
-                            onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'startTime', value)}
+                            onChange={(value) => handleGroupRangeChange(group, rangeIndex, 'startTime', value)}
                             error={rangeError.startTime}
                             placeholder="09:00"
                             required
@@ -254,7 +354,7 @@ const ScheduleForm = ({
                           <MenuTextField
                             label="Fin"
                             value={range.endTime}
-                            onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'endTime', value)}
+                            onChange={(value) => handleGroupRangeChange(group, rangeIndex, 'endTime', value)}
                             error={rangeError.endTime}
                             placeholder="17:00"
                             required
@@ -263,7 +363,7 @@ const ScheduleForm = ({
                             <button
                               type="button"
                               className={styles.addRangeButton}
-                              onClick={() => handleAddRange(schedule.dayOfWeek)}
+                              onClick={() => handleGroupAddRange(group)}
                               aria-label="Añadir rango horario"
                               title="Añadir rango horario"
                             >
@@ -272,7 +372,7 @@ const ScheduleForm = ({
                             <button
                               type="button"
                               className={styles.deleteRangeButton}
-                              onClick={() => handleDeleteRange(schedule.dayOfWeek, rangeIndex)}
+                              onClick={() => handleGroupDeleteRange(group, rangeIndex)}
                               aria-label="Eliminar rango horario"
                               title="Eliminar rango horario"
                             >

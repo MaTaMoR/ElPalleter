@@ -164,10 +164,26 @@
   flex-shrink: 0;
 }
 
+.dayNameGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .dayName {
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--primary);
+}
+
+.groupBadge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 12px;
+  font-weight: 500;
 }
 
 .rangesColumn {
