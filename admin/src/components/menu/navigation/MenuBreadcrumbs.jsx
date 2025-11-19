@@ -63,7 +63,7 @@ const MenuBreadcrumbs = () => {
         onClick={handleNavigateToCategories}
       >
         <Home size={20} />
-        <span>Inicio</span>
+        <span>Carta</span>
       </button>
 
       {categoryName && (
