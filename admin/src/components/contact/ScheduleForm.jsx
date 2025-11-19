@@ -574,7 +574,7 @@ const ScheduleForm = ({
             <div key={patternIndex} className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}>
               <div className={styles.patternHeader}>
                 <span className={styles.patternTitle}>
-                  Patrón {patternIndex + 1}
+                  Patrón de horario {patternIndex + 1}
                   {isOrphan && <span className={styles.orphanBadge}>(Sin días asignados)</span>}
                 </span>
                 {isOrphan && (
@@ -592,7 +592,6 @@ const ScheduleForm = ({
 
               {/* Time range for this pattern */}
               <div className={styles.patternRanges}>
-                <label className={styles.patternLabel}>Horario:</label>
                 <div className={styles.rangeRow}>
                   <MenuTextField
                     label="Inicio"
