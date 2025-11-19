@@ -1,0 +1,266 @@
+{
+  "descripcion": "Este es un ejemplo REAL de los datos que se envían al endpoint POST /carta/update?language=es",
+  "url": "http://92.186.195.152:8080/carta/update?language=es",
+  "metodo": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "body": [
+    {
+      "id": "cat-1",
+      "nameKey": "Entrantes",
+      "orderIndex": 0,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T15:30:00Z",
+      "subcategories": [
+        {
+          "id": "sub-1",
+          "nameKey": "Ensaladas",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-1",
+              "nameKey": "Ensalada César",
+              "descriptionKey": "Lechuga, pollo, parmesano, crutones y salsa césar",
+              "price": 8.5,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            },
+            {
+              "id": "item-2",
+              "nameKey": "Ensalada Mediterránea",
+              "descriptionKey": "Lechuga, tomate, pepino, cebolla, aceitunas y queso feta",
+              "price": 7.5,
+              "available": true,
+              "orderIndex": 1,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        },
+        {
+          "id": "sub-2",
+          "nameKey": "Tapas Frías",
+          "orderIndex": 1,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-3",
+              "nameKey": "Jamón Ibérico",
+              "descriptionKey": "Jamón ibérico de bellota con pan con tomate",
+              "price": 12,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat-2",
+      "nameKey": "Platos Principales",
+      "orderIndex": 1,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T15:30:00Z",
+      "subcategories": [
+        {
+          "id": "sub-3",
+          "nameKey": "Arroces",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z",
+          "items": [
+            {
+              "id": "item-4",
+              "nameKey": "Paella Valenciana",
+              "descriptionKey": "Arroz con pollo, conejo y verduras de temporada",
+              "price": 15,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            },
+            {
+              "id": "item-5",
+              "nameKey": "Arroz del Senyoret",
+              "descriptionKey": "Arroz con marisco pelado",
+              "price": 18,
+              "available": false,
+              "orderIndex": 1,
+              "createdAt": "2024-01-15T10:00:00Z",
+              "updatedAt": "2024-01-20T15:30:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": null,
+      "nameKey": "Postres",
+      "orderIndex": 2,
+      "createdAt": "2025-11-19T10:30:00Z",
+      "updatedAt": "2025-11-19T10:30:00Z",
+      "subcategories": [
+        {
+          "id": null,
+          "nameKey": "Postres Caseros",
+          "orderIndex": 0,
+          "createdAt": "2025-11-19T10:30:00Z",
+          "updatedAt": "2025-11-19T10:30:00Z",
+          "items": [
+            {
+              "id": null,
+              "nameKey": "Tarta de Queso",
+              "descriptionKey": "Tarta de queso casera con mermelada de frutos rojos",
+              "price": 5.5,
+              "available": true,
+              "orderIndex": 0,
+              "createdAt": "2025-11-19T10:30:00Z",
+              "updatedAt": "2025-11-19T10:30:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notas_importantes": [
+    "1. ELEMENTOS NUEVOS: Cuando 'id' es null, significa que es un elemento nuevo que NO existe en BD",
+    "2. ELEMENTOS ELIMINADOS: Los elementos con _state='deleted' se FILTRAN y NO se envían",
+    "3. ELEMENTOS EXISTENTES: Cuando 'id' tiene un valor (ej: 'cat-1'), es un elemento que ya existe en BD",
+    "4. PRECIOS: Siempre son números (float), nunca strings",
+    "5. AVAILABLE: Boolean que indica si el item está disponible",
+    "6. ORDER_INDEX: Define el orden de visualización (0, 1, 2...)",
+    "7. TIMESTAMPS: Formato ISO 8601 (YYYY-MM-DDTHH:mm:ssZ)",
+    "8. IDIOMA: Se envía como query parameter 'language' en la URL",
+    "9. MULTI-IDIOMA: Ver sección 'sistema_multiidioma' para la lógica de traducciones"
+  ],
+  "sistema_multiidioma": {
+    "concepto": "La carta debe tener la MISMA ESTRUCTURA en todos los idiomas, pero los TEXTOS son específicos de cada idioma",
+    "ejemplo_flujo": {
+      "paso_1": "Usuario crea categoría 'Postres' en español (language=es)",
+      "paso_2": "Backend crea la categoría con id='cat-3' y copia la estructura a TODOS los idiomas (es, en, ca, etc.)",
+      "paso_3": "Usuario cambia a inglés (language=en) en el selector del frontend",
+      "paso_4": "Usuario edita y traduce 'Postres' -> 'Desserts'",
+      "paso_5": "Backend actualiza solo el texto del idioma inglés, pero el id='cat-3' es el mismo"
+    },
+    "logica_backend": {
+      "modelo_sugerido": "Separar entidades de traducciones",
+      "tablas_ejemplo": {
+        "categories": {
+          "id": "cat-1",
+          "orderIndex": 0,
+          "createdAt": "2024-01-15T10:00:00Z",
+          "updatedAt": "2024-01-20T15:30:00Z"
+        },
+        "category_translations": [
+          {
+            "categoryId": "cat-1",
+            "language": "es",
+            "name": "Entrantes"
+          },
+          {
+            "categoryId": "cat-1",
+            "language": "en",
+            "name": "Starters"
+          },
+          {
+            "categoryId": "cat-1",
+            "language": "ca",
+            "name": "Entrants"
+          }
+        ]
+      },
+      "cuando_crear_nuevo_elemento": {
+        "descripcion": "Cuando id=null y es un elemento nuevo",
+        "accion": "Crear la entidad Y crear traducciones para TODOS los idiomas",
+        "idiomas_soportados": ["es", "en", "ca"],
+        "traduccion_inicial": "Copiar el texto recibido a todos los idiomas",
+        "ejemplo": {
+          "recibe": {
+            "id": null,
+            "nameKey": "Postres",
+            "language": "es"
+          },
+          "backend_crea": {
+            "category": {
+              "id": "cat-3",
+              "orderIndex": 2
+            },
+            "translations": [
+              {"categoryId": "cat-3", "language": "es", "name": "Postres"},
+              {"categoryId": "cat-3", "language": "en", "name": "Postres"},
+              {"categoryId": "cat-3", "language": "ca", "name": "Postres"}
+            ]
+          },
+          "nota": "Después el usuario cambiará a 'en' y traducirá 'Postres' a 'Desserts'"
+        }
+      },
+      "cuando_editar_elemento_existente": {
+        "descripcion": "Cuando id tiene valor (ej: 'cat-1')",
+        "accion": "Actualizar SOLO la traducción del idioma especificado",
+        "ejemplo": {
+          "recibe": {
+            "id": "cat-3",
+            "nameKey": "Desserts",
+            "language": "en"
+          },
+          "backend_actualiza": {
+            "tabla": "category_translations",
+            "where": "categoryId='cat-3' AND language='en'",
+            "set": "name='Desserts'"
+          },
+          "nota": "NO toca las traducciones de 'es' ni 'ca'"
+        }
+      },
+      "cuando_eliminar_elemento": {
+        "descripcion": "Cuando un elemento falta en el payload enviado",
+        "accion": "Eliminar la entidad Y todas sus traducciones en TODOS los idiomas",
+        "ejemplo": {
+          "antes_tenia": ["cat-1", "cat-2", "cat-3"],
+          "ahora_recibe": ["cat-1", "cat-2"],
+          "backend_elimina": {
+            "categories": "DELETE FROM categories WHERE id='cat-3'",
+            "translations": "DELETE FROM category_translations WHERE categoryId='cat-3'"
+          },
+          "nota": "Elimina la categoría y TODAS sus traducciones (es, en, ca)"
+        }
+      }
+    },
+    "campos_afectados": {
+      "Categoría": ["nameKey"],
+      "Subcategoría": ["nameKey"],
+      "Item": ["nameKey", "descriptionKey"]
+    },
+    "campos_NO_afectados": {
+      "descripcion": "Estos campos son iguales en todos los idiomas",
+      "campos": ["id", "orderIndex", "price", "available", "createdAt", "updatedAt"]
+    }
+  },
+  "logica_backend_sugerida": {
+    "paso_1": "Recibir el array de categorías",
+    "paso_2": "Para cada categoría:",
+    "paso_2_1": "Si id es null -> INSERT nueva categoría",
+    "paso_2_2": "Si id existe -> UPDATE categoría existente",
+    "paso_2_3": "Comparar subcategorías enviadas vs BD -> DELETE las que faltan",
+    "paso_3": "Para cada subcategoría:",
+    "paso_3_1": "Si id es null -> INSERT nueva subcategoría",
+    "paso_3_2": "Si id existe -> UPDATE subcategoría existente",
+    "paso_3_3": "Comparar items enviados vs BD -> DELETE los que faltan",
+    "paso_4": "Para cada item:",
+    "paso_4_1": "Si id es null -> INSERT nuevo item",
+    "paso_4_2": "Si id existe -> UPDATE item existente",
+    "paso_5": "Devolver la estructura completa actualizada desde BD"
+  },
+  "respuesta_esperada": {
+    "descripcion": "El backend debe devolver la misma estructura pero con todos los IDs reales (sin nulls)",
+    "ejemplo": "La categoría con id=null debería tener ahora id='cat-3' asignado por la BD"
+  }
+}

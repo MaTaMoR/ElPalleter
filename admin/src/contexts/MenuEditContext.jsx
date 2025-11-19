@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useMenuState } from '../hooks/useMenuState';
 import { useMenuNavigation } from '../hooks/useMenuNavigation';
 import { useMenuValidation } from '../hooks/useMenuValidation';
 import { useEntityOperations } from '../hooks/useEntityOperations';
+import { useNavigationBlocker } from '../hooks/useNavigationBlocker';
 import { unflattenMenuData, processMenuDataForBackend } from '../utils/menuDataUtils';
-import { MenuService } from '../services/MenuService';
+import { CartaService } from '@services/CartaService';
+import ToastContainer from '../components/common/ToastContainer';
 
 const MenuEditContext = createContext(null);
 
@@ -29,14 +31,16 @@ export const MenuEditProvider = ({
   loading,
   error,
   reload,
-  mockData,
   selectedLanguage,
   onLanguageChange
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Confirm dialog state
+  // Toast notifications state
+  const [toasts, setToasts] = useState([]);
+
+  // Confirm dialog state (for warnings/errors that need user decision)
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -46,7 +50,7 @@ export const MenuEditProvider = ({
   });
 
   // Menu state management (Maps, change tracking)
-  const menuState = useMenuState(backendData, loading, error, mockData);
+  const menuState = useMenuState(backendData, loading, error);
 
   // Navigation management (now URL-based)
   const navigation = useMenuNavigation(menuState);
@@ -63,6 +67,50 @@ export const MenuEditProvider = ({
   // Entity operations (unified CRUD)
   const getNavigation = () => navigation;
   const entityOps = useEntityOperations(menuState, getNavigation, setConfirmDialog);
+
+  // ============================================================================
+  // NAVIGATION BLOCKER
+  // ============================================================================
+
+  // Block navigation when there are unsaved changes
+  const handleNavigationBlock = useCallback((proceedCallback, cancelCallback) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cambios sin guardar',
+      message: '¿Estás seguro de que quieres salir? Se perderán todos los cambios no guardados.',
+      type: 'warning',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // Proceed with navigation
+        if (proceedCallback) {
+          proceedCallback();
+        }
+      },
+      onCancel: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // Cancel navigation
+        if (cancelCallback) {
+          cancelCallback();
+        }
+      }
+    });
+  }, []);
+
+  // Use navigation blocker only when there are real changes
+  useNavigationBlocker(menuState.hasRealChanges(), handleNavigationBlock);
+
+  // ============================================================================
+  // TOAST HELPERS
+  // ============================================================================
+
+  const showToast = useCallback((message, type = 'success', duration = 3000) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type, duration }]);
+  }, []);
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
 
   // ============================================================================
   // HANDLERS
@@ -137,20 +185,32 @@ export const MenuEditProvider = ({
             menuState.childrenMap
           );
           const processedData = processMenuDataForBackend(nestedData);
-          await MenuService.saveMenu(processedData, selectedLanguage);
+
+          // DEBUG: Mostrar datos que se enviarán al backend
+          console.log('='.repeat(80));
+          console.log('📤 DATOS QUE SE ENVÍAN AL BACKEND:');
+          console.log('='.repeat(80));
+          console.log('Idioma:', selectedLanguage);
+          console.log('URL:', `${import.meta.env.VITE_API_URL || 'http://92.186.195.152:8080'}/carta/update?language=${selectedLanguage}`);
+          console.log('Método:', 'POST');
+          console.log('Headers:', { 'Content-Type': 'application/json' });
+          console.log('\nBody (estructura completa):');
+          console.log(JSON.stringify(processedData, null, 2));
+          console.log('='.repeat(80));
+          console.log('📊 ESTADÍSTICAS:');
+          console.log(`- Total categorías: ${processedData.length}`);
+          console.log(`- Total subcategorías: ${processedData.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}`);
+          console.log(`- Total items: ${processedData.reduce((acc, cat) =>
+            acc + (cat.subcategories?.reduce((subAcc, sub) => subAcc + (sub.items?.length || 0), 0) || 0), 0)}`);
+          console.log('='.repeat(80));
+
+          await CartaService.saveMenu(processedData, selectedLanguage);
           await reload();
           setIsEditing(false);
           setIsSaving(false);
 
-          setConfirmDialog({
-            isOpen: true,
-            title: 'Guardado exitoso',
-            message: 'Los cambios se han guardado correctamente en la carta.',
-            type: 'info',
-            onConfirm: () => {
-              setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-            }
-          });
+          // Show success toast
+          showToast('Los cambios se han guardado correctamente', 'success', 4000);
         } catch (error) {
           console.error('Error al guardar:', error);
           setIsSaving(false);
@@ -236,6 +296,11 @@ export const MenuEditProvider = ({
     confirmDialog,
     setConfirmDialog,
 
+    // Toasts
+    toasts,
+    showToast,
+    removeToast,
+
     // Reload
     reload
   };
@@ -243,6 +308,7 @@ export const MenuEditProvider = ({
   return (
     <MenuEditContext.Provider value={value}>
       {children}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </MenuEditContext.Provider>
   );
 };
@@ -253,7 +319,6 @@ MenuEditProvider.propTypes = {
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
   reload: PropTypes.func.isRequired,
-  mockData: PropTypes.array,
   selectedLanguage: PropTypes.string.isRequired,
   onLanguageChange: PropTypes.func.isRequired
 };

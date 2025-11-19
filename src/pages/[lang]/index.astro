@@ -6,7 +6,7 @@ import { I18nService } from '../../services/I18nService';
 export async function getStaticPaths() {
   await I18nService.init();
 
-  const locales = I18nService.getDefaultLanguageCode();
+  const locales = I18nService.getLanguageCodes();
   const defaultLocale = I18nService.getDefaultLanguage();
 
   console.log('LOCALES', locales);

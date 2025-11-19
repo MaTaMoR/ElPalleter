@@ -12,106 +12,10 @@ import { MenuEditProvider, useMenuEdit } from '../../contexts/MenuEditContext';
 import styles from './MenuPage.module.css';
 
 // ============================================================================
-// MOCK DATA
+// MOCK DATA - REMOVED
 // ============================================================================
-
-const MOCK_MENU_DATA = [
-  {
-    id: 'cat-1',
-    nameKey: 'Entrantes',
-    orderIndex: 0,
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T15:30:00Z',
-    subcategories: [
-      {
-        id: 'sub-1',
-        nameKey: 'Ensaladas',
-        orderIndex: 0,
-        createdAt: '2024-01-15T10:00:00Z',
-        updatedAt: '2024-01-20T15:30:00Z',
-        items: [
-          {
-            id: 'item-1',
-            nameKey: 'Ensalada César',
-            descriptionKey: 'Lechuga, pollo, parmesano, crutones y salsa césar',
-            price: 8.50,
-            available: true,
-            orderIndex: 0,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T15:30:00Z'
-          },
-          {
-            id: 'item-2',
-            nameKey: 'Ensalada Mediterránea',
-            descriptionKey: 'Lechuga, tomate, pepino, cebolla, aceitunas y queso feta',
-            price: 7.50,
-            available: true,
-            orderIndex: 1,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T15:30:00Z'
-          }
-        ]
-      },
-      {
-        id: 'sub-2',
-        nameKey: 'Tapas Frías',
-        orderIndex: 1,
-        createdAt: '2024-01-15T10:00:00Z',
-        updatedAt: '2024-01-20T15:30:00Z',
-        items: [
-          {
-            id: 'item-3',
-            nameKey: 'Jamón Ibérico',
-            descriptionKey: 'Jamón ibérico de bellota con pan con tomate',
-            price: 12.00,
-            available: true,
-            orderIndex: 0,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T15:30:00Z'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'cat-2',
-    nameKey: 'Platos Principales',
-    orderIndex: 1,
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T15:30:00Z',
-    subcategories: [
-      {
-        id: 'sub-3',
-        nameKey: 'Arroces',
-        orderIndex: 0,
-        createdAt: '2024-01-15T10:00:00:00Z',
-        updatedAt: '2024-01-20T15:30:00Z',
-        items: [
-          {
-            id: 'item-4',
-            nameKey: 'Paella Valenciana',
-            descriptionKey: 'Arroz con pollo, conejo y verduras de temporada',
-            price: 15.00,
-            available: true,
-            orderIndex: 0,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T15:30:00Z'
-          },
-          {
-            id: 'item-5',
-            nameKey: 'Arroz del Senyoret',
-            descriptionKey: 'Arroz con marisco pelado',
-            price: 18.00,
-            available: false,
-            orderIndex: 1,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T15:30:00Z'
-          }
-        ]
-      }
-    ]
-  }
-];
+// Mock data has been removed to avoid showing misleading data when the backend fails.
+// Instead, we now show a proper error message when data cannot be loaded.
 
 // ============================================================================
 // MENU CONTENT COMPONENT
@@ -190,7 +94,6 @@ const MenuPage = () => {
       loading={loading}
       error={error}
       reload={reload}
-      mockData={MOCK_MENU_DATA}
       selectedLanguage={selectedLanguage}
       onLanguageChange={setSelectedLanguage}
     >

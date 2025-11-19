@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { MenuService } from '../services/MenuService';
+import { CartaService } from '@services/CartaService';
 
 /**
  * Hook para cargar datos de la carta desde el backend
+ * Usa CartaService en lugar de MenuService (evita duplicación)
  */
 export const useMenuData = (language = 'es') => {
   const [data, setData] = useState([]);
@@ -13,7 +14,7 @@ export const useMenuData = (language = 'es') => {
     try {
       setLoading(true);
       setError(null);
-      const categories = await MenuService.getCategories(language);
+      const categories = await CartaService.getCategories(language);
       setData(categories);
     } catch (err) {
       console.error('Error loading menu data:', err);
