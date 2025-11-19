@@ -170,6 +170,13 @@ export const MenuEditProvider = ({
   };
 
   const handleCancel = () => {
+    // Si no hay cambios, salir directamente del modo edición
+    if (!menuState.hasRealChanges()) {
+      setIsEditing(false);
+      return;
+    }
+
+    // Si hay cambios, mostrar confirmación
     setConfirmDialog({
       isOpen: true,
       title: 'Cancelar cambios',

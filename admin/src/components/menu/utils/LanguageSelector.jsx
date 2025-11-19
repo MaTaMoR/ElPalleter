@@ -1,45 +1,104 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Globe } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import I18nService from '@services/I18nService.js';
 import styles from './LanguageSelector.module.css';
 
-const LANGUAGES = [
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'val', name: 'Valencià', flag: '🇪🇸' }
-];
-
 const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
-  const handleChange = (e) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [languages, setLanguages] = useState([]);
+  const dropdownRef = useRef(null);
+
+  // Load languages from I18nService
+  useEffect(() => {
+    const availableLanguages = I18nService.getAvailableLanguages();
+    setLanguages(availableLanguages);
+  }, []);
+
+  const selectedLang = languages.find(lang => lang.code === selectedLanguage) || languages[0];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (langCode) => {
     if (onChange && !disabled) {
-      onChange(e.target.value);
+      onChange(langCode);
+    }
+    setIsOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
     }
   };
 
-  const selectedLang = LANGUAGES.find(lang => lang.code === selectedLanguage) || LANGUAGES[0];
+  // Render flag image from backend SVG
+  const renderFlag = (lang) => {
+    if (!lang?.flag?.value) {
+      return null;
+    }
+    return (
+      <img
+        src={lang.flag.value}
+        alt={lang.name}
+        className={styles.flagImage}
+        aria-hidden="true"
+      />
+    );
+  };
+
+  if (languages.length === 0) {
+    return null; // Don't render until languages are loaded
+  }
 
   return (
-    <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
-      <Globe className={styles.icon} size={20} />
-      <select
-        value={selectedLanguage}
-        onChange={handleChange}
+    <div className={`${styles.container} ${disabled ? styles.disabled : ''}`} ref={dropdownRef}>
+      <button
+        type="button"
+        className={styles.trigger}
+        onClick={toggleDropdown}
         disabled={disabled}
-        className={styles.select}
         aria-label="Seleccionar idioma"
       >
-        {LANGUAGES.map(lang => (
-          <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.name}
-          </option>
-        ))}
-      </select>
+        {renderFlag(selectedLang)}
+        <span className={styles.code}>{selectedLang?.shortName || selectedLang?.code?.toUpperCase()}</span>
+        <ChevronDown size={16} className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className={styles.dropdown}>
+          {languages.map(lang => (
+            <button
+              key={lang.code}
+              type="button"
+              className={`${styles.option} ${lang.code === selectedLanguage ? styles.optionSelected : ''}`}
+              onClick={() => handleSelect(lang.code)}
+            >
+              {renderFlag(lang)}
+              <span className={styles.name}>{lang.nativeName || lang.name}</span>
+              {lang.code === selectedLanguage && (
+                <span className={styles.checkmark}>✓</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 LanguageSelector.propTypes = {
-  selectedLanguage: PropTypes.oneOf(['es', 'en', 'val']).isRequired,
+  selectedLanguage: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool
 };

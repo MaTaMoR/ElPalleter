@@ -1,30 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthProvider';
-import { 
-  X, 
-  Home, 
-  FileText, 
-  Users, 
-  Settings, 
-  LogOut
+import {
+  Home,
+  FileText,
+  Users,
+  Settings
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, isMobile }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth > 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const menuItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: Home },
@@ -33,74 +19,51 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/admin/settings', label: 'Configuración', icon: Settings },
   ];
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin/login');
-  };
-
   const handleNavigation = (path) => {
     navigate(path);
-    if (!isDesktop) {
+    // En móvil, cerrar el sidebar al navegar
+    if (isMobile && onClose) {
       onClose();
     }
   };
 
+  // Determinar si el sidebar está visible
+  const sidebarClasses = [
+    styles.sidebar,
+    isCollapsed && !isMobile ? styles.collapsed : '',
+    isOpen && isMobile ? styles.mobileOpen : ''
+  ].filter(Boolean).join(' ');
+
   return (
     <>
-      {!isDesktop && isOpen && (
-        <div 
-          className={styles.sidebarOverlay}
+      {/* Overlay solo en móvil */}
+      {isMobile && isOpen && (
+        <div
+          className={`${styles.sidebarOverlay} ${styles.visible}`}
           onClick={onClose}
         />
       )}
-      
-      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
-        <div className={styles.sidebarHeader}>
-          <h2>El Palleter</h2>
-          <button 
-            className={styles.sidebarClose}
-            onClick={onClose}
-            style={{ display: isDesktop ? 'none' : 'block' }}
-          >
-            <X size={24} />
-          </button>
-        </div>
 
-        <nav className={styles.sidebarNav}>
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <button
-                key={item.path}
-                className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                onClick={() => handleNavigation(item.path)}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
+      <aside className={sidebarClasses}>
+        <div className={styles.sidebarInner}>
+          <nav className={styles.sidebarNav}>
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname.startsWith(item.path);
 
-        <div className={styles.sidebarFooter}>
-          <div className={styles.userInfo}>
-            <div className={styles.userAvatar}>
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
-            <div className={styles.userDetails}>
-              <span className={styles.userName}>{user?.name}</span>
-              <span className={styles.userRole}>Administrador</span>
-            </div>
-          </div>
-          <button 
-            className={styles.logoutButton}
-            onClick={handleLogout}
-          >
-            <LogOut size={20} />
-            <span>Cerrar Sesión</span>
-          </button>
+              return (
+                <button
+                  key={item.path}
+                  className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+                  onClick={() => handleNavigation(item.path)}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <Icon className={styles.navIcon} size={24} />
+                  <span className={styles.navText}>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
       </aside>
     </>

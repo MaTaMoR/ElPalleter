@@ -1,0 +1,68 @@
+/* Clase base común para todos los botones */
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: none;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Variante primaria */
+.buttonPrimary {
+  background: var(--primary);
+  color: white;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+/* Variante éxito */
+.buttonSuccess {
+  background: #10b981;
+  color: white;
+}
+
+.buttonSuccess:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Variante peligro */
+.buttonDanger {
+  background: #ef4444;
+  color: white;
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive: ocultar texto en móvil */
+@media (max-width: 768px) {
+  .buttonText {
+    display: none;
+  }
+
+  .button {
+    padding: 0.625rem;
+    justify-content: center;
+  }
+}

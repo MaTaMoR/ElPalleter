@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
-import { 
-  Menu, 
-  Settings, 
-  LogOut, 
+import {
+  Menu,
+  Settings,
+  LogOut,
   ChevronDown,
 } from 'lucide-react';
+import logoLight from '@assets/mini-logo-light.svg';
 import styles from './TopBar.module.css';
 
 const TopBar = ({ onMenuClick, title }) => {
@@ -16,47 +17,65 @@ const TopBar = ({ onMenuClick, title }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    setShowUserMenu(false);
     logout();
     navigate('/admin/login');
   };
 
+  const handleNavigateSettings = () => {
+    setShowUserMenu(false);
+    navigate('/admin/settings');
+  };
+
+  const handleLogoClick = () => {
+    navigate('/admin/dashboard');
+  };
+
   return (
     <header className={styles.topbar}>
-      <div className={styles.topbarLeft}>
-        <button 
-          className={styles.menuButton}
-          onClick={onMenuClick}
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className={styles.pageTitle}>{title}</h1>
-      </div>
-
-      <div className={styles.topbarRight}>
-        <div className={styles.userMenuContainer}>
-          <button 
-            className={styles.userMenuButton}
-            onClick={() => setShowUserMenu(!showUserMenu)}
+      <div className={styles.topbarCard}>
+        <div className={styles.topbarLeft}>
+          <button
+            className={styles.menuButton}
+            onClick={onMenuClick}
           >
-            <div className={styles.userAvatarSmall}>
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
-            <span className={styles.userNameTopbar}>{user?.name}</span>
-            <ChevronDown size={16} />
+            <Menu size={24} />
           </button>
+          <button
+            className={styles.logoButton}
+            onClick={handleLogoClick}
+            aria-label="Ir al inicio"
+          >
+            <img src={logoLight} alt="El Palleter" className={styles.logo} />
+          </button>
+        </div>
 
-          {showUserMenu && (
-            <div className={styles.userDropdown}>
-              <button onClick={() => navigate('/admin/settings')}>
-                <Settings size={16} />
-                Configuración
-              </button>
-              <button onClick={handleLogout}>
-                <LogOut size={16} />
-                Cerrar Sesión
-              </button>
-            </div>
-          )}
+        <div className={styles.topbarRight}>
+          <div className={styles.userMenuContainer}>
+            <button
+              className={styles.userMenuButton}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <div className={styles.userAvatarSmall}>
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <span className={styles.userNameTopbar}>{user?.name}</span>
+              <ChevronDown size={16} />
+            </button>
+
+            {showUserMenu && (
+              <div className={styles.userDropdown}>
+                <button onClick={handleNavigateSettings}>
+                  <Settings size={16} />
+                  Configuración
+                </button>
+                <button onClick={handleLogout}>
+                  <LogOut size={16} />
+                  Cerrar Sesión
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Edit3, Eye, Save, X } from 'lucide-react';
-import LanguageSelector from '../../components/menu/utils/LanguageSelector';
-import GlobalSearch from '../../components/menu/search/GlobalSearch';
+import PageContainer from '../../components/common/PageContainer';
+import Button from '../../components/common/Button';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -115,94 +114,6 @@ const MOCK_MENU_DATA = [
 ];
 
 // ============================================================================
-// MENU HEADER COMPONENT
-// ============================================================================
-
-const MenuHeader = () => {
-  const {
-    isEditing,
-    isSaving,
-    selectedLanguage,
-    menuState,
-    handleLanguageChange,
-    handleToggleEditMode,
-    handleSave,
-    handleCancel
-  } = useMenuEdit();
-
-  return (
-    <div className={styles.header}>
-      <div className={styles.headerTop}>
-        <h1 className={styles.title}>Gestión de Carta</h1>
-        <div className={styles.headerActions}>
-          <LanguageSelector
-            selectedLanguage={selectedLanguage}
-            onChange={handleLanguageChange}
-            disabled={isEditing}
-          />
-          <button
-            type="button"
-            className={`${styles.editButton} ${isEditing ? styles.active : ''}`}
-            onClick={handleToggleEditMode}
-          >
-            {isEditing ? (
-              <>
-                <Eye size={18} />
-                <span>Volver a visualización</span>
-              </>
-            ) : (
-              <>
-                <Edit3 size={18} />
-                <span>Editar</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      <div className={styles.searchContainer}>
-        <GlobalSearch
-          categoriesMap={menuState.categoriesMap}
-          subcategoriesMap={menuState.subcategoriesMap}
-          itemsMap={menuState.itemsMap}
-          childrenMap={menuState.childrenMap}
-        />
-      </div>
-
-      {isEditing && (
-        <div className={styles.editingBar}>
-          <div className={styles.editingInfo}>
-            <span className={menuState.hasRealChanges() ? styles.changesBadge : styles.editingBadge}>
-              {menuState.hasRealChanges() ? 'Cambios sin guardar' : 'Modo Edición'}
-            </span>
-          </div>
-          <div className={styles.editingActions}>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={handleCancel}
-              disabled={!menuState.hasRealChanges() || isSaving}
-            >
-              <X size={18} strokeWidth={2.5} />
-              <span>Cancelar</span>
-            </button>
-            <button
-              type="button"
-              className={styles.saveButton}
-              onClick={handleSave}
-              disabled={!menuState.hasRealChanges() || isSaving}
-            >
-              <Save size={18} />
-              <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============================================================================
 // MENU CONTENT COMPONENT
 // ============================================================================
 
@@ -222,13 +133,13 @@ const MenuContent = () => {
     return (
       <div className={styles.errorContainer}>
         <p className={styles.errorText}>Error al cargar la carta: {error}</p>
-        <button
-          type="button"
-          className={styles.retryButton}
+        <Button
+          variant="primary"
           onClick={reload}
+          className={styles.retryButton}
         >
           Reintentar
-        </button>
+        </Button>
       </div>
     );
   }
@@ -237,8 +148,6 @@ const MenuContent = () => {
     <>
       <div className={styles.content}>
         <div className={styles.categoriesContainer}>
-          <MenuHeader />
-
           <Routes>
             <Route path="/" element={<MenuLayout />}>
               <Route index element={<Navigate to="categories" replace />} />
@@ -285,9 +194,11 @@ const MenuPage = () => {
       selectedLanguage={selectedLanguage}
       onLanguageChange={setSelectedLanguage}
     >
-      <div className={styles.menuPage}>
-        <MenuContent />
-      </div>
+      <PageContainer>
+        <div className={styles.menuPage}>
+          <MenuContent />
+        </div>
+      </PageContainer>
     </MenuEditProvider>
   );
 };

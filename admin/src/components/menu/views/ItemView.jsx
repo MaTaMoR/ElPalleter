@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2, Undo2, ArrowLeft, Edit3, Check, X } from 'lucide-react';
+import { Plus, ArrowLeft, Check, X } from 'lucide-react';
+import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
 import MenuCheckbox from '../fields/MenuCheckbox';
+import MenuCard from '../common/MenuCard';
 import styles from './ItemView.module.css';
+import cardStyles from '../common/MenuCard.module.css';
 
 const ItemView = ({
   items,
@@ -67,6 +70,15 @@ const ItemView = ({
 
       <div className={styles.pageTitle}>
         <h1 className={styles.pageTitleName}>{subcategoryName}</h1>
+        {isEditing && (
+          <Button
+            variant="primary"
+            icon={Plus}
+            onClick={onAddItem}
+          >
+            Añadir
+          </Button>
+        )}
       </div>
 
       {isEditing && subcategory && onUpdateSubcategory && (
@@ -82,23 +94,6 @@ const ItemView = ({
         </div>
       )}
 
-      <div className={styles.header}>
-        <h2 className={styles.title}>Items</h2>
-        {isEditing && (
-          <button
-            type="button"
-            onClick={onAddItem}
-            className={styles.addButtonHeader}
-          >
-            <Plus size={18} />
-            <span>Añadir</span>
-          </button>
-        )}
-        <span className={styles.count}>
-          {items.length} items
-        </span>
-      </div>
-
       <div className={styles.itemsList}>
         {items.length === 0 ? (
           <div className={styles.emptyState}>
@@ -113,64 +108,11 @@ const ItemView = ({
               <div
                 key={item.id}
                 ref={(el) => { itemRefs.current[item.id] = el; }}
-                className={`${styles.itemCard} ${item._state ? styles[item._state] : ''}`}
               >
-                {isEditingItem ? (
-                  // Modo edición
-                  <div className={styles.editForm}>
-                    <div className={styles.fieldsGrid}>
-                      <MenuTextField
-                        label="Nombre del item"
-                        value={item.nameKey || ''}
-                        onChange={(value) => handleFieldChange(item.id, 'nameKey', value)}
-                        required
-                        error={errors[item.id]?.nameKey}
-                        helperText="Mínimo 3 caracteres"
-                      />
-                      <MenuPriceField
-                        label="Precio"
-                        value={item.price || ''}
-                        onChange={(value) => handleFieldChange(item.id, 'price', value)}
-                        min={0}
-                        required
-                        error={errors[item.id]?.price}
-                      />
-                    </div>
-                    <MenuTextField
-                      label="Descripción"
-                      value={item.descriptionKey || ''}
-                      onChange={(value) => handleFieldChange(item.id, 'descriptionKey', value)}
-                      multiline
-                    />
-                    <MenuCheckbox
-                      label="Disponible"
-                      checked={item.available !== false}
-                      onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
-                    />
-                    <div className={styles.editActions}>
-                      <button
-                        type="button"
-                        onClick={handleCancelEdit}
-                        className={styles.cancelEditButton}
-                      >
-                        <X size={18} />
-                        <span>Cancelar</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSaveEdit}
-                        className={styles.saveEditButton}
-                      >
-                        <Check size={18} />
-                        <span>Guardar</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Modo vista
-                  <div className={styles.itemContent}>
-                    <div className={styles.itemInfo}>
-                      <h3 className={styles.itemName}>{item.nameKey || 'Sin nombre'}</h3>
+                <MenuCard
+                  title={item.nameKey || 'Sin nombre'}
+                  content={
+                    <div className={styles.itemContentArea}>
                       {item.descriptionKey && (
                         <p className={styles.itemDescription}>{item.descriptionKey}</p>
                       )}
@@ -183,42 +125,69 @@ const ItemView = ({
                         )}
                       </div>
                     </div>
-
-                    {isEditing && (
-                      <div className={styles.itemActions}>
-                        {isDeleted ? (
+                  }
+                  editForm={
+                    isEditingItem ? (
+                      <div className={cardStyles.editForm}>
+                        <div className={styles.fieldsGrid}>
+                          <MenuTextField
+                            label="Nombre del item"
+                            value={item.nameKey || ''}
+                            onChange={(value) => handleFieldChange(item.id, 'nameKey', value)}
+                            required
+                            error={errors[item.id]?.nameKey}
+                            helperText="Mínimo 3 caracteres"
+                          />
+                          <MenuPriceField
+                            label="Precio"
+                            value={item.price || ''}
+                            onChange={(value) => handleFieldChange(item.id, 'price', value)}
+                            min={0}
+                            required
+                            error={errors[item.id]?.price}
+                          />
+                        </div>
+                        <MenuTextField
+                          label="Descripción"
+                          value={item.descriptionKey || ''}
+                          onChange={(value) => handleFieldChange(item.id, 'descriptionKey', value)}
+                          multiline
+                        />
+                        <MenuCheckbox
+                          label="Disponible"
+                          checked={item.available !== false}
+                          onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
+                        />
+                        <div className={cardStyles.editActions}>
                           <button
                             type="button"
-                            onClick={() => onUndoDeleteItem(item.id)}
-                            className={`${styles.actionButton} ${styles.undoButton}`}
-                            title="Deshacer eliminación"
+                            onClick={handleCancelEdit}
+                            className={cardStyles.cancelEditButton}
                           >
-                            <Undo2 size={18} />
+                            <X size={18} />
+                            <span>Cancelar</span>
                           </button>
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(item.id)}
-                              className={`${styles.actionButton} ${styles.editButton}`}
-                              title="Editar item"
-                            >
-                              <Edit3 size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onDeleteItem(item.id)}
-                              className={`${styles.actionButton} ${styles.deleteButton}`}
-                              title="Eliminar item"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </>
-                        )}
+                          <button
+                            type="button"
+                            onClick={handleSaveEdit}
+                            className={cardStyles.saveEditButton}
+                          >
+                            <Check size={18} />
+                            <span>Guardar</span>
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
+                    ) : null
+                  }
+                  state={item._state === 'normal' ? null : item._state}
+                  isDeleted={isDeleted}
+                  onClick={null}
+                  onEdit={() => handleEdit(item.id)}
+                  onDelete={() => onDeleteItem(item.id)}
+                  onUndo={() => onUndoDeleteItem(item.id)}
+                  showArrow={false}
+                  isEditing={isEditing}
+                />
               </div>
             );
           })

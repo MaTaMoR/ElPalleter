@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../auth/AuthProvider';
-import { 
+import {
   Menu,
   Phone,
   BookOpen,
@@ -10,6 +10,7 @@ import {
   Instagram,
   Facebook
 } from 'lucide-react';
+import PageContainer from '../../components/common/PageContainer';
 import WebMetricsSection from '../../components/dashboard/WebMetricsSection';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import styles from './DashboardPage.module.css';
@@ -97,11 +98,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className={styles.dashboardNew}>
-      <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Dashboard</h1>
-      </div>
-
+    <PageContainer>
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Gestión Rápida</h2>
@@ -159,7 +156,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Métricas Web Section */}
-      <WebMetricsSection 
+      <WebMetricsSection
         analyticsData={analyticsData}
         previousData={previousData}
         loading={loading}
@@ -168,7 +165,7 @@ const DashboardPage = () => {
         onRefresh={refresh}
         lastUpdated={lastUpdated}
       />
-    </div>
+    </PageContainer>
   );
 };
 

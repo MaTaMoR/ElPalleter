@@ -124,6 +124,9 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
   const handleResultClick = (result) => {
     const pathParts = location.pathname.split('/categories')[0];
 
+    // Cerrar el dropdown inmediatamente
+    setIsOpen(false);
+
     if (result.type === 'category') {
       navigate(`${pathParts}/categories/${result.categoryId}`);
     } else if (result.type === 'subcategory') {
@@ -131,14 +134,12 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     } else if (result.type === 'item') {
       navigate(`${pathParts}/categories/${result.categoryId}/${result.subcategoryId}`);
     }
-
-    setSearchTerm('');
-    setResults([]);
-    setIsOpen(false);
   };
 
   // Clear search
-  const handleClear = () => {
+  const handleClear = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSearchTerm('');
     setResults([]);
     setIsOpen(false);
@@ -151,18 +152,21 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Buscar en toda la carta..."
+          placeholder="Buscar..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => {
-            if (results.length > 0) setIsOpen(true);
+            // Si hay un término de búsqueda y hay resultados, abrir el dropdown
+            if (searchTerm && searchTerm.trim().length > 0 && results.length > 0) {
+              setIsOpen(true);
+            }
           }}
         />
         {searchTerm && (
           <button
             type="button"
             className={styles.clearButton}
-            onClick={handleClear}
+            onMouseDown={handleClear}
             aria-label="Limpiar búsqueda"
           >
             <X size={16} />
@@ -180,7 +184,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
               <div
                 key={index}
                 className={styles.resultItem}
-                onClick={() => handleResultClick(result)}
+                onMouseDown={() => handleResultClick(result)}
               >
                 {result.type === 'category' && (
                   <div className={styles.breadcrumb}>

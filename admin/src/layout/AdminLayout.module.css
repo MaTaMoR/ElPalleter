@@ -10,7 +10,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  margin-left: 280px;
+  margin-left: calc(280px + 4rem);
+  margin-top: 86px;
+  transition: margin-left 0s;
+}
+
+.mainContentCollapsed {
+  margin-left: calc(72px + 4rem);
 }
 
 .pageContainer {
@@ -19,128 +25,32 @@
   overflow-y: auto;
 }
 
-/* ==================== MÓVIL (max-width: 768px) ==================== */
-@media (max-width: 768px) {
-  /* Sidebar en móvil - overlay mode */
-  .sidebar {
-    width: 100%;
-    max-width: 280px;
-  }
-  
-  .sidebarOverlay {
-    display: block;
-  }
-  
-  .sidebarClose {
-    display: block;
-  }
-  
-  /* Layout móvil */
-  .adminLayout {
-    flex-direction: column;
-  }
-  
+/* ==================== MÓVIL Y TABLET (max-width: 1024px) ==================== */
+@media (max-width: 1024px) {
   .mainContent {
     margin-left: 0;
+    margin-top: 70px;
   }
-  
-  .topbar {
-    padding: 0 1rem;
+
+  .mainContentCollapsed {
+    margin-left: 0;
   }
-  
+
   .pageContainer {
-    padding: 0.5rem;
-  }
-  
-  /* Grids y componentes */
-  .statsGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .dashboardGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .userNameTopbar {
-    display: none;
-  }
-  
-  .pageTitle {
-    font-size: 1.125rem;
-  }
-  
-  .welcomeSection h2 {
-    font-size: 1.5rem;
+    padding: 1.5rem;
   }
 }
 
-/* ==================== DESKTOP (min-width: 769px) ==================== */
-@media (min-width: 769px) {
-  /* Sidebar siempre visible en desktop */
-  .sidebar {
-    position: fixed;
-    transform: translateX(0);
-    transition: none;
-  }
-  
-  .mainContent {
-    margin-left: 280px;
-  }
-  
-  .menuButton {
-    display: none;
-  }
-  
-  .topbar {
-    left: 280px;
+/* ==================== MÓVIL (max-width: 768px) ==================== */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 1.25rem;
   }
 }
 
 /* ==================== MÓVIL PEQUEÑO (max-width: 480px) ==================== */
 @media (max-width: 480px) {
-  .loginContainer {
-    padding: 0.5rem;
-  }
-  
-  .loginForm {
-    padding: 1.5rem;
-  }
-  
-  .statCard {
+  .pageContainer {
     padding: 1rem;
-  }
-  
-  .dashboardCard .cardContent {
-    padding: 1rem;
-  }
-  
-  .reservationItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .reservationTime {
-    min-width: auto;
-  }
-  
-  .pageContainer {
-    padding: 0.75rem 0.5rem;
-  }
-}
-
-/* ==================== TABLET (769px - 1024px) ==================== */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .pageContainer {
-    padding: 1.5rem;
-  }
-}
-
-/* ==================== DESKTOP GRANDE (min-width: 1025px) ==================== */
-@media (min-width: 1025px) {
-  .pageContainer {
-    padding: 2rem;
   }
 }

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opción 4 - Diseño Tipo Toolbar con Secciones Definidas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-info {
+            background: #fff3e0;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .header-info h2 {
+            color: #e65100;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .header-info p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ============ OPCIÓN 4: TOOLBAR CON SECCIONES ============ */
+        .header-wrapper {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        /* Desktop: Una sola fila tipo toolbar */
+        @media (min-width: 1024px) {
+            .header-wrapper {
+                display: flex;
+                align-items: stretch;
+            }
+
+            .breadcrumbs-section {
+                flex: 0 0 auto;
+                display: flex;
+                align-items: center;
+                padding: 12px 20px;
+                background: #fafafa;
+                border-right: 1px solid #e0e0e0;
+            }
+
+            .controls-section {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .search-container {
+                flex: 1;
+                max-width: 450px;
+            }
+
+            .actions-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-left: auto;
+            }
+        }
+
+        /* Tablet/Mobile: Dos secciones apiladas */
+        @media (max-width: 1023px) {
+            .header-wrapper {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .breadcrumbs-section {
+                padding: 14px 16px;
+                background: #fafafa;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .controls-section {
+                padding: 12px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .actions-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                justify-content: flex-end;
+            }
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 11px;
+            background: none;
+            border: none;
+            border-radius: 5px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .breadcrumb:hover {
+            background: white;
+            color: #333;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb.active {
+            background: #ff9800;
+            color: white;
+            font-weight: 500;
+        }
+
+        .separator {
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        /* Actions Group */
+        .actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: relative;
+        }
+
+        .language-button {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 14px;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            color: #666;
+        }
+
+        .language-button:hover {
+            border-color: #ff9800;
+            background: white;
+            color: #333;
+        }
+
+        /* En móvil, mostrar solo el código */
+        @media (max-width: 640px) {
+            .language-button .lang-full {
+                display: none;
+            }
+            .language-button .lang-code {
+                display: inline;
+            }
+        }
+
+        @media (min-width: 641px) {
+            .language-button .lang-full {
+                display: inline;
+            }
+            .language-button .lang-code {
+                display: none;
+            }
+        }
+
+        /* Edit Button */
+        .edit-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .edit-button:hover {
+            background: #f57c00;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+
+        .edit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Icons */
+        .icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Demo controls */
+        .demo-controls {
+            margin-top: 32px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .demo-controls h3 {
+            margin-bottom: 12px;
+            color: #856404;
+        }
+
+        .demo-controls p {
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-info">
+            <h2>🛠️ Opción 4: Diseño Tipo Toolbar con Secciones Definidas</h2>
+            <p><strong>Características:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #555;">
+                <li>Desktop: Diseño tipo toolbar con breadcrumbs en sección separada (fondo gris)</li>
+                <li>Mobile/Tablet: Dos secciones apiladas con separación visual clara</li>
+                <li>Search bar más prominente con fondo que cambia al hacer focus</li>
+                <li>Controles agrupados visualmente en el lado derecho</li>
+                <li>Botón de edición con efecto hover elevado (translateY)</li>
+                <li>Breadcrumb activo con color de acento naranja</li>
+                <li>Selector de idioma muestra código (ES) en pantallas pequeñas (&lt;640px)</li>
+                <li>Sin padding externo, bordes van hasta el límite del contenedor</li>
+            </ul>
+        </div>
+
+        <!-- HEADER PRINCIPAL -->
+        <div class="header-wrapper">
+            <!-- Breadcrumbs Section -->
+            <div class="breadcrumbs-section">
+                <nav class="breadcrumbs">
+                    <button class="breadcrumb">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span>Inicio</span>
+                    </button>
+                    <span class="separator">›</span>
+                    <button class="breadcrumb">
+                        <span>Entrantes</span>
+                    </button>
+                    <span class="separator">›</span>
+                    <span class="breadcrumb active">
+                        <span>Ensaladas</span>
+                    </span>
+                </nav>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <!-- Search -->
+                <div class="search-container">
+                    <svg class="search-icon icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Buscar en la carta...">
+                </div>
+
+                <!-- Actions Group -->
+                <div class="actions-group">
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <button class="language-button">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                            </svg>
+                            <span class="lang-full">Español</span>
+                            <span class="lang-code">ES</span>
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Edit Button -->
+                    <button class="edit-button">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>Editar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <h3>🎯 Instrucciones de prueba</h3>
+            <p>Redimensiona la ventana del navegador para ver cómo se adapta el diseño. Este diseño tipo toolbar separa claramente la navegación (breadcrumbs) de las acciones (search + controles). El punto de quiebre de desktop es 1024px y el del selector de idioma compacto es 640px.</p>
+        </div>
+    </div>
+</body>
+</html>

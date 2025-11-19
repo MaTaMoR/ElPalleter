@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breadcrumb Prototypes</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 3rem 2rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #fff;
+      font-size: 2rem;
+    }
+
+    .prototype {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid #3a3a3a;
+    }
+
+    .prototype-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .prototype-desc {
+      color: #999;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* OPCIÓN 1: Underline con gradiente (actual mejorado) */
+    .breadcrumb-1 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 0 1rem 0;
+      border-bottom: 2px solid #3a3a3a;
+    }
+
+    .breadcrumb-1 .item {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.625rem 0.875rem;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      color: #999;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .breadcrumb-1 .item:hover:not(.active) {
+      background-color: rgba(217, 119, 6, 0.08);
+      color: #d97706;
+    }
+
+    .breadcrumb-1 .item.active {
+      color: #d97706;
+      font-weight: 700;
+      cursor: default;
+    }
+
+    .breadcrumb-1 .item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1rem;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to right, #d97706, #b45309);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .breadcrumb-1 .separator {
+      color: #666;
+      margin: 0 0.25rem;
+    }
+
+    /* OPCIÓN 2: Pills con fondo */
+    .breadcrumb-2 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: #333;
+      border-radius: 8px;
+    }
+
+    .breadcrumb-2 .item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      border-radius: 20px;
+      color: #999;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .breadcrumb-2 .item:hover:not(.active) {
+      background-color: #3a3a3a;
+      color: #d97706;
+    }
+
+    .breadcrumb-2 .item.active {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+      font-weight: 600;
+      cursor: default;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+    }
+
+    .breadcrumb-2 .separator {
+      color: #555;
+      font-size: 0.875rem;
+    }
+
+    /* OPCIÓN 3: Estilo flecha con separadores */
+    .breadcrumb-3 {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0.5rem 0;
+    }
+
+    .breadcrumb-3 .item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem 0.75rem 1.5rem;
+      background: #333;
+      border: none;
+      color: #999;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      margin-right: -0.75rem;
+      text-decoration: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
+    }
+
+    .breadcrumb-3 .item:first-child {
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+      padding-left: 1.25rem;
+    }
+
+    .breadcrumb-3 .item:hover:not(.active) {
+      background-color: #3a3a3a;
+      color: #d97706;
+    }
+
+    .breadcrumb-3 .item.active {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+      font-weight: 600;
+      cursor: default;
+      z-index: 1;
+    }
+
+    /* OPCIÓN 4: Minimalista con punto activo */
+    .breadcrumb-4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+    }
+
+    .breadcrumb-4 .item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .breadcrumb-4 .item:hover:not(.active) {
+      color: #d97706;
+    }
+
+    .breadcrumb-4 .item.active {
+      color: #fff;
+      font-weight: 600;
+      cursor: default;
+    }
+
+    .breadcrumb-4 .item.active::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      background: #d97706;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(217, 119, 6, 0.6);
+    }
+
+    .breadcrumb-4 .separator {
+      color: #555;
+      font-size: 0.875rem;
+      margin: 0 0.25rem;
+    }
+
+    /* OPCIÓN 5: Cards discretas */
+    .breadcrumb-5 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: #2a2a2a;
+      border-radius: 8px;
+      border: 1px solid #3a3a3a;
+    }
+
+    .breadcrumb-5 .item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #999;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .breadcrumb-5 .item:hover:not(.active) {
+      background-color: #333;
+      border-color: #444;
+      color: #d97706;
+    }
+
+    .breadcrumb-5 .item.active {
+      background: #333;
+      border-color: #d97706;
+      color: #d97706;
+      font-weight: 600;
+      cursor: default;
+      box-shadow: 0 0 0 1px #d97706;
+    }
+
+    .breadcrumb-5 .separator {
+      color: #555;
+      font-size: 1.125rem;
+    }
+
+    /* Icons */
+    .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍞 Diseños de Breadcrumb</h1>
+
+    <!-- OPCIÓN 1 -->
+    <div class="prototype">
+      <div class="prototype-title">Opción 1: Underline con gradiente</div>
+      <div class="prototype-desc">Diseño limpio con borde inferior. El elemento activo tiene un underline con gradiente naranja.</div>
+      <div class="breadcrumb-1">
+        <a href="#" class="item">
+          <span class="icon">🏠</span>
+          <span>Inicio</span>
+        </a>
+        <span class="separator">›</span>
+        <a href="#" class="item">
+          <span>Bebidas</span>
+        </a>
+        <span class="separator">›</span>
+        <span class="item active">
+          <span>Cervezas</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- OPCIÓN 2 -->
+    <div class="prototype">
+      <div class="prototype-title">Opción 2: Pills con fondo</div>
+      <div class="prototype-desc">Breadcrumbs estilo píldora dentro de un contenedor. El activo tiene gradiente y sombra.</div>
+      <div class="breadcrumb-2">
+        <a href="#" class="item">
+          <span class="icon">🏠</span>
+          <span>Inicio</span>
+        </a>
+        <span class="separator">/</span>
+        <a href="#" class="item">
+          <span>Bebidas</span>
+        </a>
+        <span class="separator">/</span>
+        <span class="item active">
+          <span>Cervezas</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- OPCIÓN 3 -->
+    <div class="prototype">
+      <div class="prototype-title">Opción 3: Estilo flecha</div>
+      <div class="prototype-desc">Elementos conectados con forma de flecha. Visual progresivo y moderno.</div>
+      <div class="breadcrumb-3">
+        <a href="#" class="item">
+          <span class="icon">🏠</span>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="item">
+          <span>Bebidas</span>
+        </a>
+        <span class="item active">
+          <span>Cervezas</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- OPCIÓN 4 -->
+    <div class="prototype">
+      <div class="prototype-title">Opción 4: Minimalista con punto</div>
+      <div class="prototype-desc">Ultra minimalista. El elemento activo tiene un punto naranja brillante a la izquierda.</div>
+      <div class="breadcrumb-4">
+        <a href="#" class="item">
+          <span class="icon">🏠</span>
+          <span>Inicio</span>
+        </a>
+        <span class="separator">/</span>
+        <a href="#" class="item">
+          <span>Bebidas</span>
+        </a>
+        <span class="separator">/</span>
+        <span class="item active">
+          <span>Cervezas</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- OPCIÓN 5 -->
+    <div class="prototype">
+      <div class="prototype-title">Opción 5: Cards discretas</div>
+      <div class="prototype-desc">Elementos tipo card con borde. El activo tiene borde naranja con glow sutil.</div>
+      <div class="breadcrumb-5">
+        <a href="#" class="item">
+          <span class="icon">🏠</span>
+          <span>Inicio</span>
+        </a>
+        <span class="separator">›</span>
+        <a href="#" class="item">
+          <span>Bebidas</span>
+        </a>
+        <span class="separator">›</span>
+        <span class="item active">
+          <span>Cervezas</span>
+        </span>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
