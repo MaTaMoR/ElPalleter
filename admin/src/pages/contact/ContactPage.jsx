@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Edit3, Save, X } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
-import LanguageSelector from '../../components/menu/utils/LanguageSelector';
+import ContactLayout from './ContactLayout';
 import ContactInfoForm from '../../components/contact/ContactInfoForm';
 import ScheduleForm from '../../components/contact/ScheduleForm';
 import SocialMediaForm from '../../components/contact/SocialMediaForm';
-import { ContactRepository } from '../../repositories/ContactRepository';
+import { ContactService } from '@services/ContactService';
 import { useContactValidation } from '../../hooks/useContactValidation';
 import styles from './ContactPage.module.css';
 
 /**
  * ContactPage - Admin page for editing restaurant contact information
- * Simpler than MenuPage - no navigation, breadcrumbs, or search needed
+ * Similar structure to MenuPage but simpler - no navigation, breadcrumbs, or search
  */
-const ContactPage = () => {
+const ContactContent = ({ loading, error, reload }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // Original data from backend
   const [originalData, setOriginalData] = useState(null);
@@ -35,18 +32,12 @@ const ContactPage = () => {
   }, [selectedLanguage]);
 
   const loadContactData = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const data = await ContactRepository.getTranslatedRestaurantInfo(selectedLanguage);
+      const data = await ContactService.getContactData(selectedLanguage);
       setOriginalData(data);
       setContactData(data);
     } catch (err) {
       console.error('Error loading contact data:', err);
-      setError(err.message || 'Error al cargar los datos de contacto');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -60,6 +51,10 @@ const ContactPage = () => {
     setIsEditing(true);
   };
 
+  const hasChanges = () => {
+    return JSON.stringify(contactData) !== JSON.stringify(originalData);
+  };
+
   const handleSave = async () => {
     if (hasErrors()) {
       alert('Por favor, corrija los errores de validación antes de guardar');
@@ -68,7 +63,7 @@ const ContactPage = () => {
 
     setIsSaving(true);
     try {
-      await ContactRepository.updateRestaurantInfo(contactData, selectedLanguage);
+      await ContactService.updateRestaurantInfo(contactData, selectedLanguage);
 
       // Reload data from backend
       await loadContactData();
@@ -110,142 +105,109 @@ const ContactPage = () => {
   };
 
   // Show loading state
-  if (loading) {
+  if (loading || !contactData) {
     return (
-      <PageContainer>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
-          <p>Cargando información de contacto...</p>
-        </div>
-      </PageContainer>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+        <p>Cargando información de contacto...</p>
+      </div>
     );
   }
 
   // Show error state
-  if (error && !contactData) {
+  if (error) {
     return (
-      <PageContainer>
-        <div className={styles.errorContainer}>
-          <p className={styles.errorText}>Error al cargar los datos: {error}</p>
-          <Button
-            variant="primary"
-            onClick={loadContactData}
-            className={styles.retryButton}
-          >
-            Reintentar
-          </Button>
-        </div>
-      </PageContainer>
+      <div className={styles.errorContainer}>
+        <p className={styles.errorText}>Error al cargar los datos: {error}</p>
+        <Button
+          variant="primary"
+          onClick={reload}
+          className={styles.retryButton}
+        >
+          Reintentar
+        </Button>
+      </div>
     );
   }
 
   return (
+    <ContactLayout
+      isEditing={isEditing}
+      isSaving={isSaving}
+      selectedLanguage={selectedLanguage}
+      hasChanges={hasChanges()}
+      onLanguageChange={handleLanguageChange}
+      onEdit={handleToggleEditMode}
+      onSave={handleSave}
+      onCancel={handleCancel}
+    >
+      <div className={styles.contentCard}>
+        {/* Contact Info Section */}
+        {contactData.contactInfo && (
+          <>
+            <ContactInfoForm
+              contactInfo={contactData.contactInfo}
+              onChange={handleContactInfoChange}
+              errors={validationErrors.contactInfo || {}}
+              isEditing={isEditing}
+            />
+
+            <div className={styles.sectionDivider}></div>
+          </>
+        )}
+
+        {/* Schedules Section */}
+        {contactData.schedules && (
+          <>
+            <ScheduleForm
+              schedules={contactData.schedules}
+              onChange={handleSchedulesChange}
+              errors={validationErrors.schedules || {}}
+              isEditing={isEditing}
+            />
+
+            <div className={styles.sectionDivider}></div>
+          </>
+        )}
+
+        {/* Social Medias Section */}
+        {contactData.socialMedias && (
+          <SocialMediaForm
+            socialMedias={contactData.socialMedias}
+            onChange={handleSocialMediasChange}
+            errors={validationErrors.socialMedias || {}}
+            isEditing={isEditing}
+          />
+        )}
+      </div>
+    </ContactLayout>
+  );
+};
+
+/**
+ * Main page component with data loading
+ */
+const ContactPage = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Initial load - just set loading to false
+    // Actual data loading happens in ContactContent
+    setLoading(false);
+  }, []);
+
+  const reload = () => {
+    setLoading(true);
+    setError(null);
+    // Trigger reload by toggling loading state
+    setTimeout(() => setLoading(false), 100);
+  };
+
+  return (
     <PageContainer>
       <div className={styles.contactPage}>
-        {/* Header with controls */}
-        <div className={styles.header}>
-          <div className={styles.headerTop}>
-            <div className={styles.titleSection}>
-              <h1 className={styles.pageTitle}>Información de Contacto</h1>
-            </div>
-
-            {/* Controls Group */}
-            <div className={styles.controlsGroup}>
-              {!isEditing ? (
-                <>
-                  {/* Language Selector - Only in view mode */}
-                  <div className={styles.languageWrapper}>
-                    <LanguageSelector
-                      selectedLanguage={selectedLanguage}
-                      onChange={handleLanguageChange}
-                      disabled={false}
-                    />
-                  </div>
-
-                  <div className={styles.controlDivider}></div>
-
-                  {/* Edit Button */}
-                  <div className={styles.buttonWrapper}>
-                    <Button
-                      variant="primary"
-                      icon={Edit3}
-                      onClick={handleToggleEditMode}
-                    >
-                      Editar
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Save Button - In edit mode */}
-                  <div className={styles.buttonWrapper}>
-                    <Button
-                      variant="success"
-                      icon={Save}
-                      onClick={handleSave}
-                      disabled={hasErrors() || isSaving}
-                    >
-                      {isSaving ? 'Guardando...' : 'Guardar'}
-                    </Button>
-                  </div>
-
-                  <div className={styles.controlDivider}></div>
-
-                  {/* Cancel Button - In edit mode */}
-                  <div className={styles.buttonWrapper}>
-                    <Button
-                      variant="danger"
-                      icon={X}
-                      onClick={handleCancel}
-                      disabled={isSaving}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Content area */}
-        <div className={styles.content}>
-          <div className={styles.contentCard}>
-            {contactData && (
-              <>
-                {/* Contact Info Section */}
-                {contactData.contactInfo && (
-                  <ContactInfoForm
-                    contactInfo={contactData.contactInfo}
-                    onChange={handleContactInfoChange}
-                    errors={validationErrors.contactInfo || {}}
-                    isEditing={isEditing}
-                  />
-                )}
-
-                {/* Schedules Section */}
-                {contactData.schedules && (
-                  <ScheduleForm
-                    schedules={contactData.schedules}
-                    onChange={handleSchedulesChange}
-                    errors={validationErrors.schedules || {}}
-                    isEditing={isEditing}
-                  />
-                )}
-
-                {/* Social Medias Section */}
-                {contactData.socialMedias && (
-                  <SocialMediaForm
-                    socialMedias={contactData.socialMedias}
-                    onChange={handleSocialMediasChange}
-                    errors={validationErrors.socialMedias || {}}
-                    isEditing={isEditing}
-                  />
-                )}
-              </>
-            )}
-          </div>
-        </div>
+        <ContactContent loading={loading} error={error} reload={reload} />
       </div>
     </PageContainer>
   );
