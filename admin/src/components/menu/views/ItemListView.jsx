@@ -11,7 +11,7 @@ const ItemListView = () => {
   const { categoryId, subcategoryId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, menuState, entityOps, validationErrors, setConfirmDialog } = useMenuEdit();
+  const { isEditing, menuState, entityOps, validationErrors, showToast } = useMenuEdit();
   const [autoEditItemId, setAutoEditItemId] = useState(null);
 
   // Get current subcategory and category data
@@ -82,16 +82,13 @@ const ItemListView = () => {
     return validationErrors[currentCategory?.id]?.subcategories?.[currentSubcategory.id]?.items || {};
   };
 
-  // Handle validation error - show dialog with error messages
+  // Handle validation error - show toast with error messages
   const handleValidationError = (errorMessages) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Errores de validación',
-      message: `No se puede guardar el item porque tiene los siguientes errores:\n\n${errorMessages.join('\n')}`,
-      type: 'danger',
-      onConfirm: () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-      }
+    // Mostrar un toast por cada error (máximo 2 para no saturar la pantalla)
+    errorMessages.slice(0, 2).forEach((error, index) => {
+      setTimeout(() => {
+        showToast(error, 'error', 4000);
+      }, index * 150); // Pequeño delay entre toasts para que se vean bien
     });
   };
 
