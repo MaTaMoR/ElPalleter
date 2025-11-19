@@ -3,6 +3,7 @@ import { Edit3, Save, X } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
+import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import ContactInfoForm from '../../components/contact/ContactInfoForm';
 import ScheduleForm from '../../components/contact/ScheduleForm';
 import SocialMediaForm from '../../components/contact/SocialMediaForm';
@@ -25,6 +26,15 @@ const ContactContent = () => {
   const [originalData, setOriginalData] = useState(null);
   // Current editing data
   const [contactData, setContactData] = useState(null);
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    onConfirm: null
+  });
 
   // Validation
   const { validationErrors, hasErrors } = useContactValidation(contactData, isEditing);
@@ -63,32 +73,88 @@ const ContactContent = () => {
     return JSON.stringify(contactData) !== JSON.stringify(originalData);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
+    // Verificar errores de validación primero
     if (hasErrors()) {
-      alert('Por favor, corrija los errores de validación antes de guardar');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Errores de validación',
+        message: 'No se puede guardar porque hay errores de validación en los datos de contacto.',
+        type: 'danger',
+        onConfirm: () => {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        }
+      });
       return;
     }
 
-    setIsSaving(true);
-    try {
-      await ContactService.updateRestaurantInfo(contactData, selectedLanguage);
+    // Mostrar confirmación antes de guardar
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Guardar cambios',
+      message: '¿Estás seguro de que quieres guardar todos los cambios en la información de contacto?',
+      type: 'info',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        setIsSaving(true);
 
-      // Reload data from backend
-      await loadContactData();
-      setIsEditing(false);
-      alert('Datos guardados correctamente');
-    } catch (err) {
-      console.error('Error saving contact data:', err);
-      alert('Error al guardar: ' + (err.message || 'Error desconocido'));
-    } finally {
-      setIsSaving(false);
-    }
+        try {
+          await ContactService.updateRestaurantInfo(contactData, selectedLanguage);
+
+          // Reload data from backend
+          await loadContactData();
+          setIsEditing(false);
+          setIsSaving(false);
+
+          // Show success dialog
+          setConfirmDialog({
+            isOpen: true,
+            title: 'Cambios guardados',
+            message: 'Los cambios se han guardado correctamente.',
+            type: 'info',
+            onConfirm: () => {
+              setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+            }
+          });
+        } catch (err) {
+          console.error('Error saving contact data:', err);
+          setIsSaving(false);
+
+          // Show error dialog
+          setConfirmDialog({
+            isOpen: true,
+            title: 'Error al guardar',
+            message: `No se pudieron guardar los cambios: ${err.message || 'Error desconocido'}`,
+            type: 'danger',
+            onConfirm: () => {
+              setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+            }
+          });
+        }
+      }
+    });
   };
 
   const handleCancel = () => {
-    // Reset to original data
-    setContactData(JSON.parse(JSON.stringify(originalData)));
-    setIsEditing(false);
+    // Si no hay cambios, salir directamente del modo edición
+    if (!hasChanges()) {
+      setIsEditing(false);
+      return;
+    }
+
+    // Si hay cambios, mostrar confirmación
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cancelar cambios',
+      message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
+      type: 'danger',
+      onConfirm: () => {
+        setIsEditing(false);
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // Reset to original data
+        setContactData(JSON.parse(JSON.stringify(originalData)));
+      }
+    });
   };
 
   const handleContactInfoChange = (newContactInfo) => {
@@ -139,121 +205,136 @@ const ContactContent = () => {
   }
 
   return (
-    <div className={styles.content}>
-      <div className={styles.contactContainer}>
-        <div className={styles.viewContainer}>
-          {/* Header with controls */}
-          <div className={styles.header}>
-            <div className={styles.headerTop}>
-              {/* Title Section */}
-              <div className={styles.titleWrapper}>
-                <h1 className={styles.pageTitle}>Información de Contacto</h1>
+    <>
+      <div className={styles.content}>
+        <div className={styles.contactContainer}>
+          <div className={styles.viewContainer}>
+            {/* Header with controls */}
+            <div className={styles.header}>
+              <div className={styles.headerTop}>
+                {/* Title Section */}
+                <div className={styles.titleWrapper}>
+                  <h1 className={styles.pageTitle}>Información de Contacto</h1>
+                </div>
+
+                {/* Controls Group */}
+                <div className={styles.controlsGroup}>
+                  {!isEditing ? (
+                    <>
+                      {/* Language Selector - Solo en modo visualización */}
+                      <div className={styles.languageWrapper}>
+                        <LanguageSelector
+                          selectedLanguage={selectedLanguage}
+                          onChange={handleLanguageChange}
+                          disabled={false}
+                        />
+                      </div>
+
+                      <div className={styles.controlDivider}></div>
+
+                      {/* Edit Button */}
+                      <div className={styles.buttonWrapper}>
+                        <Button
+                          variant="primary"
+                          icon={Edit3}
+                          onClick={handleToggleEditMode}
+                        >
+                          Editar
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Save Button - En modo edición */}
+                      <div className={styles.buttonWrapper}>
+                        <Button
+                          variant="success"
+                          icon={Save}
+                          onClick={handleSave}
+                          disabled={!hasChanges() || isSaving}
+                        >
+                          {isSaving ? 'Guardando...' : 'Guardar'}
+                        </Button>
+                      </div>
+
+                      <div className={styles.controlDivider}></div>
+
+                      {/* Cancel Button - En modo edición */}
+                      <div className={styles.buttonWrapper}>
+                        <Button
+                          variant="danger"
+                          icon={X}
+                          onClick={handleCancel}
+                          disabled={isSaving}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+            </div>
 
-              {/* Controls Group */}
-              <div className={styles.controlsGroup}>
-                {!isEditing ? (
+            {/* Content area */}
+            {contactData && (
+              <div className={styles.formsContainer}>
+                {/* Contact Info Section */}
+                {contactData.contactInfo && (
                   <>
-                    {/* Language Selector - Solo en modo visualización */}
-                    <div className={styles.languageWrapper}>
-                      <LanguageSelector
-                        selectedLanguage={selectedLanguage}
-                        onChange={handleLanguageChange}
-                        disabled={false}
-                      />
-                    </div>
+                    <ContactInfoForm
+                      contactInfo={contactData.contactInfo}
+                      onChange={handleContactInfoChange}
+                      errors={validationErrors.contactInfo || {}}
+                      isEditing={isEditing}
+                    />
 
-                    <div className={styles.controlDivider}></div>
-
-                    {/* Edit Button */}
-                    <div className={styles.buttonWrapper}>
-                      <Button
-                        variant="primary"
-                        icon={Edit3}
-                        onClick={handleToggleEditMode}
-                      >
-                        Editar
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Save Button - En modo edición */}
-                    <div className={styles.buttonWrapper}>
-                      <Button
-                        variant="success"
-                        icon={Save}
-                        onClick={handleSave}
-                        disabled={!hasChanges() || hasErrors() || isSaving}
-                      >
-                        {isSaving ? 'Guardando...' : 'Guardar'}
-                      </Button>
-                    </div>
-
-                    <div className={styles.controlDivider}></div>
-
-                    {/* Cancel Button - En modo edición */}
-                    <div className={styles.buttonWrapper}>
-                      <Button
-                        variant="danger"
-                        icon={X}
-                        onClick={handleCancel}
-                        disabled={isSaving}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
+                    <div className={styles.sectionDivider}></div>
                   </>
                 )}
+
+                {/* Schedules Section */}
+                {contactData.schedules && (
+                  <>
+                    <ScheduleForm
+                      schedules={contactData.schedules}
+                      onChange={handleSchedulesChange}
+                      errors={validationErrors.schedules || {}}
+                      isEditing={isEditing}
+                    />
+
+                    <div className={styles.sectionDivider}></div>
+                  </>
+                )}
+
+                {/* Social Medias Section */}
+                {contactData.socialMedias && (
+                  <SocialMediaForm
+                    socialMedias={contactData.socialMedias}
+                    onChange={handleSocialMediasChange}
+                    errors={validationErrors.socialMedias || {}}
+                    isEditing={isEditing}
+                  />
+                )}
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Content area */}
-          {contactData && (
-            <div className={styles.formsContainer}>
-              {/* Contact Info Section */}
-              {contactData.contactInfo && (
-                <>
-                  <ContactInfoForm
-                    contactInfo={contactData.contactInfo}
-                    onChange={handleContactInfoChange}
-                    errors={validationErrors.contactInfo || {}}
-                    isEditing={isEditing}
-                  />
-
-                  <div className={styles.sectionDivider}></div>
-                </>
-              )}
-
-              {/* Schedules Section */}
-              {contactData.schedules && (
-                <>
-                  <ScheduleForm
-                    schedules={contactData.schedules}
-                    onChange={handleSchedulesChange}
-                    errors={validationErrors.schedules || {}}
-                    isEditing={isEditing}
-                  />
-
-                  <div className={styles.sectionDivider}></div>
-                </>
-              )}
-
-              {/* Social Medias Section */}
-              {contactData.socialMedias && (
-                <SocialMediaForm
-                  socialMedias={contactData.socialMedias}
-                  onChange={handleSocialMediasChange}
-                  errors={validationErrors.socialMedias || {}}
-                  isEditing={isEditing}
-                />
-              )}
-            </div>
-          )}
         </div>
       </div>
-    </div>
+
+      {/* Confirm Dialog */}
+      {confirmDialog.onConfirm && (
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          type={confirmDialog.type}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+          confirmText={confirmDialog.type === 'danger' ? 'Confirmar' : 'Aceptar'}
+        />
+      )}
+    </>
   );
 };
 
