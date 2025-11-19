@@ -12,11 +12,11 @@ import I18nService from '@services/I18nService.js';
  * Initialize I18n with timeout protection
  * Returns a promise that rejects if init takes longer than the timeout
  */
-const initI18nWithTimeout = (timeoutMs = 15000) => {
+const initI18nWithTimeout = (timeoutMs = 5000) => {
   return Promise.race([
     I18nService.init(),
     new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout: El servidor no responde después de 15 segundos')), timeoutMs)
+      setTimeout(() => reject(new Error('Timeout: El servidor no responde después de 5 segundos')), timeoutMs)
     )
   ]);
 };
