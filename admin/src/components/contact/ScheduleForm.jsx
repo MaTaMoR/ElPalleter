@@ -1,10 +1,71 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Clock } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import MenuCheckbox from '../menu/fields/MenuCheckbox';
 import Button from '../common/Button';
 import styles from './ScheduleForm.module.css';
+
+/**
+ * Timeline visual component for displaying time ranges
+ */
+const TimelineBar = ({ ranges }) => {
+  const totalMinutes = 24 * 60; // 24 hours in minutes
+
+  const timeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  return (
+    <div className={styles.timeline}>
+      <div className={styles.timelineBar}>
+        {ranges.map((range, index) => {
+          const startMinutes = timeToMinutes(range.startTime);
+          const endMinutes = timeToMinutes(range.endTime);
+          const leftPercent = (startMinutes / totalMinutes) * 100;
+          const widthPercent = ((endMinutes - startMinutes) / totalMinutes) * 100;
+
+          return (
+            <div
+              key={index}
+              className={styles.timelineBlock}
+              style={{
+                left: `${leftPercent}%`,
+                width: `${widthPercent}%`
+              }}
+              title={`${range.startTime} - ${range.endTime}`}
+            >
+              <div className={styles.timelineBlockContent}>
+                <Clock size={12} />
+                <span className={styles.timelineBlockText}>
+                  {range.startTime} - {range.endTime}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className={styles.timelineLabels}>
+        <span>00:00</span>
+        <span>06:00</span>
+        <span>12:00</span>
+        <span>18:00</span>
+        <span>24:00</span>
+      </div>
+    </div>
+  );
+};
+
+TimelineBar.propTypes = {
+  ranges: PropTypes.arrayOf(
+    PropTypes.shape({
+      startTime: PropTypes.string.isRequired,
+      endTime: PropTypes.string.isRequired,
+      nameKey: PropTypes.string
+    })
+  ).isRequired
+};
 
 /**
  * Form component for editing restaurant schedules
@@ -87,30 +148,62 @@ const ScheduleForm = ({
     return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
   });
 
+  // Group consecutive days with the same schedule
+  const groupSchedules = () => {
+    const groups = [];
+    let currentGroup = null;
+
+    sortedSchedules.forEach((schedule, index) => {
+      const scheduleKey = schedule.isOpen
+        ? JSON.stringify(schedule.scheduleRanges?.map(r => ({ s: r.startTime, e: r.endTime })) || [])
+        : 'closed';
+
+      if (currentGroup && currentGroup.scheduleKey === scheduleKey) {
+        // Add to current group
+        currentGroup.days.push(schedule.dayOfWeek);
+        currentGroup.endDay = schedule.dayOfWeek;
+      } else {
+        // Start new group
+        currentGroup = {
+          scheduleKey,
+          days: [schedule.dayOfWeek],
+          startDay: schedule.dayOfWeek,
+          endDay: schedule.dayOfWeek,
+          schedule: schedule
+        };
+        groups.push(currentGroup);
+      }
+    });
+
+    return groups;
+  };
+
+  const getDayRangeLabel = (group) => {
+    if (group.days.length === 1) {
+      return dayNames[group.startDay];
+    }
+    return `${dayNames[group.startDay]} - ${dayNames[group.endDay]}`;
+  };
+
   if (!isEditing) {
-    // Read-only display
+    // Read-only display with grouped days
+    const groupedSchedules = groupSchedules();
+
     return (
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Horarios</h2>
         <div className={styles.scheduleList}>
-          {sortedSchedules.map(schedule => (
-            <div key={schedule.dayOfWeek} className={styles.scheduleDay}>
+          {groupedSchedules.map((group, index) => (
+            <div key={index} className={styles.scheduleDay}>
               <div className={styles.dayName}>
-                <strong>{dayNames[schedule.dayOfWeek]}:</strong>
+                <strong>{getDayRangeLabel(group)}:</strong>
               </div>
               <div className={styles.daySchedule}>
-                {!schedule.isOpen || !schedule.scheduleRanges || schedule.scheduleRanges.length === 0 ? (
+                {!group.schedule.isOpen || !group.schedule.scheduleRanges || group.schedule.scheduleRanges.length === 0 ? (
                   <span className={styles.closed}>Cerrado</span>
                 ) : (
-                  <div className={styles.ranges}>
-                    {schedule.scheduleRanges.map((range, index) => (
-                      <div key={index} className={styles.range}>
-                        {range.nameKey && <span className={styles.rangeName}>{range.nameKey}: </span>}
-                        <span className={styles.rangeTime}>
-                          {range.startTime} - {range.endTime}
-                        </span>
-                      </div>
-                    ))}
+                  <div className={styles.timelineContainer}>
+                    <TimelineBar ranges={group.schedule.scheduleRanges} />
                   </div>
                 )}
               </div>
@@ -150,14 +243,12 @@ const ScheduleForm = ({
                       <div key={rangeIndex} className={styles.rangeEditor}>
                         <div className={styles.rangeFields}>
                           <MenuTextField
-                            label="Nombre del horario"
+                            label="Nombre (opcional)"
                             value={range.nameKey}
                             onChange={(value) => handleRangeChange(schedule.dayOfWeek, rangeIndex, 'nameKey', value)}
                             error={rangeError.nameKey}
-                            placeholder="Ej: Mañana, Tarde, Todo el día"
-                            required
+                            placeholder="ej: Almuerzo, Cena"
                           />
-
                           <MenuTextField
                             label="Hora inicio"
                             value={range.startTime}
@@ -166,7 +257,6 @@ const ScheduleForm = ({
                             placeholder="09:00"
                             required
                           />
-
                           <MenuTextField
                             label="Hora fin"
                             value={range.endTime}
@@ -175,12 +265,11 @@ const ScheduleForm = ({
                             placeholder="17:00"
                             required
                           />
-
                           <button
                             type="button"
                             className={styles.deleteButton}
                             onClick={() => handleDeleteRange(schedule.dayOfWeek, rangeIndex)}
-                            title="Eliminar rango"
+                            aria-label="Eliminar rango horario"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -208,17 +297,20 @@ const ScheduleForm = ({
 };
 
 ScheduleForm.propTypes = {
-  schedules: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number,
-    dayOfWeek: PropTypes.string.isRequired,
-    isOpen: PropTypes.bool.isRequired,
-    scheduleRanges: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.number,
-      nameKey: PropTypes.string,
-      startTime: PropTypes.string,
-      endTime: PropTypes.string
-    }))
-  })).isRequired,
+  schedules: PropTypes.arrayOf(
+    PropTypes.shape({
+      dayOfWeek: PropTypes.string.isRequired,
+      isOpen: PropTypes.bool.isRequired,
+      scheduleRanges: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+          nameKey: PropTypes.string,
+          startTime: PropTypes.string.isRequired,
+          endTime: PropTypes.string.isRequired
+        })
+      )
+    })
+  ).isRequired,
   onChange: PropTypes.func,
   errors: PropTypes.object,
   isEditing: PropTypes.bool
