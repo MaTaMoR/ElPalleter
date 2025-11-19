@@ -18,9 +18,6 @@ const TimeBadges = ({ ranges }) => {
           <span className={styles.badgeTime}>
             {range.startTime} - {range.endTime}
           </span>
-          {range.nameKey && (
-            <span className={styles.badgeLabel}>({range.nameKey})</span>
-          )}
         </div>
       ))}
     </div>
