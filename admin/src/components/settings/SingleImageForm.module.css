@@ -1,0 +1,259 @@
+/* SingleImageForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* Image Card - similar to TranslationsForm */
+.imageCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeaderReadOnly {
+  justify-content: flex-start;
+}
+
+.cardHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardContent {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Section Labels */
+.sectionLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+/* Image Preview */
+.imagePreview {
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 400px;
+}
+
+/* Current Image Section */
+.currentImageSection {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Upload Section */
+.uploadSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fileInput {
+  display: none;
+}
+
+/* Upload button in header */
+.uploadButtonHeader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.uploadButtonHeader:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.uploadButtonHeader:active {
+  transform: translateY(1px);
+}
+
+.uploadButtonText {
+  display: inline;
+}
+
+/* File Info Section */
+.fileInfoSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+/* File Info */
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.fileName {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.clearButton:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+/* New Image Section */
+.newImageSection {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cardHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .cardContent {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+
+  .imagePreview {
+    max-width: 100%;
+  }
+
+  /* Show only icon on tablet */
+  .uploadButtonText {
+    display: none;
+  }
+
+  .uploadButtonHeader {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardContent {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .uploadButtonHeader {
+    padding: 0.5rem;
+  }
+
+  .uploadButtonText {
+    display: none;
+  }
+
+  .imagePreview {
+    min-height: 150px;
+  }
+
+  .previewImage {
+    max-height: 300px;
+  }
+
+  .sectionLabel {
+    font-size: 0.8125rem;
+  }
+
+  .fileName {
+    font-size: 0.8125rem;
+  }
+}

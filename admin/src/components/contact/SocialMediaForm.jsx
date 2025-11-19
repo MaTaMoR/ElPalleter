@@ -44,7 +44,6 @@ const SocialMediaForm = ({
     if (enabledSocials.length === 0) {
       return (
         <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Redes Sociales</h2>
           <div className={styles.socialMediaCard}>
             <div className={styles.cardHeader}>
               <Share2 size={20} className={styles.cardIcon} />
@@ -60,7 +59,6 @@ const SocialMediaForm = ({
 
     return (
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Redes Sociales</h2>
         <div className={styles.socialMediaCard}>
           <div className={styles.cardHeader}>
             <Share2 size={20} className={styles.cardIcon} />
@@ -95,7 +93,6 @@ const SocialMediaForm = ({
   // Editable form
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Redes Sociales</h2>
       <div className={styles.socialMediaCard}>
         <div className={styles.cardHeader}>
           <Share2 size={20} className={styles.cardIcon} />

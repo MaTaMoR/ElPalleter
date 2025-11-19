@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Trash2, Clock } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
@@ -146,6 +146,21 @@ const ScheduleForm = ({
   const [orphanPatterns, setOrphanPatterns] = useState([]);
   // State to track the order of patterns to prevent reordering when days change
   const [patternOrder, setPatternOrder] = useState([]);
+  // Ref to track the last pattern container for scrolling
+  const lastPatternRef = useRef(null);
+  // State to trigger scroll when a new pattern is added
+  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+
+  // Scroll to the last pattern when a new one is added
+  useEffect(() => {
+    if (shouldScrollToLast && lastPatternRef.current) {
+      lastPatternRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      setShouldScrollToLast(false);
+    }
+  }, [shouldScrollToLast, orphanPatterns]);
 
   // Helper function to convert time string to minutes
   const timeToMinutes = (timeString) => {
@@ -184,13 +199,12 @@ const ScheduleForm = ({
     // Read-only display with weekly calendar grid
     return (
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Horarios</h2>
         <div className={styles.scheduleCard}>
-          <div className={styles.cardHeader}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
             <Clock size={20} className={styles.cardIcon} />
             <h3 className={styles.cardTitle}>Horario semanal</h3>
           </div>
-          <div className={styles.cardContent}>
+          <div className={styles.cardContentNoPadding}>
             <WeeklyCalendar schedules={sortedSchedules} />
           </div>
         </div>
@@ -507,6 +521,8 @@ const ScheduleForm = ({
         ranges: [newRange],
         days: []
       }]);
+      // Trigger scroll to the newly added pattern
+      setShouldScrollToLast(true);
     }
   };
 
@@ -547,7 +563,6 @@ const ScheduleForm = ({
 
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Horarios</h2>
       <div className={styles.scheduleCard}>
         <div className={styles.cardHeader}>
           <div className={styles.cardHeaderLeft}>
@@ -555,7 +570,7 @@ const ScheduleForm = ({
             <h3 className={styles.cardTitle}>Patrones de horario</h3>
           </div>
           <Button
-            variant="secondary"
+            variant="primary"
             icon={Plus}
             onClick={handleAddNewPattern}
             className={styles.addPatternButtonHeader}
@@ -571,12 +586,17 @@ const ScheduleForm = ({
           const rangeErrors = dayErrors.ranges || {};
 
           const isOrphan = pattern.days.length === 0;
+          const isLastPattern = patternIndex === patterns.length - 1;
 
           return (
-            <div key={patternIndex} className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}>
+            <div
+              key={patternIndex}
+              className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}
+              ref={isLastPattern ? lastPatternRef : null}
+            >
               <div className={styles.patternHeader}>
                 <span className={styles.patternTitle}>
-                  Patrón {patternIndex + 1}
+                  Patrón de horario {patternIndex + 1}
                   {isOrphan && <span className={styles.orphanBadge}>(Sin días asignados)</span>}
                 </span>
                 {isOrphan && (
@@ -594,7 +614,6 @@ const ScheduleForm = ({
 
               {/* Time range for this pattern */}
               <div className={styles.patternRanges}>
-                <label className={styles.patternLabel}>Horario:</label>
                 <div className={styles.rangeRow}>
                   <MenuTextField
                     label="Inicio"

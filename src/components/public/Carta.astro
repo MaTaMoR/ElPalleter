@@ -450,28 +450,30 @@ const categories = await CartaService.getCategories();
 
 <script>
     import { useBreakpoints, disableTransitionsDuringResize } from '../../utils/breakpoints.js';
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         const navButtons = document.querySelectorAll('.menu-nav-btn');
         const menuSections = document.querySelectorAll('.menu-section');
         const cartaSection = document.querySelector('.carta-section');
         const menuCategories = document.querySelectorAll('.menu-category');
-        
+
         const breakpoints = useBreakpoints('carta-component', {
             element: cartaSection
         });
-        
+
         breakpoints.subscribe({
             onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
                 console.debug(`Carta: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
-                
+
                 const elementsToAdjust = [...menuCategories];
                 disableTransitionsDuringResize(elementsToAdjust);
             }
         });
 
+        const buttonHandlers = new Map();
+
         navButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
+            const handler = () => {
                 navButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
@@ -482,11 +484,20 @@ const categories = await CartaService.getCategories();
                 if (targetSection) {
                     targetSection.classList.add('active');
                 }
+            };
+
+            buttonHandlers.set(btn, handler);
+            btn.addEventListener('click', handler);
+        });
+
+        const cleanup = () => {
+            buttonHandlers.forEach((handler, btn) => {
+                btn.removeEventListener('click', handler);
             });
-        });
-        
-        window.addEventListener('beforeunload', () => {
+            buttonHandlers.clear();
             breakpoints.unsubscribe();
-        });
+        };
+
+        window.addEventListener('beforeunload', cleanup);
     });
 </script>

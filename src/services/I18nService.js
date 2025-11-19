@@ -415,6 +415,35 @@ export class I18nService {
     return stats;
   }
 
+  /**
+   * Actualiza una traducción específica
+   * @param {string} languageCode - Código del idioma (es, en, val)
+   * @param {string} key - Clave de la traducción
+   * @param {string} value - Nuevo valor de la traducción
+   * @returns {Promise<Object>} Translation actualizada
+   */
+  static async updateTranslation(languageCode, key, value) {
+    try {
+      const request = {
+        languageCode,
+        key,
+        value
+      };
+
+      const updatedTranslation = await I18nRepository.updateTranslation(request);
+
+      // Actualizar el estado local con la nueva traducción
+      const localeTranslations = state.translations.get(languageCode) || {};
+      localeTranslations[key] = value;
+      state.translations.set(languageCode, localeTranslations);
+
+      return updatedTranslation;
+    } catch (error) {
+      console.error(`[I18nService] Error updating translation ${key} for ${languageCode}:`, error);
+      throw error;
+    }
+  }
+
   // ===============================================
   // GESTIÓN DE IDIOMAS
   // ===============================================

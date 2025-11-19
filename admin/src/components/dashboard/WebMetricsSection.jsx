@@ -67,8 +67,8 @@ const WebMetricsSection = ({
               </p>
             )}
           </div>
-          <RefreshButton 
-            onRefresh={onRefresh}
+          <RefreshButton
+            onClick={onRefresh}
             refreshing={refreshing}
           />
         </div>

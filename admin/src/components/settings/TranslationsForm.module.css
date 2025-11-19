@@ -1,0 +1,266 @@
+/* TranslationsForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* Translations Card - similar to ContactInfoForm */
+.translationsCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeaderReadOnly {
+  justify-content: flex-start;
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardContent {
+  padding: 1.25rem;
+}
+
+/* Search Container */
+.searchContainer {
+  margin-bottom: 1.5rem;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.9375rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Translations List */
+.translationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar */
+.translationsList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.translationsList::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.translationsList::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.translationsList::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Translation Item - Read Only */
+.translationItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.translationItem:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.1);
+}
+
+.translationKey {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.translationKey strong {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.translationValue {
+  display: block;
+  padding: 0.875rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  min-height: 3rem;
+  transition: var(--transition);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Translation Item - Edit Mode */
+.translationItemEdit {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.translationItemEdit:hover {
+  background: var(--bg-tertiary);
+}
+
+.translationKeyLabel label {
+  display: block;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.translationValueInput {
+  width: 100%;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* Results Count */
+.resultsCount {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cardHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .cardContent {
+    padding: 1rem;
+  }
+
+  .translationItemEdit {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .translationsList {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchInput {
+    font-size: 0.875rem;
+    padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+  }
+
+  .searchIcon {
+    left: 0.875rem;
+  }
+
+  .translationItem,
+  .translationItemEdit {
+    padding: 0.75rem;
+  }
+
+  .translationValue {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .translationsList {
+    max-height: 300px;
+  }
+}

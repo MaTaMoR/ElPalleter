@@ -149,6 +149,26 @@ export class BaseRepository {
     }
 
     /**
+     * Petición PUT con FormData (para archivos)
+     */
+    static async putFormData(endpoint, formData, options = {}) {
+        const { headers = {}, ...fetchOptions } = options;
+
+        // No establecer Content-Type para FormData, el navegador lo hará automáticamente
+        const customHeaders = { ...headers };
+        delete customHeaders['Content-Type'];
+
+        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+            method: 'PUT',
+            headers: customHeaders,
+            body: formData,
+            ...fetchOptions
+        });
+
+        return this.handleResponse(response);
+    }
+
+    /**
      * Petición DELETE genérica
      */
     static async delete(endpoint, options = {}) {

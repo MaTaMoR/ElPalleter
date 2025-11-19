@@ -170,31 +170,6 @@ export const prerender = true;
     .scroll-to-top {
         backface-visibility: hidden;
         transform-style: preserve-3d;
-    }
-
-    .scroll-to-top.compact {
-        width: var(--space-10);
-        height: var(--space-10);
-        bottom: var(--space-4);
-        right: var(--space-4);
-    }
-    
-    .scroll-to-top.compact svg {
-        width: var(--space-4);
-        height: var(--space-4)
-    }
-
-    .scroll-to-top.with-text {
-        width: auto;
-        padding: var(--space-3) var(--space-4);
-        border-radius: var(--radius-full);
-        gap: var(--space-2);
-        font-size: var(--text-sm);
-        font-weight: var(--font-medium);
-        white-space: nowrap;
-    }
-    
-    .scroll-to-top {
         bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
         right: calc(var(--space-8) + env(safe-area-inset-right));
     }

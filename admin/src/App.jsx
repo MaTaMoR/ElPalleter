@@ -36,6 +36,7 @@ export default function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
           <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </AuthProvider>
     </Router>

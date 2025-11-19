@@ -72,22 +72,22 @@ const icons = {
 
 const altText = alt || `Imagen ${imageId}`;
 const finalLoading = priority ? 'eager' : loading;
+const objectFitClass = `object-${objectFit}`;
+const objectPositionClass = objectPosition === 'center' ? 'object-center' :
+                            objectPosition === 'top' ? 'object-top' :
+                            objectPosition === 'bottom' ? 'object-bottom' :
+                            objectPosition === 'left' ? 'object-left' :
+                            objectPosition === 'right' ? 'object-right' : 'object-center';
 ---
 
 {imageURL ? (
-    <img 
-        class={`responsive-image ${className}`}
+    <img
+        class={`responsive-image ${objectFitClass} ${objectPositionClass} ${className}`}
         src={imageURL}
         sizes={sizes}
         alt={altText}
         loading={finalLoading}
         decoding={decoding}
-        width={width}
-        height={height}
-        style={`
-            object-fit: ${objectFit};
-            object-position: ${objectPosition};
-        `}
         data-image-id={imageId}
     />
 ) : showFallback ? (
