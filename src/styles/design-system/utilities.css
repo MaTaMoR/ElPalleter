@@ -851,15 +851,48 @@
   transition: opacity var(--duration-300) var(--ease-out);
 }
 
+.transition-base {
+  transition: var(--transition-base);
+}
+
+.transition-fast {
+  transition: var(--transition-fast);
+}
+
+.transition-slow {
+  transition: var(--transition-slow);
+}
+
+.transition-colors {
+  transition: var(--transition-colors);
+}
+
+.transition-transform {
+  transition: var(--transition-transform);
+}
+
+.transition-opacity {
+  transition: var(--transition-opacity);
+}
+
+.focus-ring:focus,
+.focus-ring:focus-visible {
+  outline: var(--border-2) solid var(--focus-ring);
+  outline-offset: var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
 .glass-effect {
   background: var(--glass-bg);
   backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
   border: var(--border-1) solid var(--glass-border);
 }
 
 .glass-effect-strong {
   background: var(--glass-bg);
   backdrop-filter: var(--backdrop-blur-strong);
+  -webkit-backdrop-filter: var(--backdrop-blur-strong);
   border: var(--border-1) solid var(--glass-border);
 }
 

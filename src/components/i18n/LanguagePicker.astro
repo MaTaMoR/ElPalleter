@@ -527,42 +527,67 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       this.dropdown = element.querySelector('.lang-options');
       this.options = element.querySelectorAll('.lang-option');
       this.isOpen = false;
-      
+      this.handlers = new Map();
+
       this.init();
     }
-    
+
     // Detectar si es dispositivo móvil
     isMobile() {
       return breakpointManager.isMobile();
     }
-    
+
     init() {
       if (!this.button || !this.dropdown) return;
-      
+
       // Event listeners básicos
-      this.button.addEventListener('click', (e) => this.toggleDropdown(e));
+      const toggleHandler = (e) => this.toggleDropdown(e);
+      this.button.addEventListener('click', toggleHandler);
+      this.handlers.set('toggle', { element: this.button, event: 'click', handler: toggleHandler });
 
       // Cerrar al hacer clic fuera
-      document.addEventListener('click', (e) => this.handleOutsideClick(e));
-      
+      const outsideClickHandler = (e) => this.handleOutsideClick(e);
+      document.addEventListener('click', outsideClickHandler);
+      this.handlers.set('outsideClick', { element: document, event: 'click', handler: outsideClickHandler });
+
       // Navegación con teclado en opciones
+      const optionHandlers = [];
       this.options.forEach((option, index) => {
         // Limpiar focus al hacer hover para evitar doble selección
-        option.addEventListener('mouseenter', () => {
+        const mouseenterHandler = () => {
           if (!this.isMobile()) {
             // En desktop, remover focus de todas las opciones al hacer hover
             this.options.forEach(opt => opt.blur());
           }
-        });
+        };
+        option.addEventListener('mouseenter', mouseenterHandler);
+        optionHandlers.push({ element: option, event: 'mouseenter', handler: mouseenterHandler });
       });
-      
+      this.handlers.set('options', optionHandlers);
+
       // Escape para cerrar
-      document.addEventListener('keydown', (e) => {
+      const keydownHandler = (e) => {
         if (e.key === 'Escape' && this.isOpen) {
           this.closeDropdown();
           this.button.focus();
         }
+      };
+      document.addEventListener('keydown', keydownHandler);
+      this.handlers.set('keydown', { element: document, event: 'keydown', handler: keydownHandler });
+    }
+
+    destroy() {
+      this.handlers.forEach((value, key) => {
+        if (Array.isArray(value)) {
+          value.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+          });
+        } else {
+          const { element, event, handler } = value;
+          element.removeEventListener(event, handler);
+        }
       });
+      this.handlers.clear();
     }
     
     toggleDropdown(event) {
@@ -607,8 +632,19 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   }
   
   // Inicializar todos los language pickers
+  const pickerInstances = [];
+
   document.addEventListener('DOMContentLoaded', () => {
     const pickers = document.querySelectorAll('[data-language-picker]');
-    pickers.forEach(picker => new LanguagePicker(picker));
+    pickers.forEach(picker => {
+      const instance = new LanguagePicker(picker);
+      pickerInstances.push(instance);
+    });
+  });
+
+  // Cleanup
+  window.addEventListener('beforeunload', () => {
+    pickerInstances.forEach(instance => instance.destroy());
+    pickerInstances.length = 0;
   });
 </script>
