@@ -204,7 +204,7 @@ const ScheduleForm = ({
             <Clock size={20} className={styles.cardIcon} />
             <h3 className={styles.cardTitle}>Horario semanal</h3>
           </div>
-          <div className={styles.cardContent}>
+          <div className={styles.cardContentNoPadding}>
             <WeeklyCalendar schedules={sortedSchedules} />
           </div>
         </div>
