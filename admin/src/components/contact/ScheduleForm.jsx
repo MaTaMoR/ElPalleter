@@ -184,9 +184,8 @@ const ScheduleForm = ({
     // Read-only display with weekly calendar grid
     return (
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Horarios</h2>
         <div className={styles.scheduleCard}>
-          <div className={styles.cardHeader}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
             <Clock size={20} className={styles.cardIcon} />
             <h3 className={styles.cardTitle}>Horario semanal</h3>
           </div>
@@ -547,7 +546,6 @@ const ScheduleForm = ({
 
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Horarios</h2>
       <div className={styles.scheduleCard}>
         <div className={styles.cardHeader}>
           <div className={styles.cardHeaderLeft}>
