@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Share2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
-import MenuCheckbox from '../menu/fields/MenuCheckbox';
+import BadgeToggle from '../common/BadgeToggle';
 import styles from './SocialMediaForm.module.css';
 
 /**
@@ -115,8 +115,8 @@ const SocialMediaForm = ({
                       </div>
                       <h3 className={styles.socialPlatform}>{social.platform}</h3>
                     </div>
-                    <MenuCheckbox
-                      label="Habilitado"
+                    <BadgeToggle
+                      label={social.enabled ? 'Habilitado' : 'Deshabilitado'}
                       checked={social.enabled}
                       onChange={(checked) => handleSocialChange(socialIndex, 'enabled', checked)}
                     />
