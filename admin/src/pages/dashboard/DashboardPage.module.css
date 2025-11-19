@@ -320,6 +320,15 @@
     min-height: 130px;
   }
 
+  .tileIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tileTitle {
+    font-size: 1.05rem;
+  }
+
   .socialGrid {
     grid-template-columns: 1fr;
   }
@@ -333,13 +342,22 @@
   .managementGrid {
     grid-template-columns: 1fr;
   }
-  
+
+  .tileIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tileTitle {
+    font-size: 1rem;
+  }
+
   .socialStats {
     flex-direction: column;
     text-align: center;
     gap: 0.5rem;
   }
-  
+
   .socialChange {
     text-align: center;
   }

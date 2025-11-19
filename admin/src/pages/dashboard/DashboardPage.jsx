@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
 import {
   Menu,
@@ -17,16 +18,18 @@ import styles from './DashboardPage.module.css';
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: analyticsData, previousData, loading, refreshing, error, refresh, lastUpdated } = useAnalyticsData();
 
   const managementSections = [
     {
       id: 'carta',
       title: 'Carta',
-      info: '24 platos',
+      info: 'Configurar carta',
       action: 'Gestionar',
       icon: Menu,
-      className: 'carta'
+      className: 'carta',
+      path: '/menu'
     },
     {
       id: 'contacto',
@@ -34,7 +37,8 @@ const DashboardPage = () => {
       info: 'Información completa',
       action: 'Editar',
       icon: Phone,
-      className: 'contacto'
+      className: 'contacto',
+      path: '/contact'
     },
     {
       id: 'historia',
@@ -92,9 +96,12 @@ const DashboardPage = () => {
     }
   ];
 
-  const handleManagementClick = (sectionId) => {
-    console.debug(`Navegando a: ${sectionId} / TODO`);
-    // TODO: Implementar navegación real aquí
+  const handleManagementClick = (section) => {
+    if (section.path) {
+      navigate(section.path);
+    } else {
+      console.debug(`Navegando a: ${section.id} / TODO`);
+    }
   };
 
   return (
@@ -109,10 +116,10 @@ const DashboardPage = () => {
           {managementSections.map((section) => {
             const IconComponent = section.icon;
             return (
-              <div 
+              <div
                 key={section.id}
-                className={`${styles.managementTile} ${styles[section.className]}`}
-                onClick={() => handleManagementClick(section.id)}
+                className={`${styles.managementTile} ${styles[section.className]} ${section.path ? styles.clickable : ''}`}
+                onClick={() => handleManagementClick(section)}
               >
                 <IconComponent className={styles.tileIcon} size={45} />
                 <h3 className={styles.tileTitle}>{section.title}</h3>
