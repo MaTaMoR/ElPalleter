@@ -206,7 +206,20 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
           const normalizedOriginal = (originalValue === undefined || originalValue === null) ? '' : originalValue;
           const normalizedUpdated = (updatedValue === undefined || updatedValue === null) ? '' : updatedValue;
 
-          return normalizedOriginal === normalizedUpdated;
+          // For numeric fields, ensure both are compared as numbers
+          if (field === 'price') {
+            const originalNum = normalizedOriginal === '' ? 0 : Number(normalizedOriginal);
+            const updatedNum = normalizedUpdated === '' ? 0 : Number(normalizedUpdated);
+            return originalNum === updatedNum;
+          }
+
+          // For boolean fields, ensure proper comparison
+          if (field === 'available') {
+            return Boolean(normalizedOriginal) === Boolean(normalizedUpdated);
+          }
+
+          // For string fields, compare as strings
+          return String(normalizedOriginal) === String(normalizedUpdated);
         });
 
         if (matchesOriginal) {
