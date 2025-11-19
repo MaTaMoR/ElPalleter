@@ -144,6 +144,9 @@
   font-weight: 600;
   font-size: 0.875rem;
   font-family: 'Courier New', monospace;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .translationValue {
@@ -158,12 +161,14 @@
   min-height: 3rem;
   transition: var(--transition);
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Translation Item - Edit Mode */
 .translationItemEdit {
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) 2fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1rem;
   align-items: start;
   padding: 1rem;
@@ -184,6 +189,8 @@
   font-size: 0.875rem;
   font-family: 'Courier New', monospace;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   line-height: 1.5;
 }
 
