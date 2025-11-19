@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Check, X } from 'lucide-react';
 import Button from '../../common/Button';
@@ -17,9 +17,12 @@ const CategoryView = ({
   onUpdateCategory,
   subcategoryCounts,
   isEditing,
-  categoryErrors = {}
+  categoryErrors = {},
+  onValidationError
 }) => {
   const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [shakingCategoryId, setShakingCategoryId] = useState(null);
+  const categoryRefs = useRef({});
 
   const handleEdit = (categoryId) => {
     setEditingCategoryId(categoryId);
@@ -29,7 +32,32 @@ const CategoryView = ({
     setEditingCategoryId(null);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (categoryId) => {
+    // Verificar si la categoría tiene errores de validación
+    const errors = categoryErrors[categoryId];
+    const hasErrors = errors && Object.values(errors).some(error => error);
+
+    if (hasErrors) {
+      // Disparar animación de vibración
+      setShakingCategoryId(categoryId);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingCategoryId(null);
+      }, 500);
+
+      // Llamar al callback de error si existe (para mostrar toast/mensaje)
+      if (onValidationError) {
+        const errorMessages = Object.entries(errors)
+          .filter(([, error]) => error)
+          .map(([field, error]) => error);
+        onValidationError(errorMessages);
+      }
+
+      return; // No cerrar el formulario si hay errores
+    }
+
+    // Si no hay errores, cerrar el formulario
     setEditingCategoryId(null);
   };
 
@@ -58,10 +86,15 @@ const CategoryView = ({
         {categories.map((category) => {
           const isEditingCategory = isEditing && editingCategoryId === category.id;
           const isDeleted = category._state === 'deleted';
+          const isShaking = shakingCategoryId === category.id;
 
           return (
-            <MenuCard
+            <div
               key={category.id}
+              ref={(el) => { categoryRefs.current[category.id] = el; }}
+              className={isShaking ? styles.categoryShake : ''}
+            >
+              <MenuCard
               title={category.nameKey || 'Sin nombre'}
               content={
                 <MenuBadge
@@ -91,7 +124,7 @@ const CategoryView = ({
                       </button>
                       <button
                         type="button"
-                        onClick={handleSaveEdit}
+                        onClick={() => handleSaveEdit(category.id)}
                         className={cardStyles.saveEditButton}
                       >
                         <Check size={18} />
@@ -110,6 +143,7 @@ const CategoryView = ({
               showArrow={true}
               isEditing={isEditing}
             />
+            </div>
           );
         })}
       </div>
@@ -132,7 +166,8 @@ CategoryView.propTypes = {
   onUpdateCategory: PropTypes.func,
   subcategoryCounts: PropTypes.object,
   isEditing: PropTypes.bool,
-  categoryErrors: PropTypes.object
+  categoryErrors: PropTypes.object,
+  onValidationError: PropTypes.func
 };
 
 export default CategoryView;

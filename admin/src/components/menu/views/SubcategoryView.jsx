@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, ArrowLeft, Check, X } from 'lucide-react';
 import Button from '../../common/Button';
@@ -22,9 +22,12 @@ const SubcategoryView = ({
   itemCounts,
   isEditing,
   categoryError,
-  subcategoryErrors = {}
+  subcategoryErrors = {},
+  onValidationError
 }) => {
   const [editingSubcategoryId, setEditingSubcategoryId] = useState(null);
+  const [shakingSubcategoryId, setShakingSubcategoryId] = useState(null);
+  const subcategoryRefs = useRef({});
 
   const handleEdit = (subcategoryId) => {
     setEditingSubcategoryId(subcategoryId);
@@ -34,7 +37,32 @@ const SubcategoryView = ({
     setEditingSubcategoryId(null);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (subcategoryId) => {
+    // Verificar si la subcategoría tiene errores de validación
+    const errors = subcategoryErrors[subcategoryId];
+    const hasErrors = errors && Object.values(errors).some(error => error);
+
+    if (hasErrors) {
+      // Disparar animación de vibración
+      setShakingSubcategoryId(subcategoryId);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingSubcategoryId(null);
+      }, 500);
+
+      // Llamar al callback de error si existe (para mostrar toast/mensaje)
+      if (onValidationError) {
+        const errorMessages = Object.entries(errors)
+          .filter(([, error]) => error)
+          .map(([field, error]) => error);
+        onValidationError(errorMessages);
+      }
+
+      return; // No cerrar el formulario si hay errores
+    }
+
+    // Si no hay errores, cerrar el formulario
     setEditingSubcategoryId(null);
   };
 
@@ -83,10 +111,15 @@ const SubcategoryView = ({
         {subcategories.map((subcategory) => {
           const isEditingSubcategory = isEditing && editingSubcategoryId === subcategory.id;
           const isDeleted = subcategory._state === 'deleted';
+          const isShaking = shakingSubcategoryId === subcategory.id;
 
           return (
-            <MenuCard
+            <div
               key={subcategory.id}
+              ref={(el) => { subcategoryRefs.current[subcategory.id] = el; }}
+              className={isShaking ? styles.subcategoryShake : ''}
+            >
+              <MenuCard
               title={subcategory.nameKey || 'Sin nombre'}
               content={
                 <MenuBadge
@@ -116,7 +149,7 @@ const SubcategoryView = ({
                       </button>
                       <button
                         type="button"
-                        onClick={handleSaveEdit}
+                        onClick={() => handleSaveEdit(subcategory.id)}
                         className={cardStyles.saveEditButton}
                       >
                         <Check size={18} />
@@ -135,6 +168,7 @@ const SubcategoryView = ({
               showArrow={true}
               isEditing={isEditing}
             />
+            </div>
           );
         })}
       </div>
@@ -168,7 +202,8 @@ SubcategoryView.propTypes = {
   itemCounts: PropTypes.object,
   isEditing: PropTypes.bool,
   categoryError: PropTypes.string,
-  subcategoryErrors: PropTypes.object
+  subcategoryErrors: PropTypes.object,
+  onValidationError: PropTypes.func
 };
 
 export default SubcategoryView;
