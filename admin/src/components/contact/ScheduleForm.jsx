@@ -142,6 +142,8 @@ const ScheduleForm = ({
 
   // State to keep orphan patterns (patterns without assigned days) visible
   const [orphanPatterns, setOrphanPatterns] = useState([]);
+  // State to track the order of patterns to prevent reordering when days change
+  const [patternOrder, setPatternOrder] = useState([]);
 
   const dayNames = {
     monday: 'Lunes',
@@ -214,7 +216,6 @@ const ScheduleForm = ({
       ...daysByPattern[key]
     }));
 
-    // Add orphan patterns (patterns without assigned days) at the end
     // Remove orphans that now have days assigned
     const updatedOrphans = orphanPatterns.filter(orphan => {
       return !activePatterns.some(p => p.patternKey === orphan.patternKey);
@@ -225,7 +226,37 @@ const ScheduleForm = ({
       setOrphanPatterns(updatedOrphans);
     }
 
-    return [...activePatterns, ...updatedOrphans];
+    // Combine active and orphan patterns
+    const allPatterns = [...activePatterns, ...updatedOrphans];
+
+    // Update pattern order - add new patterns to the order list
+    const newOrder = [...patternOrder];
+    let orderChanged = false;
+
+    allPatterns.forEach(pattern => {
+      if (!newOrder.includes(pattern.patternKey)) {
+        newOrder.push(pattern.patternKey);
+        orderChanged = true;
+      }
+    });
+
+    // Remove patterns that no longer exist
+    const cleanedOrder = newOrder.filter(key =>
+      allPatterns.some(p => p.patternKey === key)
+    );
+
+    if (orderChanged || cleanedOrder.length !== newOrder.length) {
+      setPatternOrder(cleanedOrder);
+    }
+
+    // Sort patterns by the order they first appeared
+    const orderedPatterns = allPatterns.sort((a, b) => {
+      const indexA = cleanedOrder.indexOf(a.patternKey);
+      const indexB = cleanedOrder.indexOf(b.patternKey);
+      return indexA - indexB;
+    });
+
+    return orderedPatterns;
   };
 
   const handlePatternDayToggle = (pattern, dayOfWeek, isChecked) => {
