@@ -15,6 +15,7 @@ const CategoryView = ({
   onDeleteCategory,
   onUndoDeleteCategory,
   onUpdateCategory,
+  onCancelEditCategory,
   subcategoryCounts,
   isEditing,
   categoryErrors = {},
@@ -28,7 +29,11 @@ const CategoryView = ({
     setEditingCategoryId(categoryId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (categoryId) => {
+    // Revert changes before closing
+    if (onCancelEditCategory) {
+      onCancelEditCategory(categoryId);
+    }
     setEditingCategoryId(null);
   };
 
@@ -116,7 +121,7 @@ const CategoryView = ({
                     <div className={cardStyles.editActions}>
                       <button
                         type="button"
-                        onClick={handleCancelEdit}
+                        onClick={() => handleCancelEdit(category.id)}
                         className={cardStyles.cancelEditButton}
                       >
                         <X size={18} />
@@ -164,6 +169,7 @@ CategoryView.propTypes = {
   onDeleteCategory: PropTypes.func,
   onUndoDeleteCategory: PropTypes.func,
   onUpdateCategory: PropTypes.func,
+  onCancelEditCategory: PropTypes.func,
   subcategoryCounts: PropTypes.object,
   isEditing: PropTypes.bool,
   categoryErrors: PropTypes.object,

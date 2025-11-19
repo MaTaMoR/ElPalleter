@@ -18,6 +18,7 @@ const ItemView = ({
   onUpdateSubcategory,
   onDeleteItem,
   onUndoDeleteItem,
+  onCancelEditItem,
   onBack,
   isEditing,
   errors = {},
@@ -33,7 +34,11 @@ const ItemView = ({
     setEditingItemId(itemId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (itemId) => {
+    // Revert changes before closing
+    if (onCancelEditItem) {
+      onCancelEditItem(itemId);
+    }
     setEditingItemId(null);
   };
 
@@ -191,7 +196,7 @@ const ItemView = ({
                         <div className={cardStyles.editActions}>
                           <button
                             type="button"
-                            onClick={handleCancelEdit}
+                            onClick={() => handleCancelEdit(item.id)}
                             className={cardStyles.cancelEditButton}
                           >
                             <X size={18} />
@@ -246,6 +251,7 @@ ItemView.propTypes = {
   onUpdateSubcategory: PropTypes.func,
   onDeleteItem: PropTypes.func,
   onUndoDeleteItem: PropTypes.func,
+  onCancelEditItem: PropTypes.func,
   onBack: PropTypes.func,
   isEditing: PropTypes.bool,
   errors: PropTypes.object,

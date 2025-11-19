@@ -60,6 +60,7 @@ const CategoryListView = () => {
       onDeleteCategory={isEditing ? (id) => entityOps.handleDelete('category', id) : undefined}
       onUndoDeleteCategory={isEditing ? (id) => entityOps.handleUndoDelete('category', id) : undefined}
       onUpdateCategory={isEditing ? (id, updates) => entityOps.handleUpdate('category', id, updates) : undefined}
+      onCancelEditCategory={isEditing ? (id) => entityOps.handleCancelEdit('category', id) : undefined}
       subcategoryCounts={getSubcategoryCounts()}
       isEditing={isEditing}
       categoryErrors={validationErrors}

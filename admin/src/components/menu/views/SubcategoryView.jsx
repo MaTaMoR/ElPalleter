@@ -18,6 +18,7 @@ const SubcategoryView = ({
   onUndoDeleteSubcategory,
   onUpdateCategory,
   onUpdateSubcategory,
+  onCancelEditSubcategory,
   onBack,
   itemCounts,
   isEditing,
@@ -33,7 +34,11 @@ const SubcategoryView = ({
     setEditingSubcategoryId(subcategoryId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (subcategoryId) => {
+    // Revert changes before closing
+    if (onCancelEditSubcategory) {
+      onCancelEditSubcategory(subcategoryId);
+    }
     setEditingSubcategoryId(null);
   };
 
@@ -141,7 +146,7 @@ const SubcategoryView = ({
                     <div className={cardStyles.editActions}>
                       <button
                         type="button"
-                        onClick={handleCancelEdit}
+                        onClick={() => handleCancelEdit(subcategory.id)}
                         className={cardStyles.cancelEditButton}
                       >
                         <X size={18} />
@@ -198,6 +203,7 @@ SubcategoryView.propTypes = {
   onUndoDeleteSubcategory: PropTypes.func,
   onUpdateCategory: PropTypes.func,
   onUpdateSubcategory: PropTypes.func,
+  onCancelEditSubcategory: PropTypes.func,
   onBack: PropTypes.func,
   itemCounts: PropTypes.object,
   isEditing: PropTypes.bool,

@@ -102,6 +102,7 @@ const ItemListView = () => {
       onUpdateSubcategory={isEditing ? (id, updates) => entityOps.handleUpdate('subcategory', id, updates, categoryId) : undefined}
       onDeleteItem={isEditing ? (itemId) => entityOps.handleDelete('item', itemId, currentSubcategory.id, categoryId) : undefined}
       onUndoDeleteItem={isEditing ? (id) => entityOps.handleUndoDelete('item', id, subcategoryId, categoryId) : undefined}
+      onCancelEditItem={isEditing ? (id) => entityOps.handleCancelEdit('item', id, subcategoryId, categoryId) : undefined}
       onBack={handleBack}
       isEditing={isEditing}
       errors={getItemErrors()}

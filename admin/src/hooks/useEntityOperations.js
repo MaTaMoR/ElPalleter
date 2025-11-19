@@ -450,11 +450,87 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
     }
   };
 
+  /**
+   * Generic CANCEL EDIT operation
+   * Reverts changes made during editing:
+   * - For new entities (_state === 'new'): completely removes them
+   * - For edited entities (_state === 'edited'): restores original values
+   */
+  const handleCancelEdit = (entityType, entityId, parentId = null, categoryId = null) => {
+    let hierarchicalId, parentHId;
+
+    if (entityType === 'category') {
+      hierarchicalId = buildHierarchicalId(entityId);
+    } else if (entityType === 'subcategory') {
+      if (!parentId) {
+        console.error('❌ No parentId (categoryId) provided for subcategory cancel');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(parentId, entityId);
+      parentHId = buildHierarchicalId(parentId);
+    } else if (entityType === 'item') {
+      if (!categoryId || !parentId) {
+        console.error('❌ Missing categoryId or parentId (subcategoryId) for item cancel');
+        return;
+      }
+      hierarchicalId = buildHierarchicalId(categoryId, parentId, entityId);
+      parentHId = buildHierarchicalId(categoryId, parentId);
+    }
+
+    const { map, setter } = getMapAndSetter(entityType);
+    const entity = map.get(hierarchicalId);
+    if (!entity) return;
+
+    // If it's new, delete it completely
+    if (entity._state === 'new') {
+      setter(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(hierarchicalId);
+        return newMap;
+      });
+
+      // Update childrenMap
+      if (parentHId) {
+        setChildrenMap(prev => {
+          const newMap = new Map(prev);
+          const children = newMap.get(parentHId) || [];
+          newMap.set(parentHId, children.filter(id => id !== hierarchicalId));
+          return newMap;
+        });
+      } else if (entityType === 'category') {
+        setChildrenMap(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(hierarchicalId);
+          return newMap;
+        });
+      }
+
+      untrackChange(hierarchicalId);
+    }
+    // If it's edited, revert to original values
+    else if (entity._state === 'edited') {
+      const originalMap = getOriginalMap(entityType);
+      const original = originalMap.get(hierarchicalId);
+      if (original) {
+        setter(prev => {
+          const newMap = new Map(prev);
+          newMap.set(hierarchicalId, {
+            ...original,
+            _state: 'normal'
+          });
+          return newMap;
+        });
+        untrackChange(hierarchicalId);
+      }
+    }
+  };
+
   return {
     handleAdd,
     handleUpdate,
     handleDelete,
     handleUndoDelete,
-    handleMove
+    handleMove,
+    handleCancelEdit
   };
 };
