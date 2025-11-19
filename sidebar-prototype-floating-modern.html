@@ -267,27 +267,34 @@
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 1024px) {
-      /* Tablet y móvil: sidebar oculto por defecto */
+      /* Tablet y móvil: sidebar completamente oculto por defecto */
       .sidebar {
-        left: 0;
-        top: 70px;
-        bottom: 0;
-        border-radius: 0 20px 20px 0;
-        transform: translateX(-100%);
+        left: 2rem;
+        top: 86px;
+        bottom: 1rem;
+        border-radius: 20px;
+        width: 280px;
+        transform: translateX(calc(-100% - 2rem));
+      }
+
+      /* En mobile, ignoramos el estado collapsed - siempre se oculta completamente */
+      .sidebar.collapsed {
+        width: 280px;
+        transform: translateX(calc(-100% - 2rem));
       }
 
       .sidebar.mobile-open {
         transform: translateX(0);
-        width: 280px;
       }
 
       .main-content {
         margin-left: 0;
-        margin-top: 70px;
+        margin-top: 86px;
         padding: 1.5rem;
       }
 
-      .sidebar.collapsed ~ .main-content {
+      .sidebar.collapsed ~ .main-content,
+      .sidebar ~ .main-content {
         margin-left: 0;
       }
 
