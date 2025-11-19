@@ -236,6 +236,12 @@
     width: 20px;
     height: 20px;
   }
+
+  /* Reduce padding of action buttons in tablets */
+  .actionButton,
+  .warningIcon {
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -245,5 +251,21 @@
 
   .cardTitle {
     font-size: 1rem;
+  }
+
+  /* Further reduce padding in mobile */
+  .actionButton,
+  .warningIcon {
+    padding: 0.4rem;
+  }
+
+  /* Hide move buttons in mobile to save space */
+  .moveButton {
+    display: none;
+  }
+
+  /* Reduce card actions padding */
+  .cardActions {
+    padding-right: 0.5rem;
   }
 }
