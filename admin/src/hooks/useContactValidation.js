@@ -83,10 +83,6 @@ export const useContactValidation = (contactData, isEditing) => {
           const rangeErrors = {};
           const config = CONTACT_VALIDATION_CONFIG.scheduleRange;
 
-          // Validate nameKey
-          const nameKeyError = validateTextField(range.nameKey, config.nameKey);
-          if (nameKeyError) rangeErrors.nameKey = nameKeyError;
-
           // Validate startTime
           const startTimeError = validateTimeField(range.startTime, config.startTime);
           if (startTimeError) rangeErrors.startTime = startTimeError;
@@ -102,6 +98,24 @@ export const useContactValidation = (contactData, isEditing) => {
             if (endMinutes <= startMinutes) {
               rangeErrors.endTime = 'La hora de fin debe ser posterior a la hora de inicio';
             }
+          }
+
+          // Validate that this range doesn't overlap with other ranges on the same day
+          if (!startTimeError && !endTimeError) {
+            schedule.scheduleRanges.forEach((otherRange, otherIndex) => {
+              // Skip comparing with itself
+              if (rangeIndex === otherIndex) return;
+
+              // Skip if the other range has validation errors
+              const otherStartError = validateTimeField(otherRange.startTime, config.startTime);
+              const otherEndError = validateTimeField(otherRange.endTime, config.endTime);
+              if (otherStartError || otherEndError) return;
+
+              // Check for overlap
+              if (rangesOverlap(range, otherRange)) {
+                rangeErrors.startTime = 'Los rangos horarios no pueden solaparse';
+              }
+            });
           }
 
           if (Object.keys(rangeErrors).length > 0) {
@@ -185,4 +199,22 @@ function timeToMinutes(timeString) {
   if (!timeString) return 0;
   const [hours, minutes] = timeString.split(':').map(Number);
   return (hours || 0) * 60 + (minutes || 0);
+}
+
+/**
+ * Helper function to check if two time ranges overlap
+ * @param {object} range1 - First range with startTime and endTime
+ * @param {object} range2 - Second range with startTime and endTime
+ * @returns {boolean} True if ranges overlap
+ */
+function rangesOverlap(range1, range2) {
+  const start1 = timeToMinutes(range1.startTime);
+  const end1 = timeToMinutes(range1.endTime);
+  const start2 = timeToMinutes(range2.startTime);
+  const end2 = timeToMinutes(range2.endTime);
+
+  // Ranges overlap if one starts before the other ends
+  // Example: [09:00-14:00] and [13:00-17:00] overlap
+  // Example: [09:00-14:00] and [14:00-17:00] don't overlap (touching is OK)
+  return start1 < end2 && start2 < end1;
 }
