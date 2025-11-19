@@ -92,9 +92,11 @@ export const MenuEditProvider = ({
     if (!categoryErrors) return null;
 
     // If we're viewing a subcategory/items view
+    // Only block if the subcategory ITSELF has a nameKey error
+    // Don't block for item errors - user needs to be able to navigate away from items with errors
     if (subcategoryId) {
       const subcategoryErrors = categoryErrors.subcategories?.[subcategoryId];
-      if (subcategoryErrors) {
+      if (subcategoryErrors?.nameKey) {
         return {
           type: 'subcategory',
           categoryId,
@@ -105,7 +107,9 @@ export const MenuEditProvider = ({
     }
 
     // If we're viewing a category (subcategories list)
-    if (categoryErrors.nameKey || categoryErrors.subcategories) {
+    // Only block if the category ITSELF has a nameKey error
+    // Don't block for subcategory errors - user needs to navigate to them to fix them
+    if (categoryErrors.nameKey) {
       return {
         type: 'category',
         categoryId,
