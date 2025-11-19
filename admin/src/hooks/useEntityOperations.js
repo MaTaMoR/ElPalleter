@@ -410,54 +410,53 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       const [currentHId] = itemsList[index];
       const [targetHId] = itemsList[targetIndex];
 
+      // Get current entities BEFORE the setter
+      const current = map.get(currentHId);
+      const target = map.get(targetHId);
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
+
+      // Calculate new orderIndex values
+      const newCurrentOrderIndex = target.orderIndex;
+      const newTargetOrderIndex = current.orderIndex;
+
+      // Determine if the new orderIndex matches the original
+      const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+      const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
+      // Determine new states
+      const newCurrentState = current._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited');
+      const newTargetState = target._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited');
+
       setter(prev => {
         const newMap = new Map(prev);
         const prevCurrent = newMap.get(currentHId);
         const prevTarget = newMap.get(targetHId);
 
-        // Get original entities to compare orderIndex
-        const originalCurrent = originalMap.get(currentHId);
-        const originalTarget = originalMap.get(targetHId);
-
-        // Swap orderIndex values
-        const newCurrentOrderIndex = prevTarget.orderIndex;
-        const newTargetOrderIndex = prevCurrent.orderIndex;
-
-        // Check if new orderIndex matches original for each entity
-        const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
-        const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
-
         newMap.set(currentHId, {
           ...prevCurrent,
           orderIndex: newCurrentOrderIndex,
-          _state: prevCurrent._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited')
+          _state: newCurrentState
         });
         newMap.set(targetHId, {
           ...prevTarget,
           orderIndex: newTargetOrderIndex,
-          _state: prevTarget._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited')
+          _state: newTargetState
         });
         return newMap;
       });
 
-      // Track/untrack changes based on whether orderIndex matches original
-      const originalCurrent = originalMap.get(currentHId);
-      const originalTarget = originalMap.get(targetHId);
-      const current = map.get(currentHId);
-      const target = map.get(targetHId);
-
-      if (current && current._state !== 'new') {
-        const newOrderIndex = target.orderIndex;
-        if (originalCurrent && newOrderIndex === originalCurrent.orderIndex) {
+      // Track/untrack changes based on new state
+      if (current._state !== 'new') {
+        if (currentMatchesOriginal) {
           untrackChange(currentHId);
         } else {
           trackChange(currentHId);
         }
       }
 
-      if (target && target._state !== 'new') {
-        const newOrderIndex = current.orderIndex;
-        if (originalTarget && newOrderIndex === originalTarget.orderIndex) {
+      if (target._state !== 'new') {
+        if (targetMatchesOriginal) {
           untrackChange(targetHId);
         } else {
           trackChange(targetHId);
@@ -467,6 +466,27 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
       const currentHId = itemsList[index];
       const targetHId = itemsList[targetIndex];
 
+      // Get current entities BEFORE the setter
+      const current = map.get(currentHId);
+      const target = map.get(targetHId);
+
+      if (!current || !target) return;
+
+      const originalCurrent = originalMap.get(currentHId);
+      const originalTarget = originalMap.get(targetHId);
+
+      // Calculate new orderIndex values
+      const newCurrentOrderIndex = target.orderIndex;
+      const newTargetOrderIndex = current.orderIndex;
+
+      // Determine if the new orderIndex matches the original
+      const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
+      const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
+
+      // Determine new states
+      const newCurrentState = current._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited');
+      const newTargetState = target._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited');
+
       setter(prev => {
         const newMap = new Map(prev);
         const prevCurrent = newMap.get(currentHId);
@@ -474,49 +494,30 @@ export const useEntityOperations = (menuState, getNavigation, setConfirmDialog) 
 
         if (!prevCurrent || !prevTarget) return newMap;
 
-        // Get original entities to compare orderIndex
-        const originalCurrent = originalMap.get(currentHId);
-        const originalTarget = originalMap.get(targetHId);
-
-        // Swap orderIndex values
-        const newCurrentOrderIndex = prevTarget.orderIndex;
-        const newTargetOrderIndex = prevCurrent.orderIndex;
-
-        // Check if new orderIndex matches original for each entity
-        const currentMatchesOriginal = originalCurrent && newCurrentOrderIndex === originalCurrent.orderIndex;
-        const targetMatchesOriginal = originalTarget && newTargetOrderIndex === originalTarget.orderIndex;
-
         newMap.set(currentHId, {
           ...prevCurrent,
           orderIndex: newCurrentOrderIndex,
-          _state: prevCurrent._state === 'new' ? 'new' : (currentMatchesOriginal ? 'normal' : 'edited')
+          _state: newCurrentState
         });
         newMap.set(targetHId, {
           ...prevTarget,
           orderIndex: newTargetOrderIndex,
-          _state: prevTarget._state === 'new' ? 'new' : (targetMatchesOriginal ? 'normal' : 'edited')
+          _state: newTargetState
         });
         return newMap;
       });
 
-      // Track/untrack changes based on whether orderIndex matches original
-      const current = map.get(currentHId);
-      const target = map.get(targetHId);
-      const originalCurrent = originalMap.get(currentHId);
-      const originalTarget = originalMap.get(targetHId);
-
-      if (current && current._state !== 'new') {
-        const newOrderIndex = target.orderIndex;
-        if (originalCurrent && newOrderIndex === originalCurrent.orderIndex) {
+      // Track/untrack changes based on new state
+      if (current._state !== 'new') {
+        if (currentMatchesOriginal) {
           untrackChange(currentHId);
         } else {
           trackChange(currentHId);
         }
       }
 
-      if (target && target._state !== 'new') {
-        const newOrderIndex = current.orderIndex;
-        if (originalTarget && newOrderIndex === originalTarget.orderIndex) {
+      if (target._state !== 'new') {
+        if (targetMatchesOriginal) {
           untrackChange(targetHId);
         } else {
           trackChange(targetHId);
