@@ -105,7 +105,7 @@
   /* Ocultar divisores y controles cuando el search está activo */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .headerButton {
+  .searchWrapper:focus-within ~ .buttonWrapper {
     opacity: 0;
     pointer-events: none;
     width: 0;
@@ -125,6 +125,11 @@
   }
 
   .languageWrapper {
+    flex-shrink: 0;
+    transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  }
+
+  .buttonWrapper {
     flex-shrink: 0;
     transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
   }
@@ -171,7 +176,7 @@
   /* Ocultar divisores y controles cuando el search está activo en mobile */
   .searchWrapper:focus-within ~ .controlDivider,
   .searchWrapper:focus-within ~ .languageWrapper,
-  .searchWrapper:focus-within ~ .headerButton {
+  .searchWrapper:focus-within ~ .buttonWrapper {
     opacity: 0;
     pointer-events: none;
     width: 0;
@@ -191,6 +196,11 @@
   }
 
   .languageWrapper {
+    flex-shrink: 0;
+    transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  }
+
+  .buttonWrapper {
     flex-shrink: 0;
     transition: opacity 0.2s ease, width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
   }

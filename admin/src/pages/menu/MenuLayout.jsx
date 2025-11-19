@@ -63,37 +63,43 @@ const MenuLayout = () => {
                 <div className={styles.controlDivider}></div>
 
                 {/* Edit Button */}
-                <Button
-                  variant="primary"
-                  icon={Edit3}
-                  onClick={handleToggleEditMode}
-                >
-                  Editar
-                </Button>
+                <div className={styles.buttonWrapper}>
+                  <Button
+                    variant="primary"
+                    icon={Edit3}
+                    onClick={handleToggleEditMode}
+                  >
+                    Editar
+                  </Button>
+                </div>
               </>
             ) : (
               <>
                 {/* Save Button - En modo edición */}
-                <Button
-                  variant="success"
-                  icon={Save}
-                  onClick={handleSave}
-                  disabled={!menuState.hasRealChanges() || isSaving}
-                >
-                  {isSaving ? 'Guardando...' : 'Guardar'}
-                </Button>
+                <div className={styles.buttonWrapper}>
+                  <Button
+                    variant="success"
+                    icon={Save}
+                    onClick={handleSave}
+                    disabled={!menuState.hasRealChanges() || isSaving}
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar'}
+                  </Button>
+                </div>
 
                 <div className={styles.controlDivider}></div>
 
                 {/* Cancel Button - En modo edición */}
-                <Button
-                  variant="danger"
-                  icon={X}
-                  onClick={handleCancel}
-                  disabled={isSaving}
-                >
-                  Cancelar
-                </Button>
+                <div className={styles.buttonWrapper}>
+                  <Button
+                    variant="danger"
+                    icon={X}
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </>
             )}
           </div>
