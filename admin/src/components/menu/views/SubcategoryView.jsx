@@ -28,6 +28,7 @@ const SubcategoryView = ({
 }) => {
   const [editingSubcategoryId, setEditingSubcategoryId] = useState(null);
   const [shakingSubcategoryId, setShakingSubcategoryId] = useState(null);
+  const [shakingCategoryField, setShakingCategoryField] = useState(false);
   const subcategoryRefs = useRef({});
 
   const handleEdit = (subcategoryId) => {
@@ -77,6 +78,31 @@ const SubcategoryView = ({
     }
   };
 
+  const handleAddSubcategoryClick = () => {
+    // Verificar si la categoría padre tiene errores
+    if (categoryError) {
+      // Disparar animación de vibración en el campo de categoría
+      setShakingCategoryField(true);
+
+      // Remover la clase de vibración después de la animación
+      setTimeout(() => {
+        setShakingCategoryField(false);
+      }, 500);
+
+      // Mostrar toast con el error
+      if (onValidationError) {
+        onValidationError(['No puedes añadir subcategorías hasta que corrijas el nombre de la categoría']);
+      }
+
+      return; // No permitir añadir
+    }
+
+    // Si no hay errores, ejecutar la acción normal
+    if (onAddSubcategory) {
+      onAddSubcategory();
+    }
+  };
+
   return (
     <div className={styles.container}>
       {onBack && (
@@ -92,7 +118,7 @@ const SubcategoryView = ({
           <Button
             variant="primary"
             icon={Plus}
-            onClick={onAddSubcategory}
+            onClick={handleAddSubcategoryClick}
           >
             Añadir
           </Button>
@@ -100,7 +126,7 @@ const SubcategoryView = ({
       </div>
 
       {isEditing && category && onUpdateCategory && (
-        <div className={styles.categoryEditSection}>
+        <div className={`${styles.categoryEditSection} ${shakingCategoryField ? styles.fieldShake : ''}`}>
           <MenuTextField
             label="Nombre de la categoría"
             value={category.nameKey || ''}
