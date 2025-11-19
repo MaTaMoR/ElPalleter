@@ -137,13 +137,30 @@ const ScheduleForm = ({
     dayOfWeek: null,
     pattern: null,
     currentRanges: '',
-    newRanges: ''
+    newRanges: '',
+    overlappingRanges: []
   });
 
   // State to keep orphan patterns (patterns without assigned days) visible
   const [orphanPatterns, setOrphanPatterns] = useState([]);
   // State to track the order of patterns to prevent reordering when days change
   const [patternOrder, setPatternOrder] = useState([]);
+
+  // Helper function to convert time string to minutes
+  const timeToMinutes = (timeString) => {
+    if (!timeString) return 0;
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return (hours || 0) * 60 + (minutes || 0);
+  };
+
+  // Helper function to check if two time ranges overlap
+  const rangesOverlap = (range1, range2) => {
+    const start1 = timeToMinutes(range1.startTime);
+    const end1 = timeToMinutes(range1.endTime);
+    const start2 = timeToMinutes(range2.startTime);
+    const end2 = timeToMinutes(range2.endTime);
+    return start1 < end2 && start2 < end1;
+  };
 
   const dayNames = {
     monday: 'Lunes',
@@ -177,38 +194,47 @@ const ScheduleForm = ({
     const patterns = [];
     const daysByPattern = {};
 
+    // First, collect all unique patterns from all schedules
+    // Now we need to find all unique subsets of ranges that form patterns
     sortedSchedules.forEach(schedule => {
       if (!schedule.isOpen || !schedule.scheduleRanges || schedule.scheduleRanges.length === 0) {
         return; // Skip closed days
       }
 
-      // Create a normalized pattern key by sorting ranges and using only time values
-      const normalizedRanges = [...schedule.scheduleRanges]
-        .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
-        .sort((a, b) => {
-          if (a.s !== b.s) return a.s.localeCompare(b.s);
-          return a.e.localeCompare(b.e);
+      // For each individual range in the schedule, create a pattern
+      schedule.scheduleRanges.forEach(range => {
+        const normalizedRange = { s: range.startTime.trim(), e: range.endTime.trim() };
+        const patternKey = JSON.stringify([normalizedRange]);
+
+        if (!daysByPattern[patternKey]) {
+          daysByPattern[patternKey] = {
+            ranges: [{ ...range }],
+            days: []
+          };
+          patterns.push(patternKey);
+        }
+      });
+    });
+
+    // Now check which days have each pattern assigned
+    patterns.forEach(patternKey => {
+      const pattern = daysByPattern[patternKey];
+
+      sortedSchedules.forEach(schedule => {
+        if (!schedule.isOpen || !schedule.scheduleRanges) return;
+
+        // Check if this day contains all ranges from this pattern
+        const hasAllRanges = pattern.ranges.every(patternRange => {
+          return schedule.scheduleRanges.some(dayRange =>
+            dayRange.startTime.trim() === patternRange.startTime.trim() &&
+            dayRange.endTime.trim() === patternRange.endTime.trim()
+          );
         });
 
-      const patternKey = JSON.stringify(normalizedRanges);
-
-      if (!daysByPattern[patternKey]) {
-        // Create sorted ranges for consistent display
-        const sortedRanges = [...schedule.scheduleRanges].sort((a, b) => {
-          const timeA = a.startTime.trim();
-          const timeB = b.startTime.trim();
-          if (timeA !== timeB) return timeA.localeCompare(timeB);
-          return a.endTime.trim().localeCompare(b.endTime.trim());
-        });
-
-        daysByPattern[patternKey] = {
-          ranges: sortedRanges,
-          days: []
-        };
-        patterns.push(patternKey);
-      }
-
-      daysByPattern[patternKey].days.push(schedule.dayOfWeek);
+        if (hasAllRanges) {
+          pattern.days.push(schedule.dayOfWeek);
+        }
+      });
     });
 
     const activePatterns = patterns.map(key => ({
@@ -261,36 +287,43 @@ const ScheduleForm = ({
 
   const handlePatternDayToggle = (pattern, dayOfWeek, isChecked) => {
     if (isChecked) {
-      // Check if this day already has a different pattern assigned
+      // Check if this day already has ranges that would overlap with the new pattern
       const currentSchedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
-      const isDayAlreadyAssigned = currentSchedule && currentSchedule.isOpen && currentSchedule.scheduleRanges.length > 0;
 
-      if (isDayAlreadyAssigned) {
-        // Check if it's a different pattern
-        const currentPatternKey = JSON.stringify(
-          [...currentSchedule.scheduleRanges]
-            .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
-            .sort((a, b) => {
-              if (a.s !== b.s) return a.s.localeCompare(b.s);
-              return a.e.localeCompare(b.e);
-            })
-        );
+      if (currentSchedule && currentSchedule.isOpen && currentSchedule.scheduleRanges && currentSchedule.scheduleRanges.length > 0) {
+        // Find ranges that overlap with the pattern being added
+        const overlappingRanges = [];
 
-        if (currentPatternKey !== pattern.patternKey) {
-          const currentRanges = currentSchedule.scheduleRanges
+        pattern.ranges.forEach(patternRange => {
+          currentSchedule.scheduleRanges.forEach(existingRange => {
+            if (rangesOverlap(patternRange, existingRange)) {
+              // Check if this range is not already in overlappingRanges
+              const alreadyAdded = overlappingRanges.some(r =>
+                r.startTime === existingRange.startTime && r.endTime === existingRange.endTime
+              );
+              if (!alreadyAdded) {
+                overlappingRanges.push(existingRange);
+              }
+            }
+          });
+        });
+
+        if (overlappingRanges.length > 0) {
+          // There are overlapping ranges, show confirmation
+          const currentRangesText = overlappingRanges
             .map(r => `${r.startTime}-${r.endTime}`)
             .join(', ');
-          const newRanges = pattern.ranges
+          const newRangesText = pattern.ranges
             .map(r => `${r.startTime}-${r.endTime}`)
             .join(', ');
 
-          // Show confirmation dialog
           setConfirmDialog({
             isOpen: true,
             dayOfWeek,
             pattern,
-            currentRanges,
-            newRanges
+            currentRanges: currentRangesText,
+            newRanges: newRangesText,
+            overlappingRanges
           });
           return; // Wait for user confirmation
         }
@@ -301,89 +334,84 @@ const ScheduleForm = ({
     applyPatternToDay(pattern, dayOfWeek, isChecked);
   };
 
-  const applyPatternToDay = (pattern, dayOfWeek, isChecked) => {
+  const applyPatternToDay = (pattern, dayOfWeek, isChecked, removeOverlapping = false) => {
     const updatedSchedules = schedules.map(schedule => {
       if (schedule.dayOfWeek === dayOfWeek) {
         if (isChecked) {
-          // Apply this pattern to the day
+          // Add pattern ranges to the day
+          const currentRanges = schedule.scheduleRanges || [];
+
+          let newRanges = [...currentRanges];
+
+          // If we need to remove overlapping ranges (user confirmed)
+          if (removeOverlapping && confirmDialog.overlappingRanges.length > 0) {
+            newRanges = currentRanges.filter(existingRange => {
+              return !confirmDialog.overlappingRanges.some(overlapping =>
+                overlapping.startTime === existingRange.startTime &&
+                overlapping.endTime === existingRange.endTime
+              );
+            });
+          }
+
+          // Add the new pattern ranges
+          pattern.ranges.forEach(patternRange => {
+            // Check if this range is already in the day
+            const alreadyExists = newRanges.some(r =>
+              r.startTime.trim() === patternRange.startTime.trim() &&
+              r.endTime.trim() === patternRange.endTime.trim()
+            );
+
+            if (!alreadyExists) {
+              newRanges.push({ ...patternRange });
+            }
+          });
+
+          // Sort ranges by start time
+          newRanges.sort((a, b) => {
+            const timeA = a.startTime.trim();
+            const timeB = b.startTime.trim();
+            if (timeA !== timeB) return timeA.localeCompare(timeB);
+            return a.endTime.trim().localeCompare(b.endTime.trim());
+          });
+
           return {
             ...schedule,
             isOpen: true,
-            scheduleRanges: pattern.ranges.map(r => ({ ...r }))
+            scheduleRanges: newRanges
           };
         } else {
-          // Remove pattern from day (close it)
+          // Remove pattern ranges from the day
+          const currentRanges = schedule.scheduleRanges || [];
+
+          const newRanges = currentRanges.filter(existingRange => {
+            // Keep ranges that are NOT in the pattern
+            return !pattern.ranges.some(patternRange =>
+              patternRange.startTime.trim() === existingRange.startTime.trim() &&
+              patternRange.endTime.trim() === existingRange.endTime.trim()
+            );
+          });
+
           return {
             ...schedule,
-            isOpen: false,
-            scheduleRanges: []
+            isOpen: newRanges.length > 0,
+            scheduleRanges: newRanges
           };
         }
       }
       return schedule;
     });
 
-    // Check if we need to preserve a pattern that's losing its last day
-    if (isChecked) {
-      // Find the old pattern of the day being changed
-      const oldSchedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
-      if (oldSchedule && oldSchedule.isOpen && oldSchedule.scheduleRanges.length > 0) {
-        // Create the old pattern key
-        const oldPatternKey = JSON.stringify(
-          [...oldSchedule.scheduleRanges]
-            .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
-            .sort((a, b) => {
-              if (a.s !== b.s) return a.s.localeCompare(b.s);
-              return a.e.localeCompare(b.e);
-            })
-        );
-
-        // Check if this pattern will have any days left after the change
-        const daysWithOldPattern = updatedSchedules.filter(s => {
-          if (!s.isOpen || !s.scheduleRanges || s.scheduleRanges.length === 0) return false;
-          const scheduleKey = JSON.stringify(
-            [...s.scheduleRanges]
-              .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
-              .sort((a, b) => {
-                if (a.s !== b.s) return a.s.localeCompare(b.s);
-                return a.e.localeCompare(b.e);
-              })
-          );
-          return scheduleKey === oldPatternKey;
-        });
-
-        // If the old pattern has no days left and is not already an orphan, make it orphan
-        if (daysWithOldPattern.length === 0) {
-          const isAlreadyOrphan = orphanPatterns.some(o => o.patternKey === oldPatternKey);
-          if (!isAlreadyOrphan) {
-            const sortedRanges = [...oldSchedule.scheduleRanges].sort((a, b) => {
-              const timeA = a.startTime.trim();
-              const timeB = b.startTime.trim();
-              if (timeA !== timeB) return timeA.localeCompare(timeB);
-              return a.endTime.trim().localeCompare(b.endTime.trim());
-            });
-
-            setOrphanPatterns(prev => [...prev, {
-              patternKey: oldPatternKey,
-              ranges: sortedRanges,
-              days: []
-            }]);
-          }
-        }
-      }
-    }
-
     onChange(updatedSchedules);
   };
 
   const handleConfirmDialogConfirm = () => {
     const { pattern, dayOfWeek } = confirmDialog;
-    applyPatternToDay(pattern, dayOfWeek, true);
-    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '' });
+    applyPatternToDay(pattern, dayOfWeek, true, true); // true for removeOverlapping
+    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '', overlappingRanges: [] });
   };
 
   const handleConfirmDialogCancel = () => {
-    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '' });
+    setConfirmDialog({ isOpen: false, dayOfWeek: null, pattern: null, currentRanges: '', newRanges: '', overlappingRanges: [] });
   };
 
   const handlePatternRangeChange = (pattern, rangeIndex, field, value) => {
@@ -396,7 +424,15 @@ const ScheduleForm = ({
             ...updatedRanges[rangeIndex],
             [field]: value
           };
-          return { ...orphan, ranges: updatedRanges };
+
+          // Update the pattern key based on new range values
+          const normalizedRange = {
+            s: (field === 'startTime' ? value : updatedRanges[rangeIndex].startTime).trim(),
+            e: (field === 'endTime' ? value : updatedRanges[rangeIndex].endTime).trim()
+          };
+          const newPatternKey = JSON.stringify([normalizedRange]);
+
+          return { ...orphan, ranges: updatedRanges, patternKey: newPatternKey };
         }
         return orphan;
       }));
@@ -406,19 +442,30 @@ const ScheduleForm = ({
     const updatedSchedules = schedules.map(schedule => {
       // Update all days that use this pattern
       if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
-        const updatedRanges = [...schedule.scheduleRanges];
-        updatedRanges[rangeIndex] = {
-          ...updatedRanges[rangeIndex],
-          [field]: value
-        };
-        return { ...schedule, scheduleRanges: updatedRanges };
+        // Find the specific range in this day's schedule that matches the pattern range
+        const patternRange = pattern.ranges[rangeIndex];
+        const dayRangeIndex = schedule.scheduleRanges.findIndex(r =>
+          r.startTime.trim() === patternRange.startTime.trim() &&
+          r.endTime.trim() === patternRange.endTime.trim()
+        );
+
+        if (dayRangeIndex !== -1) {
+          const updatedRanges = [...schedule.scheduleRanges];
+          updatedRanges[dayRangeIndex] = {
+            ...updatedRanges[dayRangeIndex],
+            [field]: value
+          };
+          return { ...schedule, scheduleRanges: updatedRanges };
+        }
       }
       return schedule;
     });
     onChange(updatedSchedules);
   };
 
-  const handlePatternAddRange = (pattern) => {
+
+  const handleAddNewPattern = () => {
+    // Create a new orphan pattern (not assigned to any day)
     const newRange = {
       id: Date.now(),
       nameKey: '',
@@ -426,72 +473,18 @@ const ScheduleForm = ({
       endTime: '17:00'
     };
 
-    // If this is an orphan pattern, update the orphan patterns state
-    if (pattern.days.length === 0) {
-      setOrphanPatterns(prev => prev.map(orphan => {
-        if (orphan.patternKey === pattern.patternKey) {
-          return { ...orphan, ranges: [...orphan.ranges, newRange] };
-        }
-        return orphan;
-      }));
-      return;
-    }
+    const normalizedRange = { s: newRange.startTime.trim(), e: newRange.endTime.trim() };
+    const newPatternKey = JSON.stringify([normalizedRange]);
 
-    const updatedSchedules = schedules.map(schedule => {
-      if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
-        return {
-          ...schedule,
-          scheduleRanges: [...schedule.scheduleRanges, newRange]
-        };
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
-  };
+    // Check if this pattern already exists
+    const patternExists = orphanPatterns.some(o => o.patternKey === newPatternKey);
 
-  const handlePatternDeleteRange = (pattern, rangeIndex) => {
-    // If this is an orphan pattern, update the orphan patterns state
-    if (pattern.days.length === 0) {
-      setOrphanPatterns(prev => prev.map(orphan => {
-        if (orphan.patternKey === pattern.patternKey) {
-          const updatedRanges = orphan.ranges.filter((_, index) => index !== rangeIndex);
-          return { ...orphan, ranges: updatedRanges };
-        }
-        return orphan;
-      }));
-      return;
-    }
-
-    const updatedSchedules = schedules.map(schedule => {
-      if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
-        const updatedRanges = schedule.scheduleRanges.filter((_, index) => index !== rangeIndex);
-        return { ...schedule, scheduleRanges: updatedRanges };
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
-  };
-
-  const handleAddNewPattern = () => {
-    // Add a new pattern to the first day that's currently closed
-    const closedDay = sortedSchedules.find(s => !s.isOpen);
-    if (closedDay) {
-      const updatedSchedules = schedules.map(schedule => {
-        if (schedule.dayOfWeek === closedDay.dayOfWeek) {
-          return {
-            ...schedule,
-            isOpen: true,
-            scheduleRanges: [{
-              id: Date.now(),
-              nameKey: '',
-              startTime: '09:00',
-              endTime: '17:00'
-            }]
-          };
-        }
-        return schedule;
-      });
-      onChange(updatedSchedules);
+    if (!patternExists) {
+      setOrphanPatterns(prev => [...prev, {
+        patternKey: newPatternKey,
+        ranges: [newRange],
+        days: []
+      }]);
     }
   };
 
@@ -533,54 +526,26 @@ const ScheduleForm = ({
                 )}
               </div>
 
-              {/* Time ranges for this pattern */}
+              {/* Time range for this pattern */}
               <div className={styles.patternRanges}>
-                <label className={styles.patternLabel}>Horarios:</label>
-                <div className={styles.rangesColumn}>
-                  {pattern.ranges.map((range, rangeIndex) => {
-                    const rangeError = rangeErrors[rangeIndex] || {};
-
-                    return (
-                      <div key={rangeIndex} className={styles.rangeRow}>
-                        <MenuTextField
-                          label="Inicio"
-                          value={range.startTime}
-                          onChange={(value) => handlePatternRangeChange(pattern, rangeIndex, 'startTime', value)}
-                          error={rangeError.startTime}
-                          placeholder="09:00"
-                          required
-                        />
-                        <MenuTextField
-                          label="Fin"
-                          value={range.endTime}
-                          onChange={(value) => handlePatternRangeChange(pattern, rangeIndex, 'endTime', value)}
-                          error={rangeError.endTime}
-                          placeholder="17:00"
-                          required
-                        />
-                        <div className={styles.rangeActions}>
-                          <button
-                            type="button"
-                            className={styles.addRangeButton}
-                            onClick={() => handlePatternAddRange(pattern)}
-                            aria-label="Añadir rango horario"
-                            title="Añadir rango horario"
-                          >
-                            <Plus size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.deleteRangeButton}
-                            onClick={() => handlePatternDeleteRange(pattern, rangeIndex)}
-                            aria-label="Eliminar rango horario"
-                            title="Eliminar rango horario"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <label className={styles.patternLabel}>Horario:</label>
+                <div className={styles.rangeRow}>
+                  <MenuTextField
+                    label="Inicio"
+                    value={pattern.ranges[0]?.startTime || '09:00'}
+                    onChange={(value) => handlePatternRangeChange(pattern, 0, 'startTime', value)}
+                    error={rangeErrors[0]?.startTime}
+                    placeholder="09:00"
+                    required
+                  />
+                  <MenuTextField
+                    label="Fin"
+                    value={pattern.ranges[0]?.endTime || '17:00'}
+                    onChange={(value) => handlePatternRangeChange(pattern, 0, 'endTime', value)}
+                    error={rangeErrors[0]?.endTime}
+                    placeholder="17:00"
+                    required
+                  />
                 </div>
               </div>
 
@@ -608,24 +573,22 @@ const ScheduleForm = ({
         })}
 
         {/* Add new pattern button */}
-        {patterns.length < 7 && (
-          <Button
-            variant="secondary"
-            icon={Plus}
-            onClick={handleAddNewPattern}
-            className={styles.addPatternButton}
-          >
-            Añadir patrón de horario
-          </Button>
-        )}
+        <Button
+          variant="secondary"
+          icon={Plus}
+          onClick={handleAddNewPattern}
+          className={styles.addPatternButton}
+        >
+          Añadir patrón de horario
+        </Button>
       </div>
 
       {/* Confirmation dialog for pattern reassignment */}
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        title="Cambiar horario del día"
-        message={`${confirmDialog.dayOfWeek ? dayNames[confirmDialog.dayOfWeek] : ''} ya tiene el horario: ${confirmDialog.currentRanges}\n\n¿Deseas cambiarlo a: ${confirmDialog.newRanges}?`}
-        confirmText="Cambiar"
+        title="Solapamiento de horarios"
+        message={`${confirmDialog.dayOfWeek ? dayNames[confirmDialog.dayOfWeek] : ''} ya tiene rangos horarios que se solapan:\n${confirmDialog.currentRanges}\n\nSi continúas, estos rangos se eliminarán y se añadirá:\n${confirmDialog.newRanges}\n\n¿Deseas continuar?`}
+        confirmText="Sí, reemplazar"
         cancelText="Cancelar"
         onConfirm={handleConfirmDialogConfirm}
         onCancel={handleConfirmDialogCancel}
