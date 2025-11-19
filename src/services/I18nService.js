@@ -1,4 +1,5 @@
 import { I18nRepository } from '../repositories/I18nRepository.js';
+import { AuthService } from './AuthService.js';
 
 /**
  * NOTA: LANGUAGE_CONFIG ahora se carga dinámicamente desde el backend
@@ -426,11 +427,11 @@ export class I18nService {
     try {
       const request = {
         languageCode,
-        trnaslationKey: key,
+        translationKey: key,
         translationValue: value
       };
 
-      const updatedTranslation = await I18nRepository.updateTranslation(request);
+      const updatedTranslation = await I18nRepository.updateTranslation(request, AuthService.getToken());
 
       // Actualizar el estado local con la nueva traducción
       const localeTranslations = state.translations.get(languageCode) || {};

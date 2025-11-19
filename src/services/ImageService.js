@@ -1,5 +1,6 @@
 import { ImageRepository } from '../repositories/ImageRepository';
 import { GalleryRepository } from '../repositories/GalleryRepository';
+import { AuthService } from './AuthService';
 
 /**
  * Servicio para gestionar imágenes responsivas - Adaptado a estructura existente
@@ -44,7 +45,7 @@ export class ImageService {
      */
     static async updateImage(name, file) {
         try {
-            const updatedImage = await ImageRepository.updateImage(name, file);
+            const updatedImage = await ImageRepository.updateImage(name, file, AuthService.getToken());
             return updatedImage;
         } catch (error) {
             console.error(`ImageService: Error updating image ${name}:`, error);

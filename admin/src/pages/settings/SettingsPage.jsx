@@ -7,9 +7,8 @@ import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import ToastContainer from '../../components/common/ToastContainer';
 import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
-import { I18nRepository } from '@repositories/I18nRepository';
-import { ImageRepository } from '@repositories/ImageRepository';
-import { AuthService } from '@services/AuthService';
+import { I18nService } from '@services/I18nService';
+import { ImageService } from '@services/ImageService';
 import styles from './SettingsPage.module.css';
 
 // ============================================================================
@@ -62,8 +61,7 @@ const SettingsContent = () => {
     setLoading(true);
     setError(null);
     try {
-      const translationsArray = await I18nRepository.getTranslationsByLanguage(selectedLanguage);
-      const flatTranslations = I18nRepository.convertToFlatFormat(translationsArray);
+      const flatTranslations = I18nService.getAllTranslations(selectedLanguage);
       setOriginalTranslations(flatTranslations);
       setTranslations(flatTranslations);
     } catch (err) {
@@ -133,16 +131,11 @@ const SettingsContent = () => {
 
         try {
           const updatePromises = [];
-          const token = AuthService.getToken();
 
           // Update all changed translations
           if (changedTranslations.length > 0) {
-            const translationPromises = changedTranslations.map(({ key, newValue }) =>
-              I18nRepository.updateTranslation({
-                languageCode: selectedLanguage,
-                key,
-                value: newValue
-              }, token)
+            const translationPromises = changedTranslations.map(({ key, newValue }) => (
+              I18nService.updateTranslation(selectedLanguage, key, newValue))
             );
             updatePromises.push(...translationPromises);
           }
@@ -150,7 +143,7 @@ const SettingsContent = () => {
           // Update all changed images
           if (changedImages.length > 0) {
             const imagePromises = changedImages.map(imageName =>
-              ImageRepository.updateImage(imageName, modifiedImages[imageName], token)
+              ImageService.updateImage(imageName, modifiedImages[imageName], token)
             );
             updatePromises.push(...imagePromises);
           }
