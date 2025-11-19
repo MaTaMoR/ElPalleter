@@ -65,7 +65,7 @@
 }
 
 .cardContentNoPadding {
-  padding: 0;
+  padding: 1.25rem;
 }
 
 /* Read-only styles */
@@ -108,7 +108,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 1.25rem;
+  padding: 0.75rem;
 }
 
 .calendar {
@@ -135,12 +135,12 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
-  width: 32px;
-  min-width: 32px;
-  max-width: 32px;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
   vertical-align: middle;
-  font-size: 0.625rem;
-  line-height: 1;
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 .dayLabel {
@@ -152,11 +152,11 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-left: none;
-  width: 28px;
-  min-width: 28px;
-  max-width: 28px;
-  font-size: 0.625rem;
-  line-height: 1;
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 .dayLabel:first-of-type {
@@ -169,10 +169,10 @@
   border: 1px solid var(--border-color);
   border-left: none;
   border-top: none;
-  height: 18px;
-  width: 28px;
-  min-width: 28px;
-  max-width: 28px;
+  height: 20px;
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
   transition: var(--transition);
 }
 
@@ -357,37 +357,38 @@
     justify-content: flex-start;
   }
 
-  .cardContent {
+  .cardContent,
+  .cardContentNoPadding {
     padding: 1rem;
   }
 
   .calendarContainer {
-    padding: 0.25rem;
+    padding: 0.5rem;
   }
 
   .timeLabel,
   .dayLabel {
     padding: 0.2rem 0.1rem;
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
   }
 
   .timeLabel {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+  }
+
+  .dayLabel {
     width: 28px;
     min-width: 28px;
     max-width: 28px;
   }
 
-  .dayLabel {
-    width: 24px;
-    min-width: 24px;
-    max-width: 24px;
-  }
-
   .calendarCell {
-    height: 16px;
-    width: 24px;
-    min-width: 24px;
-    max-width: 24px;
+    height: 18px;
+    width: 28px;
+    min-width: 28px;
+    max-width: 28px;
   }
 
   /* Pattern editor responsive */
@@ -415,36 +416,37 @@
     font-size: 0.9375rem;
   }
 
-  .cardContent {
+  .cardContent,
+  .cardContentNoPadding {
     padding: 0.875rem;
   }
 
   .calendarContainer {
-    padding: 0.2rem;
+    padding: 0.5rem;
   }
 
   .timeLabel,
   .dayLabel {
     padding: 0.15rem 0.05rem;
-    font-size: 0.5rem;
+    font-size: 0.625rem;
   }
 
   .timeLabel {
+    width: 30px;
+    min-width: 30px;
+    max-width: 30px;
+  }
+
+  .dayLabel {
     width: 26px;
     min-width: 26px;
     max-width: 26px;
   }
 
-  .dayLabel {
-    width: 22px;
-    min-width: 22px;
-    max-width: 22px;
-  }
-
   .calendarCell {
-    height: 14px;
-    width: 22px;
-    min-width: 22px;
-    max-width: 22px;
+    height: 16px;
+    width: 26px;
+    min-width: 26px;
+    max-width: 26px;
   }
 }
