@@ -233,6 +233,35 @@ export class CartaRepository extends BaseRepository {
     }
 
     /**
+     * Actualiza/guarda cambios en la carta
+     * POST /carta/update?language={language}
+     * REQUIERE AUTENTICACIÓN
+     * @param {Array} menuData - Array de categorías con subcategorías e items
+     * @param {string} language - Código de idioma
+     * @param {string} token - Token de autenticación (opcional, se obtiene de AuthService)
+     * @returns {Promise<Object>} Respuesta del backend
+     */
+    static async updateMenu(menuData, language = 'es', token = null) {
+        try {
+            // Obtener token de AuthService si no se proporciona
+            const authToken = token || (await import('../services/AuthService.js')).AuthService.getToken();
+
+            // Usar getAuthHeaders de BaseRepository para obtener headers con token
+            const headers = authToken ? this.getAuthHeaders(authToken) : this.getBaseHeaders();
+
+            // POST usa el endpoint directamente, agregamos params a la URL
+            const endpoint = `/carta/update?language=${encodeURIComponent(language)}`;
+
+            const response = await this.post(endpoint, menuData, { headers });
+
+            return response;
+        } catch (error) {
+            console.error('CartaRepository: Error updating menu:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Obtiene la configuración del repositorio
      * @returns {Object} Configuración actual
      */
@@ -240,7 +269,8 @@ export class CartaRepository extends BaseRepository {
         return {
             baseUrl: this.getBaseUrl(),
             endpoints: {
-                translatedCategories: '/carta/translated-categories'
+                translatedCategories: '/carta/translated-categories',
+                updateMenu: '/carta/update'
             },
             supportedLanguages: ['es', 'en', 'val'],
             defaultLanguage: 'es'

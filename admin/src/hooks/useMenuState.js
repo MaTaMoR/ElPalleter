@@ -4,7 +4,7 @@ import { flattenMenuData, isDescendantOf } from '../utils/menuDataUtils';
 /**
  * Hook to manage menu state using flat Maps structure
  */
-export const useMenuState = (backendData, loading, error, mockData) => {
+export const useMenuState = (backendData, loading, error) => {
   // Flat data structure using Maps
   const [categoriesMap, setCategoriesMap] = useState(new Map());
   const [subcategoriesMap, setSubcategoriesMap] = useState(new Map());
@@ -21,16 +21,9 @@ export const useMenuState = (backendData, loading, error, mockData) => {
 
   // Sync backend data with local state
   useEffect(() => {
-    let dataToUse = null;
-
+    // Only use backend data if it exists and has content
     if (backendData && backendData.length > 0) {
-      dataToUse = backendData;
-    } else if (!loading && !error) {
-      dataToUse = mockData;
-    }
-
-    if (dataToUse) {
-      const flattened = flattenMenuData(dataToUse);
+      const flattened = flattenMenuData(backendData);
       setCategoriesMap(flattened.categoriesMap);
       setSubcategoriesMap(flattened.subcategoriesMap);
       setItemsMap(flattened.itemsMap);
@@ -43,7 +36,7 @@ export const useMenuState = (backendData, loading, error, mockData) => {
 
       setChangeTracking(new Map());
     }
-  }, [backendData, loading, error, mockData]);
+  }, [backendData, loading, error]);
 
   // Change tracking utilities
   const trackChange = (hierarchicalId, type) => {

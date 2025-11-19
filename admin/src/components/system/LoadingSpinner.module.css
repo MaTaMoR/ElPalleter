@@ -1,0 +1,227 @@
+/* ============================================================================
+   LOADING SPINNER - GLASSMORPHISM DESIGN
+   ============================================================================ */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background pattern */
+.container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(104, 109, 224, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(72, 219, 251, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(104, 109, 224, 0.06) 0%, transparent 50%);
+  animation: drift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-5%, 5%) rotate(2deg); }
+  66% { transform: translate(5%, -5%) rotate(-2deg); }
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.content {
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+
+/* ============================================================================
+   SPINNER
+   ============================================================================ */
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.spinner {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.spinnerRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+
+.spinnerRing:nth-child(1) {
+  border-top-color: rgba(104, 109, 224, 0.8);
+  animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.spinnerRing:nth-child(2) {
+  border-right-color: rgba(72, 219, 251, 0.6);
+  animation: spin 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  animation-delay: 0.15s;
+}
+
+.spinnerRing:nth-child(3) {
+  border-bottom-color: rgba(104, 109, 224, 0.4);
+  animation: spin 2.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  animation-delay: 0.3s;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Glow effect */
+.spinner::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(104, 109, 224, 0.2) 0%, transparent 70%);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* ============================================================================
+   TEXT
+   ============================================================================ */
+
+.title {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.subtitle {
+  margin: 0 0 32px 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  animation: fadeIn 0.6s ease-out 0.2s backwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.progressBar {
+  width: 280px;
+  height: 4px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  animation: fadeIn 0.6s ease-out 0.4s backwards;
+}
+
+.progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(104, 109, 224, 0.4) 20%,
+    rgba(72, 219, 251, 0.8) 50%,
+    rgba(104, 109, 224, 0.4) 80%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  animation: progress 1.5s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(333%);
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .spinner {
+    width: 90px;
+    height: 90px;
+  }
+
+  .spinner::before {
+    width: 60px;
+    height: 60px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .progressBar {
+    width: 200px;
+  }
+}

@@ -350,6 +350,23 @@ export class CartaService {
             throw error;
         }
     }
+
+    /**
+     * Guarda/actualiza cambios en la carta
+     * REQUIERE AUTENTICACIÓN - Solo para panel de administración
+     * @param {Array} menuData - Array de categorías con subcategorías e items
+     * @param {string} language - Código de idioma
+     * @param {string} token - Token de autenticación (opcional)
+     * @returns {Promise<Object>} Respuesta del backend
+     */
+    static async saveMenu(menuData, language = 'es', token = null) {
+        try {
+            return await CartaRepository.updateMenu(menuData, language, token);
+        } catch (error) {
+            console.error('CartaService: Error saving menu:', error);
+            throw error;
+        }
+    }
 }
 
 export default CartaService;

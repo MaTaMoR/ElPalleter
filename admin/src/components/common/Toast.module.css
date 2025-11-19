@@ -1,0 +1,182 @@
+/* ============================================================================
+   TOAST NOTIFICATION - GLASSMORPHISM DESIGN
+   ============================================================================ */
+
+.toast {
+  position: relative;
+  min-width: 320px;
+  max-width: 500px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* Glassmorphism effect */
+  background: rgba(30, 30, 30, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* Animation */
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(calc(100% + 24px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   TOAST TYPES
+   ============================================================================ */
+
+.success {
+  border-left: 4px solid #4ade80;
+}
+
+.error {
+  border-left: 4px solid #ff6b6b;
+}
+
+.info {
+  border-left: 4px solid #686de0;
+}
+
+/* ============================================================================
+   ICON
+   ============================================================================ */
+
+.iconContainer {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+}
+
+.success .icon {
+  color: #4ade80;
+}
+
+.error .icon {
+  color: #ff6b6b;
+}
+
+.info .icon {
+  color: #686de0;
+}
+
+/* ============================================================================
+   MESSAGE
+   ============================================================================ */
+
+.message {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* ============================================================================
+   CLOSE BUTTON
+   ============================================================================ */
+
+.closeButton {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.closeButton svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  animation-name: shrink;
+  animation-timing-function: linear;
+}
+
+.success .progressFill {
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+}
+
+.error .progressFill {
+  background: linear-gradient(90deg, #ff6b6b, #ef4444);
+}
+
+.info .progressFill {
+  background: linear-gradient(90deg, #686de0, #5b63d3);
+}
+
+@keyframes shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .toast {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+    max-width: none;
+  }
+}
