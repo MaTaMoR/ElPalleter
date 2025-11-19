@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, Trash2, Clock } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
@@ -146,6 +146,10 @@ const ScheduleForm = ({
   const [orphanPatterns, setOrphanPatterns] = useState([]);
   // State to track the order of patterns to prevent reordering when days change
   const [patternOrder, setPatternOrder] = useState([]);
+  // Ref to track the last pattern container for scrolling
+  const lastPatternRef = useRef(null);
+  // State to trigger scroll when a new pattern is added
+  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
 
   // Helper function to convert time string to minutes
   const timeToMinutes = (timeString) => {
@@ -506,8 +510,21 @@ const ScheduleForm = ({
         ranges: [newRange],
         days: []
       }]);
+      // Trigger scroll to the newly added pattern
+      setShouldScrollToLast(true);
     }
   };
+
+  // Scroll to the last pattern when a new one is added
+  useEffect(() => {
+    if (shouldScrollToLast && lastPatternRef.current) {
+      lastPatternRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      setShouldScrollToLast(false);
+    }
+  }, [shouldScrollToLast, orphanPatterns]);
 
   const handleDeleteOrphanPattern = (patternKey) => {
     setOrphanPatterns(prev => prev.filter(orphan => orphan.patternKey !== patternKey));
@@ -569,9 +586,14 @@ const ScheduleForm = ({
           const rangeErrors = dayErrors.ranges || {};
 
           const isOrphan = pattern.days.length === 0;
+          const isLastPattern = patternIndex === patterns.length - 1;
 
           return (
-            <div key={patternIndex} className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}>
+            <div
+              key={patternIndex}
+              className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}
+              ref={isLastPattern ? lastPatternRef : null}
+            >
               <div className={styles.patternHeader}>
                 <span className={styles.patternTitle}>
                   Patrón de horario {patternIndex + 1}
