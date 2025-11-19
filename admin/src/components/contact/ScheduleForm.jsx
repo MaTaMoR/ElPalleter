@@ -140,6 +140,9 @@ const ScheduleForm = ({
     newRanges: ''
   });
 
+  // State to keep orphan patterns (patterns without assigned days) visible
+  const [orphanPatterns, setOrphanPatterns] = useState([]);
+
   const dayNames = {
     monday: 'Lunes',
     tuesday: 'Martes',
@@ -206,10 +209,23 @@ const ScheduleForm = ({
       daysByPattern[patternKey].days.push(schedule.dayOfWeek);
     });
 
-    return patterns.map(key => ({
+    const activePatterns = patterns.map(key => ({
       patternKey: key,
       ...daysByPattern[key]
     }));
+
+    // Add orphan patterns (patterns without assigned days) at the end
+    // Remove orphans that now have days assigned
+    const updatedOrphans = orphanPatterns.filter(orphan => {
+      return !activePatterns.some(p => p.patternKey === orphan.patternKey);
+    });
+
+    // Update orphan patterns state if it changed
+    if (updatedOrphans.length !== orphanPatterns.length) {
+      setOrphanPatterns(updatedOrphans);
+    }
+
+    return [...activePatterns, ...updatedOrphans];
   };
 
   const handlePatternDayToggle = (pattern, dayOfWeek, isChecked) => {
@@ -275,6 +291,57 @@ const ScheduleForm = ({
       }
       return schedule;
     });
+
+    // Check if we need to preserve a pattern that's losing its last day
+    if (isChecked) {
+      // Find the old pattern of the day being changed
+      const oldSchedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
+      if (oldSchedule && oldSchedule.isOpen && oldSchedule.scheduleRanges.length > 0) {
+        // Create the old pattern key
+        const oldPatternKey = JSON.stringify(
+          [...oldSchedule.scheduleRanges]
+            .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
+            .sort((a, b) => {
+              if (a.s !== b.s) return a.s.localeCompare(b.s);
+              return a.e.localeCompare(b.e);
+            })
+        );
+
+        // Check if this pattern will have any days left after the change
+        const daysWithOldPattern = updatedSchedules.filter(s => {
+          if (!s.isOpen || !s.scheduleRanges || s.scheduleRanges.length === 0) return false;
+          const scheduleKey = JSON.stringify(
+            [...s.scheduleRanges]
+              .map(r => ({ s: r.startTime.trim(), e: r.endTime.trim() }))
+              .sort((a, b) => {
+                if (a.s !== b.s) return a.s.localeCompare(b.s);
+                return a.e.localeCompare(b.e);
+              })
+          );
+          return scheduleKey === oldPatternKey;
+        });
+
+        // If the old pattern has no days left and is not already an orphan, make it orphan
+        if (daysWithOldPattern.length === 0) {
+          const isAlreadyOrphan = orphanPatterns.some(o => o.patternKey === oldPatternKey);
+          if (!isAlreadyOrphan) {
+            const sortedRanges = [...oldSchedule.scheduleRanges].sort((a, b) => {
+              const timeA = a.startTime.trim();
+              const timeB = b.startTime.trim();
+              if (timeA !== timeB) return timeA.localeCompare(timeB);
+              return a.endTime.trim().localeCompare(b.endTime.trim());
+            });
+
+            setOrphanPatterns(prev => [...prev, {
+              patternKey: oldPatternKey,
+              ranges: sortedRanges,
+              days: []
+            }]);
+          }
+        }
+      }
+    }
+
     onChange(updatedSchedules);
   };
 
@@ -289,6 +356,22 @@ const ScheduleForm = ({
   };
 
   const handlePatternRangeChange = (pattern, rangeIndex, field, value) => {
+    // If this is an orphan pattern, update the orphan patterns state
+    if (pattern.days.length === 0) {
+      setOrphanPatterns(prev => prev.map(orphan => {
+        if (orphan.patternKey === pattern.patternKey) {
+          const updatedRanges = [...orphan.ranges];
+          updatedRanges[rangeIndex] = {
+            ...updatedRanges[rangeIndex],
+            [field]: value
+          };
+          return { ...orphan, ranges: updatedRanges };
+        }
+        return orphan;
+      }));
+      return;
+    }
+
     const updatedSchedules = schedules.map(schedule => {
       // Update all days that use this pattern
       if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
@@ -312,6 +395,17 @@ const ScheduleForm = ({
       endTime: '17:00'
     };
 
+    // If this is an orphan pattern, update the orphan patterns state
+    if (pattern.days.length === 0) {
+      setOrphanPatterns(prev => prev.map(orphan => {
+        if (orphan.patternKey === pattern.patternKey) {
+          return { ...orphan, ranges: [...orphan.ranges, newRange] };
+        }
+        return orphan;
+      }));
+      return;
+    }
+
     const updatedSchedules = schedules.map(schedule => {
       if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
         return {
@@ -325,6 +419,18 @@ const ScheduleForm = ({
   };
 
   const handlePatternDeleteRange = (pattern, rangeIndex) => {
+    // If this is an orphan pattern, update the orphan patterns state
+    if (pattern.days.length === 0) {
+      setOrphanPatterns(prev => prev.map(orphan => {
+        if (orphan.patternKey === pattern.patternKey) {
+          const updatedRanges = orphan.ranges.filter((_, index) => index !== rangeIndex);
+          return { ...orphan, ranges: updatedRanges };
+        }
+        return orphan;
+      }));
+      return;
+    }
+
     const updatedSchedules = schedules.map(schedule => {
       if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
         const updatedRanges = schedule.scheduleRanges.filter((_, index) => index !== rangeIndex);
@@ -358,6 +464,10 @@ const ScheduleForm = ({
     }
   };
 
+  const handleDeleteOrphanPattern = (patternKey) => {
+    setOrphanPatterns(prev => prev.filter(orphan => orphan.patternKey !== patternKey));
+  };
+
   // Editable form - pattern-based layout
   const patterns = groupSchedulesByPattern();
 
@@ -370,10 +480,26 @@ const ScheduleForm = ({
           const dayErrors = errors[firstDayWithPattern] || {};
           const rangeErrors = dayErrors.ranges || {};
 
+          const isOrphan = pattern.days.length === 0;
+
           return (
-            <div key={patternIndex} className={styles.patternCard}>
+            <div key={patternIndex} className={`${styles.patternCard} ${isOrphan ? styles.orphanPattern : ''}`}>
               <div className={styles.patternHeader}>
-                <span className={styles.patternTitle}>Patrón {patternIndex + 1}</span>
+                <span className={styles.patternTitle}>
+                  Patrón {patternIndex + 1}
+                  {isOrphan && <span className={styles.orphanBadge}>(Sin días asignados)</span>}
+                </span>
+                {isOrphan && (
+                  <button
+                    type="button"
+                    className={styles.deletePatternButton}
+                    onClick={() => handleDeleteOrphanPattern(pattern.patternKey)}
+                    aria-label="Eliminar patrón"
+                    title="Eliminar patrón"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
               </div>
 
               {/* Time ranges for this pattern */}

@@ -153,16 +153,51 @@
   border-radius: 8px;
 }
 
+.orphanPattern {
+  border-color: var(--text-secondary);
+  opacity: 0.7;
+}
+
 .patternHeader {
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .patternTitle {
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.orphanBadge {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.deletePatternButton {
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.deletePatternButton:hover {
+  background: var(--error-light);
 }
 
 .patternRanges {
