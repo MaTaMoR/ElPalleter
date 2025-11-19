@@ -117,7 +117,7 @@ const SubcategoryListView = () => {
       itemCounts={getItemCounts()}
       isEditing={isEditing}
       categoryError={validationErrors[currentCategory.id]?.nameKey}
-      subcategoryErrors={validationErrors}
+      subcategoryErrors={validationErrors[currentCategory.id]?.subcategories || {}}
       onValidationError={handleValidationError}
     />
   );
