@@ -120,13 +120,13 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0s, transform 0.3s ease;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
       z-index: 90;
     }
 
     .sidebar.collapsed {
-      width: 88px;
+      width: 72px;
     }
 
     .sidebar-inner {
@@ -181,13 +181,13 @@
 
     .sidebar.collapsed .nav-item {
       flex-direction: column;
-      padding: 16px 8px;
-      gap: 6px;
-      font-size: 0.7rem;
+      padding: 14px 6px;
+      gap: 4px;
+      font-size: 0.65rem;
       justify-content: center;
       align-items: center;
-      margin: 8px auto;
-      width: 64px;
+      margin: 6px auto;
+      width: 56px;
     }
 
     /* Overlay para móvil/tablet */
@@ -215,12 +215,12 @@
       margin-left: calc(280px + 4rem);
       margin-top: 86px;
       padding: 2rem;
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: margin-left 0s;
       min-height: calc(100vh - 86px);
     }
 
     .sidebar.collapsed ~ .main-content {
-      margin-left: calc(88px + 4rem);
+      margin-left: calc(72px + 4rem);
     }
 
     .content-card {
