@@ -1,0 +1,198 @@
+/* ContactInfoForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================================
+   READ-ONLY VIEW
+   ============================================================================ */
+
+.readOnlyContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.infoCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardContent {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.infoItem strong {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.infoItem span {
+  display: block;
+  padding: 0.875rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  min-height: 3rem;
+  transition: var(--transition);
+}
+
+.infoItem:hover span {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.1);
+}
+
+.inlineIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   EDITABLE VIEW
+   ============================================================================ */
+
+.editableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.formCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.1);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .readOnlyContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoRow {
+    grid-template-columns: 1fr;
+  }
+
+  .cardHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .cardContent {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardHeader {
+    padding: 0.75rem 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .cardTitle {
+    font-size: 0.9375rem;
+  }
+
+  .cardContent {
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .infoItem strong {
+    font-size: 0.8125rem;
+  }
+
+  .infoItem span {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    min-height: 2.75rem;
+  }
+
+  .inlineIcon {
+    width: 14px;
+    height: 14px;
+  }
+}

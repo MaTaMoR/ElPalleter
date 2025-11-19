@@ -183,6 +183,14 @@
   gap: 0.875rem;
 }
 
+.fieldLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
 .emptyState {
   text-align: center;
   padding: 3rem 1rem;

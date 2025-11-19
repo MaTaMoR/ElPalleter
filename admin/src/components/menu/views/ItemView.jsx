@@ -4,7 +4,7 @@ import { Plus, ArrowLeft, Check, X, Trash2 } from 'lucide-react';
 import Button from '../../common/Button';
 import MenuTextField from '../fields/MenuTextField';
 import MenuPriceField from '../fields/MenuPriceField';
-import MenuCheckbox from '../fields/MenuCheckbox';
+import BadgeToggle from '../../common/BadgeToggle';
 import MenuCard from '../common/MenuCard';
 import styles from './ItemView.module.css';
 import cardStyles from '../common/MenuCard.module.css';
@@ -227,11 +227,14 @@ const ItemView = ({
                           onChange={(value) => handleFieldChange(item.id, 'descriptionKey', value)}
                           multiline
                         />
-                        <MenuCheckbox
-                          label="Disponible"
-                          checked={item.available !== false}
-                          onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
-                        />
+                        <div>
+                          <label className={styles.fieldLabel}>Disponibilidad</label>
+                          <BadgeToggle
+                            label={item.available !== false ? 'Disponible' : 'No disponible'}
+                            checked={item.available !== false}
+                            onChange={(checked) => handleFieldChange(item.id, 'available', checked)}
+                          />
+                        </div>
                         <div className={cardStyles.editActions}>
                           <button
                             type="button"

@@ -1,57 +1,6 @@
 import { useState, useEffect } from 'react';
-import { VALIDATION_CONFIG, formatErrorMessage } from '../config/validationConfig';
-
-/**
- * Helper function to validate a text field
- */
-const validateTextField = (value, fieldConfig) => {
-  if (!value || value.trim().length === 0) {
-    if (fieldConfig.required) {
-      return fieldConfig.errorMessages.required;
-    }
-    return null;
-  }
-
-  const trimmedValue = value.trim();
-
-  if (trimmedValue.length < fieldConfig.minLength) {
-    return formatErrorMessage(fieldConfig.errorMessages.minLength, fieldConfig);
-  }
-
-  if (fieldConfig.maxLength && trimmedValue.length > fieldConfig.maxLength) {
-    return formatErrorMessage(fieldConfig.errorMessages.maxLength, fieldConfig);
-  }
-
-  return null;
-};
-
-/**
- * Helper function to validate a price field
- */
-const validatePriceField = (value, fieldConfig) => {
-  if (value === undefined || value === null || value === '') {
-    if (fieldConfig.required) {
-      return fieldConfig.errorMessages.required;
-    }
-    return null;
-  }
-
-  const priceNum = parseFloat(value);
-
-  if (isNaN(priceNum)) {
-    return fieldConfig.errorMessages.invalid;
-  }
-
-  if (priceNum < fieldConfig.min) {
-    return formatErrorMessage(fieldConfig.errorMessages.min, fieldConfig);
-  }
-
-  if (fieldConfig.max && priceNum > fieldConfig.max) {
-    return formatErrorMessage(fieldConfig.errorMessages.max, fieldConfig);
-  }
-
-  return null;
-};
+import { VALIDATION_CONFIG } from '../config/validationConfig';
+import { validateTextField, validatePriceField } from '../utils/validationUtils';
 
 /**
  * Hook to handle menu data validation

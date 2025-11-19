@@ -12,12 +12,6 @@ import { MenuEditProvider, useMenuEdit } from '../../contexts/MenuEditContext';
 import styles from './MenuPage.module.css';
 
 // ============================================================================
-// MOCK DATA - REMOVED
-// ============================================================================
-// Mock data has been removed to avoid showing misleading data when the backend fails.
-// Instead, we now show a proper error message when data cannot be loaded.
-
-// ============================================================================
 // MENU CONTENT COMPONENT
 // ============================================================================
 

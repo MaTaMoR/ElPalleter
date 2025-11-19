@@ -80,6 +80,21 @@ export class ContactService {
     }
 
     /**
+     * Actualiza la información completa del restaurante
+     * @param {Object} restaurantData - Datos del restaurante a actualizar
+     * @param {string} language - Código de idioma
+     * @returns {Promise<Object>} Resultado de la actualización
+     */
+    static async updateRestaurantInfo(restaurantData, language = 'es') {
+        try {
+            return await ContactRepository.updateRestaurantInfo(restaurantData, language);
+        } catch (error) {
+            console.error('ContactService: Error updating restaurant info:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Genera enlaces de acción (teléfono, email, maps, etc.)
      * @param {string} language - Código de idioma
      * @returns {Promise<Object>} Enlaces de acción
