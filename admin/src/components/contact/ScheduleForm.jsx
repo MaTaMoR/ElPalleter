@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus, Trash2, Unlink } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
-import MenuCheckbox from '../menu/fields/MenuCheckbox';
 import Button from '../common/Button';
 import styles from './ScheduleForm.module.css';
 
@@ -144,101 +143,10 @@ const ScheduleForm = ({
 
   const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-  const handleDayOpenChange = (dayOfWeek, isOpen) => {
-    const updatedSchedules = schedules.map(schedule =>
-      schedule.dayOfWeek === dayOfWeek
-        ? { ...schedule, isOpen }
-        : schedule
-    );
-    onChange(updatedSchedules);
-  };
-
-  const handleRangeChange = (dayOfWeek, rangeIndex, field, value) => {
-    const updatedSchedules = schedules.map(schedule => {
-      if (schedule.dayOfWeek === dayOfWeek) {
-        const updatedRanges = [...schedule.scheduleRanges];
-        updatedRanges[rangeIndex] = {
-          ...updatedRanges[rangeIndex],
-          [field]: value
-        };
-        return { ...schedule, scheduleRanges: updatedRanges };
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
-  };
-
-  const handleAddRange = (dayOfWeek) => {
-    const updatedSchedules = schedules.map(schedule => {
-      if (schedule.dayOfWeek === dayOfWeek) {
-        const newRange = {
-          id: Date.now(), // Temporary ID for new ranges
-          nameKey: '',
-          startTime: '09:00',
-          endTime: '17:00'
-        };
-        return {
-          ...schedule,
-          scheduleRanges: [...(schedule.scheduleRanges || []), newRange]
-        };
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
-  };
-
-  const handleDeleteRange = (dayOfWeek, rangeIndex) => {
-    const updatedSchedules = schedules.map(schedule => {
-      if (schedule.dayOfWeek === dayOfWeek) {
-        const updatedRanges = schedule.scheduleRanges.filter((_, index) => index !== rangeIndex);
-        return { ...schedule, scheduleRanges: updatedRanges };
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
-  };
-
   // Sort schedules by day order
   const sortedSchedules = [...schedules].sort((a, b) => {
     return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
   });
-
-  // Group consecutive days with the same schedule for editing
-  const groupSchedulesForEdit = () => {
-    const groups = [];
-    let currentGroup = null;
-
-    sortedSchedules.forEach((schedule) => {
-      const scheduleKey = schedule.isOpen
-        ? JSON.stringify(schedule.scheduleRanges?.map(r => ({ s: r.startTime, e: r.endTime })) || [])
-        : 'closed';
-
-      if (currentGroup && currentGroup.scheduleKey === scheduleKey) {
-        // Add to current group
-        currentGroup.days.push(schedule.dayOfWeek);
-        currentGroup.endDay = schedule.dayOfWeek;
-      } else {
-        // Start new group
-        currentGroup = {
-          scheduleKey,
-          days: [schedule.dayOfWeek],
-          startDay: schedule.dayOfWeek,
-          endDay: schedule.dayOfWeek,
-          schedule: schedule
-        };
-        groups.push(currentGroup);
-      }
-    });
-
-    return groups;
-  };
-
-  const getDayRangeLabel = (group) => {
-    if (group.days.length === 1) {
-      return dayNames[group.startDay];
-    }
-    return `${dayNames[group.startDay]} - ${dayNames[group.endDay]}`;
-  };
 
   if (!isEditing) {
     // Read-only display with weekly calendar grid
@@ -250,19 +158,63 @@ const ScheduleForm = ({
     );
   }
 
-  // Handler for group changes (updates all days in the group)
-  const handleGroupDayOpenChange = (group, isOpen) => {
-    const updatedSchedules = schedules.map(schedule =>
-      group.days.includes(schedule.dayOfWeek)
-        ? { ...schedule, isOpen }
-        : schedule
-    );
+  // Group schedules by their time ranges for editing
+  const groupSchedulesByPattern = () => {
+    const patterns = [];
+    const daysByPattern = {};
+
+    sortedSchedules.forEach(schedule => {
+      if (!schedule.isOpen || !schedule.scheduleRanges || schedule.scheduleRanges.length === 0) {
+        return; // Skip closed days
+      }
+
+      const patternKey = JSON.stringify(schedule.scheduleRanges.map(r => ({ s: r.startTime, e: r.endTime })));
+
+      if (!daysByPattern[patternKey]) {
+        daysByPattern[patternKey] = {
+          ranges: schedule.scheduleRanges,
+          days: []
+        };
+        patterns.push(patternKey);
+      }
+
+      daysByPattern[patternKey].days.push(schedule.dayOfWeek);
+    });
+
+    return patterns.map(key => ({
+      patternKey: key,
+      ...daysByPattern[key]
+    }));
+  };
+
+  const handlePatternDayToggle = (pattern, dayOfWeek, isChecked) => {
+    const updatedSchedules = schedules.map(schedule => {
+      if (schedule.dayOfWeek === dayOfWeek) {
+        if (isChecked) {
+          // Apply this pattern to the day
+          return {
+            ...schedule,
+            isOpen: true,
+            scheduleRanges: pattern.ranges.map(r => ({ ...r }))
+          };
+        } else {
+          // Remove pattern from day (close it)
+          return {
+            ...schedule,
+            isOpen: false,
+            scheduleRanges: []
+          };
+        }
+      }
+      return schedule;
+    });
     onChange(updatedSchedules);
   };
 
-  const handleGroupRangeChange = (group, rangeIndex, field, value) => {
+  const handlePatternRangeChange = (pattern, rangeIndex, field, value) => {
     const updatedSchedules = schedules.map(schedule => {
-      if (group.days.includes(schedule.dayOfWeek)) {
+      // Update all days that use this pattern
+      if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
         const updatedRanges = [...schedule.scheduleRanges];
         updatedRanges[rangeIndex] = {
           ...updatedRanges[rangeIndex],
@@ -275,18 +227,19 @@ const ScheduleForm = ({
     onChange(updatedSchedules);
   };
 
-  const handleGroupAddRange = (group) => {
+  const handlePatternAddRange = (pattern) => {
+    const newRange = {
+      id: Date.now(),
+      nameKey: '',
+      startTime: '09:00',
+      endTime: '17:00'
+    };
+
     const updatedSchedules = schedules.map(schedule => {
-      if (group.days.includes(schedule.dayOfWeek)) {
-        const newRange = {
-          id: Date.now(),
-          nameKey: '',
-          startTime: '09:00',
-          endTime: '17:00'
-        };
+      if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
         return {
           ...schedule,
-          scheduleRanges: [...(schedule.scheduleRanges || []), newRange]
+          scheduleRanges: [...schedule.scheduleRanges, newRange]
         };
       }
       return schedule;
@@ -294,9 +247,9 @@ const ScheduleForm = ({
     onChange(updatedSchedules);
   };
 
-  const handleGroupDeleteRange = (group, rangeIndex) => {
+  const handlePatternDeleteRange = (pattern, rangeIndex) => {
     const updatedSchedules = schedules.map(schedule => {
-      if (group.days.includes(schedule.dayOfWeek)) {
+      if (pattern.days.includes(schedule.dayOfWeek) && schedule.isOpen) {
         const updatedRanges = schedule.scheduleRanges.filter((_, index) => index !== rangeIndex);
         return { ...schedule, scheduleRanges: updatedRanges };
       }
@@ -305,129 +258,132 @@ const ScheduleForm = ({
     onChange(updatedSchedules);
   };
 
-  const handleUnlinkGroup = (group) => {
-    // To unlink a group, we slightly modify the time of each day except the first
-    // This breaks the grouping so each day becomes editable independently
-    const updatedSchedules = schedules.map(schedule => {
-      if (group.days.includes(schedule.dayOfWeek) && schedule.dayOfWeek !== group.startDay) {
-        // Add one minute to the first range's start time to make it unique
-        if (schedule.scheduleRanges && schedule.scheduleRanges.length > 0) {
-          const firstRange = schedule.scheduleRanges[0];
-          const [hours, minutes] = firstRange.startTime.split(':').map(Number);
-          const newMinutes = (minutes + 1) % 60;
-          const newHours = minutes === 59 ? (hours + 1) % 24 : hours;
-          const newStartTime = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
-
+  const handleAddNewPattern = () => {
+    // Add a new pattern to the first day that's currently closed
+    const closedDay = sortedSchedules.find(s => !s.isOpen);
+    if (closedDay) {
+      const updatedSchedules = schedules.map(schedule => {
+        if (schedule.dayOfWeek === closedDay.dayOfWeek) {
           return {
             ...schedule,
-            scheduleRanges: [
-              { ...firstRange, startTime: newStartTime },
-              ...schedule.scheduleRanges.slice(1)
-            ]
+            isOpen: true,
+            scheduleRanges: [{
+              id: Date.now(),
+              nameKey: '',
+              startTime: '09:00',
+              endTime: '17:00'
+            }]
           };
         }
-      }
-      return schedule;
-    });
-    onChange(updatedSchedules);
+        return schedule;
+      });
+      onChange(updatedSchedules);
+    }
   };
 
-  // Editable form - compact table-like layout with grouped days
-  const groupedSchedules = groupSchedulesForEdit();
+  // Editable form - pattern-based layout
+  const patterns = groupSchedulesByPattern();
 
   return (
     <div className={styles.section}>
       <h2 className={styles.sectionTitle}>Horarios</h2>
-      <div className={styles.scheduleTable}>
-        {groupedSchedules.map((group, groupIndex) => {
-          const dayErrors = errors[group.startDay] || {};
+      <div className={styles.patternsContainer}>
+        {patterns.map((pattern, patternIndex) => {
+          const firstDayWithPattern = pattern.days[0];
+          const dayErrors = errors[firstDayWithPattern] || {};
           const rangeErrors = dayErrors.ranges || {};
-          const isGrouped = group.days.length > 1;
 
           return (
-            <div key={groupIndex} className={styles.scheduleRow}>
-              {/* Day name(s) and open checkbox */}
-              <div className={styles.dayColumn}>
-                <div className={styles.dayNameGroup}>
-                  <span className={styles.dayName}>{getDayRangeLabel(group)}</span>
-                  {isGrouped && (
-                    <>
-                      <span className={styles.groupBadge}>{group.days.length} días</span>
-                      <button
-                        type="button"
-                        className={styles.unlinkButton}
-                        onClick={() => handleUnlinkGroup(group)}
-                        aria-label="Desvincular días"
-                        title="Desvincular días para editar individualmente"
-                      >
-                        <Unlink size={14} />
-                      </button>
-                    </>
-                  )}
-                </div>
-                <MenuCheckbox
-                  label="Abierto"
-                  checked={group.schedule.isOpen}
-                  onChange={(checked) => handleGroupDayOpenChange(group, checked)}
-                />
+            <div key={patternIndex} className={styles.patternCard}>
+              <div className={styles.patternHeader}>
+                <span className={styles.patternTitle}>Patrón {patternIndex + 1}</span>
               </div>
 
-              {/* Time ranges */}
-              <div className={styles.rangesColumn}>
-                {group.schedule.isOpen ? (
-                  <>
-                    {group.schedule.scheduleRanges && group.schedule.scheduleRanges.map((range, rangeIndex) => {
-                      const rangeError = rangeErrors[rangeIndex] || {};
+              {/* Time ranges for this pattern */}
+              <div className={styles.patternRanges}>
+                <label className={styles.patternLabel}>Horarios:</label>
+                <div className={styles.rangesColumn}>
+                  {pattern.ranges.map((range, rangeIndex) => {
+                    const rangeError = rangeErrors[rangeIndex] || {};
 
-                      return (
-                        <div key={rangeIndex} className={styles.rangeRow}>
-                          <MenuTextField
-                            label="Inicio"
-                            value={range.startTime}
-                            onChange={(value) => handleGroupRangeChange(group, rangeIndex, 'startTime', value)}
-                            error={rangeError.startTime}
-                            placeholder="09:00"
-                            required
-                          />
-                          <MenuTextField
-                            label="Fin"
-                            value={range.endTime}
-                            onChange={(value) => handleGroupRangeChange(group, rangeIndex, 'endTime', value)}
-                            error={rangeError.endTime}
-                            placeholder="17:00"
-                            required
-                          />
-                          <div className={styles.rangeActions}>
-                            <button
-                              type="button"
-                              className={styles.addRangeButton}
-                              onClick={() => handleGroupAddRange(group)}
-                              aria-label="Añadir rango horario"
-                              title="Añadir rango horario"
-                            >
-                              <Plus size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              className={styles.deleteRangeButton}
-                              onClick={() => handleGroupDeleteRange(group, rangeIndex)}
-                              aria-label="Eliminar rango horario"
-                              title="Eliminar rango horario"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
+                    return (
+                      <div key={rangeIndex} className={styles.rangeRow}>
+                        <MenuTextField
+                          label="Inicio"
+                          value={range.startTime}
+                          onChange={(value) => handlePatternRangeChange(pattern, rangeIndex, 'startTime', value)}
+                          error={rangeError.startTime}
+                          placeholder="09:00"
+                          required
+                        />
+                        <MenuTextField
+                          label="Fin"
+                          value={range.endTime}
+                          onChange={(value) => handlePatternRangeChange(pattern, rangeIndex, 'endTime', value)}
+                          error={rangeError.endTime}
+                          placeholder="17:00"
+                          required
+                        />
+                        <div className={styles.rangeActions}>
+                          <button
+                            type="button"
+                            className={styles.addRangeButton}
+                            onClick={() => handlePatternAddRange(pattern)}
+                            aria-label="Añadir rango horario"
+                            title="Añadir rango horario"
+                          >
+                            <Plus size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.deleteRangeButton}
+                            onClick={() => handlePatternDeleteRange(pattern, rangeIndex)}
+                            aria-label="Eliminar rango horario"
+                            title="Eliminar rango horario"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-                      );
-                    })}
-                  </>
-                ) : (
-                  <span className={styles.closedLabel}>Cerrado</span>
-                )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Day selectors */}
+              <div className={styles.patternDays}>
+                <label className={styles.patternLabel}>Días:</label>
+                <div className={styles.daysGrid}>
+                  {dayOrder.map(day => {
+                    const isSelected = pattern.days.includes(day);
+                    return (
+                      <label key={day} className={styles.dayCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => handlePatternDayToggle(pattern, day, e.target.checked)}
+                        />
+                        <span className={styles.dayCheckboxLabel}>{dayNames[day]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           );
         })}
+
+        {/* Add new pattern button */}
+        {patterns.length < 7 && (
+          <Button
+            variant="secondary"
+            icon={Plus}
+            onClick={handleAddNewPattern}
+            className={styles.addPatternButton}
+          >
+            Añadir patrón de horario
+          </Button>
+        )}
       </div>
     </div>
   );
