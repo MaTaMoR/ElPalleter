@@ -1,0 +1,255 @@
+/* ContactPage.module.css */
+
+.contactPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-primary);
+}
+
+/* Header Styles */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.titleSection {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Controls Group */
+.controlsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.languageWrapper {
+  flex-shrink: 0;
+}
+
+.buttonWrapper {
+  flex-shrink: 0;
+}
+
+.controlDivider {
+  width: 1px;
+  height: 32px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+/* Content Styles */
+.content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.contentCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.infoGrid > div {
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.infoGrid strong {
+  color: var(--primary);
+  margin-right: 0.5rem;
+}
+
+/* Validation Summary */
+.validationSummary {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--error-light);
+  border: 1px solid var(--error);
+  border-radius: 4px;
+}
+
+.validationSummary h3 {
+  color: var(--error);
+  margin: 0 0 0.5rem 0;
+}
+
+.validationSummary pre {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Error State */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.errorText {
+  color: var(--error);
+  font-size: 1.125rem;
+  text-align: center;
+  max-width: 600px;
+}
+
+.retryButton {
+  min-width: 150px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .headerTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .titleSection {
+    text-align: center;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .controlsGroup {
+    justify-content: center;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .contentCard {
+    padding: 1.5rem;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerTop {
+    padding: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .contentCard {
+    padding: 1rem;
+  }
+
+  .controlDivider {
+    display: none;
+  }
+
+  .controlsGroup {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .languageWrapper,
+  .buttonWrapper {
+    width: 100%;
+  }
+
+  .languageWrapper > *,
+  .buttonWrapper > * {
+    width: 100%;
+  }
+}
