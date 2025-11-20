@@ -1,8 +1,3 @@
-/**
- * ThemeService - Servicio simplificado para gestionar temas dark/light
- * Compatible con el sistema de design tokens existente de El Palleter
- */
-
 export class ThemeService {
 
     static themes = {

@@ -1,7 +1,16 @@
 ---
 export const prerender = true;
 
+import Layout from '../layouts/Layout.astro';
 import HomePage from '../components/HomePage.astro';
+
+const locale = "es";
 ---
 
-<HomePage locale="es" />
+<Layout 
+    title="El Palleter - Restaurante en Benissa"
+    description="Auténtica cocina mediterránea en Benissa. Tapas y parrilla tradicional desde 1985."
+    lang={locale}
+>
+    <HomePage locale={locale} />
+</Layout>

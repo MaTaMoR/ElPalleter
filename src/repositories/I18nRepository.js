@@ -227,8 +227,8 @@ export class I18nRepository extends BaseRepository {
      * @returns {Promise<Object>} Translation actualizada
      */
     static async updateTranslation(request, token) {
-        if (!request || !request.languageCode || !request.key) {
-            throw new Error('Language code and translation key are required');
+        if (!request || !request.languageCode || !request.translationKey || !request.translationValue) {
+            throw new Error('Language code, translationKey and translationValue are required');
         }
 
         try {
