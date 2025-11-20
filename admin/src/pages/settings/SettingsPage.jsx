@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import ToastContainer from '../../components/common/ToastContainer';
+import SavingOverlay from '../../components/common/SavingOverlay';
 import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
 import { I18nService } from '@services/I18nService';
@@ -382,14 +383,7 @@ const SettingsContent = () => {
       <ToastContainer toasts={toasts} onClose={removeToast} />
 
       {/* Saving Overlay */}
-      {isSaving && (
-        <div className={styles.savingOverlay}>
-          <div className={styles.savingContent}>
-            <div className={styles.savingSpinner}></div>
-            <p className={styles.savingText}>Guardando...</p>
-          </div>
-        </div>
-      )}
+      <SavingOverlay isVisible={isSaving} />
     </>
   );
 };
