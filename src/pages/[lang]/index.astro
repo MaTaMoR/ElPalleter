@@ -9,16 +9,12 @@ export async function getStaticPaths() {
   const locales = I18nService.getLanguageCodes();
   const defaultLocale = I18nService.getDefaultLanguage();
 
-  console.log('LOCALES', locales);
-  console.log('DEFAULT_LOCALE', defaultLocale);
-
   return locales
     .filter(locale => locale !== defaultLocale)
     .map(locale => ({
       params: { lang: locale }
     }));
 }
-
 
 const { lang } = Astro.params;
 

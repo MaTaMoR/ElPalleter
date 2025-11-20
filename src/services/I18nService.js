@@ -853,7 +853,7 @@ export class I18nService {
 
 // Auto-inicialización en servidor
 if (typeof window === 'undefined') {
-  I18nService.init().catch(console.error);
+  await I18nService.init().catch(console.error);
 }
 
 // ===============================================
