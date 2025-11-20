@@ -387,6 +387,16 @@ const SettingsContent = () => {
 
       {/* Toast Container */}
       <ToastContainer toasts={toasts} onClose={removeToast} />
+
+      {/* Saving Overlay */}
+      {isSaving && (
+        <div className={styles.savingOverlay}>
+          <div className={styles.savingContent}>
+            <div className={styles.savingSpinner}></div>
+            <p className={styles.savingText}>Guardando...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 };
