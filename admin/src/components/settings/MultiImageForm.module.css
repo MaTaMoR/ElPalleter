@@ -409,6 +409,18 @@
     height: 60px;
     margin: 0.5rem 0 0.5rem 0.75rem;
   }
+
+  .imageThumbnailExpanded {
+    max-width: 100%;
+  }
+
+  .expandedActions {
+    max-width: 100%;
+  }
+
+  .cardLayoutExpanded {
+    padding: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -438,6 +450,18 @@
     width: 50px;
     height: 50px;
     margin: 0.5rem 0 0.5rem 0.5rem;
+  }
+
+  .imageThumbnailExpanded {
+    max-width: 100%;
+  }
+
+  .expandedActions {
+    max-width: 100%;
+  }
+
+  .cardLayoutExpanded {
+    padding: 0.5rem;
   }
 
   .badge {
