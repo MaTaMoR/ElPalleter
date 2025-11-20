@@ -132,15 +132,15 @@ export class ImageService {
     /**
      * Añade una imagen a una galería
      * @param {string} galleryName - Nombre de la galería
-     * @param {number} imageId - ID de la imagen
-     * @param {number} order - Orden de la imagen en la galería
+     * @param {string} imageName - Nombre de la imagen
+     * @param {number} order - Orden de la imagen en la galería (opcional)
      * @returns {Promise<void>}
      */
-    static async addImageToGallery(galleryName, imageId, order) {
+    static async addImageToGallery(galleryName, imageName, order) {
         try {
-            await GalleryRepository.addImageToGallery(galleryName, imageId, order, AuthService.getToken());
+            await GalleryRepository.addImageToGallery(galleryName, imageName, order, AuthService.getToken());
         } catch (error) {
-            console.error(`ImageService: Error adding image ${imageId} to gallery ${galleryName}:`, error);
+            console.error(`ImageService: Error adding image ${imageName} to gallery ${galleryName}:`, error);
             throw error;
         }
     }
@@ -148,15 +148,14 @@ export class ImageService {
     /**
      * Elimina una imagen de una galería
      * @param {string} galleryName - Nombre de la galería
-     * @param {number} imageId - ID de la imagen
-     * @param {string} token - Token de autenticación
+     * @param {string} imageName - Nombre de la imagen
      * @returns {Promise<void>}
      */
-    static async removeImageFromGallery(galleryName, imageId) {
+    static async removeImageFromGallery(galleryName, imageName) {
         try {
-            await GalleryRepository.removeImageFromGallery(galleryName, imageId, AuthService.getToken());
+            await GalleryRepository.removeImageFromGallery(galleryName, imageName, AuthService.getToken());
         } catch (error) {
-            console.error(`ImageService: Error removing image ${imageId} from gallery ${galleryName}:`, error);
+            console.error(`ImageService: Error removing image ${imageName} from gallery ${galleryName}:`, error);
             throw error;
         }
     }
@@ -164,16 +163,15 @@ export class ImageService {
     /**
      * Actualiza el orden de una imagen en una galería
      * @param {string} galleryName - Nombre de la galería
-     * @param {number} imageId - ID de la imagen
+     * @param {string} imageName - Nombre de la imagen
      * @param {number} order - Nuevo orden de la imagen
-     * @param {string} token - Token de autenticación
      * @returns {Promise<void>}
      */
-    static async updateImageOrder(galleryName, imageId, order) {
+    static async updateImageOrder(galleryName, imageName, order) {
         try {
-            await GalleryRepository.updateImageOrder(galleryName, imageId, order, AuthService.getToken());
+            await GalleryRepository.updateImageOrder(galleryName, imageName, order, AuthService.getToken());
         } catch (error) {
-            console.error(`ImageService: Error updating image ${imageId} order in gallery ${galleryName}:`, error);
+            console.error(`ImageService: Error updating image ${imageName} order in gallery ${galleryName}:`, error);
             throw error;
         }
     }
