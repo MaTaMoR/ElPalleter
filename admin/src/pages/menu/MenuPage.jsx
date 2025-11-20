@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
+import SavingOverlay from '../../components/common/SavingOverlay';
 import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
@@ -16,7 +17,7 @@ import styles from './MenuPage.module.css';
 // ============================================================================
 
 const MenuContent = () => {
-  const { loading, error, menuState, reload, confirmDialog, setConfirmDialog } = useMenuEdit();
+  const { loading, error, menuState, reload, confirmDialog, setConfirmDialog, isSaving } = useMenuEdit();
 
   if (loading) {
     return (
@@ -68,6 +69,9 @@ const MenuContent = () => {
           confirmText={confirmDialog.type === 'danger' ? 'Eliminar' : 'Confirmar'}
         />
       )}
+
+      {/* Saving Overlay */}
+      <SavingOverlay isVisible={isSaving} />
     </>
   );
 };

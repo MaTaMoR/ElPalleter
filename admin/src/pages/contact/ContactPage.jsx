@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
 import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
 import ToastContainer from '../../components/common/ToastContainer';
+import SavingOverlay from '../../components/common/SavingOverlay';
 import ContactInfoForm from '../../components/contact/ContactInfoForm';
 import ScheduleForm from '../../components/contact/ScheduleForm';
 import SocialMediaForm from '../../components/contact/SocialMediaForm';
@@ -335,6 +336,9 @@ const ContactContent = () => {
 
       {/* Toast Container */}
       <ToastContainer toasts={toasts} onClose={removeToast} />
+
+      {/* Saving Overlay */}
+      <SavingOverlay isVisible={isSaving} />
     </>
   );
 };
