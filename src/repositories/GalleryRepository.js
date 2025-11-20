@@ -29,48 +29,79 @@ export class GalleryRepository extends BaseRepository {
     }
 
     /**
-     * Elimina una imagen de una galería
-     * DELETE /gallery/{galleryName}/image/{imageId}
+     * Añade una imagen a una galería
+     * POST /gallery/{galleryName}/image/{imageName}
      * @param {string} galleryName - Nombre de la galería
-     * @param {number} imageId - ID de la imagen
+     * @param {string} imageName - Nombre de la imagen
+     * @param {number} order - Orden de la imagen en la galería (opcional)
      * @param {string} token - Token de autenticación
      * @returns {Promise<void>}
      */
-    static async removeImageFromGallery(galleryName, imageId, token) {
+    static async addImageToGallery(galleryName, imageName, order, token) {
         if (!galleryName) {
             throw new Error('Gallery name is required');
         }
 
-        if (!imageId) {
-            throw new Error('Image ID is required');
+        if (!imageName) {
+            throw new Error('Image name is required');
         }
 
         try {
-            await this.delete(`/gallery/${galleryName}/image/${imageId}`, {
+            const body = (order !== null && order !== undefined) ? { order } : undefined;
+            await this.post(
+                `/gallery/${galleryName}/image/${imageName}`,
+                body,
+                { headers: this.getAuthHeaders(token) }
+            );
+        } catch (error) {
+            console.error(`GalleryRepository: Error adding image ${imageName} to gallery ${galleryName}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Elimina una imagen de una galería
+     * DELETE /gallery/{galleryName}/image/{imageName}
+     * @param {string} galleryName - Nombre de la galería
+     * @param {string} imageName - Nombre de la imagen
+     * @param {string} token - Token de autenticación
+     * @returns {Promise<void>}
+     */
+    static async removeImageFromGallery(galleryName, imageName, token) {
+        if (!galleryName) {
+            throw new Error('Gallery name is required');
+        }
+
+        if (!imageName) {
+            throw new Error('Image name is required');
+        }
+
+        try {
+            await this.delete(`/gallery/${galleryName}/image/${imageName}`, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
-            console.error(`GalleryRepository: Error removing image ${imageId} from gallery ${galleryName}:`, error);
+            console.error(`GalleryRepository: Error removing image ${imageName} from gallery ${galleryName}:`, error);
             throw error;
         }
     }
 
     /**
      * Actualiza el orden de una imagen en una galería
-     * PATCH /gallery/{galleryName}/image/{imageId}/order
+     * PATCH /gallery/{galleryName}/image/{imageName}/order
      * @param {string} galleryName - Nombre de la galería
-     * @param {number} imageId - ID de la imagen
+     * @param {string} imageName - Nombre de la imagen
      * @param {number} order - Nuevo orden de la imagen
      * @param {string} token - Token de autenticación
      * @returns {Promise<void>}
      */
-    static async updateImageOrder(galleryName, imageId, order, token) {
+    static async updateImageOrder(galleryName, imageName, order, token) {
         if (!galleryName) {
             throw new Error('Gallery name is required');
         }
 
-        if (!imageId) {
-            throw new Error('Image ID is required');
+        if (!imageName) {
+            throw new Error('Image name is required');
         }
 
         if (order === null || order === undefined) {
@@ -79,12 +110,12 @@ export class GalleryRepository extends BaseRepository {
 
         try {
             await this.patch(
-                `/gallery/${galleryName}/image/${imageId}/order`,
+                `/gallery/${galleryName}/image/${imageName}/order`,
                 { order },
                 { headers: this.getAuthHeaders(token) }
             );
         } catch (error) {
-            console.error(`GalleryRepository: Error updating image ${imageId} order in gallery ${galleryName}:`, error);
+            console.error(`GalleryRepository: Error updating image ${imageName} order in gallery ${galleryName}:`, error);
             throw error;
         }
     }
