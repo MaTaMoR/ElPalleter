@@ -30,6 +30,9 @@ const SettingsContent = () => {
   // Images state - stores File objects for modified images
   const [modifiedImages, setModifiedImages] = useState({});
 
+  // Image refresh key - updates when images are saved to force reload
+  const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
+
   // Toast state
   const [toasts, setToasts] = useState([]);
 
@@ -153,6 +156,12 @@ const SettingsContent = () => {
           // Reload data from backend
           await loadTranslations();
           setModifiedImages({});
+
+          // Update image refresh key to force image reload if images were changed
+          if (changedImages.length > 0) {
+            setImageRefreshKey(Date.now());
+          }
+
           setIsEditing(false);
           setIsSaving(false);
 
@@ -348,6 +357,7 @@ const SettingsContent = () => {
                   title="Fondo de inicio"
                   onChange={(file) => handleImageChange('hero-main', file)}
                   isEditing={isEditing}
+                  refreshKey={imageRefreshKey}
                 />
               </div>
             )}

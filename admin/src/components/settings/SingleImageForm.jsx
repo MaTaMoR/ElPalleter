@@ -11,13 +11,16 @@ const SingleImageForm = ({
   imageName,
   title = 'Imagen',
   onChange,
-  isEditing = false
+  isEditing = false,
+  refreshKey = null
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // Get the current image URL
-  const currentImageUrl = ImageService.getImageURL(imageName);
+  // Get the current image URL with cache-busting parameter
+  const currentImageUrl = refreshKey
+    ? `${ImageService.getImageURL(imageName)}?t=${refreshKey}`
+    : ImageService.getImageURL(imageName);
 
   // Clean up preview URL when component unmounts or file changes
   useEffect(() => {
@@ -193,7 +196,8 @@ SingleImageForm.propTypes = {
   imageName: PropTypes.string.isRequired,
   title: PropTypes.string,
   onChange: PropTypes.func,
-  isEditing: PropTypes.bool
+  isEditing: PropTypes.bool,
+  refreshKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 };
 
 export default SingleImageForm;

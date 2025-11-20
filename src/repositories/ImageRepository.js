@@ -34,14 +34,18 @@ export class ImageRepository extends BaseRepository {
             const formData = new FormData();
             formData.append('image', file);
 
-            // No establecer Content-Type para FormData, el navegador lo hará automáticamente
-            const customHeaders = { ...this.getAuthHeaders(token) };
-            delete customHeaders['Content-Type'];
+            // Crear headers manualmente para FormData
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            // NO incluir Content-Type - el navegador lo agregará con el boundary correcto
 
             const response = await fetch(`${this.getBaseUrl()}/image/upload`, {
                 method: 'POST',
-                headers: customHeaders,
-                body: formData
+                headers: headers,
+                body: formData,
+                // Sin timeout explícito para permitir archivos grandes
             });
 
             return this.handleResponse(response);
