@@ -342,15 +342,6 @@ const SettingsContent = () => {
             {/* Content area */}
             {translations && (
               <div className={styles.formsContainer}>
-                {/* Translations Section */}
-                <TranslationsForm
-                  translations={translations}
-                  onChange={handleTranslationsChange}
-                  errors={{}}
-                  isEditing={isEditing}
-                  language={selectedLanguage}
-                />
-
                 {/* Images Section */}
                 <SingleImageForm
                   imageName="hero-main"
@@ -358,6 +349,14 @@ const SettingsContent = () => {
                   onChange={(file) => handleImageChange('hero-main', file)}
                   isEditing={isEditing}
                   refreshKey={imageRefreshKey}
+                />
+                {/* Translations Section */}
+                <TranslationsForm
+                  translations={translations}
+                  onChange={handleTranslationsChange}
+                  errors={{}}
+                  isEditing={isEditing}
+                  language={selectedLanguage}
                 />
               </div>
             )}
