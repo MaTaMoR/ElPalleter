@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Image as ImageIcon, Upload, X, ChevronUp, ChevronDown, Trash2, Undo2, ZoomIn } from 'lucide-react';
+import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import styles from './MultiImageForm.module.css';
 
@@ -18,7 +18,6 @@ const MultiImageForm = ({
 }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedImageId, setExpandedImageId] = useState(null);
   const [maxUploadSize, setMaxUploadSize] = useState(null);
   const [loadingSize, setLoadingSize] = useState(true);
   const imageRefs = useRef({});
@@ -169,10 +168,6 @@ const MultiImageForm = ({
     notifyChange(updatedImages);
   };
 
-  const handleToggleExpand = (imageId) => {
-    setExpandedImageId(expandedImageId === imageId ? null : imageId);
-  };
-
   const getImageUrl = (image) => {
     if (image._previewUrl) {
       return image._previewUrl;
@@ -195,7 +190,6 @@ const MultiImageForm = ({
   // Reset when exiting edit mode
   useEffect(() => {
     if (!isEditing) {
-      setExpandedImageId(null);
       loadGalleryImages();
     }
   }, [isEditing]);
@@ -287,71 +281,59 @@ const MultiImageForm = ({
                   {/* Active Images List */}
                   <div className={styles.imagesList}>
                     {visibleImages.map((image, index) => {
-                      const isExpanded = expandedImageId === image.id;
                       const isNew = image._state === 'new';
-                      const isEdited = image._state === 'edited';
 
                       return (
                         <div
                           key={image.id}
                           ref={(el) => { imageRefs.current[image.id] = el; }}
-                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
+                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''}`}
                         >
-                          <div className={styles.imageCardContent}>
-                            {/* Image Preview (clickable) */}
-                            <div
-                              className={styles.imagePreviewContainer}
-                              onClick={() => handleToggleExpand(image.id)}
-                            >
+                          <div className={styles.cardLayout}>
+                            {/* Image Thumbnail */}
+                            <div className={styles.imageThumbnail}>
                               <img
                                 src={getImageUrl(image)}
-                                alt={image.name}
-                                className={isExpanded ? styles.imagePreviewLarge : styles.imagePreviewSmall}
+                                alt={`Imagen ${index + 1}`}
+                                className={styles.thumbnailImage}
                               />
-                              {!isExpanded && (
-                                <div className={styles.expandOverlay}>
-                                  <ZoomIn size={24} />
-                                </div>
-                              )}
                             </div>
 
-                            {/* Image Controls */}
-                            <div className={styles.imageControls}>
-                              <div className={styles.imageInfo}>
-                                {isNew && <span className={styles.badge}>Nueva</span>}
-                              </div>
-                              <div className={styles.imageActions}>
-                                {/* Move buttons */}
-                                <div className={styles.moveButtonsContainer}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleMoveImage(image.id, 'up')}
-                                    disabled={index === 0}
-                                    className={`${styles.actionButton} ${styles.moveButton}`}
-                                    title="Mover arriba"
-                                  >
-                                    <ChevronUp size={18} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleMoveImage(image.id, 'down')}
-                                    disabled={index === visibleImages.length - 1}
-                                    className={`${styles.actionButton} ${styles.moveButton}`}
-                                    title="Mover abajo"
-                                  >
-                                    <ChevronDown size={18} />
-                                  </button>
-                                </div>
-                                {/* Delete button */}
+                            {/* Image Info */}
+                            <div className={styles.imageInfo}>
+                              {isNew && <span className={styles.badge}>Nueva</span>}
+                            </div>
+
+                            {/* Actions on the right */}
+                            <div className={styles.cardActions}>
+                              <div className={styles.moveButtonsContainer}>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteImage(image.id)}
-                                  className={`${styles.actionButton} ${styles.deleteButton}`}
-                                  title="Eliminar"
+                                  onClick={() => handleMoveImage(image.id, 'up')}
+                                  disabled={index === 0}
+                                  className={`${styles.actionButton} ${styles.moveButton}`}
+                                  title="Mover arriba"
                                 >
-                                  <Trash2 size={18} />
+                                  <ChevronUp size={18} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveImage(image.id, 'down')}
+                                  disabled={index === visibleImages.length - 1}
+                                  className={`${styles.actionButton} ${styles.moveButton}`}
+                                  title="Mover abajo"
+                                >
+                                  <ChevronDown size={18} />
                                 </button>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteImage(image.id)}
+                                className={`${styles.actionButton} ${styles.deleteButton}`}
+                                title="Eliminar"
+                              >
+                                <Trash2 size={18} />
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -366,29 +348,27 @@ const MultiImageForm = ({
                       <div className={styles.deletedList}>
                         {deletedImages.map((image) => (
                           <div key={image.id} className={`${styles.imageCard} ${styles.deletedCard}`}>
-                            <div className={styles.imageCardContent}>
-                              <div className={styles.imagePreviewContainer}>
+                            <div className={styles.cardLayout}>
+                              <div className={styles.imageThumbnail}>
                                 <img
                                   src={getImageUrl(image)}
-                                  alt={image.name}
-                                  className={styles.imagePreviewSmall}
+                                  alt="Imagen eliminada"
+                                  className={styles.thumbnailImage}
                                 />
                                 <div className={styles.deletedOverlay}>Eliminada</div>
                               </div>
-                              <div className={styles.imageControls}>
-                                <div className={styles.imageInfo}>
-                                  {/* Empty - no name shown */}
-                                </div>
-                                <div className={styles.imageActions}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUndoDelete(image.id)}
-                                    className={`${styles.actionButton} ${styles.undoButton}`}
-                                    title="Deshacer eliminación"
-                                  >
-                                    <Undo2 size={18} />
-                                  </button>
-                                </div>
+                              <div className={styles.imageInfo}>
+                                {/* Empty */}
+                              </div>
+                              <div className={styles.cardActions}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUndoDelete(image.id)}
+                                  className={`${styles.actionButton} ${styles.undoButton}`}
+                                  title="Deshacer eliminación"
+                                >
+                                  <Undo2 size={18} />
+                                </button>
                               </div>
                             </div>
                           </div>

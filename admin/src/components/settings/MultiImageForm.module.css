@@ -151,16 +151,17 @@
 
 /* Individual Image Card in Edit Mode */
 .imageCard {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: var(--transition);
+  min-height: 90px;
 }
 
 .imageCard:hover {
-  border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-tertiary);
+  transform: scale(1.01);
 }
 
 /* State indicators */
@@ -175,62 +176,30 @@
   opacity: 0.6;
 }
 
-.expandedCard {
-  border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
-}
-
-/* Image Card Content */
-.imageCardContent {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-/* Image Preview Container */
-.imagePreviewContainer {
-  position: relative;
-  flex-shrink: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--bg-secondary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.imagePreviewSmall {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  display: block;
-}
-
-.imagePreviewLarge {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  max-height: 400px;
-  object-fit: contain;
-  display: block;
-}
-
-.expandOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+/* Card Layout - horizontal like MenuCard */
+.cardLayout {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  color: white;
+  gap: 0.75rem;
 }
 
-.imagePreviewContainer:hover .expandOverlay {
-  opacity: 1;
+/* Image Thumbnail */
+.imageThumbnail {
+  position: relative;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  margin: 0.625rem 0 0.625rem 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .deletedOverlay {
@@ -248,19 +217,12 @@
   font-size: 0.875rem;
 }
 
-/* Image Controls */
-.imageControls {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
+/* Image Info */
 .imageInfo {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
 }
 
 /* Badges */
@@ -275,10 +237,11 @@
   color: var(--success);
 }
 
-/* Image Actions */
-.imageActions {
+/* Card Actions - on the right */
+.cardActions {
   display: flex;
   align-items: center;
+  padding-right: 1rem;
   gap: 0;
 }
 
@@ -372,19 +335,6 @@
     gap: 0.75rem;
   }
 
-  .imageCardContent {
-    flex-direction: column;
-  }
-
-  .imagePreviewSmall {
-    width: 100%;
-    height: 200px;
-  }
-
-  .imagePreviewLarge {
-    max-width: 100%;
-  }
-
   /* Show only icon on tablet */
   .uploadButtonText {
     display: none;
@@ -396,6 +346,12 @@
 
   .actionButton {
     padding: 0.5rem;
+  }
+
+  .imageThumbnail {
+    width: 60px;
+    height: 60px;
+    margin: 0.5rem 0 0.5rem 0.75rem;
   }
 }
 
@@ -410,17 +366,22 @@
     gap: 0.5rem;
   }
 
-  .imageCardContent {
-    padding: 0.75rem;
-    gap: 0.75rem;
-  }
-
   .actionButton {
-    padding: 0.5rem;
+    padding: 0.4rem;
   }
 
   .moveButtonsContainer .moveButton {
     padding: 0.25rem;
+  }
+
+  .cardActions {
+    padding-right: 0.5rem;
+  }
+
+  .imageThumbnail {
+    width: 50px;
+    height: 50px;
+    margin: 0.5rem 0 0.5rem 0.5rem;
   }
 
   .badge {
