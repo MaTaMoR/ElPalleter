@@ -155,7 +155,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   min-height: 90px;
 }
 
@@ -166,7 +166,6 @@
 .expandedCard {
   border-color: var(--primary);
   box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
-  min-height: auto;
   background-color: var(--bg-tertiary);
 }
 
@@ -189,7 +188,7 @@
   gap: 0.75rem;
   width: 100%;
   min-height: 90px;
-  transition: all 0.3s ease;
+  transition: padding 0.2s ease;
 }
 
 .cardLayoutExpanded {
@@ -197,7 +196,6 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  min-height: auto;
 }
 
 /* Image Thumbnail */
@@ -211,7 +209,7 @@
   overflow: hidden;
   background: var(--bg-tertiary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .imageThumbnail:hover {
@@ -220,11 +218,12 @@
 
 .imageThumbnailExpanded {
   width: 100%;
-  height: auto;
   max-width: 600px;
+  height: auto;
   margin: 0;
   cursor: pointer;
   align-self: center;
+  flex-shrink: 1;
 }
 
 .thumbnailImage {
@@ -232,13 +231,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: all 0.3s ease;
 }
 
 .thumbnailImageExpanded {
   object-fit: contain;
   max-height: 500px;
   height: auto;
+  width: 100%;
 }
 
 .deletedOverlay {
