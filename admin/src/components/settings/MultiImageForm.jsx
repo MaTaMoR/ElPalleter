@@ -139,11 +139,22 @@ const MultiImageForm = ({
     const [movedImage] = updatedImages.splice(index, 1);
     updatedImages.splice(newIndex, 0, movedImage);
 
-    // Only update order, don't mark as edited (order changes are tracked separately)
-    const finalImages = updatedImages.map((img, idx) => ({
-      ...img,
-      order: idx
-    }));
+    // Mark as edited only the images that actually changed position
+    const finalImages = updatedImages.map((img, idx) => {
+      const newOrder = idx;
+      // Check if this image changed position
+      const originalImage = images.find(i => i.id === img.id);
+      const hasChangedPosition = originalImage && originalImage.order !== newOrder;
+
+      // Only mark as edited if it's not new and changed position
+      const shouldMarkEdited = hasChangedPosition && img._state !== 'new' && img._state !== 'deleted';
+
+      return {
+        ...img,
+        order: newOrder,
+        _state: shouldMarkEdited ? 'edited' : img._state
+      };
+    });
 
     setImages(finalImages);
     notifyChange(finalImages);
