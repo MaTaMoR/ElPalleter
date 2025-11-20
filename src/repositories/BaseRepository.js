@@ -169,6 +169,25 @@ export class BaseRepository {
     }
 
     /**
+     * Petición PATCH genérica
+     */
+    static async patch(endpoint, data, options = {}) {
+        const { headers = {}, ...fetchOptions } = options;
+
+        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+            method: 'PATCH',
+            headers: {
+                ...this.getBaseHeaders(),
+                ...headers
+            },
+            body: JSON.stringify(data),
+            ...fetchOptions
+        });
+
+        return this.handleResponse(response);
+    }
+
+    /**
      * Petición DELETE genérica
      */
     static async delete(endpoint, options = {}) {
