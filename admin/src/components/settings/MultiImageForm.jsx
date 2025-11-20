@@ -139,11 +139,10 @@ const MultiImageForm = ({
     const [movedImage] = updatedImages.splice(index, 1);
     updatedImages.splice(newIndex, 0, movedImage);
 
-    // Update order and mark as edited if not new
+    // Only update order, don't mark as edited (order changes are tracked separately)
     const finalImages = updatedImages.map((img, idx) => ({
       ...img,
-      order: idx,
-      _state: img._isNew ? 'new' : (img._state === 'deleted' ? 'deleted' : 'edited')
+      order: idx
     }));
 
     setImages(finalImages);
@@ -296,7 +295,7 @@ const MultiImageForm = ({
                         <div
                           key={image.id}
                           ref={(el) => { imageRefs.current[image.id] = el; }}
-                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isEdited ? styles.editedCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
+                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
                         >
                           <div className={styles.imageCardContent}>
                             {/* Image Preview (clickable) */}
@@ -319,20 +318,16 @@ const MultiImageForm = ({
                             {/* Image Controls */}
                             <div className={styles.imageControls}>
                               <div className={styles.imageInfo}>
-                                <span className={styles.imageName}>
-                                  {image.name}
-                                  {isNew && <span className={styles.badge}>Nueva</span>}
-                                  {isEdited && <span className={styles.badgeEdited}>Editada</span>}
-                                </span>
+                                {isNew && <span className={styles.badge}>Nueva</span>}
                               </div>
                               <div className={styles.imageActions}>
                                 {/* Move buttons */}
-                                <div className={styles.moveButtons}>
+                                <div className={styles.moveButtonsContainer}>
                                   <button
                                     type="button"
                                     onClick={() => handleMoveImage(image.id, 'up')}
                                     disabled={index === 0}
-                                    className={styles.moveButton}
+                                    className={`${styles.actionButton} ${styles.moveButton}`}
                                     title="Mover arriba"
                                   >
                                     <ChevronUp size={18} />
@@ -341,7 +336,7 @@ const MultiImageForm = ({
                                     type="button"
                                     onClick={() => handleMoveImage(image.id, 'down')}
                                     disabled={index === visibleImages.length - 1}
-                                    className={styles.moveButton}
+                                    className={`${styles.actionButton} ${styles.moveButton}`}
                                     title="Mover abajo"
                                   >
                                     <ChevronDown size={18} />
@@ -351,7 +346,7 @@ const MultiImageForm = ({
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteImage(image.id)}
-                                  className={styles.deleteButton}
+                                  className={`${styles.actionButton} ${styles.deleteButton}`}
                                   title="Eliminar"
                                 >
                                   <Trash2 size={18} />
@@ -382,13 +377,13 @@ const MultiImageForm = ({
                               </div>
                               <div className={styles.imageControls}>
                                 <div className={styles.imageInfo}>
-                                  <span className={styles.imageName}>{image.name}</span>
+                                  {/* Empty - no name shown */}
                                 </div>
                                 <div className={styles.imageActions}>
                                   <button
                                     type="button"
                                     onClick={() => handleUndoDelete(image.id)}
-                                    className={styles.undoButton}
+                                    className={`${styles.actionButton} ${styles.undoButton}`}
                                     title="Deshacer eliminación"
                                   >
                                     <Undo2 size={18} />
