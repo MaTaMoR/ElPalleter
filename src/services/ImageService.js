@@ -22,9 +22,9 @@ export class ImageService {
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} Imagen subida
      */
-    static async uploadImage(file, token) {
+    static async uploadImage(file) {
         try {
-            const uploadedImage = await ImageRepository.uploadImage(file, token);
+            const uploadedImage = await ImageRepository.uploadImage(file, AuthService.getToken());
             return uploadedImage;
         } catch (error) {
             console.error('ImageService: Error uploading image:', error);
@@ -83,9 +83,9 @@ export class ImageService {
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} Imagen actualizada
      */
-    static async updateImage(name, file, token) {
+    static async updateImage(name, file) {
         try {
-            const updatedImage = await ImageRepository.updateImage(name, file, token);
+            const updatedImage = await ImageRepository.updateImage(name, file, AuthService.getToken());
             return updatedImage;
         } catch (error) {
             console.error(`ImageService: Error updating image ${name}:`, error);
@@ -136,9 +136,9 @@ export class ImageService {
      * @param {string} token - Token de autenticación
      * @returns {Promise<void>}
      */
-    static async removeImageFromGallery(galleryName, imageId, token) {
+    static async removeImageFromGallery(galleryName, imageId) {
         try {
-            await GalleryRepository.removeImageFromGallery(galleryName, imageId, token);
+            await GalleryRepository.removeImageFromGallery(galleryName, imageId, AuthService.getToken());
         } catch (error) {
             console.error(`ImageService: Error removing image ${imageId} from gallery ${galleryName}:`, error);
             throw error;
@@ -153,9 +153,9 @@ export class ImageService {
      * @param {string} token - Token de autenticación
      * @returns {Promise<void>}
      */
-    static async updateImageOrder(galleryName, imageId, order, token) {
+    static async updateImageOrder(galleryName, imageId, order) {
         try {
-            await GalleryRepository.updateImageOrder(galleryName, imageId, order, token);
+            await GalleryRepository.updateImageOrder(galleryName, imageId, order, AuthService.getToken());
         } catch (error) {
             console.error(`ImageService: Error updating image ${imageId} order in gallery ${galleryName}:`, error);
             throw error;
