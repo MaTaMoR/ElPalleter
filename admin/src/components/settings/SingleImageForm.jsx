@@ -16,11 +16,28 @@ const SingleImageForm = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [maxUploadSize, setMaxUploadSize] = useState(null);
+  const [loadingSize, setLoadingSize] = useState(true);
 
   // Get the current image URL with cache-busting parameter
   const currentImageUrl = refreshKey
     ? `${ImageService.getImageURL(imageName)}?t=${refreshKey}`
     : ImageService.getImageURL(imageName);
+
+  // Load max upload size on mount
+  useEffect(() => {
+    const loadMaxSize = async () => {
+      try {
+        const sizeInfo = await ImageService.getMaxUploadSize();
+        setMaxUploadSize(sizeInfo);
+      } catch (error) {
+        console.error('Error loading max upload size:', error);
+      } finally {
+        setLoadingSize(false);
+      }
+    };
+    loadMaxSize();
+  }, []);
 
   // Clean up preview URL when component unmounts or file changes
   useEffect(() => {
@@ -123,7 +140,14 @@ const SingleImageForm = ({
         <div className={styles.cardHeader}>
           <div className={styles.cardHeaderLeft}>
             <ImageIcon size={20} className={styles.cardIcon} />
-            <h3 className={styles.cardTitle}>{title}</h3>
+            <div className={styles.titleSection}>
+              <h3 className={styles.cardTitle}>{title}</h3>
+              {!loadingSize && maxUploadSize && (
+                <span className={styles.sizeLimit}>
+                  Máx: {maxUploadSize.maxFileSize}
+                </span>
+              )}
+            </div>
           </div>
           <div className={styles.cardHeaderRight}>
             {/* Hidden file input */}
@@ -161,31 +185,34 @@ const SingleImageForm = ({
             </div>
           )}
 
-          {/* Current Image Preview */}
-          <div className={styles.currentImageSection}>
-            <label className={styles.sectionLabel}>Imagen actual:</label>
-            <div className={styles.imagePreview}>
-              <img
-                src={currentImageUrl}
-                alt={`${title} actual`}
-                className={styles.previewImage}
-              />
-            </div>
-          </div>
-
-          {/* New Image Preview */}
-          {previewUrl && (
-            <div className={styles.newImageSection}>
-              <label className={styles.sectionLabel}>Vista previa de la nueva imagen:</label>
+          {/* Images Container - side by side on desktop */}
+          <div className={styles.imagesContainer}>
+            {/* Current Image Preview */}
+            <div className={styles.imageColumn}>
+              <label className={styles.sectionLabel}>Imagen actual:</label>
               <div className={styles.imagePreview}>
                 <img
-                  src={previewUrl}
-                  alt="Vista previa"
+                  src={currentImageUrl}
+                  alt={`${title} actual`}
                   className={styles.previewImage}
                 />
               </div>
             </div>
-          )}
+
+            {/* New Image Preview */}
+            {previewUrl && (
+              <div className={styles.imageColumn}>
+                <label className={styles.sectionLabel}>Vista previa:</label>
+                <div className={styles.imagePreview}>
+                  <img
+                    src={previewUrl}
+                    alt="Vista previa"
+                    className={styles.previewImage}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

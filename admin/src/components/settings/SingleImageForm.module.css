@@ -48,11 +48,23 @@
   flex-shrink: 0;
 }
 
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .cardTitle {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+}
+
+.sizeLimit {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
 .cardContent {
@@ -91,6 +103,19 @@
   display: block;
   object-fit: contain;
   max-height: 400px;
+}
+
+/* Images Container - side by side layout */
+.imagesContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.imageColumn {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Permite que las columnas se encojan */
 }
 
 /* Current Image Section */
@@ -211,6 +236,12 @@
   .cardContent {
     padding: 1rem;
     gap: 1.25rem;
+  }
+
+  /* Single column layout on tablet */
+  .imagesContainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .imagePreview {
