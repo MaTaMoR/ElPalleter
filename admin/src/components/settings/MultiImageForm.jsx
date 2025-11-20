@@ -18,6 +18,7 @@ const MultiImageForm = ({
 }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedImageId, setExpandedImageId] = useState(null);
   const [maxUploadSize, setMaxUploadSize] = useState(null);
   const [loadingSize, setLoadingSize] = useState(true);
   const imageRefs = useRef({});
@@ -168,6 +169,10 @@ const MultiImageForm = ({
     notifyChange(updatedImages);
   };
 
+  const handleToggleExpand = (imageId) => {
+    setExpandedImageId(expandedImageId === imageId ? null : imageId);
+  };
+
   const getImageUrl = (image) => {
     if (image._previewUrl) {
       return image._previewUrl;
@@ -190,6 +195,7 @@ const MultiImageForm = ({
   // Reset when exiting edit mode
   useEffect(() => {
     if (!isEditing) {
+      setExpandedImageId(null);
       loadGalleryImages();
     }
   }, [isEditing]);
@@ -282,59 +288,105 @@ const MultiImageForm = ({
                   <div className={styles.imagesList}>
                     {visibleImages.map((image, index) => {
                       const isNew = image._state === 'new';
+                      const isExpanded = expandedImageId === image.id;
 
                       return (
                         <div
                           key={image.id}
                           ref={(el) => { imageRefs.current[image.id] = el; }}
-                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''}`}
+                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
                         >
-                          <div className={styles.cardLayout}>
+                          <div className={`${styles.cardLayout} ${isExpanded ? styles.cardLayoutExpanded : ''}`}>
                             {/* Image Thumbnail */}
-                            <div className={styles.imageThumbnail}>
+                            <div
+                              className={`${styles.imageThumbnail} ${isExpanded ? styles.imageThumbnailExpanded : ''}`}
+                              onClick={() => handleToggleExpand(image.id)}
+                            >
                               <img
                                 src={getImageUrl(image)}
                                 alt={`Imagen ${index + 1}`}
-                                className={styles.thumbnailImage}
+                                className={`${styles.thumbnailImage} ${isExpanded ? styles.thumbnailImageExpanded : ''}`}
                               />
                             </div>
 
-                            {/* Image Info */}
-                            <div className={styles.imageInfo}>
-                              {isNew && <span className={styles.badge}>Nueva</span>}
-                            </div>
+                            {/* Image Info and Actions Container */}
+                            {!isExpanded ? (
+                              <>
+                                {/* Image Info */}
+                                <div className={styles.imageInfo}>
+                                  {isNew && <span className={styles.badge}>Nueva</span>}
+                                </div>
 
-                            {/* Actions on the right */}
-                            <div className={styles.cardActions}>
-                              <div className={styles.moveButtonsContainer}>
-                                <button
-                                  type="button"
-                                  onClick={() => handleMoveImage(image.id, 'up')}
-                                  disabled={index === 0}
-                                  className={`${styles.actionButton} ${styles.moveButton}`}
-                                  title="Mover arriba"
-                                >
-                                  <ChevronUp size={18} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleMoveImage(image.id, 'down')}
-                                  disabled={index === visibleImages.length - 1}
-                                  className={`${styles.actionButton} ${styles.moveButton}`}
-                                  title="Mover abajo"
-                                >
-                                  <ChevronDown size={18} />
-                                </button>
+                                {/* Actions on the right */}
+                                <div className={styles.cardActions}>
+                                  <div className={styles.moveButtonsContainer}>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveImage(image.id, 'up')}
+                                      disabled={index === 0}
+                                      className={`${styles.actionButton} ${styles.moveButton}`}
+                                      title="Mover arriba"
+                                    >
+                                      <ChevronUp size={18} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveImage(image.id, 'down')}
+                                      disabled={index === visibleImages.length - 1}
+                                      className={`${styles.actionButton} ${styles.moveButton}`}
+                                      title="Mover abajo"
+                                    >
+                                      <ChevronDown size={18} />
+                                    </button>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteImage(image.id)}
+                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                    title="Eliminar"
+                                  >
+                                    <Trash2 size={18} />
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              /* When expanded, show actions below image */
+                              <div className={styles.expandedActions}>
+                                <div className={styles.imageInfo}>
+                                  {isNew && <span className={styles.badge}>Nueva</span>}
+                                </div>
+                                <div className={styles.cardActions}>
+                                  <div className={styles.moveButtonsContainer}>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveImage(image.id, 'up')}
+                                      disabled={index === 0}
+                                      className={`${styles.actionButton} ${styles.moveButton}`}
+                                      title="Mover arriba"
+                                    >
+                                      <ChevronUp size={18} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveImage(image.id, 'down')}
+                                      disabled={index === visibleImages.length - 1}
+                                      className={`${styles.actionButton} ${styles.moveButton}`}
+                                      title="Mover abajo"
+                                    >
+                                      <ChevronDown size={18} />
+                                    </button>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteImage(image.id)}
+                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                    title="Eliminar"
+                                  >
+                                    <Trash2 size={18} />
+                                  </button>
+                                </div>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteImage(image.id)}
-                                className={`${styles.actionButton} ${styles.deleteButton}`}
-                                title="Eliminar"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </div>
+                            )}
                           </div>
                         </div>
                       );
