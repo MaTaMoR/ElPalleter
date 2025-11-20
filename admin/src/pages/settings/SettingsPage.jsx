@@ -143,7 +143,7 @@ const SettingsContent = () => {
           // Update all changed images
           if (changedImages.length > 0) {
             const imagePromises = changedImages.map(imageName =>
-              ImageService.updateImage(imageName, modifiedImages[imageName], token)
+              ImageService.updateImage(imageName, modifiedImages[imageName])
             );
             updatePromises.push(...imagePromises);
           }
