@@ -29,6 +29,40 @@ export class GalleryRepository extends BaseRepository {
     }
 
     /**
+     * Añade una imagen a una galería
+     * POST /gallery/{galleryName}/image/{imageId}
+     * @param {string} galleryName - Nombre de la galería
+     * @param {number} imageId - ID de la imagen
+     * @param {number} order - Orden de la imagen en la galería
+     * @param {string} token - Token de autenticación
+     * @returns {Promise<void>}
+     */
+    static async addImageToGallery(galleryName, imageId, order, token) {
+        if (!galleryName) {
+            throw new Error('Gallery name is required');
+        }
+
+        if (!imageId) {
+            throw new Error('Image ID is required');
+        }
+
+        if (order === null || order === undefined) {
+            throw new Error('Order is required');
+        }
+
+        try {
+            await this.post(
+                `/gallery/${galleryName}/image/${imageId}`,
+                { order },
+                { headers: this.getAuthHeaders(token) }
+            );
+        } catch (error) {
+            console.error(`GalleryRepository: Error adding image ${imageId} to gallery ${galleryName}:`, error);
+            throw error;
+        }
+    }
+
+    /**
      * Elimina una imagen de una galería
      * DELETE /gallery/{galleryName}/image/{imageId}
      * @param {string} galleryName - Nombre de la galería

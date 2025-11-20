@@ -130,6 +130,22 @@ export class ImageService {
     }
 
     /**
+     * Añade una imagen a una galería
+     * @param {string} galleryName - Nombre de la galería
+     * @param {number} imageId - ID de la imagen
+     * @param {number} order - Orden de la imagen en la galería
+     * @returns {Promise<void>}
+     */
+    static async addImageToGallery(galleryName, imageId, order) {
+        try {
+            await GalleryRepository.addImageToGallery(galleryName, imageId, order, AuthService.getToken());
+        } catch (error) {
+            console.error(`ImageService: Error adding image ${imageId} to gallery ${galleryName}:`, error);
+            throw error;
+        }
+    }
+
+    /**
      * Elimina una imagen de una galería
      * @param {string} galleryName - Nombre de la galería
      * @param {number} imageId - ID de la imagen
