@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:astro\" \"npm run dev:admin\" \"npm run dev:webhook\"",
-    "dev:astro": "astro dev",
+    "dev:astro": "npm run download-images && astro dev",
     "dev:admin": "cd admin && npm run dev",
     "dev:webhook": "cd build-webhook && npm run dev",
     "download-images": "node scripts/download-images.js",
