@@ -138,19 +138,13 @@ const {
                             ))
                         }
                     </div>
-                    <div class="contact-info-section">
+                    <div class="contact-info-section social-section">
                         <h4>
                             <Text
                                 key="contact.sections.social"
                                 fallback="Síguenos"
                             />
                         </h4>
-                        <p>
-                            <Text
-                                key="contact.values.followUs"
-                                fallback="Mantente al día con nuestras novedades"
-                            />
-                        </p>
                         <div class="social-links">
                             {
                                 socials.map((social) => (
@@ -224,8 +218,7 @@ const {
         justify-content: center;
         align-items: center;
         background: var(--bg-overlay);
-        padding: calc(var(--padding-mobile) * 1.25)
-            calc(var(--padding-mobile) * 1.5);
+        padding: var(--padding-mobile);
         border-bottom: var(--border-1) solid var(--border-primary);
         transition:
             background-color var(--duration-300) var(--ease-out),
@@ -315,12 +308,13 @@ const {
     }
 
     .contact-content {
-        padding: calc(var(--padding-mobile) * 1.5);
+        padding: var(--padding-mobile);
     }
 
     .contact-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3,1fr);
+        grid-template-rows: auto auto;
         gap: calc(var(--gap-mobile) * 1.5);
     }
 
@@ -336,8 +330,8 @@ const {
 
     .contact-info-section h4 {
         color: var(--accent-primary);
-        font-size: var(--text-xl);
-        margin-bottom: calc(var(--gap-mobile) * 0.8);
+        font-size: var(--text-base);
+        margin-bottom: calc(var(--gap-mobile) * 0.75);
         border-bottom: var(--border-2) solid var(--accent-medium);
         padding-bottom: calc(var(--padding-mobile) * 0.3);
         display: flex;
@@ -350,8 +344,8 @@ const {
 
     .contact-info-section p {
         color: var(--text-secondary);
-        margin-bottom: calc(var(--gap-mobile) * 0.5);
-        font-size: var(--text-base);
+        margin-bottom: calc(var(--gap-mobile) * 0.4);
+        font-size: var(--text-sm);
         line-height: var(--leading-normal);
         transition: color var(--duration-300) var(--ease-out);
     }
@@ -427,15 +421,15 @@ const {
     .social-links a {
         background: var(--accent-light);
         color: var(--accent-primary);
-        width: var(--space-10);
-        height: var(--space-10);
+        width: var(--space-9);
+        height: var(--space-9);
         border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
         transition: var(--transition-base);
-        font-size: var(--text-lg);
+        font-size: var(--text-base);
         border: var(--border-1) solid var(--accent-medium);
     }
 
@@ -446,50 +440,7 @@ const {
         border-color: var(--accent-primary);
     }
 
-    @media (max-width: 767px) {
-        .contact-header {
-            margin-bottom: calc(var(--gap-mobile) * 2);
-        }
-
-        .contact-title {
-            font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
-            margin-bottom: calc(var(--gap-mobile) * 0.75);
-        }
-
-        .contact-subtitle {
-            font-size: var(--text-base);
-        }
-
-        .top-bar {
-            flex-direction: column;
-            gap: calc(var(--gap-mobile) * 1);
-            text-align: center;
-            padding: calc(var(--padding-mobile) * 1.25);
-        }
-
-        .contact-grid {
-            grid-template-columns: 1fr;
-            gap: calc(var(--gap-mobile) * 1.5);
-        }
-
-        .contact-content {
-            padding: var(--padding-mobile);
-        }
-
-        .contact-info-section {
-            padding: calc(var(--padding-mobile) * 1.25);
-        }
-
-        .contact-info-section h4 {
-            font-size: var(--text-lg);
-            margin-bottom: calc(var(--gap-mobile) * 1);
-        }
-
-        .schedule-ranges {
-            margin-left: calc(var(--padding-mobile) * 0.75);
-        }
-    }
-
+    /* Mobile */
     @media (max-width: 420px) {
         .contact-header {
             margin-bottom: calc(var(--gap-mobile) * 1.5);
@@ -502,11 +453,6 @@ const {
 
         .contact-subtitle {
             font-size: var(--text-sm);
-        }
-
-        .top-bar {
-            padding: calc(var(--padding-mobile) * 1);
-            gap: calc(var(--gap-mobile) * 0.75);
         }
 
         .contact-content {
@@ -537,77 +483,146 @@ const {
         }
     }
 
-    @media (min-width: 768px) {
+    @media (max-width: 767px) {
         .contact-header {
-            margin-bottom: calc(var(--gap-tablet) * 2);
+            margin-bottom: calc(var(--gap-mobile) * 2);
         }
 
         .contact-title {
-            font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
-            margin-bottom: var(--gap-tablet);
+            font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+            margin-bottom: calc(var(--gap-mobile) * 0.75);
         }
 
         .contact-subtitle {
-            font-size: var(--text-xl);
+            font-size: var(--text-base);
         }
 
-        .top-bar {
-            padding: calc(var(--padding-tablet) * 1)
-                calc(var(--padding-tablet) * 1.2);
-        }
-
-        .mini-brand {
-            gap: var(--gap-tablet);
+        .contact-grid {
+            grid-template-columns: 1fr;
+            gap: calc(var(--gap-mobile) * 1.5);
         }
 
         .contact-content {
             padding: var(--padding-mobile);
         }
 
-        .contact-grid {
-            gap: calc(var(--gap-tablet) * 1.5);
-        }
-
         .contact-info-section {
-            padding: calc(var(--padding-tablet) * 1.25);
+            padding: calc(var(--padding-mobile) * 1.25);
         }
 
         .contact-info-section h4 {
-            margin-bottom: calc(var(--gap-tablet) * 1.2);
-            padding-bottom: calc(var(--padding-tablet) * 0.5);
-            gap: calc(var(--gap-tablet) * 0.5);
-        }
-
-        .contact-info-section p {
-            margin-bottom: calc(var(--gap-tablet) * 0.67);
-        }
-
-        .social-links {
-            gap: var(--gap-tablet);
-            margin-top: var(--gap-tablet);
-        }
-
-        .schedule-group {
-            margin-bottom: calc(var(--gap-tablet) * 1);
+            font-size: var(--text-lg);
+            margin-bottom: calc(var(--gap-mobile) * 1);
         }
 
         .schedule-ranges {
-            margin-left: calc(var(--padding-tablet) * 1);
+            margin-left: calc(var(--padding-mobile) * 0.75);
         }
     }
 
-    @media (min-width: 1024px) {
+    /* Tablet */
+    @media (min-width: 768px) {
         .contact-header {
-            margin-bottom: calc(var(--gap-desktop) * 1.33);
+            margin-bottom: calc(var(--gap-tablet) * 1.5);
         }
 
         .contact-title {
             margin-bottom: var(--gap-desktop);
         }
 
-        .top-bar {
-            padding: calc(var(--padding-desktop) * 0.5)
-                calc(var(--padding-desktop) * 1);
+        .mini-brand {
+            gap: var(--gap-tablet);
+        }
+
+        .contact-content {
+            padding: var(--padding-tablet);
+        }
+
+        /* Grid de 3 columnas y 2 filas */
+        .contact-grid {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: calc(var(--gap-tablet) * 0.75);
+        }
+
+        /* Dirección - Columna 1, Fila 1 */
+        .contact-info-section:nth-child(1) {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        /* Contacto - Columna 2, Fila 1 */
+        .contact-info-section:nth-child(2) {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        /* Horarios - Columna 3, Filas 1-2 (ocupa 2 filas) */
+        .contact-info-section:nth-child(3) {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+        }
+
+        /* Síguenos - Columnas 1-2, Fila 2 - COMPACTO Y HORIZONTAL */
+        .contact-info-section:nth-child(4) {
+            grid-column: 1 / span 2;
+            grid-row: 2;
+            padding: calc(var(--padding-tablet) * 0.6) calc(var(--padding-tablet) * 0.75);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--gap-tablet) * 1.5);
+        }
+
+        .contact-info-section:nth-child(4) h4 {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .contact-info-section:nth-child(4) .social-links {
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+
+        .contact-info-section {
+            padding: var(--padding-tablet);
+        }
+
+        .contact-info-section h4 {
+            font-size: var(--text-base);
+            margin-bottom: calc(var(--gap-tablet) * 0.6);
+            padding-bottom: calc(var(--padding-tablet) * 0.3);
+            gap: calc(var(--gap-tablet) * 0.4);
+        }
+
+        .contact-info-section p {
+            margin-bottom: calc(var(--gap-tablet) * 0.3);
+            font-size: var(--text-sm);
+        }
+
+        .social-links {
+            gap: calc(var(--gap-tablet) * 0.6);
+            margin-top: calc(var(--gap-tablet) * 0.6);
+        }
+
+        .schedule-group {
+            margin-bottom: calc(var(--gap-tablet) * 0.5);
+        }
+
+        .schedule-ranges {
+            margin-left: calc(var(--padding-tablet) * 0.8);
+        }
+    }
+
+    /* Desktop - DISEÑO 3x2 PERSONALIZADO */
+    @media (min-width: 1024px) {
+        .contact-header {
+            margin-bottom: calc(var(--gap-desktop) * 1.5);
+        }
+
+        .contact-title {
+            margin-bottom: var(--gap-desktop);
         }
 
         .mini-brand {
@@ -615,44 +630,90 @@ const {
         }
 
         .contact-content {
-            padding: var(--padding-mobile);
+            padding: var(--padding-tablet);
         }
 
+        /* Grid de 3 columnas y 2 filas */
         .contact-grid {
-            gap: calc(var(--gap-desktop) * 1.25);
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: calc(var(--gap-desktop) * 0.75);
+        }
+
+        /* Dirección - Columna 1, Fila 1 */
+        .contact-info-section:nth-child(1) {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        /* Contacto - Columna 2, Fila 1 */
+        .contact-info-section:nth-child(2) {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        /* Horarios - Columna 3, Filas 1-2 (ocupa 2 filas) */
+        .contact-info-section:nth-child(3) {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+        }
+
+        /* Síguenos - Columnas 1-2, Fila 2 - COMPACTO Y HORIZONTAL */
+        .contact-info-section:nth-child(4) {
+            grid-column: 1 / span 2;
+            grid-row: 2;
+            padding: calc(var(--padding-desktop) * 0.6) calc(var(--padding-desktop) * 0.75);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--gap-desktop) * 1.5);
+        }
+
+        .contact-info-section:nth-child(4) h4 {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .contact-info-section:nth-child(4) .social-links {
+            margin-top: 0;
+            flex-shrink: 0;
         }
 
         .contact-info-section {
-            padding: calc(var(--padding-desktop) * 1);
+            padding: var(--padding-tablet);
         }
 
         .contact-info-section h4 {
-            margin-bottom: calc(var(--gap-desktop) * 0.8);
-            padding-bottom: calc(var(--padding-desktop) * 0.33);
-            gap: calc(var(--gap-desktop) * 0.5);
+            font-size: var(--text-base);
+            margin-bottom: calc(var(--gap-desktop) * 0.6);
+            padding-bottom: calc(var(--padding-desktop) * 0.3);
+            gap: calc(var(--gap-desktop) * 0.4);
         }
 
         .contact-info-section p {
-            margin-bottom: calc(var(--gap-desktop) * 0.5);
+            margin-bottom: calc(var(--gap-desktop) * 0.3);
+            font-size: var(--text-sm);
         }
 
         .social-links {
-            gap: var(--gap-desktop);
-            margin-top: calc(var(--gap-desktop) * 0.67);
+            gap: calc(var(--gap-desktop) * 0.6);
+            margin-top: calc(var(--gap-desktop) * 0.6);
         }
 
         .schedule-group {
-            margin-bottom: calc(var(--gap-desktop) * 0.8);
+            margin-bottom: calc(var(--gap-desktop) * 0.5);
         }
 
         .schedule-ranges {
-            margin-left: calc(var(--padding-desktop) * 1);
+            margin-left: calc(var(--padding-desktop) * 0.8);
         }
     }
 
+    /* Desktop Large */
     @media (min-width: 1400px) {
         .contact-header {
-            margin-bottom: var(--gap-desktop-lg);
+            margin-bottom: calc(var(--gap-desktop-lg) * 1.2);
         }
 
         .contact-title {
@@ -663,12 +724,24 @@ const {
             gap: var(--gap-desktop-lg);
         }
 
+        .contact-content {
+            padding: var(--padding-tablet);
+        }
+
         .contact-grid {
-            gap: var(--gap-desktop-lg);
+            gap: calc(var(--gap-desktop-lg) * 0.8);
+        }
+
+        .contact-info-section {
+            padding: var(--padding-tablet);
+        }
+
+        .contact-info-section:nth-child(4) {
+            padding: calc(var(--padding-desktop) * 0.7) calc(var(--padding-desktop) * 0.875);
         }
 
         .social-links {
-            gap: var(--gap-desktop-lg);
+            gap: calc(var(--gap-desktop-lg) * 0.6);
         }
     }
 
