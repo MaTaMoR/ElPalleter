@@ -3,7 +3,8 @@ export const prerender = true;
 
 import Text from '../i18n/Text.astro';
 import { I18nService } from '../../services/I18nService.js'
-import ContactService from '../../services/ContactService.js';
+import { ContactService } from '../../services/ContactService.js';
+import { ImageService } from '../../services/ImageService';
 
 // Obtener información de i18n
 const { locale } = I18nService.getI18nInfo(Astro);
@@ -155,7 +156,7 @@ const {
                                         title={social.handle}
                                         aria-label={social.platform}
                                     >
-                                        {social.icon}
+                                        <img class="media-icon" src={ImageService.getImageURL(social.icon.name)} alt="flag-svg" class="flag-svg" aria-hidden="true" />
                                     </a>
                                 ))
                             }
@@ -421,8 +422,8 @@ const {
     .social-links a {
         background: var(--accent-light);
         color: var(--accent-primary);
-        width: var(--space-9);
-        height: var(--space-9);
+        width: var(--space-8);
+        height: var(--space-8);
         border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
@@ -430,7 +431,6 @@ const {
         text-decoration: none;
         transition: var(--transition-base);
         font-size: var(--text-base);
-        border: var(--border-1) solid var(--accent-medium);
     }
 
     .social-links a:hover {
