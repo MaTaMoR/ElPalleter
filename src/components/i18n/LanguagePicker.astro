@@ -18,7 +18,9 @@ const {
 } = Astro.props;
 
 // Obtener datos de idiomas desde el sistema centralizado
-const languages = await I18nService.getLanguagePickerDataWithAstro(Astro);
+
+const languages = I18nService.getLanguagePickerDataWithAstro(Astro);
+console.log('TEST ' + languages);
 
 // Encontrar idioma actual y otros idiomas
 const currentLanguage = languages.find(lang => lang.isActive) || languages[0];

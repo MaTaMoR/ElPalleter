@@ -24,6 +24,8 @@ import Contact from './public/Contact.astro';
 import ScrollToTop from './public/ScrollToTop.astro';
 import Footer from './public/Footer.astro';
 
+await I18nService.init();
+
 const { locale: currentLocale } = I18nService.getI18nInfo(Astro);
 
 const seoData = I18nService.getSEOMetadata({

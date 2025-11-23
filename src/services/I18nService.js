@@ -65,9 +65,19 @@ export class I18nService {
    * Inicializa el servicio cargando idiomas y traducciones desde el backend
    */
   static async init() {
-    if (!state.loaded && !state.loading) {
-      await this.loadFromBackend();
+    // Si ya está cargado, retornar inmediatamente
+    if (state.loaded) {
+      return this;
     }
+    
+    // Si está cargando, esperar al promise existente
+    if (state.loading && state.loadPromise) {
+      await state.loadPromise;
+      return this;
+    }
+    
+    // Si no está cargado ni cargando, iniciar la carga
+    await this.loadFromBackend();
     return this;
   }
 
@@ -849,11 +859,6 @@ export class I18nService {
       console[level](`[${locale}] ${message}`);
     }
   }
-}
-
-// Auto-inicialización en servidor
-if (typeof window === 'undefined') {
-  await I18nService.init().catch(console.error);
 }
 
 // ===============================================
