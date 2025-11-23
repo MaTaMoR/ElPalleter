@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
   } : {
     drop: ['console', 'debugger'], // Eliminar console.log en producción
   },
-  base: '/admin',
+  base: '/admin/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
