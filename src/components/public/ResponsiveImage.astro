@@ -50,12 +50,17 @@ const imagePath = Object.keys(images).find(path => {
 const imageModule = imagePath ? images[imagePath] : null;
 const imageData = imageModule?.default;
 
+// Avisos en modo desarrollo
 if (import.meta.env.DEV) {
-    console.log(`ResponsiveImage [${imageId}]:`, {
-        found: !!imageData,
-        path: imagePath || 'NOT_FOUND',
-        availableImages: Object.keys(images).length
-    });
+    if (!imageData) {
+        console.warn(
+            `⚠️  ResponsiveImage [${imageId}]: Imagen NO encontrada en cache.\n` +
+            `   → Añádela a src/config/images.json y ejecuta: npm run download-images\n` +
+            `   → Imágenes disponibles: ${Object.keys(images).length}`
+        );
+    } else {
+        console.log(`✓ ResponsiveImage [${imageId}]: Cargada desde ${imagePath}`);
+    }
 }
 
 const icons = {
@@ -116,9 +121,15 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
                     )}
                 </p>
                 {import.meta.env.DEV && (
-                    <small class="fallback-debug">
-                        ID: {imageId}
-                    </small>
+                    <div class="fallback-dev-info">
+                        <small class="fallback-debug">
+                            ⚠️ Imagen: <strong>{imageId}</strong>
+                        </small>
+                        <small class="fallback-instructions">
+                            Añádela a <code>src/config/images.json</code><br/>
+                            Luego ejecuta: <code>npm run download-images</code>
+                        </small>
+                    </div>
                 )}
             </div>
         </div>
@@ -183,16 +194,47 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         font-weight: 500;
     }
 
+    .fallback-dev-info {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
     .fallback-debug {
-        font-size: 0.8rem;
-        opacity: 0.6;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        color: #ff9800;
+        display: block;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 152, 0, 0.1);
+        border-radius: 6px;
+        border-left: 3px solid #ff9800;
+    }
+
+    .fallback-debug strong {
+        color: #f57c00;
+        font-weight: 600;
+    }
+
+    .fallback-instructions {
+        font-size: 0.75rem;
         font-family: 'Courier New', monospace;
         color: #666;
         display: block;
-        margin-top: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+        line-height: 1.6;
+    }
+
+    .fallback-instructions code {
+        background: rgba(244, 162, 97, 0.2);
+        padding: 0.125rem 0.375rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        color: rgba(244, 162, 97, 1);
+        font-weight: 600;
     }
 
     .responsive-image-fallback.small {
