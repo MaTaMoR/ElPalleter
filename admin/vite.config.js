@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
     include: ['react', 'react-dom'],
   },
   server: {
-    host: '192.168.1.14',
+    host: '0.0.0.0',
     port: 3001,
     sourcemapIgnoreList: () => true, // Ignorar warnings de source maps en desarrollo
   },
