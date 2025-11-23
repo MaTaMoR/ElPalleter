@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { ImageService } from '../../services/ImageService.js';
+import { Image } from 'astro:assets';
 import Text from '../i18n/Text.astro';
 
 interface Props {
@@ -16,8 +16,8 @@ interface Props {
     showFallback?: boolean;
     fallbackText?: string;
     fallbackIcon?: 'image' | 'gallery' | 'photo' | 'picture';
-    width?: string | number;
-    height?: string | number;
+    width?: number;
+    height?: number;
     priority?: boolean;
 }
 
@@ -38,12 +38,23 @@ const {
     priority = false
 } = Astro.props;
 
-const imageURL = ImageService.getImageURL(imageId);
+// Importar todas las imágenes descargadas usando glob
+const images = import.meta.glob('/src/assets/downloaded-images/*.*', { eager: true });
+
+// Buscar la imagen por nombre (sin extensión)
+const imagePath = Object.keys(images).find(path => {
+    const filename = path.split('/').pop()?.split('.')[0];
+    return filename === imageId;
+});
+
+const imageModule = imagePath ? images[imagePath] : null;
+const imageData = imageModule?.default;
 
 if (import.meta.env.DEV) {
     console.log(`ResponsiveImage [${imageId}]:`, {
-        found: !!imageURL,
-        imageData: imageURL ? 'OK' : 'NOT_FOUND'
+        found: !!imageData,
+        path: imagePath || 'NOT_FOUND',
+        availableImages: Object.keys(images).length
     });
 }
 
@@ -80,15 +91,19 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
                             objectPosition === 'right' ? 'object-right' : 'object-center';
 ---
 
-{imageURL ? (
-    <img
+{imageData ? (
+    <Image
         class={`responsive-image ${objectFitClass} ${objectPositionClass} ${className}`}
-        src={imageURL}
-        sizes={sizes}
+        src={imageData}
         alt={altText}
         loading={finalLoading}
         decoding={decoding}
+        widths={[400, 800, 1200, 1600, 2000]}
+        sizes={sizes}
+        format="webp"
         data-image-id={imageId}
+        width={width}
+        height={height}
     />
 ) : showFallback ? (
     <div class={`responsive-image-fallback ${className}`} data-image-id={imageId}>
@@ -221,13 +236,13 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         color: rgba(255, 255, 255, 0.7);
     }
 
-    .responsive-image.loading {
-        opacity: 0.7;
+    /* Shimmer effect mientras se carga */
+    .responsive-image {
         background: linear-gradient(
             90deg,
-            rgba(244, 162, 97, 0.1) 0%,
-            rgba(244, 162, 97, 0.2) 50%,
-            rgba(244, 162, 97, 0.1) 100%
+            rgba(244, 162, 97, 0.05) 0%,
+            rgba(244, 162, 97, 0.1) 50%,
+            rgba(244, 162, 97, 0.05) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite;
@@ -240,6 +255,12 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         100% {
             background-position: 200% 0;
         }
+    }
+
+    /* Una vez cargada, quitar el shimmer */
+    .responsive-image.loaded {
+        animation: none;
+        background: none;
     }
 
     @media (max-width: 768px) {
@@ -261,21 +282,16 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const images = document.querySelectorAll('.responsive-image');
-        
+
         images.forEach(img => {
             if (img.complete && img.naturalHeight !== 0) {
                 img.classList.add('loaded');
             } else {
-                img.classList.add('loading');
-                
                 img.addEventListener('load', () => {
-                    img.classList.remove('loading');
                     img.classList.add('loaded');
                 });
-                
+
                 img.addEventListener('error', () => {
-                    img.classList.remove('loading');
-                
                     if (img.dataset.imageId) {
                         console.warn(`Error cargando imagen: ${img.dataset.imageId}`);
                     }
