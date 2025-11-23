@@ -13,6 +13,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +23,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsOpen(false);
+        setIsFocused(false);
       }
     };
 
@@ -102,8 +104,9 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     });
 
     setResults(foundResults);
-    setIsOpen(foundResults.length > 0);
-  }, [searchTerm, categoriesMap, subcategoriesMap, itemsMap, childrenMap]);
+    // Solo abrir el dropdown si el input está enfocado y hay resultados
+    setIsOpen(isFocused && foundResults.length > 0);
+  }, [searchTerm, categoriesMap, subcategoriesMap, itemsMap, childrenMap, isFocused]);
 
   // Highlight matching text
   const highlightText = (text, highlight) => {
@@ -143,6 +146,7 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
     setSearchTerm('');
     setResults([]);
     setIsOpen(false);
+    setIsFocused(false);
   };
 
   return (
@@ -156,10 +160,14 @@ const GlobalSearch = ({ categoriesMap, subcategoriesMap, itemsMap, childrenMap }
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => {
+            setIsFocused(true);
             // Si hay un término de búsqueda y hay resultados, abrir el dropdown
             if (searchTerm && searchTerm.trim().length > 0 && results.length > 0) {
               setIsOpen(true);
             }
+          }}
+          onBlur={() => {
+            setIsFocused(false);
           }}
         />
         {searchTerm && (
