@@ -8,6 +8,7 @@ import ToastContainer from '../../components/common/ToastContainer';
 import SavingOverlay from '../../components/common/SavingOverlay';
 import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
+import MultiImageForm from '../../components/settings/MultiImageForm';
 import { I18nService } from '@services/I18nService';
 import { ImageService } from '@services/ImageService';
 import styles from './SettingsPage.module.css';
@@ -30,6 +31,9 @@ const SettingsContent = () => {
 
   // Images state - stores File objects for modified images
   const [modifiedImages, setModifiedImages] = useState({});
+
+  // Gallery state - stores gallery changes (new, deleted, reordered images)
+  const [galleryChanges, setGalleryChanges] = useState({});
 
   // Image refresh key - updates when images are saved to force reload
   const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
@@ -89,7 +93,8 @@ const SettingsContent = () => {
   const hasChanges = () => {
     const hasTranslationChanges = JSON.stringify(translations) !== JSON.stringify(originalTranslations);
     const hasImageChanges = Object.keys(modifiedImages).length > 0;
-    return hasTranslationChanges || hasImageChanges;
+    const hasGalleryChanges = Object.keys(galleryChanges).length > 0;
+    return hasTranslationChanges || hasImageChanges || hasGalleryChanges;
   };
 
   const getChangedTranslations = () => {
@@ -107,8 +112,9 @@ const SettingsContent = () => {
   const handleSave = () => {
     const changedTranslations = getChangedTranslations();
     const changedImages = Object.keys(modifiedImages);
+    const changedGalleries = Object.keys(galleryChanges);
 
-    if (changedTranslations.length === 0 && changedImages.length === 0) {
+    if (changedTranslations.length === 0 && changedImages.length === 0 && changedGalleries.length === 0) {
       showToast('No hay cambios para guardar', 'info');
       return;
     }
@@ -120,6 +126,18 @@ const SettingsContent = () => {
     }
     if (changedImages.length > 0) {
       messageParts.push(`${changedImages.length} imagen(es)`);
+    }
+    if (changedGalleries.length > 0) {
+      // Count total gallery image changes
+      let totalGalleryChanges = 0;
+      changedGalleries.forEach(galleryName => {
+        const changes = galleryChanges[galleryName];
+        totalGalleryChanges += (changes.newImages?.length || 0);
+        totalGalleryChanges += (changes.deletedImages?.length || 0);
+      });
+      if (totalGalleryChanges > 0) {
+        messageParts.push(`${totalGalleryChanges} cambio(s) en galerías`);
+      }
     }
     const message = `¿Estás seguro de que quieres guardar los cambios en ${messageParts.join(' y ')}?`;
 
@@ -154,12 +172,60 @@ const SettingsContent = () => {
 
           await Promise.all(updatePromises);
 
+          // Process gallery changes sequentially (one by one)
+          if (changedGalleries.length > 0) {
+            for (const galleryName of changedGalleries) {
+              const changes = galleryChanges[galleryName];
+
+              // 1. Upload new images one by one and add to gallery
+              if (changes.newImages && changes.newImages.length > 0) {
+                for (let i = 0; i < changes.newImages.length; i++) {
+                  const newImage = changes.newImages[i];
+                  try {
+                    // Upload the image first
+                    const uploadedImage = await ImageService.uploadImage(newImage._file);
+                    // Then add it to the gallery with the correct order
+                    await ImageService.addImageToGallery(galleryName, uploadedImage.name, newImage.order);
+                  } catch (error) {
+                    console.error(`Error uploading image ${newImage.name}:`, error);
+                    throw new Error(`Error al subir la imagen ${newImage.name}: ${error.message}`);
+                  }
+                }
+              }
+
+              // 2. Remove deleted images from gallery
+              if (changes.deletedImages && changes.deletedImages.length > 0) {
+                for (const deletedImage of changes.deletedImages) {
+                  try {
+                    await ImageService.removeImageFromGallery(galleryName, deletedImage.name);
+                  } catch (error) {
+                    console.error(`Error removing image ${deletedImage.name}:`, error);
+                    throw new Error(`Error al eliminar la imagen ${deletedImage.name}: ${error.message}`);
+                  }
+                }
+              }
+
+              // 3. Update order of reordered images
+              if (changes.reorderedImages && changes.reorderedImages.length > 0) {
+                for (const reorderedImage of changes.reorderedImages) {
+                  try {
+                    await ImageService.updateImageOrder(galleryName, reorderedImage.name, reorderedImage.order);
+                  } catch (error) {
+                    console.error(`Error updating order for image ${reorderedImage.name}:`, error);
+                    // Continue with other images even if one fails
+                  }
+                }
+              }
+            }
+          }
+
           // Reload data from backend
           await loadTranslations();
           setModifiedImages({});
+          setGalleryChanges({});
 
           // Update image refresh key to force image reload if images were changed
-          if (changedImages.length > 0) {
+          if (changedImages.length > 0 || changedGalleries.length > 0) {
             setImageRefreshKey(Date.now());
           }
 
@@ -173,6 +239,9 @@ const SettingsContent = () => {
           }
           if (changedImages.length > 0) {
             successParts.push(`${changedImages.length} imagen(es)`);
+          }
+          if (changedGalleries.length > 0) {
+            successParts.push('cambios en galerías');
           }
           showToast(
             `${successParts.join(' y ')} actualizada(s) correctamente`,
@@ -203,6 +272,7 @@ const SettingsContent = () => {
     if (!hasChanges()) {
       setIsEditing(false);
       setModifiedImages({});
+      setGalleryChanges({});
       return;
     }
 
@@ -218,6 +288,7 @@ const SettingsContent = () => {
         // Reset to original data
         setTranslations(JSON.parse(JSON.stringify(originalTranslations)));
         setModifiedImages({});
+        setGalleryChanges({});
       }
     });
   };
@@ -238,6 +309,26 @@ const SettingsContent = () => {
       return {
         ...prev,
         [imageName]: file
+      };
+    });
+  };
+
+  const handleGalleryChange = (galleryName, changes) => {
+    setGalleryChanges(prev => {
+      if (!changes || (
+        (!changes.newImages || changes.newImages.length === 0) &&
+        (!changes.deletedImages || changes.deletedImages.length === 0) &&
+        (!changes.reorderedImages || changes.reorderedImages.length === 0)
+      )) {
+        // Remove the gallery from changes if no changes
+        const newChanges = { ...prev };
+        delete newChanges[galleryName];
+        return newChanges;
+      }
+      // Add or update the gallery changes
+      return {
+        ...prev,
+        [galleryName]: changes
       };
     });
   };
@@ -343,11 +434,19 @@ const SettingsContent = () => {
             {/* Content area */}
             {translations && (
               <div className={styles.formsContainer}>
-                {/* Images Section */}
+                {/* Single Images Section */}
                 <SingleImageForm
                   imageName="hero-main"
                   title="Fondo de inicio"
                   onChange={(file) => handleImageChange('hero-main', file)}
+                  isEditing={isEditing}
+                  refreshKey={imageRefreshKey}
+                />
+                {/* Gallery Section */}
+                <MultiImageForm
+                  galleryName="historia"
+                  title="Galería de Historia"
+                  onChange={(changes) => handleGalleryChange('historia', changes)}
                   isEditing={isEditing}
                   refreshKey={imageRefreshKey}
                 />

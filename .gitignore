@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# downloaded images (generated during build)
+src/assets/downloaded-images/

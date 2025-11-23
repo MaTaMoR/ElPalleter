@@ -40,7 +40,6 @@ import HeroBackground from './HeroBackground.astro';
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding-top: calc(var(--padding-mobile) * 5);
         padding-left: var(--padding-mobile);
         padding-right: var(--padding-mobile);
     }
@@ -168,7 +167,6 @@ import HeroBackground from './HeroBackground.astro';
 
     @media (min-width: 1400px) {
         .hero-header {
-            padding-top: calc(var(--padding-desktop) * 2.33);
             padding-left: var(--padding-desktop);
             padding-right: var(--padding-desktop);
         }
@@ -198,7 +196,6 @@ import HeroBackground from './HeroBackground.astro';
 
     @media (min-width: 1024px) and (max-width: 1399px) {
         .hero-header {
-            padding-top: calc(var(--padding-desktop) * 3.5);
             padding-left: var(--padding-desktop);
             padding-right: var(--padding-desktop);
         }
@@ -228,7 +225,6 @@ import HeroBackground from './HeroBackground.astro';
 
     @media (min-width: 768px) and (max-width: 1023px) {
         .hero-header {
-            padding-top: calc(var(--padding-tablet) * 4);
             padding-left: var(--padding-tablet);
             padding-right: var(--padding-tablet);
         }
@@ -256,10 +252,6 @@ import HeroBackground from './HeroBackground.astro';
     }
 
     @media (min-width: 420px) and (max-width: 767px) {
-        .hero-header {
-            padding-top: calc(var(--padding-mobile) * 3);
-        }
-
         .hero-logo-container {
             max-width: 420px;
             margin-bottom: var(--space-6);
@@ -278,7 +270,6 @@ import HeroBackground from './HeroBackground.astro';
 
     @media (max-width: 419px) {
         .hero-header {
-            padding-top: calc(var(--padding-mobile) * 2.5);
             padding-left: calc(var(--padding-mobile) * 0.75);
             padding-right: calc(var(--padding-mobile) * 0.75);
         }
