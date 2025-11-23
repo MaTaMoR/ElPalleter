@@ -1,12 +1,8 @@
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
-  output: 'hybrid', 
-  adapter: node({
-    mode: 'standalone'
-  }),
+  output: 'static',
   vite: {
     resolve: {
       alias: {
