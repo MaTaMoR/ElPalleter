@@ -149,8 +149,8 @@ async function main() {
           return orderA - orderB;
         });
 
-        for (const image of sortedImages) {
-          const imageName = image.name || image.imageName;
+        for (const galleryImage of sortedImages) {
+          const imageName = galleryImage.image.name;
           const result = await downloadImage(imageName);
           galleryResults.push(result);
           if (result.success) results.totalDownloaded++;

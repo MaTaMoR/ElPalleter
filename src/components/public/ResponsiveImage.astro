@@ -54,7 +54,7 @@ const imageData = imageModule?.default;
 if (import.meta.env.DEV) {
     if (!imageData) {
         console.warn(
-            `⚠️  ResponsiveImage [${imageId}]: Imagen NO encontrada en cache.\n` +
+            `  ResponsiveImage [${imageId}]: Imagen NO encontrada en cache.\n` +
             `   → Añádela a src/config/images.json y ejecuta: npm run download-images\n` +
             `   → Imágenes disponibles: ${Object.keys(images).length}`
         );
@@ -123,7 +123,7 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
                 {import.meta.env.DEV && (
                     <div class="fallback-dev-info">
                         <small class="fallback-debug">
-                            ⚠️ Imagen: <strong>{imageId}</strong>
+                            Imagen: <strong>{imageId}</strong>
                         </small>
                         <small class="fallback-instructions">
                             Añádela a <code>src/config/images.json</code><br/>
