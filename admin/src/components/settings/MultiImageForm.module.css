@@ -1,0 +1,475 @@
+/* MultiImageForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* Image Card - similar to SingleImageForm */
+.imageCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeaderReadOnly {
+  justify-content: flex-start;
+}
+
+.cardHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sizeLimit {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.cardContent {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: var(--bg-primary);
+}
+
+/* File Input */
+.fileInput {
+  display: none;
+}
+
+/* Upload button in header */
+.uploadButtonHeader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.uploadButtonHeader:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.uploadButtonHeader:active {
+  transform: translateY(1px);
+}
+
+.uploadButtonText {
+  display: inline;
+}
+
+/* Loading and Empty States */
+.loadingState,
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Read-only Grid View */
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.gridImageCard {
+  aspect-ratio: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.gridImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Edit Mode - Images List */
+.imagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Individual Image Card in Edit Mode */
+.imageCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 90px;
+}
+
+.imageCard:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.expandedCard {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
+  background-color: var(--bg-tertiary);
+}
+
+/* State indicators */
+.newCard {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.deletedCard {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  opacity: 0.6;
+}
+
+/* Card Layout - horizontal like MenuCard */
+.cardLayout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 90px;
+  transition: padding 0.2s ease;
+}
+
+.cardLayoutExpanded {
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Image Thumbnail */
+.imageThumbnail {
+  position: relative;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  margin: 0.625rem 0 0.625rem 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.imageThumbnail:hover {
+  opacity: 0.8;
+}
+
+.imageThumbnailExpanded {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  margin: 0;
+  cursor: pointer;
+  align-self: center;
+  flex-shrink: 1;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnailImageExpanded {
+  object-fit: contain;
+  max-height: 500px;
+  height: auto;
+  width: 100%;
+}
+
+.deletedOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(220, 38, 38, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Image Info */
+.imageInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+/* Card Actions - on the right */
+.cardActions {
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+  gap: 0;
+}
+
+/* Expanded Actions - when image is expanded */
+.expandedActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.expandedActions .imageInfo {
+  flex: 0;
+}
+
+.expandedActions .cardActions {
+  padding-right: 0;
+}
+
+.moveButtonsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.moveButtonsContainer .moveButton {
+  padding: 0.375rem;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.actionButton:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.moveButton:hover:not(:disabled) {
+  color: var(--primary);
+  background-color: rgba(217, 119, 6, 0.1);
+}
+
+.moveButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.deleteButton:hover {
+  color: var(--error);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.undoButton {
+  color: var(--error);
+}
+
+.undoButton:hover {
+  color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Deleted Section */
+.deletedSection {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.deletedTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.deletedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cardHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .cardContent {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+
+  .imageGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  /* Show only icon on tablet */
+  .uploadButtonText {
+    display: none;
+  }
+
+  .uploadButtonHeader {
+    padding: 0.5rem;
+  }
+
+  .actionButton {
+    padding: 0.5rem;
+  }
+
+  .imageThumbnail:not(.imageThumbnailExpanded) {
+    width: 60px;
+    height: 60px;
+    margin: 0.5rem 0 0.5rem 0.75rem;
+  }
+
+  .imageThumbnailExpanded {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+
+  .expandedActions {
+    max-width: 100%;
+  }
+
+  .cardLayoutExpanded {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardContent {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .imageGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .actionButton {
+    padding: 0.4rem;
+  }
+
+  .moveButtonsContainer .moveButton {
+    padding: 0.25rem;
+  }
+
+  .cardActions {
+    padding-right: 0.5rem;
+  }
+
+  .imageThumbnail:not(.imageThumbnailExpanded) {
+    width: 50px;
+    height: 50px;
+    margin: 0.5rem 0 0.5rem 0.5rem;
+  }
+
+  .imageThumbnailExpanded {
+    max-width: 100%;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .expandedActions {
+    max-width: 100%;
+  }
+
+  .cardLayoutExpanded {
+    padding: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+}
