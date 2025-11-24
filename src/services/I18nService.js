@@ -107,12 +107,12 @@ export class I18nService {
    */
   static async _performLoad() {
     try {
-      console.log('[I18nService] Starting load from backend...');
+      console.debug('[I18nService] Starting load from backend...');
       
       // 1. Cargar configuración de idiomas desde backend
       const languageConfig = await I18nRepository.getLanguagesConfig();
       
-      console.log('[I18nService] Raw language config from backend:', languageConfig);
+      console.debug('[I18nService] Raw language config from backend:', languageConfig);
       
       if (Object.keys(languageConfig).length === 0) {
         console.warn('[I18nService] No languages received from backend, using fallback');
@@ -126,27 +126,27 @@ export class I18nService {
         .filter(lang => lang.enabled !== false)
         .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
       
-      console.log('[I18nService] Processed languages:', state.languages);
+      console.debug('[I18nService] Processed languages:', state.languages);
       
       state.languageCodes = state.languages.map(lang => lang.code);
       
-      console.log('[I18nService] Language codes:', state.languageCodes);
+      console.debug('[I18nService] Language codes:', state.languageCodes);
       
       state.defaultLanguage = state.languages.find(lang => lang.isDefault) || state.languages[0];
 
-      console.log('[I18nService] Default language:', state.defaultLanguage);
+      console.debug('[I18nService] Default language:', state.defaultLanguage);
 
       if (import.meta.env.DEV) {
-        console.log(`[I18nService] Loaded ${state.languages.length} languages from backend:`,
+        console.debug(`[I18nService] Loaded ${state.languages.length} languages from backend:`,
           state.languageCodes.join(', '));
       }
 
       // 3. Cargar traducciones para todos los idiomas
-      console.log('[I18nService] Loading translations for:', state.languageCodes);
+      console.debug('[I18nService] Loading translations for:', state.languageCodes);
       
       const flatTranslations = await I18nRepository.getAllFlatTranslations(state.languageCodes);
 
-      console.log('[I18nService] Flat translations received:', Object.keys(flatTranslations));
+      console.debug('[I18nService] Flat translations received:', Object.keys(flatTranslations));
 
       Object.entries(flatTranslations).forEach(([locale, translations]) => {
         if (!translations || typeof translations !== 'object') {
@@ -157,10 +157,10 @@ export class I18nService {
 
         state.translations.set(locale, translations);
 
-        console.log(`[I18nService] Loaded ${Object.keys(translations).length} translations for ${locale}`);
+        console.debug(`[I18nService] Loaded ${Object.keys(translations).length} translations for ${locale}`);
       });
 
-      console.log('[I18nService] Final translations map keys:', Array.from(state.translations.keys()));
+      console.debug('[I18nService] Final translations map keys:', Array.from(state.translations.keys()));
 
       state.loaded = true;
 
@@ -198,7 +198,7 @@ export class I18nService {
     await this.init();
     
     if (import.meta.env.DEV) {
-      console.log('[I18nService] Reloaded from backend');
+      console.debug('[I18nService] Reloaded from backend');
     }
   }
 

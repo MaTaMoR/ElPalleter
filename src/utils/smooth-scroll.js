@@ -14,11 +14,11 @@ export function initSmoothScroll() {
 
     // Función principal de smooth scroll CON offset del header
     const smoothScrollTo = (targetId) => {
-        console.log(`Smooth scroll to: #${targetId}`); // Debug log
+        console.debug(`Smooth scroll to: #${targetId}`); // Debug log
         
         const target = document.querySelector(`#${targetId}`);
         if (target) {
-            console.log(`Target encontrado:`, target); // Debug log
+            console.debug(`Target encontrado:`, target); // Debug log
             
             // Obtener la altura actual del header
             const headerHeight = getHeaderHeight();
@@ -42,7 +42,7 @@ export function initSmoothScroll() {
             
             // Listar todas las secciones disponibles para debug
             const allSections = document.querySelectorAll('section[id]');
-            console.log('Secciones disponibles:', 
+            console.debug('Secciones disponibles:', 
                 Array.from(allSections).map(s => `#${s.id}`)
             );
         }
@@ -51,12 +51,12 @@ export function initSmoothScroll() {
     // Función para manejar todos los elementos con data-scroll-to
     const handleScrollElements = () => {
         const scrollElements = document.querySelectorAll('[data-scroll-to]');
-        console.log(`Elementos con data-scroll-to encontrados: ${scrollElements.length}`); // Debug log
+        console.debug(`Elementos con data-scroll-to encontrados: ${scrollElements.length}`); // Debug log
         
         scrollElements.forEach((element, index) => {
             const target = element.getAttribute('data-scroll-to');
             const exists = document.querySelector(`#${target}`) ? 'Exists' : 'Doesnt exist';
-            console.log(`${index + 1}. ${exists} data-scroll-to="${target}"`); // Debug log
+            console.debug(`${index + 1}. ${exists} data-scroll-to="${target}"`); // Debug log
             
             // Remover listeners existentes para evitar duplicados
             element.removeEventListener('click', handleScrollClick);
@@ -66,7 +66,7 @@ export function initSmoothScroll() {
 
     // Handler para clicks de scroll
     const handleScrollClick = (e) => {
-        console.log('🖱️ Click en elemento data-scroll-to detectado'); // Debug log
+        console.debug('🖱️ Click en elemento data-scroll-to detectado'); // Debug log
         e.preventDefault();
         const targetId = e.currentTarget.getAttribute('data-scroll-to');
         if (targetId) {
@@ -86,7 +86,7 @@ export function initSmoothScroll() {
 
     // Handler para clicks de navegación
     const handleNavClick = (e) => {
-        console.log('Click en enlace href="#" detectado'); // Debug log
+        console.debug('Click en enlace href="#" detectado'); // Debug log
         e.preventDefault();
         const href = e.currentTarget.getAttribute('href');
         const targetId = href.substring(1); // Quitar el #
@@ -100,7 +100,7 @@ export function initSmoothScroll() {
         const hash = window.location.hash;
         if (hash) {
             const targetId = hash.substring(1);
-            console.log(`🔗 Hash inicial detectado: ${hash}`); // Debug log
+            console.debug(`🔗 Hash inicial detectado: ${hash}`); // Debug log
             // Pequeño delay para asegurar que la página esté completamente cargada
             setTimeout(() => smoothScrollTo(targetId), 100);
         }
@@ -111,7 +111,7 @@ export function initSmoothScroll() {
         const hash = window.location.hash;
         if (hash) {
             const targetId = hash.substring(1);
-            console.log(`Hash cambió: ${hash}`); // Debug log
+            console.debug(`Hash cambió: ${hash}`); // Debug log
             smoothScrollTo(targetId);
         }
     };

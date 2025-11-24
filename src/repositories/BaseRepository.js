@@ -82,7 +82,11 @@ export class BaseRepository {
     static async get(endpoint, options = {}) {
         const { headers = {}, params = {}, ...fetchOptions } = options;
         
-        const url = `${this.getBaseUrl()}${endpoint}`;
+        const baseUrl = this.getBaseUrl();
+        const url = baseUrl.startsWith('http') 
+            ? new URL(`${baseUrl}${endpoint}`)
+            : new URL(`${baseUrl}${endpoint}`, window.location.origin);
+            
         Object.entries(params).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
                 url.searchParams.append(key, value);

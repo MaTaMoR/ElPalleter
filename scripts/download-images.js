@@ -21,7 +21,7 @@ const colors = {
 };
 
 function log(message, color = 'reset') {
-  console.log(`${colors[color]}${message}${colors.reset}`);
+  console.debug(`${colors[color]}${message}${colors.reset}`);
 }
 
 // Configuración de la API

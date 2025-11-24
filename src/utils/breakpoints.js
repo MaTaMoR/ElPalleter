@@ -53,7 +53,7 @@ class BreakpointManager {
         this.setupResizeListener();
         this.isInitialized = true;
 
-        console.log('BreakpointManager initialized:', this.currentBreakpoint);
+        console.debug('BreakpointManager initialized:', this.currentBreakpoint);
     }
 
     /**
@@ -110,7 +110,7 @@ class BreakpointManager {
             element: callbacks.element || null
         });
 
-        console.log(`Component ${componentId} subscribed to BreakpointManager`);
+        console.debug(`Component ${componentId} subscribed to BreakpointManager`);
     }
 
     /**
@@ -119,7 +119,7 @@ class BreakpointManager {
     unsubscribe(componentId) {
         if (this.subscribers.has(componentId)) {
             this.subscribers.delete(componentId);
-            console.log(`Component ${componentId} unsubscribed from BreakpointManager`);
+            console.debug(`Component ${componentId} unsubscribed from BreakpointManager`);
         }
     }
 
@@ -127,7 +127,7 @@ class BreakpointManager {
      * Notifica a todos los suscriptores sobre cambio de breakpoint
      */
     notifyBreakpointChange(oldBreakpoint, newBreakpoint) {
-        console.log(`Breakpoint changed: ${oldBreakpoint} -> ${newBreakpoint}`);
+        console.debug(`Breakpoint changed: ${oldBreakpoint} -> ${newBreakpoint}`);
 
         this.subscribers.forEach((subscriber, componentId) => {
             if (subscriber.onBreakpointChange) {
@@ -225,7 +225,7 @@ class BreakpointManager {
         if (this.resizeTimer) {
             clearTimeout(this.resizeTimer);
         }
-        console.log('BreakpointManager cleaned up');
+        console.debug('BreakpointManager cleaned up');
     }
 }
 

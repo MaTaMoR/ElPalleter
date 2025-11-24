@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
   esbuild: mode === 'development' ? {
     sourcemap: 'inline', // Source maps inline en desarrollo para evitar archivos .map rotos
   } : {
-    drop: ['console', 'debugger'], // Eliminar console.log en producción
+    drop: ['console', 'debugger'], // Eliminar console.debug en producción
   },
   base: '/admin/',
   resolve: {
