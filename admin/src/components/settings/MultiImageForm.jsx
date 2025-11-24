@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
+import useImageUploadSettings from '@hooks/useImageUploadSettings';
 import styles from './MultiImageForm.module.css';
 
 /**
@@ -19,9 +20,10 @@ const MultiImageForm = ({
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImageId, setExpandedImageId] = useState(null);
-  const [maxUploadSize, setMaxUploadSize] = useState(null);
-  const [loadingSize, setLoadingSize] = useState(true);
   const imageRefs = useRef({});
+
+  // Load upload settings using custom hook
+  const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
 
   // Load images from gallery
   useEffect(() => {
@@ -29,21 +31,6 @@ const MultiImageForm = ({
       loadGalleryImages();
     }
   }, [galleryName, refreshKey, isEditing]);
-
-  // Load max upload size on mount
-  useEffect(() => {
-    const loadMaxSize = async () => {
-      try {
-        const sizeInfo = await ImageService.getMaxUploadSize();
-        setMaxUploadSize(sizeInfo);
-      } catch (error) {
-        console.error('Error loading max upload size:', error);
-      } finally {
-        setLoadingSize(false);
-      }
-    };
-    loadMaxSize();
-  }, []);
 
   const loadGalleryImages = async () => {
     setLoading(true);
@@ -256,9 +243,9 @@ const MultiImageForm = ({
             <ImageIcon size={20} className={styles.cardIcon} />
             <div className={styles.titleSection}>
               <h3 className={styles.cardTitle}>{title}</h3>
-              {!loadingSize && maxUploadSize && (
+              {!loadingSettings && uploadSettings && (
                 <span className={styles.sizeLimit}>
-                  Máx: {maxUploadSize.maxFileSize}
+                  Máx: {uploadSettings.maxFileSize}
                 </span>
               )}
             </div>
