@@ -21,8 +21,10 @@ export default defineConfig(({ mode }) => ({
     // Optimización de chunks simplificada
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': [/node_modules/],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
       }
     },
