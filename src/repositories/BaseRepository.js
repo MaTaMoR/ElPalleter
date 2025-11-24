@@ -21,6 +21,8 @@ export class BaseRepository {
         const baseUrl = this.getBaseUrl();
         const builtUrl = `${baseUrl}${endpoint}`;
 
+        console.debug('BUILT_URL: ' + builtUrl);
+
         let url;
         if (baseUrl.startsWith('http')) {
             url = new URL(builtUrl);

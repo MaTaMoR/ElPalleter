@@ -74,11 +74,6 @@ export class I18nRepository extends BaseRepository {
         }
 
         languagesFromBackend.forEach(lang => {
-            // Usar ImageService para construir URL de la bandera
-            const flagImageUrl = lang.flagImagePath 
-                ? ImageService.getImageURL(lang.flagImagePath)
-                : null;
-
             languageConfig[lang.code] = {
                 code: lang.code,
                 name: lang.name,
@@ -86,7 +81,7 @@ export class I18nRepository extends BaseRepository {
                 shortName: lang.shortName,
                 isDefault: lang.isDefault,
                 flag: {
-                    value: flagImageUrl // URL construida por ImageService
+                    value: lang.flagImagePath
                 },
                 direction: lang.direction,
                 enabled: lang.enabled,

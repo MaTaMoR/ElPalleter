@@ -56,7 +56,10 @@ async function downloadImage(imageName) {
 
     // Obtener el tipo de contenido para determinar la extensión
     const contentType = response.headers.get('content-type') || 'image/jpeg';
-    const extension = contentType.split('/')[1] || 'jpg';
+    let extension = contentType.split('/')[1] || 'jpg';
+    if (extension === 'svg+xml') {
+      extension = 'svg';
+    }
 
     // Obtener el buffer de la imagen
     const arrayBuffer = await response.arrayBuffer();
