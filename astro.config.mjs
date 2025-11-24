@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   output: 'static',
   
   // Configuración de build para producción
@@ -61,4 +61,4 @@ export default defineConfig({
   
   // Compresión de assets
   compressHTML: true,
-});
+}));
