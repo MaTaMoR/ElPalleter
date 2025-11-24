@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { X, AlertTriangle } from 'lucide-react';
 import styles from './ConfirmDialog.module.css';
@@ -21,7 +22,7 @@ const ConfirmDialog = ({
     }
   };
 
-  return (
+  const dialogContent = (
     <div className={styles.backdrop} onClick={handleBackdropClick}>
       <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
         <button
@@ -60,6 +61,9 @@ const ConfirmDialog = ({
       </div>
     </div>
   );
+
+  // Render the dialog in a portal attached to document.body
+  return ReactDOM.createPortal(dialogContent, document.body);
 };
 
 ConfirmDialog.propTypes = {
