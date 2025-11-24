@@ -59,7 +59,9 @@ export class AnalyticsService {
         this.hasStartedVisit = false;
         this.deviceType = typeof window !== 'undefined' ? detectDeviceType() : 'UNKNOWN';
         
-        // Solo configurar listeners si estamos en el browser
+        this.MIN_SESSION_DURATION = 5000; // 5 segundos mínimo
+        this.visibilityTimeout = null;
+        
         if (typeof window !== 'undefined') {
             this.setupEventListeners();
         }
@@ -70,13 +72,27 @@ export class AnalyticsService {
     }
 
     setupEventListeners() {
+        // ← MODIFICAR: Agregar delay antes de reportar fin
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
-                this.endVisitTracking();
+                // Esperar 3 segundos antes de considerar que se fue
+                this.visibilityTimeout = setTimeout(() => {
+                    this.endVisitTracking();
+                }, 3000);
+            } else {
+                // Si vuelve, cancelar el timeout
+                if (this.visibilityTimeout) {
+                    clearTimeout(this.visibilityTimeout);
+                    this.visibilityTimeout = null;
+                }
             }
         });
 
         window.addEventListener('beforeunload', () => {
+            // Cancelar timeout si existe
+            if (this.visibilityTimeout) {
+                clearTimeout(this.visibilityTimeout);
+            }
             this.endVisitTracking();
         });
 
@@ -89,7 +105,6 @@ export class AnalyticsService {
             this.isOnline = false;
         });
 
-        // Auto-start tracking
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 this.startVisitTracking();
@@ -206,12 +221,16 @@ export class AnalyticsService {
 
         const duration = Math.floor((Date.now() - this.visitStartTime) / 1000);
         
+        if (duration * 1000 < this.MIN_SESSION_DURATION) {
+            console.debug('Session too short, not tracking end', { duration });
+            return;
+        }
+        
         const endData = {
             sessionId: this.sessionId,
             durationSeconds: duration
         };
 
-        // Use sendBeacon for reliable sending on page unload
         if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             try {
                 const blob = new Blob([JSON.stringify(endData)], { type: 'application/json' });
@@ -313,14 +332,21 @@ export class AnalyticsService {
     setupSectionTracking(sectionIds = []) {
         if (typeof window === 'undefined' || !window.IntersectionObserver) return;
 
+        // Set para trackear secciones ya vistas
+        const viewedSections = new Set();
+
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
                         const sectionName = entry.target.id || 
                                            entry.target.getAttribute('data-section');
-                        if (sectionName) {
+                        
+                        // Solo trackear si NO fue vista antes
+                        if (sectionName && !viewedSections.has(sectionName)) {
+                            viewedSections.add(sectionName);
                             this.trackSectionView(sectionName);
+                            console.debug('Section viewed (first time):', sectionName);
                         }
                     }
                 });

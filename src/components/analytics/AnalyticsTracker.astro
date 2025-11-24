@@ -5,8 +5,8 @@
 ---
 
 <script>
-  import analyticsService from '../../services/AnalyticsService.js';
-  import { breakpointManager } from '../../utils/breakpoints.js';
+  import analyticsService from "../../services/AnalyticsService.js";
+  import { breakpointManager } from "../../utils/breakpoints.js";
 
   /**
    * Detecta el tipo de DISPOSITIVO REAL (hardware) independiente del tamaño de ventana
@@ -15,13 +15,13 @@
    */
   function detectActualDevice() {
     const ua = navigator.userAgent.toLowerCase();
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;
     const maxScreenDimension = Math.max(screenWidth, screenHeight);
     const minScreenDimension = Math.min(screenWidth, screenHeight);
-    
+
     // Patrones específicos de móviles
     const mobilePatterns = [
       /android.*mobile/i,
@@ -31,9 +31,9 @@
       /windows phone/i,
       /opera mini/i,
       /iemobile/i,
-      /mobile safari/i
+      /mobile safari/i,
     ];
-    
+
     // Patrones específicos de tablets
     const tabletPatterns = [
       /ipad/i,
@@ -41,37 +41,37 @@
       /tablet/i,
       /kindle/i,
       /silk/i,
-      /playbook/i
+      /playbook/i,
     ];
-    
-    const isMobileUA = mobilePatterns.some(pattern => pattern.test(ua));
-    const isTabletUA = tabletPatterns.some(pattern => pattern.test(ua));
-    
+
+    const isMobileUA = mobilePatterns.some((pattern) => pattern.test(ua));
+    const isTabletUA = tabletPatterns.some((pattern) => pattern.test(ua));
+
     if (isMobileUA) {
-      return 'MOBILE';
+      return "MOBILE";
     }
-    
+
     if (isTabletUA) {
-      return 'TABLET';
+      return "TABLET";
     }
-    
+
     if (hasTouch) {
       if (maxScreenDimension <= 768 || minScreenDimension <= 480) {
-        return 'MOBILE';
+        return "MOBILE";
       }
-      
+
       if (maxScreenDimension <= 1366 && minScreenDimension >= 600) {
-        return 'TABLET';
+        return "TABLET";
       }
-      
-      return 'DESKTOP';
+
+      return "DESKTOP";
     }
-    
+
     if (maxScreenDimension >= 1024) {
-      return 'DESKTOP';
+      return "DESKTOP";
     }
-    
-    return 'DESKTOP';
+
+    return "DESKTOP";
   }
 
   /**
@@ -90,7 +90,7 @@
   function getDeviceInfo() {
     const actualDevice = detectActualDevice();
     const currentViewport = getCurrentViewport();
-    
+
     return {
       deviceType: actualDevice,
       viewport: currentViewport,
@@ -98,15 +98,16 @@
       screenHeight: window.screen.height,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
-      hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+      hasTouch: "ontouchstart" in window || navigator.maxTouchPoints > 0,
       touchPoints: navigator.maxTouchPoints || 0,
       pixelRatio: window.devicePixelRatio || 1,
-      orientation: window.screen.orientation?.type || 
-                   (window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'),
+      orientation:
+        window.screen.orientation?.type ||
+        (window.innerWidth > window.innerHeight ? "landscape" : "portrait"),
       platform: navigator.platform,
       vendor: navigator.vendor,
       userAgent: navigator.userAgent,
-      isWindowResized: window.innerWidth < window.screen.width * 0.9
+      isWindowResized: window.innerWidth < window.screen.width * 0.9,
     };
   }
 
@@ -114,43 +115,39 @@
    * Configura el tracking automático de secciones visibles
    */
   function setupSectionTracking() {
-    // Buscar todas las secciones principales con ID
-    const mainSections = [
-      'hero',
-      'historia', 
-      'carta',
-      'contacto'
-    ];
-    
+    const mainSections = ["hero", "historia", "carta", "contacto"];
+
     const sections = mainSections
-      .map(id => document.getElementById(id))
+      .map((id) => document.getElementById(id))
       .filter(Boolean);
-    
+
     if (sections.length === 0) return;
 
-    // Usar IntersectionObserver para detectar visibilidad
+    // ← AGREGAR: Set para trackear secciones ya vistas
+    const viewedSections = new Set();
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
             const sectionId = entry.target.id;
-            
-            // Track la visualización de la sección
-            analyticsService.trackSectionView(sectionId);
-            
-            console.debug('Section viewed:', sectionId);
+
+            // ← SOLO trackear si NO fue vista antes
+            if (!viewedSections.has(sectionId)) {
+              viewedSections.add(sectionId);
+              analyticsService.trackSectionView(sectionId);
+              console.debug("Section viewed (first time):", sectionId);
+            }
           }
         });
       },
       {
-        threshold: [0.3, 0.5, 0.7], // Diferentes niveles de visibilidad
-        rootMargin: '-10% 0px -10% 0px' // Margin para activar antes/después
-      }
+        threshold: [0.3], // ← Simplifica a un solo threshold
+        rootMargin: "-10% 0px -10% 0px",
+      },
     );
 
-    // Observar cada sección
-    sections.forEach(section => observer.observe(section));
-    
+    sections.forEach((section) => observer.observe(section));
     return observer;
   }
 
@@ -160,19 +157,20 @@
   function setupNavigationTracking() {
     // Trackear clicks en navegación
     const navLinks = document.querySelectorAll('[data-scroll-to], [href^="#"]');
-    
-    navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const target = link.getAttribute('data-scroll-to') || 
-                      link.getAttribute('href')?.replace('#', '');
-        
+
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const target =
+          link.getAttribute("data-scroll-to") ||
+          link.getAttribute("href")?.replace("#", "");
+
         if (target) {
-          analyticsService.trackEvent('NAVIGATION_CLICK', target, {
+          analyticsService.trackEvent("NAVIGATION_CLICK", target, {
             linkText: link.textContent?.trim(),
-            fromSection: getCurrentSection()
+            fromSection: getCurrentSection(),
           });
-          
-          console.debug('Navigation click:', target);
+
+          console.debug("Navigation click:", target);
         }
       });
     });
@@ -182,30 +180,30 @@
    * Obtiene la sección actual visible
    */
   function getCurrentSection() {
-    const sections = ['hero', 'historia', 'carta', 'contacto'];
-    
+    const sections = ["hero", "historia", "carta", "contacto"];
+
     for (const sectionId of sections) {
       const section = document.getElementById(sectionId);
       if (!section) continue;
-      
+
       const rect = section.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      
+
       // Si la sección está en el centro del viewport
       if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
         return sectionId;
       }
     }
-    
-    return 'unknown';
+
+    return "unknown";
   }
 
   /**
    * Inicializa el tracking cuando el DOM esté listo
    */
   function initAnalytics() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startTracking);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", startTracking);
     } else {
       startTracking();
     }
@@ -217,14 +215,14 @@
   function startTracking() {
     try {
       const deviceInfo = getDeviceInfo();
-      
+
       // Inicializar el breakpoint manager
       if (!breakpointManager.isInitialized) {
         breakpointManager.init();
       }
-      
+
       // Track device detection
-      analyticsService.trackEvent('DEVICE_DETECTED', null, {
+      analyticsService.trackEvent("DEVICE_DETECTED", null, {
         deviceType: deviceInfo.deviceType,
         viewport: deviceInfo.viewport,
         screenWidth: deviceInfo.screenWidth,
@@ -236,28 +234,27 @@
         pixelRatio: deviceInfo.pixelRatio,
         orientation: deviceInfo.orientation,
         isWindowResized: deviceInfo.isWindowResized,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
-      console.debug('Analytics initialized', {
+      console.debug("Analytics initialized", {
         device: deviceInfo.deviceType,
         viewport: deviceInfo.viewport,
-        resized: deviceInfo.isWindowResized
+        resized: deviceInfo.isWindowResized,
       });
-      
+
       // Configurar tracking de secciones y navegación
       // Esperar un poco para que todo el DOM esté listo
       setTimeout(() => {
         setupSectionTracking();
         setupNavigationTracking();
-        console.debug('Section and navigation tracking configured');
+        console.debug("Section and navigation tracking configured");
       }, 500);
-      
+
       // Track cambios de orientación
       trackOrientationChanges(deviceInfo.deviceType);
-      
     } catch (error) {
-      console.error('Error initializing analytics:', error);
+      console.error("Error initializing analytics:", error);
     }
   }
 
@@ -266,13 +263,13 @@
    */
   function trackOrientationChanges(deviceType) {
     if (!window.screen.orientation) return;
-    
-    window.screen.orientation.addEventListener('change', () => {
-      analyticsService.trackEvent('ORIENTATION_CHANGE', null, {
+
+    window.screen.orientation.addEventListener("change", () => {
+      analyticsService.trackEvent("ORIENTATION_CHANGE", null, {
         deviceType: deviceType,
         orientation: window.screen.orientation.type,
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       });
     });
   }
