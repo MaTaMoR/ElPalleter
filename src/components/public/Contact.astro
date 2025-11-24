@@ -4,7 +4,7 @@ export const prerender = true;
 import Text from '../i18n/Text.astro';
 import { I18nService } from '../../services/I18nService.js'
 import { ContactService } from '../../services/ContactService.js';
-import LocalImage from './LocalImage.astro';
+import Icon from './Icon.astro';
 
 // Obtener información de i18n
 const { locale } = I18nService.getI18nInfo(Astro);
@@ -156,7 +156,7 @@ const {
                                         title={social.handle}
                                         aria-label={social.platform}
                                     >
-                                        <LocalImage imageId={social.icon.name}/>
+                                        <Icon imageId={social.icon.name}/>
                                     </a>
                                 ))
                             }

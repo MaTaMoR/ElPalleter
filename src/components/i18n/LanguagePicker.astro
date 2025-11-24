@@ -4,7 +4,7 @@ export const prerender = true;
 import { I18nService } from '../../services/I18nService.js';
 import ThemeToggle from '../theme/ThemeToggle.astro';
 import Text from '../i18n/Text.astro'; // Importar el componente Text
-import LocalImage from '../public/LocalImage.astro';
+import Icon from '../public/Icon.astro';
 
 export interface Props {
   variant?: 'desktop' | 'mobile';
@@ -34,7 +34,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
       {currentLanguage.flag.isEmoji ? (
         <span class="flag-emoji" aria-hidden="true">{currentLanguage.flag.value}</span>
       ) : (
-        <LocalImage imageId={currentLanguage.flag.value}/>
+        <Icon imageId={currentLanguage.flag.value}/>
       )}
     </span>
     <span class="lang-arrow" aria-hidden="true">▼</span>
@@ -55,7 +55,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
           {lang.flag.isEmoji ? (
             <span class="flag-emoji" aria-hidden="true">{lang.flag.value}</span>
           ) : (
-            <LocalImage imageId={lang.flag.value}/>
+            <Icon imageId={lang.flag.value}/>
           )}
         </span>
         <span class="lang-full-name">{lang.nativeName}</span>

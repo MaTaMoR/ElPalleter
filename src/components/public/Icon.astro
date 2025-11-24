@@ -1,0 +1,18 @@
+---
+const {
+    imageId,
+    className = '',
+    width,
+    height
+} = Astro.props;
+
+const path = `/src/assets/downloaded-images/${imageId}.svg`;
+---
+
+<img
+    class={`${className}`}
+    src={path}
+    data-image-id={imageId}
+    width={width}
+    height={height}
+/>
