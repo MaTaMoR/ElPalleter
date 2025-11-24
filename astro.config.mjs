@@ -3,53 +3,50 @@ import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => ({
   output: 'static',
-  
-  // Configuración de build para producción
+
+  // Esta es la única config build que debe ir en Astro
   build: {
-    inlineStylesheets: 'auto', // Inline CSS pequeños
+    inlineStylesheets: 'auto',
   },
-  
+
   vite: {
-    ...(mode === 'production' && {
-      esbuild: {
-        drop: ['console', 'debugger'],
-      }
-    }),
     resolve: {
       alias: {
         '@shared': fileURLToPath(new URL('./src/shared', import.meta.url)),
       }
     },
-    
-    // Optimización para producción
+
     build: {
-      // Minificación
+      // Usa esbuild como minificador (correcto)
       minify: 'esbuild',
       cssMinify: true,
-      
-      // Rollup optimizations
+
+      // IMPORTANTÍSIMO: aquí sí va esbuild.drop
+      esbuild: {
+        ...(mode === 'production' && {
+          drop: ['console', 'debugger'],
+        })
+      },
+
       rollupOptions: {
         output: {
-          // Mejores nombres para chunks
           manualChunks: {
             'analytics': ['./src/shared/services/AnalyticsService.js'],
             'i18n': ['./src/shared/services/I18nService.js'],
           }
         }
       },
-      
-      // Chunk size warning
+
       chunkSizeWarningLimit: 500,
     },
-    
-    // Compresión
+
     server: {
       hmr: {
         overlay: true
       }
     }
   },
-  
+
   i18n: {
     defaultLocale: 'es',
     locales: ['es', 'en', 'val'],
@@ -58,7 +55,6 @@ export default defineConfig(({ mode }) => ({
       fallbackType: 'rewrite'
     }
   },
-  
-  // Compresión de assets
+
   compressHTML: true,
 }));
