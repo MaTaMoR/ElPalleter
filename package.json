@@ -15,9 +15,9 @@
     "install:all": "npm install && cd admin && npm install && cd build-webhook && npm install"
   },
   "dependencies": {
-    "@astrojs/node": "^8.3.3",
+    "@astrojs/node": "^9.5.1",
     "@astrojs/react": "^3.6.2",
-    "astro": "^4.15.9",
+    "astro": "^5.16.0",
     "cookie": "^1.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
