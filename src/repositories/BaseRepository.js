@@ -1,14 +1,42 @@
-// src/repositories/BaseRepository.js
-
 /**
  * Configuración base para todas las peticiones a la API
  */
 export class BaseRepository {
     
     static getBaseUrl() {
-        return import.meta.env.VITE_API_URL || 
-            import.meta.env.PUBLIC_API_URL || 
-            'http://localhost:8080';
+        let baseUrl;
+
+        if (typeof window !== 'undefined') {
+            // run time (browser)
+            baseUrl = import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_API_URL;
+        } else {
+            // build time
+            baseUrl = import.meta.env.VITE_BUILD_URL || import.meta.env.PUBLIC_BUILD_URL;
+        }
+
+        return baseUrl;
+    }
+
+    static getBuiltUrl(endpoint = '', params = {}) {
+        const baseUrl = this.getBaseUrl();
+        const builtUrl = `${baseUrl}${endpoint}`;
+
+        let url;
+        if (baseUrl.startsWith('http')) {
+            url = new URL(builtUrl);
+        } else if (typeof window !== 'undefined') {
+            url = new URL(builtUrl, window.location.origin);
+        } else {
+            url = new URL(builtUrl, 'http://localhost:8080');
+        }
+
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                url.searchParams.append(key, value);
+            }
+        });
+
+        return url;
     }
 
     /**
@@ -82,26 +110,7 @@ export class BaseRepository {
     static async get(endpoint, options = {}) {
         const { headers = {}, params = {}, ...fetchOptions } = options;
         
-        const baseUrl = this.getBaseUrl();
-
-        let url;
-        if (baseUrl.startsWith('http')) {
-            url = new URL(`${baseUrl}${endpoint}`);
-        } else {
-            if (typeof window !== 'undefined') {
-                url = new URL(`${baseUrl}${endpoint}`, window.location.origin);
-            } else {
-                url = `${baseUrl}${endpoint}`;
-            }
-        }
-
-        Object.entries(params).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) {
-                url.searchParams.append(key, value);
-            }
-        });
-
-        const response = await fetch(url.toString(), {
+        const response = await fetch(this.getBuiltUrl(endpoint, params), {
             method: 'GET',
             headers: {
                 ...this.getBaseHeaders(),
@@ -137,7 +146,7 @@ export class BaseRepository {
             }
         }
 
-        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, requestOptions);
+        const response = await fetch(this.getBuiltUrl(endpoint), requestOptions);
         return this.handleResponse(response);
     }
 
@@ -147,7 +156,7 @@ export class BaseRepository {
     static async put(endpoint, data, options = {}) {
         const { headers = {}, ...fetchOptions } = options;
 
-        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+        const response = await fetch(this.getBuiltUrl(endpoint), {
             method: 'PUT',
             headers: {
                 ...this.getBaseHeaders(),
@@ -170,7 +179,7 @@ export class BaseRepository {
         const customHeaders = { ...headers };
         delete customHeaders['Content-Type'];
 
-        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+        const response = await fetch(this.getBuiltUrl(endpoint), {
             method: 'PUT',
             headers: customHeaders,
             body: formData,
@@ -186,7 +195,7 @@ export class BaseRepository {
     static async patch(endpoint, data, options = {}) {
         const { headers = {}, ...fetchOptions } = options;
 
-        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+        const response = await fetch(this.getBuiltUrl(endpoint), {
             method: 'PATCH',
             headers: {
                 ...this.getBaseHeaders(),
@@ -205,7 +214,7 @@ export class BaseRepository {
     static async delete(endpoint, options = {}) {
         const { headers = {}, ...fetchOptions } = options;
 
-        const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+        const response = await fetch(this.getBuiltUrl(endpoint), {
             method: 'DELETE',
             headers: {
                 ...this.getBaseHeaders(),
