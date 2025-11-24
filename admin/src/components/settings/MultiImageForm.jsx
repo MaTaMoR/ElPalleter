@@ -4,6 +4,7 @@ import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } fro
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '@hooks/useImageUploadSettings';
 import { validateImageFiles } from '@utils/imageValidationUtils';
+import ConfirmDialog from '../common/ConfirmDialog';
 import styles from './MultiImageForm.module.css';
 
 /**
@@ -21,6 +22,7 @@ const MultiImageForm = ({
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImageId, setExpandedImageId] = useState(null);
+  const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
   const imageRefs = useRef({});
 
   // Load upload settings using custom hook
@@ -90,7 +92,10 @@ const MultiImageForm = ({
     const validation = validateImageFiles(files, uploadSettings);
 
     if (!validation.isValid) {
-      alert(validation.errorMessage);
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
       // Reset file input
       e.target.value = '';
       return;
@@ -122,7 +127,10 @@ const MultiImageForm = ({
 
     // Show warning if some files were filtered out
     if (validation.errorMessage) {
-      alert(validation.errorMessage);
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
     }
   };
 
@@ -443,6 +451,17 @@ const MultiImageForm = ({
           )}
         </div>
       </div>
+
+      {/* Error Dialog */}
+      <ConfirmDialog
+        isOpen={errorDialog.isOpen}
+        title="Error de validación"
+        message={errorDialog.message}
+        type="danger"
+        confirmText="Aceptar"
+        onConfirm={() => setErrorDialog({ isOpen: false, message: '' })}
+        onCancel={() => setErrorDialog({ isOpen: false, message: '' })}
+      />
     </div>
   );
 };

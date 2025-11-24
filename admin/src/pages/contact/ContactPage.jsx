@@ -3,7 +3,7 @@ import { Edit3, Save, X } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
-import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import ToastContainer from '../../components/common/ToastContainer';
 import SavingOverlay from '../../components/common/SavingOverlay';
 import ContactInfoForm from '../../components/contact/ContactInfoForm';
