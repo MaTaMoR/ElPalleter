@@ -83,10 +83,18 @@ export class BaseRepository {
         const { headers = {}, params = {}, ...fetchOptions } = options;
         
         const baseUrl = this.getBaseUrl();
-        const url = baseUrl.startsWith('http') 
-            ? new URL(`${baseUrl}${endpoint}`)
-            : new URL(`${baseUrl}${endpoint}`, window.location.origin);
-            
+
+        let url;
+        if (baseUrl.startsWith('http')) {
+            url = new URL(`${baseUrl}${endpoint}`);
+        } else {
+            if (typeof window !== 'undefined') {
+                url = new URL(`${baseUrl}${endpoint}`, window.location.origin);
+            } else {
+                url = `${baseUrl}${endpoint}`;
+            }
+        }
+
         Object.entries(params).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
                 url.searchParams.append(key, value);
