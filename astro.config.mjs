@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
+import strip from '@rollup/plugin-strip';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => ({
   output: 'static',
 
-  // Esta es la única config build que debe ir en Astro
   build: {
     inlineStylesheets: 'auto',
   },
@@ -17,18 +17,18 @@ export default defineConfig(({ mode }) => ({
     },
 
     build: {
-      // Usa esbuild como minificador (correcto)
       minify: 'esbuild',
       cssMinify: true,
 
-      // IMPORTANTÍSIMO: aquí sí va esbuild.drop
-      esbuild: {
-        ...(mode === 'production' && {
-          drop: ['console', 'debugger'],
-        })
-      },
-
       rollupOptions: {
+        plugins: [
+          mode === 'production' &&
+            strip({
+              include: ['**/*.js', '**/*.ts', '**/*.astro'],
+              functions: ['console.*'], // Borra TODOS los console.*
+              debugger: true,            // Borra todos los debugger
+            }),
+        ],
         output: {
           manualChunks: {
             'analytics': ['./src/shared/services/AnalyticsService.js'],
@@ -41,19 +41,14 @@ export default defineConfig(({ mode }) => ({
     },
 
     server: {
-      hmr: {
-        overlay: true
-      }
+      hmr: { overlay: true }
     }
   },
 
   i18n: {
     defaultLocale: 'es',
     locales: ['es', 'en', 'val'],
-    routing: {
-      prefixDefaultLocale: false,
-      fallbackType: 'rewrite'
-    }
+    routing: { prefixDefaultLocale: false, fallbackType: 'rewrite' }
   },
 
   compressHTML: true,

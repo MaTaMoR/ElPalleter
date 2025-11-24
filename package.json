@@ -24,6 +24,7 @@
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
+    "@rollup/plugin-strip": "^3.0.4",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "concurrently": "^8.2.2"
