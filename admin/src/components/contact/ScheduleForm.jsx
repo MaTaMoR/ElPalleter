@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Plus, Trash2, Clock } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import Button from '../common/Button';
-import ConfirmDialog from '../menu/utils/ConfirmDialog';
+import ConfirmDialog from '../common/ConfirmDialog';
 import BadgeToggle from '../common/BadgeToggle';
 import styles from './ScheduleForm.module.css';
 

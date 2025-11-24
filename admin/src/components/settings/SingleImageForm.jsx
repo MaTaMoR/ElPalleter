@@ -4,6 +4,7 @@ import { Image as ImageIcon, Upload } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '../../hooks/useImageUploadSettings';
 import { validateImageFile } from '../../utils/imageValidationUtils';
+import ConfirmDialog from '../common/ConfirmDialog';
 import styles from './SingleImageForm.module.css';
 
 /**
@@ -18,6 +19,7 @@ const SingleImageForm = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
 
   // Load upload settings using custom hook
   const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
@@ -64,7 +66,10 @@ const SingleImageForm = ({
     // Validate file using upload settings
     const validation = validateImageFile(file, uploadSettings);
     if (!validation.isValid) {
-      alert(validation.errorMessage);
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
       // Reset file input
       e.target.value = '';
       return;
@@ -206,6 +211,17 @@ const SingleImageForm = ({
           </div>
         </div>
       </div>
+
+      {/* Error Dialog */}
+      <ConfirmDialog
+        isOpen={errorDialog.isOpen}
+        title="Error de validación"
+        message={errorDialog.message}
+        type="danger"
+        confirmText="Aceptar"
+        onConfirm={() => setErrorDialog({ isOpen: false, message: '' })}
+        onCancel={() => setErrorDialog({ isOpen: false, message: '' })}
+      />
     </div>
   );
 };
