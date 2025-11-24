@@ -15,8 +15,6 @@ const {
     ogImage = "/images/og-image.svg"
 } = Astro.props;
 
-import '../styles/design-system.css'; 
-import '../utils/breakpoints.js';
 import AnalyticsTracker from '../components/analytics/AnalyticsTracker.astro';
 ---
 
@@ -24,6 +22,10 @@ import AnalyticsTracker from '../components/analytics/AnalyticsTracker.astro';
 <html lang={lang} dir={dir}>
     <head>
         <meta charset="UTF-8" />
+        
+        <link rel="stylesheet" href="/src/styles/design-system.css">
+        <link rel="preload" href="/src/styles/design-system.css" as="style">
+
         <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
         <link rel="icon" type="image/svg+xml" href="/mini-logo-dark.svg" />
@@ -41,6 +43,7 @@ import AnalyticsTracker from '../components/analytics/AnalyticsTracker.astro';
         <meta name="twitter:image" content={new URL(ogImage, Astro.url.origin)} />
 
         <slot name="head" />
+        
 
         <title>{title}</title>
     </head>
