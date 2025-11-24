@@ -10,6 +10,11 @@ export default defineConfig({
   },
   
   vite: {
+    ...(mode === 'production' && {
+      esbuild: {
+        drop: ['console', 'debugger'],
+      }
+    }),
     resolve: {
       alias: {
         '@shared': fileURLToPath(new URL('./src/shared', import.meta.url)),
@@ -21,14 +26,6 @@ export default defineConfig({
       // Minificación
       minify: 'esbuild',
       cssMinify: true,
-      
-      // Eliminar console.log y debugger en producción
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        }
-      },
       
       // Rollup optimizations
       rollupOptions: {
