@@ -66,7 +66,7 @@ export function initSmoothScroll() {
 
     // Handler para clicks de scroll
     const handleScrollClick = (e) => {
-        console.debug('🖱️ Click en elemento data-scroll-to detectado'); // Debug log
+        console.debug('Click en elemento data-scroll-to detectado'); // Debug log
         e.preventDefault();
         const targetId = e.currentTarget.getAttribute('data-scroll-to');
         if (targetId) {
@@ -100,7 +100,7 @@ export function initSmoothScroll() {
         const hash = window.location.hash;
         if (hash) {
             const targetId = hash.substring(1);
-            console.debug(`🔗 Hash inicial detectado: ${hash}`); // Debug log
+            console.debug(`Hash inicial detectado: ${hash}`); // Debug log
             // Pequeño delay para asegurar que la página esté completamente cargada
             setTimeout(() => smoothScrollTo(targetId), 100);
         }

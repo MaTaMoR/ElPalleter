@@ -20,7 +20,6 @@ const {
 // Obtener datos de idiomas desde el sistema centralizado
 
 const languages = I18nService.getLanguagePickerDataWithAstro(Astro);
-console.debug('TEST ' + languages);
 
 // Encontrar idioma actual y otros idiomas
 const currentLanguage = languages.find(lang => lang.isActive) || languages[0];
