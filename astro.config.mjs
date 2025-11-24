@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => ({
   output: 'static',
 
   build: {
-    inlineStylesheets: 'auto',
+    inlineStylesheets: 'always',
   },
 
   vite: {
@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
     build: {
       minify: 'esbuild',
       cssMinify: true,
+      cssCodeSplit: false,
 
       rollupOptions: {
         plugins: [
