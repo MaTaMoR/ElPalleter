@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '../../hooks/useImageUploadSettings';
+import { validateImageFile } from '../../utils/imageValidationUtils';
 import styles from './SingleImageForm.module.css';
 
 /**
@@ -60,9 +61,12 @@ const SingleImageForm = ({
       return;
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona un archivo de imagen válido');
+    // Validate file using upload settings
+    const validation = validateImageFile(file, uploadSettings);
+    if (!validation.isValid) {
+      alert(validation.errorMessage);
+      // Reset file input
+      e.target.value = '';
       return;
     }
 

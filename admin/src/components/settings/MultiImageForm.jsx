@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '../../hooks/useImageUploadSettings';
+import { validateImageFiles } from '@utils/imageValidationUtils';
+=======
+import useImageUploadSettings from '@hooks/useImageUploadSettings';
+import { validateImageFiles } from '@utils/imageValidationUtils';
+>>>>>>> 8faa6fb735b220f0dda58706ad7188a51150773d
 import styles from './MultiImageForm.module.css';
 
 /**
