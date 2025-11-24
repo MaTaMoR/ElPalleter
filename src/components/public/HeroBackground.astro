@@ -17,8 +17,6 @@ const {
     imageId,
     alt = "Fondo Hero",
     className = '',
-    overlayColor = 'rgba(0, 0, 0, 0.25)',
-    overlayOpacity = 1,
     adaptiveOverlay = true
 } = Astro.props;
 
@@ -53,7 +51,7 @@ const heroClasses = [
     </div>
 </div>
 
-<style is:inline>
+<style>
     .hero-background {
         position: relative;
         width: 100%;
