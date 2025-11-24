@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
-import useImageUploadSettings from '@hooks/useImageUploadSettings';
+import useImageUploadSettings from '../../hooks/useImageUploadSettings';
 import styles from './SingleImageForm.module.css';
 
 /**

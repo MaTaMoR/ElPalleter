@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
-import useImageUploadSettings from '@hooks/useImageUploadSettings';
+import useImageUploadSettings from '../../hooks/useImageUploadSettings';
 import styles from './MultiImageForm.module.css';
 
 /**
