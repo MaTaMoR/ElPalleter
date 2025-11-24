@@ -4,26 +4,50 @@ import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  base: '/admin/',
+  
   build: {
-    sourcemap: false, // Deshabilitar source maps en producción
-    minify: 'esbuild', // Asegurar minificación con esbuild
-    chunkSizeWarningLimit: 800, // Aumentar el límite a 800 KB (más realista para apps modernas)
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2022',
+    
+    // Eliminar console.log en producción
+    ...(mode === 'production' && {
+      esbuild: {
+        drop: ['console', 'debugger'],
+      }
+    }),
+    
+    // Optimización de chunks simplificada
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': [/node_modules/],
+        }
+      }
+    },
+    
+    chunkSizeWarningLimit: 800,
+    
+    // Compresión adicional
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096, // Inline assets < 4kb
   },
+  
   optimizeDeps: {
-    include: ['react', 'react-dom'],
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
+  
   server: {
     host: '0.0.0.0',
     port: 3001,
-    sourcemapIgnoreList: () => true, // Ignorar warnings de source maps en desarrollo
   },
-  // Configuración para development - solo inline sourcemaps en dev
-  esbuild: mode === 'development' ? {
-    sourcemap: 'inline', // Source maps inline en desarrollo para evitar archivos .map rotos
-  } : {
-    drop: ['console', 'debugger'], // Eliminar console.debug en producción
+  
+  // CSS optimizations
+  css: {
+    devSourcemap: mode === 'development',
   },
-  base: '/admin/',
+  
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
