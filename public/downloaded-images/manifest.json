@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2025-11-24T04:27:47.120Z",
+  "apiUrl": "http://localhost:8080",
+  "images": [
+    "hero-main"
+  ],
+  "galleries": [
+    "historia",
+    "flags",
+    "icons"
+  ],
+  "results": {
+    "images": [
+      {
+        "name": "hero-main",
+        "filename": "hero-main.jpeg",
+        "success": true
+      }
+    ],
+    "galleries": {
+      "historia": {
+        "success": true,
+        "images": [
+          {
+            "name": "historia-1",
+            "filename": "historia-1.jpeg",
+            "success": true
+          },
+          {
+            "name": "historia-2",
+            "filename": "historia-2.jpeg",
+            "success": true
+          },
+          {
+            "name": "historia-3",
+            "filename": "historia-3.jpeg",
+            "success": true
+          },
+          {
+            "name": "historia-4",
+            "filename": "historia-4.jpeg",
+            "success": true
+          }
+        ]
+      },
+      "flags": {
+        "success": true,
+        "images": [
+          {
+            "name": "flag-spain",
+            "filename": "flag-spain.svg",
+            "success": true
+          },
+          {
+            "name": "flag-uk",
+            "filename": "flag-uk.svg",
+            "success": true
+          },
+          {
+            "name": "flag-valencia",
+            "filename": "flag-valencia.svg",
+            "success": true
+          }
+        ]
+      },
+      "icons": {
+        "success": true,
+        "images": [
+          {
+            "name": "facebook",
+            "filename": "facebook.svg",
+            "success": true
+          },
+          {
+            "name": "instagram",
+            "filename": "instagram.svg",
+            "success": true
+          },
+          {
+            "name": "google-maps",
+            "filename": "google-maps.svg",
+            "success": true
+          }
+        ]
+      }
+    },
+    "totalDownloaded": 11,
+    "totalFailed": 0
+  }
+}

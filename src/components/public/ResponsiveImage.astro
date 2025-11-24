@@ -39,7 +39,7 @@ const {
 } = Astro.props;
 
 // Importar todas las imágenes descargadas usando glob
-const images = import.meta.glob('/src/assets/downloaded-images/*.*', { eager: true });
+const images = import.meta.glob('/public/downloaded-images/*.*', { eager: true });
 
 // Buscar la imagen por nombre (sin extensión)
 const imagePath = Object.keys(images).find(path => {

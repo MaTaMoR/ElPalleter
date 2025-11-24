@@ -26,7 +26,7 @@ function log(message, color = 'reset') {
 
 // Configuración de la API
 const API_URL = process.env.VITE_BUILD_URL || process.env.PUBLIC_BUILD_URL || 'http://localhost:8080';
-const OUTPUT_DIR = join(projectRoot, 'src', 'assets', 'downloaded-images');
+const OUTPUT_DIR = join(projectRoot, 'public', 'downloaded-images');
 
 // Función para obtener información de una galería
 async function fetchGalleryInfo(galleryName) {
