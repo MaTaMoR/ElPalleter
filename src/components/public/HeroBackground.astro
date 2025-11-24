@@ -4,7 +4,7 @@ export const prerender = true;
 import ResponsiveImage from './ResponsiveImage.astro';
 
 interface Props {
-    imageId: string;
+    imageName: string;
     alt?: string;
     className?: string;
     overlayColor?: string;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const {
-    imageId,
+    imageName,
     alt = "Fondo Hero",
     className = '',
     adaptiveOverlay = true
@@ -29,7 +29,7 @@ const heroClasses = [
 
 <div class={heroClasses} id="inicio">
     <ResponsiveImage
-        imageId={imageId}
+        name={imageName}
         alt={alt}
         className="hero-bg-image"
         loading="eager"

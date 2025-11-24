@@ -19,7 +19,7 @@ const { images } = Astro.props;
         {images.map((image, index) => (
             <div class={`slide ${index === 0 ? 'active' : ''}`}>
                 <ResponsiveImage
-                    imageId={image.name}
+                    name={image.name}
                     alt={image.name}
                     className="slide-background"
                     loading={index === 0 ? 'eager' : 'lazy'}

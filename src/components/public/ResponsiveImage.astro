@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import Text from '../i18n/Text.astro';
 
 interface Props {
-    imageId: string;
+    name: string;
     alt?: string;
     className?: string;
     loading?: 'eager' | 'lazy';
@@ -22,7 +22,7 @@ interface Props {
 }
 
 const {
-    imageId,
+    name,
     alt,
     className = '',
     loading = 'lazy',
@@ -39,27 +39,20 @@ const {
 } = Astro.props;
 
 // Importar todas las imágenes descargadas usando glob
+const imagePath = '/public/downloaded-images/' + name;
 const images = import.meta.glob('/public/downloaded-images/*.*', { eager: true });
-
-// Buscar la imagen por nombre (sin extensión)
-const imagePath = Object.keys(images).find(path => {
-    const filename = path.split('/').pop()?.split('.')[0];
-    return filename === imageId;
-});
-
-const imageModule = imagePath ? images[imagePath] : null;
-const imageData = imageModule?.default;
+const imageData = images[imagePath] ? images[imagePath]?.default : undefined;
 
 // Avisos en modo desarrollo
 if (import.meta.env.DEV) {
     if (!imageData) {
         console.warn(
-            `  ResponsiveImage [${imageId}]: Imagen NO encontrada en cache.\n` +
+            `  ResponsiveImage [${name}]: Imagen NO encontrada en cache.\n` +
             `   → Añádela a src/config/images.json y ejecuta: npm run download-images\n` +
             `   → Imágenes disponibles: ${Object.keys(images).length}`
         );
     } else {
-        console.debug(`✓ ResponsiveImage [${imageId}]: Cargada desde ${imagePath}`);
+        console.debug(`✓ ResponsiveImage [${name}]: Cargada desde ${imagePath}`);
     }
 }
 
@@ -86,7 +79,7 @@ const icons = {
     </svg>`
 };
 
-const altText = alt || `Imagen ${imageId}`;
+const altText = alt || `Imagen ${name}`;
 const finalLoading = priority ? 'eager' : loading;
 const objectFitClass = `object-${objectFit}`;
 const objectPositionClass = objectPosition === 'center' ? 'object-center' :
@@ -106,12 +99,12 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         widths={[400, 800, 1200, 1600, 2000]}
         sizes={sizes}
         format="webp"
-        data-image-id={imageId}
+        data-image-id={name}
         width={width}
         height={height}
     />
 ) : showFallback ? (
-    <div class={`responsive-image-fallback ${className}`} data-image-id={imageId}>
+    <div class={`responsive-image-fallback ${className}`} data-image-id={name}>
         <div class="fallback-content">
             <div class="fallback-icon" set:html={icons[fallbackIcon]} />
             <div class="fallback-text">
@@ -123,7 +116,7 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
                 {import.meta.env.DEV && (
                     <div class="fallback-dev-info">
                         <small class="fallback-debug">
-                            Imagen: <strong>{imageId}</strong>
+                            Imagen: <strong>{name}</strong>
                         </small>
                         <small class="fallback-instructions">
                             Añádela a <code>src/config/images.json</code><br/>
@@ -135,7 +128,7 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         </div>
     </div>
 ) : (
-    <div class={`responsive-image-empty ${className}`} data-image-id={imageId} style="display: none;"></div>
+    <div class={`responsive-image-empty ${className}`} data-image-id={name} style="display: none;"></div>
 )}
 
 <style is:inline>

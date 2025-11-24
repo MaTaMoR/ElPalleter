@@ -59,47 +59,14 @@ export class I18nRepository extends BaseRepository {
             throw error;
         }
     }
-
-    /**
-     * Convierte idiomas del backend a formato frontend
-     * Transforma el formato DTO del backend al formato LANGUAGE_CONFIG del frontend
-     * @param {Array<Object>} languagesFromBackend - Array de LanguageDTO del backend
-     * @returns {Object} Objeto de idiomas en formato LANGUAGE_CONFIG
-     */
-    static convertLanguagesToFrontendFormat(languagesFromBackend) {
-        const languageConfig = {};
-        
-        if (!Array.isArray(languagesFromBackend)) {
-            return languageConfig;
-        }
-
-        languagesFromBackend.forEach(lang => {
-            languageConfig[lang.code] = {
-                code: lang.code,
-                name: lang.name,
-                nativeName: lang.nativeName,
-                shortName: lang.shortName,
-                isDefault: lang.isDefault,
-                flag: {
-                    value: lang.flagImagePath
-                },
-                direction: lang.direction,
-                enabled: lang.enabled,
-                displayOrder: lang.displayOrder
-            };
-        });
-
-        return languageConfig;
-    }
-
+    
     /**
      * Obtiene los idiomas en formato LANGUAGE_CONFIG
      * @returns {Promise<Object>} Idiomas en formato frontend
      */
     static async getLanguagesConfig() {
         try {
-            const languages = await this.getLanguages();
-            return this.convertLanguagesToFrontendFormat(languages);
+            return await this.getLanguages();
         } catch (error) {
             console.error('I18nRepository: Error getting languages config:', error);
             throw error;

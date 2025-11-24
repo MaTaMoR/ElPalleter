@@ -66,12 +66,12 @@ export class ImageService {
      * Obtiene los límites de tamaño máximo de subida
      * @returns {Promise<Object>} Límites de tamaño de subida
      */
-    static async getMaxUploadSize() {
+    static async getImageUploadSettings() {
         try {
-            const maxSize = await ImageRepository.getMaxUploadSize();
-            return maxSize;
+            const imageUploadSettings = await ImageRepository.getImageUploadSettings();
+            return imageUploadSettings;
         } catch (error) {
-            console.error('ImageService: Error getting max upload size:', error);
+            console.error('ImageService: Error getting image upload settings:', error);
             throw error;
         }
     }

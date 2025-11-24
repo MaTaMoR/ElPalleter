@@ -54,25 +54,17 @@ async function downloadImage(imageName) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // Obtener el tipo de contenido para determinar la extensión
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
-    let extension = contentType.split('/')[1] || 'jpg';
-    if (extension === 'svg+xml') {
-      extension = 'svg';
-    }
-
     // Obtener el buffer de la imagen
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     // Guardar la imagen
-    const filename = `${imageName}.${extension}`;
-    const filepath = join(OUTPUT_DIR, filename);
+    const filepath = join(OUTPUT_DIR, imageName);
 
     await writeFile(filepath, buffer);
 
     log(`  ✓ Descargada: ${imageName}`, 'green');
-    return { name: imageName, filename, success: true };
+    return { name: imageName, imageName, success: true };
   } catch (error) {
     log(`  ✗ Error descargando "${imageName}": ${error.message}`, 'red');
     return { name: imageName, success: false, error: error.message };

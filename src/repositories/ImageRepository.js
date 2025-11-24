@@ -100,15 +100,15 @@ export class ImageRepository extends BaseRepository {
 
     /**
      * Obtiene los límites de tamaño máximo de subida
-     * GET /image/max-upload-size
+     * GET /image/image-upload-settings
      * @returns {Promise<Object>} Límites de tamaño de subida
      */
-    static async getMaxUploadSize() {
+    static async getImageUploadSettings() {
         try {
-            const response = await this.get('/image/max-upload-size');
+            const response = await this.get('/image/image-upload-settings');
             return response;
         } catch (error) {
-            console.error('ImageRepository: Error getting max upload size:', error);
+            console.error('ImageRepository: Error getting image upload settings:', error);
             throw error;
         }
     }

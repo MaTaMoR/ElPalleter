@@ -31,11 +31,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
   <!-- Botón principal que muestra el idioma actual -->
   <button class="lang-current" aria-label={`Idioma actual: ${currentLanguage.name}`} aria-haspopup="true" aria-expanded="false">
     <span class="lang-flag">
-      {currentLanguage.flag.isEmoji ? (
-        <span class="flag-emoji" aria-hidden="true">{currentLanguage.flag.value}</span>
-      ) : (
-        <Icon imageId={currentLanguage.flag.value}/>
-      )}
+      <Icon name={currentLanguage.flag.name}/>
     </span>
     <span class="lang-arrow" aria-hidden="true">▼</span>
   </button>
@@ -52,11 +48,7 @@ const otherLanguages = languages.filter(lang => !lang.isActive);
         hreflang={lang.code}
       >
         <span class="lang-flag">
-          {lang.flag.isEmoji ? (
-            <span class="flag-emoji" aria-hidden="true">{lang.flag.value}</span>
-          ) : (
-            <Icon imageId={lang.flag.value}/>
-          )}
+          <Icon name={lang.flag.name}/>
         </span>
         <span class="lang-full-name">{lang.nativeName}</span>
       </a>

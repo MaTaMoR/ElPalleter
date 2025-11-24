@@ -21,7 +21,7 @@ Define qué imágenes necesita el sitio:
 ```json
 {
   "images": [
-    "hero-main"
+    "hero-main.jpg"
   ],
   "galleries": [
     "historia"
@@ -134,8 +134,8 @@ Para añadir nuevas imágenes al sistema:
    ```json
    {
      "images": [
-       "hero-main",
-       "nueva-imagen"  // ← Añadir aquí
+       "hero-main.jpg",
+       "nueva-imagen.jpg"  // ← Añadir aquí
      ],
      "galleries": ["historia"]
    }
@@ -144,7 +144,7 @@ Para añadir nuevas imágenes al sistema:
 2. **Galería Completa:**
    ```json
    {
-     "images": ["hero-main"],
+     "images": ["hero-main.jpg"],
      "galleries": [
        "historia",
        "nueva-galeria"  // ← Añadir aquí

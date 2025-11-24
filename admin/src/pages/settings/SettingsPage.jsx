@@ -436,7 +436,7 @@ const SettingsContent = () => {
               <div className={styles.formsContainer}>
                 {/* Single Images Section */}
                 <SingleImageForm
-                  imageName="hero-main"
+                  imageName="hero-main.jpg"
                   title="Fondo de inicio"
                   onChange={(file) => handleImageChange('hero-main', file)}
                   isEditing={isEditing}

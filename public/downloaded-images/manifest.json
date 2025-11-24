@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2025-11-24T04:27:47.120Z",
+  "generatedAt": "2025-11-24T22:23:11.078Z",
   "apiUrl": "http://localhost:8080",
   "images": [
-    "hero-main"
+    "hero-main.jpg"
   ],
   "galleries": [
     "historia",
@@ -12,8 +12,8 @@
   "results": {
     "images": [
       {
-        "name": "hero-main",
-        "filename": "hero-main.jpeg",
+        "name": "hero-main.jpg",
+        "imageName": "hero-main.jpg",
         "success": true
       }
     ],
@@ -22,23 +22,23 @@
         "success": true,
         "images": [
           {
-            "name": "historia-1",
-            "filename": "historia-1.jpeg",
+            "name": "historia-1.jpg",
+            "imageName": "historia-1.jpg",
             "success": true
           },
           {
-            "name": "historia-2",
-            "filename": "historia-2.jpeg",
+            "name": "historia-2.jpg",
+            "imageName": "historia-2.jpg",
             "success": true
           },
           {
-            "name": "historia-3",
-            "filename": "historia-3.jpeg",
+            "name": "historia-3.jpg",
+            "imageName": "historia-3.jpg",
             "success": true
           },
           {
-            "name": "historia-4",
-            "filename": "historia-4.jpeg",
+            "name": "historia-4.jpg",
+            "imageName": "historia-4.jpg",
             "success": true
           }
         ]
@@ -47,18 +47,18 @@
         "success": true,
         "images": [
           {
-            "name": "flag-spain",
-            "filename": "flag-spain.svg",
+            "name": "flag-spain.svg",
+            "imageName": "flag-spain.svg",
             "success": true
           },
           {
-            "name": "flag-uk",
-            "filename": "flag-uk.svg",
+            "name": "flag-uk.svg",
+            "imageName": "flag-uk.svg",
             "success": true
           },
           {
-            "name": "flag-valencia",
-            "filename": "flag-valencia.svg",
+            "name": "flag-valencia.svg",
+            "imageName": "flag-valencia.svg",
             "success": true
           }
         ]
@@ -67,18 +67,18 @@
         "success": true,
         "images": [
           {
-            "name": "facebook",
-            "filename": "facebook.svg",
+            "name": "facebook.svg",
+            "imageName": "facebook.svg",
             "success": true
           },
           {
-            "name": "instagram",
-            "filename": "instagram.svg",
+            "name": "instagram.svg",
+            "imageName": "instagram.svg",
             "success": true
           },
           {
-            "name": "google-maps",
-            "filename": "google-maps.svg",
+            "name": "google-maps.svg",
+            "imageName": "google-maps.svg",
             "success": true
           }
         ]

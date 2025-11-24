@@ -18,26 +18,6 @@ const FALLBACK_LANGUAGE_CONFIG = {
 };
 
 /**
- * Clase para manejar banderas (SVG)
- */
-export class FlagRenderer {
-  static renderFlag(flagConfig, className = '', size = '1rem') {
-    if (!flagConfig?.value) {
-      return '';
-    }
-    return `<img src="${flagConfig.value}" alt="" class="flag-svg ${className}" style="width: ${size}; height: ${size};" aria-hidden="true" />`;
-  }
-
-  static getFlagElement(flagConfig) {
-    return {
-      type: 'svg',
-      value: flagConfig?.value || null,
-      isSvg: true
-    };
-  }
-}
-
-/**
  * Estado del servicio (a nivel de módulo)
  */
 const state = {
@@ -114,7 +94,7 @@ export class I18nService {
       
       console.debug('[I18nService] Raw language config from backend:', languageConfig);
       
-      if (Object.keys(languageConfig).length === 0) {
+      if (languageConfig.length === 0) {
         console.warn('[I18nService] No languages received from backend, using fallback');
         state.languageConfig = FALLBACK_LANGUAGE_CONFIG;
       } else {
@@ -122,7 +102,7 @@ export class I18nService {
       }
 
       // 2. Extraer información derivada
-      state.languages = Object.values(state.languageConfig)
+      state.languages = state.languageConfig
         .filter(lang => lang.enabled !== false)
         .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
       
@@ -687,7 +667,7 @@ export class I18nService {
       name: lang.name,
       nativeName: lang.nativeName,
       shortName: lang.shortName,
-      flag: FlagRenderer.getFlagElement(lang.flag),
+      flag: lang.flag,
       url: absolute && Astro 
         ? this.getAbsoluteUrl(currentPath, lang.code, Astro)
         : this.getRelativeUrl(currentPath, lang.code),
@@ -834,13 +814,6 @@ export class I18nService {
     }
 
     return null;
-  }
-
-  /**
-   * Renderiza una bandera
-   */
-  static renderFlag(flagConfig, className = '', size = '1rem') {
-    return FlagRenderer.renderFlag(flagConfig, className, size);
   }
 
   /**

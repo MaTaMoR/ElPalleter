@@ -1,18 +1,18 @@
 ---
 const {
-    imageId,
+    name,
     className = '',
     width,
     height
 } = Astro.props;
 
-const path = `/downloaded-images/${imageId}.svg`;
+const path = `/downloaded-images/${name}`;
 ---
 
 <img
     class={`${className}`}
     src={path}
-    data-image-id={imageId}
+    data-image-id={name}
     width={width}
     height={height}
 />
