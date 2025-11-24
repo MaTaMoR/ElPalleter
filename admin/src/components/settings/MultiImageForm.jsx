@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '../../hooks/useImageUploadSettings';
-import { validateImageFiles } from '@utils/imageValidationUtils';
-=======
-import useImageUploadSettings from '@hooks/useImageUploadSettings';
-import { validateImageFiles } from '@utils/imageValidationUtils';
->>>>>>> 8faa6fb735b220f0dda58706ad7188a51150773d
+import { validateImageFiles } from '../../utils/imageValidationUtils';
 import styles from './MultiImageForm.module.css';
 
 /**
@@ -90,13 +86,18 @@ const MultiImageForm = ({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    const newImages = files.map((file, index) => {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert(`El archivo ${file.name} no es una imagen válida`);
-        return null;
-      }
+    // Validate all files at once using upload settings
+    const validation = validateImageFiles(files, uploadSettings);
 
+    if (!validation.isValid) {
+      alert(validation.errorMessage);
+      // Reset file input
+      e.target.value = '';
+      return;
+    }
+
+    // Only process valid files
+    const newImages = validation.validFiles.map((file, index) => {
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       const tempId = `new-${Date.now()}-${index}`;
@@ -110,7 +111,7 @@ const MultiImageForm = ({
         _file: file,
         _previewUrl: previewUrl
       };
-    }).filter(Boolean);
+    });
 
     const updatedImages = [...images, ...newImages];
     setImages(updatedImages);
@@ -118,6 +119,11 @@ const MultiImageForm = ({
 
     // Reset file input
     e.target.value = '';
+
+    // Show warning if some files were filtered out
+    if (validation.errorMessage) {
+      alert(validation.errorMessage);
+    }
   };
 
   const handleMoveImage = (imageId, direction) => {
