@@ -204,11 +204,28 @@ const MultiImageForm = ({
   };
 
   const handleUndoDelete = (imageId) => {
-    const updatedImages = images.map(img =>
-      img.id === imageId
-        ? { ...img, _state: img._isNew ? 'new' : 'normal' }
-        : img
-    );
+    const updatedImages = images.map((img, idx) => {
+      if (img.id === imageId) {
+        // Restore the deleted image
+        // Check if it's in its original position
+        const originalImage = originalImagesRef.current.find(i => i.id === img.id);
+        const currentOrder = idx;
+        const hasChangedPosition = originalImage && originalImage.order !== currentOrder;
+
+        // Determine state based on position
+        let restoredState;
+        if (img._isNew) {
+          restoredState = 'new';
+        } else if (hasChangedPosition) {
+          restoredState = 'edited';
+        } else {
+          restoredState = 'normal';
+        }
+
+        return { ...img, _state: restoredState };
+      }
+      return img;
+    });
     setImages(updatedImages);
     notifyChange(updatedImages);
   };
