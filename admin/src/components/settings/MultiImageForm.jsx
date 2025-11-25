@@ -25,6 +25,9 @@ const MultiImageForm = ({
   const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
   const imageRefs = useRef({});
 
+  // Store original image order for comparison when editing
+  const originalImagesRef = useRef([]);
+
   // Load upload settings using custom hook
   const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
 
@@ -34,6 +37,18 @@ const MultiImageForm = ({
       loadGalleryImages();
     }
   }, [galleryName, refreshKey, isEditing]);
+
+  // Save original image state when entering edit mode
+  useEffect(() => {
+    if (isEditing && images.length > 0) {
+      // Deep copy of images to preserve original order
+      originalImagesRef.current = images.map(img => ({
+        id: img.id,
+        name: img.name,
+        order: img.order
+      }));
+    }
+  }, [isEditing]);
 
   const loadGalleryImages = async () => {
     setLoading(true);
@@ -148,8 +163,8 @@ const MultiImageForm = ({
     // Mark as edited only the images that actually changed position
     const finalImages = updatedImages.map((img, idx) => {
       const newOrder = idx;
-      // Check if this image changed position
-      const originalImage = images.find(i => i.id === img.id);
+      // Check if this image changed position compared to original state
+      const originalImage = originalImagesRef.current.find(i => i.id === img.id);
       const hasChangedPosition = originalImage && originalImage.order !== newOrder;
 
       // Only mark as edited if it's not new and changed position
@@ -305,13 +320,14 @@ const MultiImageForm = ({
                   <div className={styles.imagesList}>
                     {visibleImages.map((image, index) => {
                       const isNew = image._state === 'new';
+                      const isEdited = image._state === 'edited';
                       const isExpanded = expandedImageId === image.id;
 
                       return (
                         <div
                           key={image.id}
                           ref={(el) => { imageRefs.current[image.id] = el; }}
-                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
+                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isEdited ? styles.editedCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
                         >
                           <div className={`${styles.cardLayout} ${isExpanded ? styles.cardLayoutExpanded : ''}`}>
                             {/* Image Thumbnail */}
@@ -332,6 +348,7 @@ const MultiImageForm = ({
                                 {/* Image Info */}
                                 <div className={styles.imageInfo}>
                                   {isNew && <span className={styles.badge}>Nueva</span>}
+                                  {isEdited && <span className={`${styles.badge} ${styles.badgeEdited}`}>Editado</span>}
                                 </div>
 
                                 {/* Actions on the right */}
@@ -371,6 +388,7 @@ const MultiImageForm = ({
                               <div className={styles.expandedActions}>
                                 <div className={styles.imageInfo}>
                                   {isNew && <span className={styles.badge}>Nueva</span>}
+                                  {isEdited && <span className={`${styles.badge} ${styles.badgeEdited}`}>Editado</span>}
                                 </div>
                                 <div className={styles.cardActions}>
                                   <div className={styles.moveButtonsContainer}>
