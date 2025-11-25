@@ -177,8 +177,8 @@
 }
 
 .editedCard {
-  border-color: rgba(217, 119, 6, 0.3);
-  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .deletedCard {
@@ -279,11 +279,6 @@
   white-space: nowrap;
   background: rgba(16, 185, 129, 0.15);
   color: var(--success);
-}
-
-.badgeEdited {
-  background: rgba(217, 119, 6, 0.15);
-  color: var(--warning);
 }
 
 /* Card Actions - on the right */

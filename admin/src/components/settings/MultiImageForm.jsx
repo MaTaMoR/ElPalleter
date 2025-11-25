@@ -348,7 +348,6 @@ const MultiImageForm = ({
                                 {/* Image Info */}
                                 <div className={styles.imageInfo}>
                                   {isNew && <span className={styles.badge}>Nueva</span>}
-                                  {isEdited && <span className={`${styles.badge} ${styles.badgeEdited}`}>Editado</span>}
                                 </div>
 
                                 {/* Actions on the right */}
@@ -388,7 +387,6 @@ const MultiImageForm = ({
                               <div className={styles.expandedActions}>
                                 <div className={styles.imageInfo}>
                                   {isNew && <span className={styles.badge}>Nueva</span>}
-                                  {isEdited && <span className={`${styles.badge} ${styles.badgeEdited}`}>Editado</span>}
                                 </div>
                                 <div className={styles.cardActions}>
                                   <div className={styles.moveButtonsContainer}>
