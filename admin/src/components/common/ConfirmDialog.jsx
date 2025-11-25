@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { X, AlertTriangle } from 'lucide-react';
@@ -14,6 +14,21 @@ const ConfirmDialog = ({
   onCancel,
   type = 'warning' // 'warning' | 'danger' | 'info'
 }) => {
+  // Disable body scroll when dialog is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save current overflow value
+      const originalOverflow = document.body.style.overflow;
+      // Disable scroll
+      document.body.style.overflow = 'hidden';
+
+      // Restore scroll on cleanup
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {
