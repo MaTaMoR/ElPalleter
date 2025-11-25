@@ -167,13 +167,25 @@ const MultiImageForm = ({
       const originalImage = originalImagesRef.current.find(i => i.id === img.id);
       const hasChangedPosition = originalImage && originalImage.order !== newOrder;
 
-      // Only mark as edited if it's not new and changed position
-      const shouldMarkEdited = hasChangedPosition && img._state !== 'new' && img._state !== 'deleted';
+      // Determine the correct state
+      let newState = img._state;
+      if (img._state !== 'deleted') {
+        if (img._isNew) {
+          // New images stay as 'new'
+          newState = 'new';
+        } else if (hasChangedPosition) {
+          // Images that moved from original position are 'edited'
+          newState = 'edited';
+        } else {
+          // Images that are back to original position are 'normal'
+          newState = 'normal';
+        }
+      }
 
       return {
         ...img,
         order: newOrder,
-        _state: shouldMarkEdited ? 'edited' : img._state
+        _state: newState
       };
     });
 
