@@ -460,7 +460,6 @@ const MultiImageForm = ({
         type="danger"
         confirmText="Aceptar"
         onConfirm={() => setErrorDialog({ isOpen: false, message: '' })}
-        onCancel={() => setErrorDialog({ isOpen: false, message: '' })}
       />
     </div>
   );

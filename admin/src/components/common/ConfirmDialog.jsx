@@ -11,7 +11,7 @@ const ConfirmDialog = ({
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   onConfirm,
-  onCancel,
+  onCancel = null,
   type = 'warning' // 'warning' | 'danger' | 'info'
 }) => {
   // Disable body scroll when dialog is open
@@ -31,8 +31,11 @@ const ConfirmDialog = ({
 
   if (!isOpen) return null;
 
+  // Determine if we should show cancel button
+  const showCancelButton = onCancel !== null;
+
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && onCancel) {
       onCancel();
     }
   };
@@ -40,14 +43,16 @@ const ConfirmDialog = ({
   const dialogContent = (
     <div className={styles.backdrop} onClick={handleBackdropClick}>
       <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-        <button
-          type="button"
-          className={styles.closeButton}
-          onClick={onCancel}
-          aria-label="Cerrar"
-        >
-          <X size={20} />
-        </button>
+        {showCancelButton && (
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={onCancel}
+            aria-label="Cerrar"
+          >
+            <X size={20} />
+          </button>
+        )}
 
         <div className={`${styles.iconContainer} ${styles[type]}`}>
           <AlertTriangle size={32} />
@@ -58,13 +63,15 @@ const ConfirmDialog = ({
         <p className={styles.message}>{message}</p>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.cancelButton}
-            onClick={onCancel}
-          >
-            {cancelText}
-          </button>
+          {showCancelButton && (
+            <button
+              type="button"
+              className={styles.cancelButton}
+              onClick={onCancel}
+            >
+              {cancelText}
+            </button>
+          )}
           <button
             type="button"
             className={`${styles.confirmButton} ${styles[type]}`}
@@ -88,7 +95,7 @@ ConfirmDialog.propTypes = {
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
   onConfirm: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  onCancel: PropTypes.func, // Optional - if not provided, dialog will have single button
   type: PropTypes.oneOf(['warning', 'danger', 'info'])
 };
 
