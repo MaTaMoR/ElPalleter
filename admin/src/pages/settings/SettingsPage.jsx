@@ -182,10 +182,10 @@ const SettingsContent = () => {
                 for (let i = 0; i < changes.newImages.length; i++) {
                   const newImage = changes.newImages[i];
                   try {
-                    // Upload the image first
-                    const uploadedImage = await ImageService.uploadImage(newImage._file);
+                    // Upload the image first with the generated unique name
+                    await ImageService.uploadImage(newImage.name, newImage._file);
                     // Then add it to the gallery with the correct order
-                    await ImageService.addImageToGallery(galleryName, uploadedImage.name, newImage.order);
+                    await ImageService.addImageToGallery(galleryName, newImage.name, newImage.order);
                   } catch (error) {
                     console.error(`Error uploading image ${newImage.name}:`, error);
                     throw new Error(`Error al subir la imagen ${newImage.name}: ${error.message}`);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
 import useImageUploadSettings from '../../hooks/useImageUploadSettings';
-import { validateImageFiles } from '../../utils/imageValidationUtils';
+import { validateImageFiles, generateUniqueImageName } from '../../utils/imageValidationUtils';
 import ConfirmDialog from '../common/ConfirmDialog';
 import styles from './MultiImageForm.module.css';
 
@@ -118,13 +118,15 @@ const MultiImageForm = ({
 
     // Only process valid files
     const newImages = validation.validFiles.map((file, index) => {
+      // Generate unique image name for gallery
+      const uniqueName = generateUniqueImageName(galleryName, file.name);
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       const tempId = `new-${Date.now()}-${index}`;
 
       return {
         id: tempId,
-        name: file.name,
+        name: uniqueName,
         order: images.length + index,
         _state: 'new',
         _isNew: true,

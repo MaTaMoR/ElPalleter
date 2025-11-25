@@ -64,6 +64,35 @@ export const getFileExtension = (filename) => {
 };
 
 /**
+ * Generates a random alphanumeric string
+ * @param {number} length - Length of the random string
+ * @returns {string} Random alphanumeric string
+ */
+const generateRandomString = (length = 8) => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+/**
+ * Generates a unique image name for gallery uploads
+ * Format: {galleryName}-{timestamp}-{randomId}.{extension}
+ * @param {string} galleryName - Name of the gallery
+ * @param {string} originalFilename - Original filename with extension
+ * @returns {string} Unique image name
+ */
+export const generateUniqueImageName = (galleryName, originalFilename) => {
+  const extension = getFileExtension(originalFilename);
+  const timestamp = Date.now();
+  const randomId = generateRandomString(8);
+
+  return `${galleryName}-${timestamp}-${randomId}.${extension}`;
+};
+
+/**
  * Validates an image file based on upload settings
  * @param {File} file - The file to validate
  * @param {Object} settings - Upload settings with maxFileSize and validExtensions
