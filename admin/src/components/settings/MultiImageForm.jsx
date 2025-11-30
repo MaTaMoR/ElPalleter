@@ -567,7 +567,7 @@ const MultiImageForm = forwardRef(({
       />
     </div>
   );
-};
+});
 
 MultiImageForm.propTypes = {
   id: PropTypes.string.isRequired,

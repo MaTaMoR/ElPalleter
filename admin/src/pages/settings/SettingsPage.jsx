@@ -268,26 +268,26 @@ const SettingsContent = () => {
             <div className={styles.formsContainer}>
               {/* Single Images Section */}
               <SingleImageForm
-                ref={singleImageRef}
                 id="singleImage"
                 imageName="hero-main.jpg"
                 title="Fondo de inicio"
+                ref={singleImageRef}
                 onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}
               />
               {/* Gallery Section */}
               <MultiImageForm
-                ref={galleryRef}
                 id="gallery"
                 galleryName="historia"
                 title="Galería de Historia"
+                ref={galleryRef}
                 onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}
               />
               {/* Translations Section */}
               <TranslationsForm
-                ref={translationsRef}
                 id="translations"
+                ref={translationsRef}
                 language={selectedLanguage}
                 onHasChangesChange={handleChildHasChangesChange}
                 errors={{}}

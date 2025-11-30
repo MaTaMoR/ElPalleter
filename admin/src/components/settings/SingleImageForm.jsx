@@ -245,7 +245,7 @@ const SingleImageForm = forwardRef(({
       />
     </div>
   );
-};
+});
 
 SingleImageForm.propTypes = {
   id: PropTypes.string.isRequired,

@@ -11,7 +11,7 @@ const ConfirmDialog = ({
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   onConfirm,
-  onCancel = null,
+  onCancel = undefined,
   type = 'warning' // 'warning' | 'danger' | 'info'
 }) => {
   // Disable body scroll when dialog is open
@@ -32,7 +32,7 @@ const ConfirmDialog = ({
   if (!isOpen) return null;
 
   // Determine if we should show cancel button
-  const showCancelButton = onCancel !== null;
+  const showCancelButton = !!onCancel;
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget && onCancel) {

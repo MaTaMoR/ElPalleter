@@ -300,7 +300,7 @@ const TranslationsForm = forwardRef(({
       </div>
     </div>
   );
-};
+});
 
 TranslationsForm.propTypes = {
   id: PropTypes.string.isRequired,

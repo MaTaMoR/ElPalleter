@@ -130,53 +130,6 @@ export class ImageService {
     }
 
     /**
-     * Añade una imagen a una galería
-     * @param {string} galleryName - Nombre de la galería
-     * @param {string} imageName - Nombre de la imagen
-     * @param {number} order - Orden de la imagen en la galería (opcional)
-     * @returns {Promise<void>}
-     */
-    static async addImageToGallery(galleryName, imageName, order) {
-        try {
-            await GalleryRepository.addImageToGallery(galleryName, imageName, order, AuthService.getToken());
-        } catch (error) {
-            console.error(`ImageService: Error adding image ${imageName} to gallery ${galleryName}:`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Elimina una imagen de una galería
-     * @param {string} galleryName - Nombre de la galería
-     * @param {string} imageName - Nombre de la imagen
-     * @returns {Promise<void>}
-     */
-    static async removeImageFromGallery(galleryName, imageName) {
-        try {
-            await GalleryRepository.removeImageFromGallery(galleryName, imageName, AuthService.getToken());
-        } catch (error) {
-            console.error(`ImageService: Error removing image ${imageName} from gallery ${galleryName}:`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Actualiza el orden de una imagen en una galería
-     * @param {string} galleryName - Nombre de la galería
-     * @param {string} imageName - Nombre de la imagen
-     * @param {number} order - Nuevo orden de la imagen
-     * @returns {Promise<void>}
-     */
-    static async updateImageOrder(galleryName, imageName, order) {
-        try {
-            await GalleryRepository.updateImageOrder(galleryName, imageName, order, AuthService.getToken());
-        } catch (error) {
-            console.error(`ImageService: Error updating image ${imageName} order in gallery ${galleryName}:`, error);
-            throw error;
-        }
-    }
-
-    /**
      * Actualiza una galería completa
      * Este método reemplaza el contenido completo de la galería con el nuevo contenido proporcionado
      * El backend se encarga de comparar el contenido anterior con el nuevo y realizar los cambios necesarios
