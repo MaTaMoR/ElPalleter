@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Edit3, Save, X } from 'lucide-react';
+import { Edit3, Save, X, Settings } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
@@ -206,6 +206,7 @@ const SettingsContent = () => {
               <div className={styles.headerTop}>
                 {/* Title Section */}
                 <div className={styles.titleWrapper}>
+                  <Settings scale={24} />
                   <h1 className={styles.pageTitle}>Configuración</h1>
                 </div>
 

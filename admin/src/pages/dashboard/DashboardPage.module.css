@@ -142,14 +142,6 @@
   box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
 }
 
-.managementTile.historia {
-  background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
-}
-
-.managementTile.historia:hover {
-  box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
-}
-
 .managementTile.configuracion {
   background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
 }
@@ -159,11 +151,11 @@
 }
 
 .managementTile.usuarios {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--primary) 100%);
+  background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
 }
 
 .managementTile.usuarios:hover {
-  box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
 }
 
 /* Elementos del tile */

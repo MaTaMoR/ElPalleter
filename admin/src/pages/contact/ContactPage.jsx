@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Edit3, Save, X } from 'lucide-react';
+import { Edit3, Save, X, Phone } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
@@ -221,6 +221,7 @@ const ContactContent = () => {
               <div className={styles.headerTop}>
                 {/* Title Section */}
                 <div className={styles.titleWrapper}>
+                  <Phone scale={24}/>
                   <h1 className={styles.pageTitle}>Información de contacto</h1>
                 </div>
 
