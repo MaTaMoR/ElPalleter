@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Edit3, Save, X } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Edit3, Save, X, Settings } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 import Button from '../../components/common/Button';
 import LanguageSelector from '../../components/menu/utils/LanguageSelector';
@@ -9,8 +9,6 @@ import SavingOverlay from '../../components/common/SavingOverlay';
 import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
 import MultiImageForm from '../../components/settings/MultiImageForm';
-import { I18nService } from '@services/I18nService';
-import { ImageService } from '@services/ImageService';
 import styles from './SettingsPage.module.css';
 
 // ============================================================================
@@ -21,22 +19,18 @@ const SettingsContent = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Original data from backend
-  const [originalTranslations, setOriginalTranslations] = useState(null);
-  // Current editing data
-  const [translations, setTranslations] = useState(null);
+  // Refs to child components
+  const singleImageRef = useRef(null);
+  const galleryRef = useRef(null);
+  const translationsRef = useRef(null);
 
-  // Images state - stores File objects for modified images
-  const [modifiedImages, setModifiedImages] = useState({});
-
-  // Gallery state - stores gallery changes (new, deleted, reordered images)
-  const [galleryChanges, setGalleryChanges] = useState({});
-
-  // Image refresh key - updates when images are saved to force reload
-  const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
+  // Track which children have changes
+  const [childrenHasChanges, setChildrenHasChanges] = useState({
+    singleImage: false,
+    gallery: false,
+    translations: false
+  });
 
   // Toast state
   const [toasts, setToasts] = useState([]);
@@ -47,7 +41,8 @@ const SettingsContent = () => {
     title: '',
     message: '',
     type: 'warning',
-    onConfirm: null
+    onConfirm: null,
+    onCancel: null
   });
 
   // Toast handlers
@@ -60,26 +55,6 @@ const SettingsContent = () => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
-  // Load data from backend
-  useEffect(() => {
-    loadTranslations();
-  }, [selectedLanguage]);
-
-  const loadTranslations = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const flatTranslations = I18nService.getAllTranslations(selectedLanguage);
-      setOriginalTranslations(flatTranslations);
-      setTranslations(flatTranslations);
-    } catch (err) {
-      console.error('Error loading translations:', err);
-      setError(err.message || 'Error al cargar las traducciones');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLanguageChange = (newLanguage) => {
     if (!isEditing) {
       setSelectedLanguage(newLanguage);
@@ -90,161 +65,70 @@ const SettingsContent = () => {
     setIsEditing(true);
   };
 
+  const handleChildHasChangesChange = useCallback((childId, hasChanges) => {
+    setChildrenHasChanges(prev => ({ ...prev, [childId]: hasChanges }));
+  }, []);
+
   const hasChanges = () => {
-    const hasTranslationChanges = JSON.stringify(translations) !== JSON.stringify(originalTranslations);
-    const hasImageChanges = Object.keys(modifiedImages).length > 0;
-    const hasGalleryChanges = Object.keys(galleryChanges).length > 0;
-    return hasTranslationChanges || hasImageChanges || hasGalleryChanges;
-  };
-
-  const getChangedTranslations = () => {
-    if (!hasChanges()) return [];
-
-    const changed = [];
-    for (const [key, value] of Object.entries(translations)) {
-      if (originalTranslations[key] !== value) {
-        changed.push({ key, oldValue: originalTranslations[key], newValue: value });
-      }
-    }
-    return changed;
+    return Object.values(childrenHasChanges).some(hasChange => hasChange);
   };
 
   const handleSave = () => {
-    const changedTranslations = getChangedTranslations();
-    const changedImages = Object.keys(modifiedImages);
-    const changedGalleries = Object.keys(galleryChanges);
-
-    if (changedTranslations.length === 0 && changedImages.length === 0 && changedGalleries.length === 0) {
+    if (!hasChanges()) {
       showToast('No hay cambios para guardar', 'info');
       return;
     }
 
     // Build confirmation message
     const messageParts = [];
-    if (changedTranslations.length > 0) {
-      messageParts.push(`${changedTranslations.length} traducción(es)`);
-    }
-    if (changedImages.length > 0) {
-      messageParts.push(`${changedImages.length} imagen(es)`);
-    }
-    if (changedGalleries.length > 0) {
-      // Count total gallery image changes
-      let totalGalleryChanges = 0;
-      changedGalleries.forEach(galleryName => {
-        const changes = galleryChanges[galleryName];
-        totalGalleryChanges += (changes.newImages?.length || 0);
-        totalGalleryChanges += (changes.deletedImages?.length || 0);
-      });
-      if (totalGalleryChanges > 0) {
-        messageParts.push(`${totalGalleryChanges} cambio(s) en galerías`);
-      }
-    }
-    const message = `¿Estás seguro de que quieres guardar los cambios en ${messageParts.join(' y ')}?`;
+    if (childrenHasChanges.singleImage) messageParts.push('imagen');
+    if (childrenHasChanges.gallery) messageParts.push('galería');
+    if (childrenHasChanges.translations) messageParts.push('traducciones');
 
-    // Mostrar confirmaci�n antes de guardar
+    const message = `¿Estás seguro de que quieres guardar los cambios en ${messageParts.join(', ')}?`;
+
+    // Show confirmation before saving
     setConfirmDialog({
       isOpen: true,
       title: 'Guardar cambios',
       message,
       type: 'info',
+      onCancel: () => setConfirmDialog(prev => ({ ...prev, isOpen: false })),
       onConfirm: async () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
         setIsSaving(true);
 
         try {
-          const updatePromises = [];
+          // Call save() on each child component that has changes
+          const savePromises = [];
 
-          // Update all changed translations
-          if (changedTranslations.length > 0) {
-            const translationPromises = changedTranslations.map(({ key, newValue }) => (
-              I18nService.updateTranslation(selectedLanguage, key, newValue))
-            );
-            updatePromises.push(...translationPromises);
+          if (childrenHasChanges.singleImage && singleImageRef.current) {
+            savePromises.push(singleImageRef.current.save());
           }
 
-          // Update all changed images
-          if (changedImages.length > 0) {
-            const imagePromises = changedImages.map(imageName =>
-              ImageService.updateImage(imageName, modifiedImages[imageName])
-            );
-            updatePromises.push(...imagePromises);
+          if (childrenHasChanges.gallery && galleryRef.current) {
+            savePromises.push(galleryRef.current.save());
           }
 
-          await Promise.all(updatePromises);
-
-          // Process gallery changes sequentially (one by one)
-          if (changedGalleries.length > 0) {
-            for (const galleryName of changedGalleries) {
-              const changes = galleryChanges[galleryName];
-
-              // 1. Upload new images one by one and add to gallery
-              if (changes.newImages && changes.newImages.length > 0) {
-                for (let i = 0; i < changes.newImages.length; i++) {
-                  const newImage = changes.newImages[i];
-                  try {
-                    // Upload the image first with the generated unique name
-                    await ImageService.uploadImage(newImage.name, newImage._file);
-                    // Then add it to the gallery with the correct order
-                    await ImageService.addImageToGallery(galleryName, newImage.name, newImage.order);
-                  } catch (error) {
-                    console.error(`Error uploading image ${newImage.name}:`, error);
-                    throw new Error(`Error al subir la imagen ${newImage.name}: ${error.message}`);
-                  }
-                }
-              }
-
-              // 2. Remove deleted images from gallery
-              if (changes.deletedImages && changes.deletedImages.length > 0) {
-                for (const deletedImage of changes.deletedImages) {
-                  try {
-                    await ImageService.removeImageFromGallery(galleryName, deletedImage.name);
-                  } catch (error) {
-                    console.error(`Error removing image ${deletedImage.name}:`, error);
-                    throw new Error(`Error al eliminar la imagen ${deletedImage.name}: ${error.message}`);
-                  }
-                }
-              }
-
-              // 3. Update order of reordered images
-              if (changes.reorderedImages && changes.reorderedImages.length > 0) {
-                for (const reorderedImage of changes.reorderedImages) {
-                  try {
-                    await ImageService.updateImageOrder(galleryName, reorderedImage.name, reorderedImage.order);
-                  } catch (error) {
-                    console.error(`Error updating order for image ${reorderedImage.name}:`, error);
-                    // Continue with other images even if one fails
-                  }
-                }
-              }
-            }
+          if (childrenHasChanges.translations && translationsRef.current) {
+            savePromises.push(translationsRef.current.save());
           }
 
-          // Reload data from backend
-          await loadTranslations();
-          setModifiedImages({});
-          setGalleryChanges({});
+          await Promise.all(savePromises);
 
-          // Update image refresh key to force image reload if images were changed
-          if (changedImages.length > 0 || changedGalleries.length > 0) {
-            setImageRefreshKey(Date.now());
-          }
+          // Reset children changes state
+          setChildrenHasChanges({
+            singleImage: false,
+            gallery: false,
+            translations: false
+          });
 
           setIsEditing(false);
           setIsSaving(false);
 
           // Show success toast
-          const successParts = [];
-          if (changedTranslations.length > 0) {
-            successParts.push(`${changedTranslations.length} traducción(es)`);
-          }
-          if (changedImages.length > 0) {
-            successParts.push(`${changedImages.length} imagen(es)`);
-          }
-          if (changedGalleries.length > 0) {
-            successParts.push('cambios en galerías');
-          }
           showToast(
-            `${successParts.join(' y ')} actualizada(s) correctamente`,
+            `Cambios guardados correctamente`,
             'success',
             4000
           );
@@ -258,6 +142,7 @@ const SettingsContent = () => {
             title: 'Error al guardar',
             message: `No se pudieron guardar los cambios: ${err.message || 'Error desconocido'}`,
             type: 'danger',
+            onCancel: null, // No show cancel button for error dialogs
             onConfirm: () => {
               setConfirmDialog(prev => ({ ...prev, isOpen: false }));
             }
@@ -268,96 +153,48 @@ const SettingsContent = () => {
   };
 
   const handleCancel = () => {
-    // Si no hay cambios, salir directamente del modo edici�n
+    // If no changes, exit edit mode directly
     if (!hasChanges()) {
       setIsEditing(false);
-      setModifiedImages({});
-      setGalleryChanges({});
+      setChildrenHasChanges({
+        singleImage: false,
+        gallery: false,
+        translations: false
+      });
       return;
     }
 
-    // Si hay cambios, mostrar confirmaci�n
+    // If there are changes, show confirmation
     setConfirmDialog({
       isOpen: true,
       title: 'Cancelar cambios',
       message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
       type: 'danger',
+      onCancel: () => setConfirmDialog(prev => ({ ...prev, isOpen: false })),
       onConfirm: () => {
         setIsEditing(false);
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        // Reset to original data
-        setTranslations(JSON.parse(JSON.stringify(originalTranslations)));
-        setModifiedImages({});
-        setGalleryChanges({});
+
+        // Call cancel() on all child components
+        if (singleImageRef.current) {
+          singleImageRef.current.cancel();
+        }
+        if (galleryRef.current) {
+          galleryRef.current.cancel();
+        }
+        if (translationsRef.current) {
+          translationsRef.current.cancel();
+        }
+
+        // Reset children changes state
+        setChildrenHasChanges({
+          singleImage: false,
+          gallery: false,
+          translations: false
+        });
       }
     });
   };
-
-  const handleTranslationsChange = (newTranslations) => {
-    setTranslations(newTranslations);
-  };
-
-  const handleImageChange = (imageName, file) => {
-    setModifiedImages(prev => {
-      if (!file) {
-        // Remove the image from modified images
-        const newModified = { ...prev };
-        delete newModified[imageName];
-        return newModified;
-      }
-      // Add or update the image
-      return {
-        ...prev,
-        [imageName]: file
-      };
-    });
-  };
-
-  const handleGalleryChange = (galleryName, changes) => {
-    setGalleryChanges(prev => {
-      if (!changes || (
-        (!changes.newImages || changes.newImages.length === 0) &&
-        (!changes.deletedImages || changes.deletedImages.length === 0) &&
-        (!changes.reorderedImages || changes.reorderedImages.length === 0)
-      )) {
-        // Remove the gallery from changes if no changes
-        const newChanges = { ...prev };
-        delete newChanges[galleryName];
-        return newChanges;
-      }
-      // Add or update the gallery changes
-      return {
-        ...prev,
-        [galleryName]: changes
-      };
-    });
-  };
-
-  // Show loading state
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Cargando traducciones...</p>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error && !translations) {
-    return (
-      <div className={styles.errorContainer}>
-        <p className={styles.errorText}>Error al cargar los datos: {error}</p>
-        <Button
-          variant="primary"
-          onClick={loadTranslations}
-          className={styles.retryButton}
-        >
-          Reintentar
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -369,6 +206,7 @@ const SettingsContent = () => {
               <div className={styles.headerTop}>
                 {/* Title Section */}
                 <div className={styles.titleWrapper}>
+                  <Settings scale={24} />
                   <h1 className={styles.pageTitle}>Configuración</h1>
                 </div>
 
@@ -432,34 +270,35 @@ const SettingsContent = () => {
             </div>
 
             {/* Content area */}
-            {translations && (
-              <div className={styles.formsContainer}>
-                {/* Single Images Section */}
-                <SingleImageForm
-                  imageName="hero-main.jpg"
-                  title="Fondo de inicio"
-                  onChange={(file) => handleImageChange('hero-main', file)}
-                  isEditing={isEditing}
-                  refreshKey={imageRefreshKey}
-                />
-                {/* Gallery Section */}
-                <MultiImageForm
-                  galleryName="historia"
-                  title="Galería de Historia"
-                  onChange={(changes) => handleGalleryChange('historia', changes)}
-                  isEditing={isEditing}
-                  refreshKey={imageRefreshKey}
-                />
-                {/* Translations Section */}
-                <TranslationsForm
-                  translations={translations}
-                  onChange={handleTranslationsChange}
-                  errors={{}}
-                  isEditing={isEditing}
-                  language={selectedLanguage}
-                />
-              </div>
-            )}
+            <div className={styles.formsContainer}>
+              {/* Single Images Section */}
+              <SingleImageForm
+                id="singleImage"
+                imageName="hero-main.jpg"
+                title="Fondo de inicio"
+                ref={singleImageRef}
+                onHasChangesChange={handleChildHasChangesChange}
+                isEditing={isEditing}
+              />
+              {/* Gallery Section */}
+              <MultiImageForm
+                id="gallery"
+                galleryName="historia"
+                title="Galería de Historia"
+                ref={galleryRef}
+                onHasChangesChange={handleChildHasChangesChange}
+                isEditing={isEditing}
+              />
+              {/* Translations Section */}
+              <TranslationsForm
+                id="translations"
+                ref={translationsRef}
+                language={selectedLanguage}
+                onHasChangesChange={handleChildHasChangesChange}
+                errors={{}}
+                isEditing={isEditing}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -472,7 +311,7 @@ const SettingsContent = () => {
           message={confirmDialog.message}
           type={confirmDialog.type}
           onConfirm={confirmDialog.onConfirm}
-          onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+          onCancel={confirmDialog.onCancel}
           confirmText={confirmDialog.type === 'danger' ? 'Confirmar' : 'Aceptar'}
         />
       )}

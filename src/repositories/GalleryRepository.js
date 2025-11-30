@@ -26,24 +26,23 @@ export class GalleryRepository extends BaseRepository {
     }
 
     /**
-     * Actualiza/guarda cambios en la carta
+     * Actualiza una galería completa
      * POST /gallery/update/{name}
      * REQUIERE AUTENTICACIÓN
-     * @param {Array} menuData - Array de categorías con subcategorías e items
-     * @param {string} language - Código de idioma
+     * @param {string} name - Nombre de la galería
+     * @param {Object} gallery - Contenido completo de la galería
      * @param {string} token - Token de autenticación (opcional, se obtiene de AuthService)
      * @returns {Promise<Object>} Respuesta del backend
      */
-    static async updateMenu(name, gallery, token) {
+    static async updateGallery(name, gallery, token) {
         try {
-            // POST usa el endpoint directamente, agregamos params a la URL
-            const endpoint = `/gallery/update/${name}}`;
+            const endpoint = `/gallery/update/${name}`;
 
-            return await this.post(endpoint, gallery, { 
+            return await this.post(endpoint, gallery, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
-            console.error('CartaRepository: Error updating menu:', error);
+            console.error('GalleryRepository: Error updating gallery:', error);
             throw error;
         }
     }
