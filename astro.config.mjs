@@ -1,9 +1,24 @@
 import { defineConfig } from 'astro/config';
 import strip from '@rollup/plugin-strip';
 import { fileURLToPath, URL } from 'node:url';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig(({ mode }) => ({
+  site: process.env.SITE_URL || 'https://www.elpalleter.com',
   output: 'static',
+
+  integrations: [
+    sitemap({
+      i18n: {
+        defaultLocale: 'es',
+        locales: {
+          es: 'es',
+          en: 'en',
+          val: 'val',
+        },
+      },
+    }),
+  ],
 
   build: {
     inlineStylesheets: 'always',
