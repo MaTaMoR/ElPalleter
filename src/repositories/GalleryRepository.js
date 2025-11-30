@@ -35,15 +35,24 @@ export class GalleryRepository extends BaseRepository {
      * @returns {Promise<Object>} Respuesta del backend
      */
     static async updateMenu(name, gallery, token) {
-        try {
-            // POST usa el endpoint directamente, agregamos params a la URL
-            const endpoint = `/gallery/update/${name}}`;
+        if (!name) {
+            throw new Error('Gallery name is required');
+        }
+        if (!gallery) {
+            throw new Error('Gallery data is required');
+        }
+        if (!token) {
+            throw new Error('Token is required');
+        }
 
-            return await this.post(endpoint, gallery, { 
+        try {
+            const endpoint = `/gallery/update/${name}`;
+
+            return await this.post(endpoint, gallery, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
-            console.error('CartaRepository: Error updating menu:', error);
+            console.error('GalleryRepository: Error updating gallery:', error);
             throw error;
         }
     }

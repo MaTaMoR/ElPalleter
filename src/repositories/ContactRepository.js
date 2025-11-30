@@ -13,12 +13,14 @@ export class ContactRepository extends BaseRepository {
      * @returns {Promise<Object>} Información completa del restaurante
      */
     static async getTranslatedRestaurantInfo(language = 'es') {
+        if (!language) {
+            throw new Error('Language is required');
+        }
+
         try {
-            const response = await this.get('/contact/translated-restaurant-info', {
+            return await this.get('/contact/translated-restaurant-info', {
                 params: { language }
             });
-            
-            return response;
         } catch (error) {
             console.error('ContactRepository: Error getting translated restaurant info:', error);
             throw error;
@@ -45,95 +47,6 @@ export class ContactRepository extends BaseRepository {
                 }
             }
             
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene solo la información de contacto básica
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Object>} Información de contacto
-     */
-    static async getContactInfo(language = 'es') {
-        try {
-            const restaurantInfo = await this.getTranslatedRestaurantInfo(language);
-            return restaurantInfo.contactInfo || null;
-        } catch (error) {
-            console.error('ContactRepository: Error getting contact info:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene solo los horarios del restaurante
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de horarios por día
-     */
-    static async getSchedules(language = 'es') {
-        try {
-            const restaurantInfo = await this.getTranslatedRestaurantInfo(language);
-            return restaurantInfo.schedules || [];
-        } catch (error) {
-            console.error('ContactRepository: Error getting schedules:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene solo las redes sociales
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de redes sociales
-     */
-    static async getSocialMedias(language = 'es') {
-        try {
-            const restaurantInfo = await this.getTranslatedRestaurantInfo(language);
-            return restaurantInfo.socialMedias || [];
-        } catch (error) {
-            console.error('ContactRepository: Error getting social medias:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene solo las redes sociales activas/habilitadas
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de redes sociales activas
-     */
-    static async getActiveSocialMedias(language = 'es') {
-        try {
-            const socialMedias = await this.getSocialMedias(language);
-            return socialMedias.filter(social => social.enabled === true);
-        } catch (error) {
-            console.error('ContactRepository: Error getting active social medias:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Genera enlaces de acción (teléfono, email, maps, etc.)
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Object>} Enlaces de acción
-     */
-    static async getActionLinks(language = 'es') {
-        try {
-            const contactInfo = await this.getContactInfo(language);
-
-            if (!contactInfo) {
-                throw new Error('No contact info available');
-            }
-
-            const fullAddress = `${contactInfo.street}, ${contactInfo.postalCode} ${contactInfo.city}, ${contactInfo.province}`;
-            
-            return {
-                call: contactInfo.phoneMain ? `tel:${contactInfo.phoneMain}` : null,
-                email: contactInfo.emailMain ? `mailto:${contactInfo.emailMain}` : null,
-                website: contactInfo.website || null,
-                maps: fullAddress ? `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}` : null,
-                directions: fullAddress ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}` : null,
-                fullAddress
-            };
-        } catch (error) {
-            console.error('ContactRepository: Error generating action links:', error);
             throw error;
         }
     }
@@ -184,13 +97,11 @@ export class ContactRepository extends BaseRepository {
         }
 
         try {
-            // POST usa el endpoint directamente, agregamos params a la URL
             const endpoint = `/contact/update?language=${encodeURIComponent(language)}`;
 
-            const response = await this.post(endpoint, restaurantData, {
-              headers: this.getAuthHeaders(token)
+            return await this.post(endpoint, restaurantData, {
+                headers: this.getAuthHeaders(token)
             });
-            return response;
         } catch (error) {
             console.error('ContactRepository: Error updating restaurant info:', error);
             throw error;
