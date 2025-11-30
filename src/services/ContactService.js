@@ -197,8 +197,7 @@ export class ContactService {
      */
     static async getContactInfo(language = 'es') {
         try {
-            const restaurantInfo = await ContactRepository.getTranslatedRestaurantInfo(language);
-            return restaurantInfo.contactInfo || null;
+            return await ContactRepository.getTranslatedRestaurantInfo(language);
         } catch (error) {
             console.error('ContactService: Error getting contact info:', error);
             throw error;
@@ -212,8 +211,7 @@ export class ContactService {
      */
     static async getSchedules(language = 'es') {
         try {
-            const restaurantInfo = await ContactRepository.getTranslatedRestaurantInfo(language);
-            return restaurantInfo.schedules || [];
+            return await ContactRepository.getTranslatedRestaurantInfo(language);
         } catch (error) {
             console.error('ContactService: Error getting schedules:', error);
             throw error;

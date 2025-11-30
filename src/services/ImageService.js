@@ -24,8 +24,7 @@ export class ImageService {
      */
     static async uploadImage(name, file) {
         try {
-            const uploadedImage = await ImageRepository.uploadImage(name, file, AuthService.getToken());
-            return uploadedImage;
+            return await ImageRepository.uploadImage(name, file, AuthService.getToken());
         } catch (error) {
             console.error('ImageService: Error uploading image:', error);
             throw error;
@@ -39,8 +38,7 @@ export class ImageService {
      */
     static async getImageDetails(name) {
         try {
-            const imageDetails = await ImageRepository.getImageDetails(name);
-            return imageDetails;
+            return await ImageRepository.getImageDetails(name);
         } catch (error) {
             console.error(`ImageService: Error getting image details for ${name}:`, error);
             throw error;
@@ -54,8 +52,7 @@ export class ImageService {
      */
     static async getImage(name) {
         try {
-            const imageBlob = await ImageRepository.getImage(name);
-            return imageBlob;
+            return await ImageRepository.getImage(name);
         } catch (error) {
             console.error(`ImageService: Error getting image ${name}:`, error);
             throw error;
@@ -68,8 +65,7 @@ export class ImageService {
      */
     static async getImageUploadSettings() {
         try {
-            const imageUploadSettings = await ImageRepository.getImageUploadSettings();
-            return imageUploadSettings;
+            return await ImageRepository.getImageUploadSettings();
         } catch (error) {
             console.error('ImageService: Error getting image upload settings:', error);
             throw error;
@@ -85,8 +81,7 @@ export class ImageService {
      */
     static async updateImage(name, file) {
         try {
-            const updatedImage = await ImageRepository.updateImage(name, file, AuthService.getToken());
-            return updatedImage;
+            return await ImageRepository.updateImage(name, file, AuthService.getToken());
         } catch (error) {
             console.error(`ImageService: Error updating image ${name}:`, error);
             throw error;
@@ -100,8 +95,7 @@ export class ImageService {
      */
     static async getGallery(name) {
         try {
-            const gallery = await GalleryRepository.getGallery(name);
-            return gallery;
+            return await GalleryRepository.getGallery(name);
         } catch (error) {
             console.error(`ImageService: Error getting gallery ${name}:`, error);
             throw error;
