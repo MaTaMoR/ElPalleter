@@ -41,7 +41,8 @@ const SettingsContent = () => {
     title: '',
     message: '',
     type: 'warning',
-    onConfirm: null
+    onConfirm: null,
+    onCancel: null
   });
 
   // Toast handlers
@@ -92,6 +93,7 @@ const SettingsContent = () => {
       title: 'Guardar cambios',
       message,
       type: 'info',
+      onCancel: () => setConfirmDialog(prev => ({ ...prev, isOpen: false })),
       onConfirm: async () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
         setIsSaving(true);
@@ -140,6 +142,7 @@ const SettingsContent = () => {
             title: 'Error al guardar',
             message: `No se pudieron guardar los cambios: ${err.message || 'Error desconocido'}`,
             type: 'danger',
+            onCancel: null, // No show cancel button for error dialogs
             onConfirm: () => {
               setConfirmDialog(prev => ({ ...prev, isOpen: false }));
             }
@@ -167,6 +170,7 @@ const SettingsContent = () => {
       title: 'Cancelar cambios',
       message: '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios realizados.',
       type: 'danger',
+      onCancel: () => setConfirmDialog(prev => ({ ...prev, isOpen: false })),
       onConfirm: () => {
         setIsEditing(false);
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
@@ -306,7 +310,7 @@ const SettingsContent = () => {
           message={confirmDialog.message}
           type={confirmDialog.type}
           onConfirm={confirmDialog.onConfirm}
-          onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+          onCancel={confirmDialog.onCancel}
           confirmText={confirmDialog.type === 'danger' ? 'Confirmar' : 'Aceptar'}
         />
       )}
