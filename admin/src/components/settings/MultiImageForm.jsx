@@ -111,14 +111,7 @@ const MultiImageForm = forwardRef(({
         }
       }
 
-      // 2. Load current gallery and build updated content
-      const currentGallery = await ImageService.getGallery(galleryName);
-
-      // Build new images array with all changes applied
-      const deletedImageNames = new Set(
-        images.filter(img => img._state === 'deleted').map(img => img.name)
-      );
-
+      // 2. Build updated images array with all changes applied
       const updatedImages = images
         .filter(img => img._state !== 'deleted')
         .map((img, index) => ({
@@ -128,13 +121,8 @@ const MultiImageForm = forwardRef(({
           imageOrder: index
         }));
 
-      const updatedGallery = {
-        ...currentGallery,
-        images: updatedImages
-      };
-
-      // 3. Update the gallery
-      await ImageService.updateGallery(galleryName, updatedGallery);
+      // 3. Update the gallery with the new images list
+      await ImageService.updateGallery(galleryName, updatedImages);
 
       // 4. Reload gallery to get fresh data
       await loadGalleryImages();
