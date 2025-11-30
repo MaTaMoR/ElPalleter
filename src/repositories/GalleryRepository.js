@@ -26,11 +26,11 @@ export class GalleryRepository extends BaseRepository {
     }
 
     /**
-     * Actualiza/guarda cambios en la carta
+     * Actualiza una galería completa
      * POST /gallery/update/{name}
      * REQUIERE AUTENTICACIÓN
-     * @param {Array} menuData - Array de categorías con subcategorías e items
-     * @param {string} language - Código de idioma
+     * @param {string} name - Nombre de la galería
+     * @param {Object} gallery - Contenido completo de la galería
      * @param {string} token - Token de autenticación (opcional, se obtiene de AuthService)
      * @returns {Promise<Object>} Respuesta del backend
      */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
@@ -9,14 +9,19 @@ import styles from './SingleImageForm.module.css';
 
 /**
  * Form component for viewing and editing a single image
+ *
+ * Exposes methods via ref:
+ * - save(): Saves the selected image
+ * - cancel(): Discards changes and clears selection
+ * - hasChanges(): Returns true if an image has been selected
  */
-const SingleImageForm = ({
+const SingleImageForm = forwardRef(({
+  id,
   imageName,
   title = 'Imagen',
-  onChange,
-  isEditing = false,
-  refreshKey = null
-}) => {
+  onHasChangesChange,
+  isEditing = false
+}, ref) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
@@ -24,10 +29,27 @@ const SingleImageForm = ({
   // Load upload settings using custom hook
   const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
 
-  // Get the current image URL with cache-busting parameter
-  const currentImageUrl = refreshKey
-    ? `${ImageService.getImageURL(imageName)}?t=${refreshKey}`
-    : ImageService.getImageURL(imageName);
+  // Get the current image URL
+  const currentImageUrl = ImageService.getImageURL(imageName);
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (selectedFile) {
+        await ImageService.updateImage(imageName, selectedFile);
+        // Clear selection after save
+        handleClearSelection();
+      }
+    },
+
+    cancel: () => {
+      handleClearSelection();
+    },
+
+    hasChanges: () => {
+      return selectedFile !== null;
+    }
+  }), [selectedFile, imageName]);
 
   // Clean up preview URL when component unmounts or file changes
   useEffect(() => {
@@ -57,8 +79,8 @@ const SingleImageForm = ({
         URL.revokeObjectURL(previewUrl);
         setPreviewUrl(null);
       }
-      if (onChange) {
-        onChange(null);
+      if (onHasChangesChange) {
+        onHasChangesChange(id, false);
       }
       return;
     }
@@ -85,8 +107,8 @@ const SingleImageForm = ({
     setPreviewUrl(newPreviewUrl);
 
     // Notify parent component
-    if (onChange) {
-      onChange(file);
+    if (onHasChangesChange) {
+      onHasChangesChange(id, true);
     }
   };
 
@@ -96,8 +118,8 @@ const SingleImageForm = ({
       URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
     }
-    if (onChange) {
-      onChange(null);
+    if (onHasChangesChange) {
+      onHasChangesChange(id, false);
     }
     // Reset file input
     const fileInput = document.getElementById(`image-upload-${imageName}`);
@@ -223,14 +245,14 @@ const SingleImageForm = ({
       />
     </div>
   );
-};
+});
 
 SingleImageForm.propTypes = {
+  id: PropTypes.string.isRequired,
   imageName: PropTypes.string.isRequired,
   title: PropTypes.string,
-  onChange: PropTypes.func,
-  isEditing: PropTypes.bool,
-  refreshKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  onHasChangesChange: PropTypes.func,
+  isEditing: PropTypes.bool
 };
 
 export default SingleImageForm;

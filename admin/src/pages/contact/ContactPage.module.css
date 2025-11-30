@@ -1,5 +1,3 @@
-/* ContactPage.module.css */
-
 .contactPage {
   display: flex;
   flex-direction: column;
@@ -67,6 +65,23 @@
   gap: 1rem;
 }
 
+.titleWrapper {
+  width: fit-content;
+  text-align: center;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  gap: 1rem;
+
+  color: var(--primary);
+
+  .pageTitle {
+    color: var(--text-primary);
+  }
+}
+
 /* Desktop: Una sola fila con título y controles */
 @media (min-width: 1024px) {
   .headerTop {
@@ -81,10 +96,6 @@
     border-radius: 16px;
     padding: 1rem 1.5rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  }
-
-  .titleWrapper {
-    flex: 0 0 auto;
   }
 
   .controlsGroup {
@@ -133,11 +144,6 @@
     border-radius: 16px;
     padding: 1rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  }
-
-  .titleWrapper {
-    width: 100%;
-    text-align: center;
   }
 
   .controlsGroup {

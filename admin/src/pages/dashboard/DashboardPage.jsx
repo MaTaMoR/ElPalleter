@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
 import {
-  Menu,
+  FileText,
   Phone,
   BookOpen,
   Settings,
@@ -27,7 +27,7 @@ const DashboardPage = () => {
       title: 'Carta',
       info: 'Configurar carta',
       action: 'Gestionar',
-      icon: Menu,
+      icon: FileText,
       className: 'carta',
       path: '/admin/menu'
     },
@@ -39,14 +39,6 @@ const DashboardPage = () => {
       icon: Phone,
       className: 'contacto',
       path: '/admin/contact'
-    },
-    {
-      id: 'historia',
-      title: 'Historia',
-      info: 'Del restaurante',
-      action: 'Modificar',
-      icon: BookOpen,
-      className: 'historia'
     },
     {
       id: 'configuracion',
