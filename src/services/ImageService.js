@@ -175,6 +175,23 @@ export class ImageService {
             throw error;
         }
     }
+
+    /**
+     * Actualiza una galería completa
+     * Este método reemplaza el contenido completo de la galería con el nuevo contenido proporcionado
+     * El backend se encarga de comparar el contenido anterior con el nuevo y realizar los cambios necesarios
+     * @param {string} galleryName - Nombre de la galería
+     * @param {Object} gallery - Contenido completo de la galería (formato igual que getGallery)
+     * @returns {Promise<void>}
+     */
+    static async updateGallery(galleryName, gallery) {
+        try {
+            await GalleryRepository.updateGallery(galleryName, gallery, AuthService.getToken());
+        } catch (error) {
+            console.error(`ImageService: Error updating gallery ${galleryName}:`, error);
+            throw error;
+        }
+    }
 }
 
 export default ImageService;

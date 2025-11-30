@@ -172,20 +172,16 @@ const SettingsContent = () => {
 
           await Promise.all(updatePromises);
 
-          // Process gallery changes sequentially (one by one)
+          // Process gallery changes
           if (changedGalleries.length > 0) {
             for (const galleryName of changedGalleries) {
               const changes = galleryChanges[galleryName];
 
-              // 1. Upload new images one by one and add to gallery
+              // 1. Upload new images first (they need to exist before adding to gallery)
               if (changes.newImages && changes.newImages.length > 0) {
-                for (let i = 0; i < changes.newImages.length; i++) {
-                  const newImage = changes.newImages[i];
+                for (const newImage of changes.newImages) {
                   try {
-                    // Upload the image first with the generated unique name
                     await ImageService.uploadImage(newImage.name, newImage._file);
-                    // Then add it to the gallery with the correct order
-                    await ImageService.addImageToGallery(galleryName, newImage.name, newImage.order);
                   } catch (error) {
                     console.error(`Error uploading image ${newImage.name}:`, error);
                     throw new Error(`Error al subir la imagen ${newImage.name}: ${error.message}`);
@@ -193,28 +189,37 @@ const SettingsContent = () => {
                 }
               }
 
-              // 2. Remove deleted images from gallery
-              if (changes.deletedImages && changes.deletedImages.length > 0) {
-                for (const deletedImage of changes.deletedImages) {
-                  try {
-                    await ImageService.removeImageFromGallery(galleryName, deletedImage.name);
-                  } catch (error) {
-                    console.error(`Error removing image ${deletedImage.name}:`, error);
-                    throw new Error(`Error al eliminar la imagen ${deletedImage.name}: ${error.message}`);
-                  }
-                }
-              }
+              // 2. Build the new gallery content with all changes applied
+              try {
+                // Load current gallery
+                const currentGallery = await ImageService.getGallery(galleryName);
 
-              // 3. Update order of reordered images
-              if (changes.reorderedImages && changes.reorderedImages.length > 0) {
-                for (const reorderedImage of changes.reorderedImages) {
-                  try {
-                    await ImageService.updateImageOrder(galleryName, reorderedImage.name, reorderedImage.order);
-                  } catch (error) {
-                    console.error(`Error updating order for image ${reorderedImage.name}:`, error);
-                    // Continue with other images even if one fails
-                  }
-                }
+                // Build new images array applying all changes
+                const deletedImageNames = new Set(
+                  (changes.deletedImages || []).map(img => img.name)
+                );
+
+                // Start with reordered images (which includes existing and new images, excluding deleted)
+                const newImages = (changes.reorderedImages || [])
+                  .filter(img => !deletedImageNames.has(img.name))
+                  .map(img => ({
+                    image: {
+                      name: img.name
+                    },
+                    imageOrder: img.order
+                  }));
+
+                // Build the updated gallery object
+                const updatedGallery = {
+                  ...currentGallery,
+                  images: newImages
+                };
+
+                // 3. Update the gallery with the new content
+                await ImageService.updateGallery(galleryName, updatedGallery);
+              } catch (error) {
+                console.error(`Error updating gallery ${galleryName}:`, error);
+                throw new Error(`Error al actualizar la galería ${galleryName}: ${error.message}`);
               }
             }
           }
