@@ -118,9 +118,11 @@ export class AnalyticsRepository extends BaseRepository {
         if (!token) {
             throw new Error('Token is required');
         }
+
         if (!startDate) {
             throw new Error('Start date is required');
         }
+        
         if (!endDate) {
             throw new Error('End date is required');
         }

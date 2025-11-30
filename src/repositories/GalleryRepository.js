@@ -34,13 +34,15 @@ export class GalleryRepository extends BaseRepository {
      * @param {string} token - Token de autenticación (opcional, se obtiene de AuthService)
      * @returns {Promise<Object>} Respuesta del backend
      */
-    static async updateMenu(name, gallery, token) {
+    static async updateGallery(name, gallery, token) {
         if (!name) {
             throw new Error('Gallery name is required');
         }
+        
         if (!gallery) {
             throw new Error('Gallery data is required');
         }
+
         if (!token) {
             throw new Error('Token is required');
         }
