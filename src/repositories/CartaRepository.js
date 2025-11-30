@@ -14,11 +14,9 @@ export class CartaRepository extends BaseRepository {
      */
     static async getTranslatedCategories(language = 'es') {
         try {
-            const response = await this.get('/carta/translated-categories', {
+            return await this.get('/carta/translated-categories', {
                 params: { language }
             });
-            
-            return response || [];
         } catch (error) {
             console.error('CartaRepository: Error getting translated categories:', error);
             throw error;
@@ -239,16 +237,22 @@ export class CartaRepository extends BaseRepository {
      * @param {string} token - Token de autenticación (opcional, se obtiene de AuthService)
      * @returns {Promise<Object>} Respuesta del backend
      */
-    static async updateMenu(menuData, language = 'es', token = null) {
+    static async updateMenu(menuData, language = 'es', token) {
+        if (!menuData) {
+            throw new Error('MenuData is required');
+        }
+
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
             // POST usa el endpoint directamente, agregamos params a la URL
             const endpoint = `/carta/update?language=${encodeURIComponent(language)}`;
 
-            const response = await this.post(endpoint, menuData, { 
-                 headers: this.getAuthHeaders(token)
+            return await this.post(endpoint, menuData, { 
+                headers: this.getAuthHeaders(token)
             });
-
-            return response;
         } catch (error) {
             console.error('CartaRepository: Error updating menu:', error);
             throw error;

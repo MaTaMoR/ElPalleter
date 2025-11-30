@@ -1,7 +1,4 @@
-// src/repositories/ContactRepository.js
 import { BaseRepository } from './BaseRepository.js';
-import { I18nService } from '../services/I18nService.js';
-import { AuthService } from '../services/AuthService.js';
 
 /**
  * Repositorio para operaciones de información de contacto
@@ -113,174 +110,6 @@ export class ContactRepository extends BaseRepository {
     }
 
     /**
-     * Calcula el estado actual del restaurante basado en horarios
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Object>} Estado actual del restaurante
-     */
-    static async getCurrentStatus(language = 'es') {
-        try {
-            const schedules = await this.getSchedules(language);
-            
-            const now = new Date();
-            const currentDay = now.getDay(); // 0 = domingo, 1 = lunes, etc.
-            const currentTime = now.getHours() * 60 + now.getMinutes(); // minutos desde medianoche
-            
-            // Mapear días (backend podría usar nombres en inglés)
-            const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const currentDayName = dayNames[currentDay];
-            
-            // Buscar horario del día actual
-            const todaySchedule = schedules.find(schedule => 
-                schedule.dayOfWeek.toLowerCase() === currentDayName.toLowerCase()
-            );
-            
-            if (!todaySchedule || !todaySchedule.isOpen || !todaySchedule.scheduleRanges?.length) {
-                return {
-                    status: 'closed',
-                    isOpen: false,
-                    message: I18nService.getTranslation('contact.status.states.closed', language),
-                    nextOpening: await this.getNextOpening(schedules, currentDay, currentTime)
-                };
-            }
-
-            // Verificar si está abierto en algún rango actual
-            for (const range of todaySchedule.scheduleRanges) {
-                const startMinutes = this.timeToMinutes(range.startTime);
-                const endMinutes = this.timeToMinutes(range.endTime);
-                
-                if (currentTime >= startMinutes && currentTime <= endMinutes) {
-                    const minutesUntilClose = endMinutes - currentTime;
-                    // contact.status.messages.closingIn
-                    if (minutesUntilClose <= 30) {
-                        return {
-                            status: 'closing_soon',
-                            isOpen: true,
-                            message: I18nService.getTranslation('contact.status.messages.closingIn', language, { 
-                                minutes: minutesUntilClose
-                            }),
-                            minutesUntilClose,
-                            closingTime: range.endTime
-                        };
-                    }
-                    
-                    return {
-                        status: 'open',
-                        isOpen: true,
-                        message: I18nService.getTranslation('contact.status.messages.until', language, { 
-                            time: range.endTime
-                        }),
-                        closingTime: range.endTime
-                    };
-                }
-            }
-
-            // Verificar si abre pronto
-            const nextRange = todaySchedule.scheduleRanges
-                .filter(range => this.timeToMinutes(range.startTime) > currentTime)
-                .sort((a, b) => this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime))[0];
-
-            if (nextRange) {
-                const minutesUntilOpen = this.timeToMinutes(nextRange.startTime) - currentTime;
-                
-                if (minutesUntilOpen <= 60) {
-                    return {
-                        status: 'opening_soon',
-                        isOpen: false,
-                        message: I18nService.getTranslation('contact.status.messages.openingAt', language, { 
-                            time: minutesUntilOpen
-                        }),
-                        minutesUntilOpen,
-                        openingTime: nextRange.startTime
-                    };
-                }
-            }
-
-            return {
-                status: 'closed',
-                isOpen: false,
-                message: I18nService.getTranslation('contact.status.states.closed', language),
-                nextOpening: await this.getNextOpening(schedules, currentDay, currentTime)
-            };
-        } catch (error) {
-            console.error('ContactRepository: Error calculating current status:', error);
-            return {
-                status: 'unknown',
-                isOpen: false,
-                message: 'Estado desconocido',
-                error: error.message
-            };
-        }
-    }
-
-    /**
-     * Encuentra la próxima apertura del restaurante
-     * @param {Array} schedules - Array de horarios
-     * @param {number} currentDay - Día actual (0-6)
-     * @param {number} currentTime - Tiempo actual en minutos
-     * @returns {Promise<Object|null>} Información de la próxima apertura
-     */
-    static async getNextOpening(schedules, currentDay, currentTime) {
-        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        
-        // Buscar en los próximos 7 días
-        for (let i = 0; i < 7; i++) {
-            const checkDay = (currentDay + i) % 7;
-            const dayName = dayNames[checkDay];
-            
-            const daySchedule = schedules.find(schedule => 
-                schedule.dayOfWeek.toLowerCase() === dayName.toLowerCase()
-            );
-            
-            if (!daySchedule || !daySchedule.isOpen || !daySchedule.scheduleRanges?.length) {
-                continue;
-            }
-            
-            const ranges = daySchedule.scheduleRanges
-                .sort((a, b) => this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime));
-                
-            if (i === 0) {
-                // Día actual - buscar rangos que aún no han empezado
-                const futureRanges = ranges.filter(range => 
-                    this.timeToMinutes(range.startTime) > currentTime
-                );
-                
-                if (futureRanges.length > 0) {
-                    return {
-                        day: dayName,
-                        dayIndex: checkDay,
-                        time: futureRanges[0].startTime,
-                        isToday: true
-                    };
-                }
-            } else {
-                // Días futuros - tomar el primer rango
-                if (ranges.length > 0) {
-                    return {
-                        day: dayName,
-                        dayIndex: checkDay,
-                        time: ranges[0].startTime,
-                        isToday: false
-                    };
-                }
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Convierte tiempo HH:MM a minutos desde medianoche
-     * @param {string} timeString - Tiempo en formato "HH:MM"
-     * @returns {number} Minutos desde medianoche
-     */
-    static timeToMinutes(timeString) {
-        if (!timeString) return 0;
-        
-        const [hours, minutes] = timeString.split(':').map(Number);
-        return (hours || 0) * 60 + (minutes || 0);
-    }
-
-    /**
      * Genera enlaces de acción (teléfono, email, maps, etc.)
      * @param {string} language - Código de idioma
      * @returns {Promise<Object>} Enlaces de acción
@@ -288,8 +117,7 @@ export class ContactRepository extends BaseRepository {
     static async getActionLinks(language = 'es') {
         try {
             const contactInfo = await this.getContactInfo(language);
-            const restaurantInfo = await this.getTranslatedRestaurantInfo(language);
-            
+
             if (!contactInfo) {
                 throw new Error('No contact info available');
             }
@@ -346,19 +174,22 @@ export class ContactRepository extends BaseRepository {
      * @param {string} token - Token de autenticación (opcional)
      * @returns {Promise<Object>} Respuesta del backend
      */
-    static async updateRestaurantInfo(restaurantData, language = 'es', token = null) {
+    static async updateRestaurantInfo(restaurantData, language = 'es', token) {
+        if (!restaurantData) {
+            throw new Error('RestaurantData is required');
+        }
+
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
-            // Obtener token de AuthService si no se proporciona
-            const authToken = token || AuthService.getToken();
-
-            // Usar getAuthHeaders de BaseRepository para obtener headers con token
-            const headers = authToken ? this.getAuthHeaders(authToken) : this.getBaseHeaders();
-
             // POST usa el endpoint directamente, agregamos params a la URL
             const endpoint = `/contact/update?language=${encodeURIComponent(language)}`;
 
-            const response = await this.post(endpoint, restaurantData, { headers });
-
+            const response = await this.post(endpoint, restaurantData, {
+              headers: this.getAuthHeaders(token)
+            });
             return response;
         } catch (error) {
             console.error('ContactRepository: Error updating restaurant info:', error);

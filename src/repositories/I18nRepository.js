@@ -1,5 +1,4 @@
 import { BaseRepository } from './BaseRepository.js';
-import ImageService from '../services/ImageService.js';
 
 /**
  * Repositorio para operaciones de internacionalización

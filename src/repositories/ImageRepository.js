@@ -1,6 +1,3 @@
-
-// src/repositories/ImageRepository.js
-
 import { BaseRepository } from './BaseRepository.js';
 
 /**
@@ -35,6 +32,10 @@ export class ImageRepository extends BaseRepository {
             throw new Error('Image file is required');
         }
 
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
             const formData = new FormData();
             formData.append('image', file);
@@ -62,8 +63,7 @@ export class ImageRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.get(`/image/info/${name}`);
-            return response;
+            return await this.get(`/image/info/${name}`);
         } catch (error) {
             console.error(`ImageRepository: Error getting image details for ${name}:`, error);
             throw error;
@@ -123,6 +123,10 @@ export class ImageRepository extends BaseRepository {
 
         if (!file) {
             throw new Error('Image file is required');
+        }
+        
+        if (!token) {
+            throw new Error('Token is required');
         }
 
         try {
