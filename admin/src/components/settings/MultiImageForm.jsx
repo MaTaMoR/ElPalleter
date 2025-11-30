@@ -18,6 +18,7 @@ import styles from './MultiImageForm.module.css';
  * - hasChanges(): Returns true if there are pending changes
  */
 const MultiImageForm = forwardRef(({
+  id,
   galleryName,
   title = 'Galería',
   onHasChangesChange,
@@ -95,7 +96,7 @@ const MultiImageForm = forwardRef(({
   const notifyHasChangesChange = (updatedImages) => {
     if (onHasChangesChange) {
       const hasChanges = checkHasChanges(updatedImages);
-      onHasChangesChange(hasChanges);
+      onHasChangesChange(id, hasChanges);
     }
   };
 
@@ -569,6 +570,7 @@ const MultiImageForm = forwardRef(({
 };
 
 MultiImageForm.propTypes = {
+  id: PropTypes.string.isRequired,
   galleryName: PropTypes.string.isRequired,
   title: PropTypes.string,
   onHasChangesChange: PropTypes.func,

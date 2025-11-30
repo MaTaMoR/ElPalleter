@@ -14,6 +14,7 @@ import styles from './TranslationsForm.module.css';
  * - hasChanges(): Returns true if there are pending changes
  */
 const TranslationsForm = forwardRef(({
+  id,
   language = 'es',
   onHasChangesChange,
   errors = {},
@@ -154,7 +155,7 @@ const TranslationsForm = forwardRef(({
     // Notify parent of changes
     if (onHasChangesChange) {
       const hasChanges = JSON.stringify(updatedTranslations) !== JSON.stringify(originalTranslationsRef.current);
-      onHasChangesChange(hasChanges);
+      onHasChangesChange(id, hasChanges);
     }
   };
 
@@ -302,6 +303,7 @@ const TranslationsForm = forwardRef(({
 };
 
 TranslationsForm.propTypes = {
+  id: PropTypes.string.isRequired,
   language: PropTypes.string,
   onHasChangesChange: PropTypes.func,
   errors: PropTypes.object,

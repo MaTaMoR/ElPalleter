@@ -16,6 +16,7 @@ import styles from './SingleImageForm.module.css';
  * - hasChanges(): Returns true if an image has been selected
  */
 const SingleImageForm = forwardRef(({
+  id,
   imageName,
   title = 'Imagen',
   onHasChangesChange,
@@ -79,7 +80,7 @@ const SingleImageForm = forwardRef(({
         setPreviewUrl(null);
       }
       if (onHasChangesChange) {
-        onHasChangesChange(false);
+        onHasChangesChange(id, false);
       }
       return;
     }
@@ -107,7 +108,7 @@ const SingleImageForm = forwardRef(({
 
     // Notify parent component
     if (onHasChangesChange) {
-      onHasChangesChange(true);
+      onHasChangesChange(id, true);
     }
   };
 
@@ -118,7 +119,7 @@ const SingleImageForm = forwardRef(({
       setPreviewUrl(null);
     }
     if (onHasChangesChange) {
-      onHasChangesChange(false);
+      onHasChangesChange(id, false);
     }
     // Reset file input
     const fileInput = document.getElementById(`image-upload-${imageName}`);
@@ -247,6 +248,7 @@ const SingleImageForm = forwardRef(({
 };
 
 SingleImageForm.propTypes = {
+  id: PropTypes.string.isRequired,
   imageName: PropTypes.string.isRequired,
   title: PropTypes.string,
   onHasChangesChange: PropTypes.func,

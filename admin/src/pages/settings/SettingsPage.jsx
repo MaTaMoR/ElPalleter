@@ -64,6 +64,10 @@ const SettingsContent = () => {
     setIsEditing(true);
   };
 
+  const handleChildHasChangesChange = useCallback((childId, hasChanges) => {
+    setChildrenHasChanges(prev => ({ ...prev, [childId]: hasChanges }));
+  }, []);
+
   const hasChanges = () => {
     return Object.values(childrenHasChanges).some(hasChange => hasChange);
   };
@@ -265,24 +269,27 @@ const SettingsContent = () => {
               {/* Single Images Section */}
               <SingleImageForm
                 ref={singleImageRef}
+                id="singleImage"
                 imageName="hero-main.jpg"
                 title="Fondo de inicio"
-                onHasChangesChange={(hasChanges) => setChildrenHasChanges(prev => ({ ...prev, singleImage: hasChanges }))}
+                onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}
               />
               {/* Gallery Section */}
               <MultiImageForm
                 ref={galleryRef}
+                id="gallery"
                 galleryName="historia"
                 title="Galería de Historia"
-                onHasChangesChange={(hasChanges) => setChildrenHasChanges(prev => ({ ...prev, gallery: hasChanges }))}
+                onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}
               />
               {/* Translations Section */}
               <TranslationsForm
                 ref={translationsRef}
+                id="translations"
                 language={selectedLanguage}
-                onHasChangesChange={(hasChanges) => setChildrenHasChanges(prev => ({ ...prev, translations: hasChanges }))}
+                onHasChangesChange={handleChildHasChangesChange}
                 errors={{}}
                 isEditing={isEditing}
               />
