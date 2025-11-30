@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig(({ mode }) => ({
-  site: 'https://www.elpalleter.com',
+  site: process.env.SITE_URL || 'https://www.elpalleter.com',
   output: 'static',
 
   integrations: [
