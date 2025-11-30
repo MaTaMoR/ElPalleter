@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
+import useImageUploadSettings from '../../hooks/useImageUploadSettings';
+import { validateImageFiles, generateUniqueImageName } from '../../utils/imageValidationUtils';
+import ConfirmDialog from '../common/ConfirmDialog';
 import styles from './MultiImageForm.module.css';
 
 /**
@@ -19,9 +22,14 @@ const MultiImageForm = ({
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImageId, setExpandedImageId] = useState(null);
-  const [maxUploadSize, setMaxUploadSize] = useState(null);
-  const [loadingSize, setLoadingSize] = useState(true);
+  const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
   const imageRefs = useRef({});
+
+  // Store original image order for comparison when editing
+  const originalImagesRef = useRef([]);
+
+  // Load upload settings using custom hook
+  const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
 
   // Load images from gallery
   useEffect(() => {
@@ -30,20 +38,17 @@ const MultiImageForm = ({
     }
   }, [galleryName, refreshKey, isEditing]);
 
-  // Load max upload size on mount
+  // Save original image state when entering edit mode
   useEffect(() => {
-    const loadMaxSize = async () => {
-      try {
-        const sizeInfo = await ImageService.getMaxUploadSize();
-        setMaxUploadSize(sizeInfo);
-      } catch (error) {
-        console.error('Error loading max upload size:', error);
-      } finally {
-        setLoadingSize(false);
-      }
-    };
-    loadMaxSize();
-  }, []);
+    if (isEditing && images.length > 0) {
+      // Deep copy of images to preserve original order
+      originalImagesRef.current = images.map(img => ({
+        id: img.id,
+        name: img.name,
+        order: img.order
+      }));
+    }
+  }, [isEditing]);
 
   const loadGalleryImages = async () => {
     setLoading(true);
@@ -98,27 +103,37 @@ const MultiImageForm = ({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    const newImages = files.map((file, index) => {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert(`El archivo ${file.name} no es una imagen válida`);
-        return null;
-      }
+    // Validate all files at once using upload settings
+    const validation = validateImageFiles(files, uploadSettings);
 
+    if (!validation.isValid) {
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
+      // Reset file input
+      e.target.value = '';
+      return;
+    }
+
+    // Only process valid files
+    const newImages = validation.validFiles.map((file, index) => {
+      // Generate unique image name for gallery
+      const uniqueName = generateUniqueImageName(galleryName, file.name);
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       const tempId = `new-${Date.now()}-${index}`;
 
       return {
         id: tempId,
-        name: file.name,
+        name: uniqueName,
         order: images.length + index,
         _state: 'new',
         _isNew: true,
         _file: file,
         _previewUrl: previewUrl
       };
-    }).filter(Boolean);
+    });
 
     const updatedImages = [...images, ...newImages];
     setImages(updatedImages);
@@ -126,6 +141,14 @@ const MultiImageForm = ({
 
     // Reset file input
     e.target.value = '';
+
+    // Show warning if some files were filtered out
+    if (validation.errorMessage) {
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
+    }
   };
 
   const handleMoveImage = (imageId, direction) => {
@@ -142,17 +165,29 @@ const MultiImageForm = ({
     // Mark as edited only the images that actually changed position
     const finalImages = updatedImages.map((img, idx) => {
       const newOrder = idx;
-      // Check if this image changed position
-      const originalImage = images.find(i => i.id === img.id);
+      // Check if this image changed position compared to original state
+      const originalImage = originalImagesRef.current.find(i => i.id === img.id);
       const hasChangedPosition = originalImage && originalImage.order !== newOrder;
 
-      // Only mark as edited if it's not new and changed position
-      const shouldMarkEdited = hasChangedPosition && img._state !== 'new' && img._state !== 'deleted';
+      // Determine the correct state
+      let newState = img._state;
+      if (img._state !== 'deleted') {
+        if (img._isNew) {
+          // New images stay as 'new'
+          newState = 'new';
+        } else if (hasChangedPosition) {
+          // Images that moved from original position are 'edited'
+          newState = 'edited';
+        } else {
+          // Images that are back to original position are 'normal'
+          newState = 'normal';
+        }
+      }
 
       return {
         ...img,
         order: newOrder,
-        _state: shouldMarkEdited ? 'edited' : img._state
+        _state: newState
       };
     });
 
@@ -171,11 +206,28 @@ const MultiImageForm = ({
   };
 
   const handleUndoDelete = (imageId) => {
-    const updatedImages = images.map(img =>
-      img.id === imageId
-        ? { ...img, _state: img._isNew ? 'new' : 'normal' }
-        : img
-    );
+    const updatedImages = images.map((img, idx) => {
+      if (img.id === imageId) {
+        // Restore the deleted image
+        // Check if it's in its original position
+        const originalImage = originalImagesRef.current.find(i => i.id === img.id);
+        const currentOrder = idx;
+        const hasChangedPosition = originalImage && originalImage.order !== currentOrder;
+
+        // Determine state based on position
+        let restoredState;
+        if (img._isNew) {
+          restoredState = 'new';
+        } else if (hasChangedPosition) {
+          restoredState = 'edited';
+        } else {
+          restoredState = 'normal';
+        }
+
+        return { ...img, _state: restoredState };
+      }
+      return img;
+    });
     setImages(updatedImages);
     notifyChange(updatedImages);
   };
@@ -256,9 +308,9 @@ const MultiImageForm = ({
             <ImageIcon size={20} className={styles.cardIcon} />
             <div className={styles.titleSection}>
               <h3 className={styles.cardTitle}>{title}</h3>
-              {!loadingSize && maxUploadSize && (
+              {!loadingSettings && uploadSettings && (
                 <span className={styles.sizeLimit}>
-                  Máx: {maxUploadSize.maxFileSize}
+                  Máx: {uploadSettings.maxFileSize}
                 </span>
               )}
             </div>
@@ -299,13 +351,14 @@ const MultiImageForm = ({
                   <div className={styles.imagesList}>
                     {visibleImages.map((image, index) => {
                       const isNew = image._state === 'new';
+                      const isEdited = image._state === 'edited';
                       const isExpanded = expandedImageId === image.id;
 
                       return (
                         <div
                           key={image.id}
                           ref={(el) => { imageRefs.current[image.id] = el; }}
-                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
+                          className={`${styles.imageCard} ${isNew ? styles.newCard : ''} ${isEdited ? styles.editedCard : ''} ${isExpanded ? styles.expandedCard : ''}`}
                         >
                           <div className={`${styles.cardLayout} ${isExpanded ? styles.cardLayoutExpanded : ''}`}>
                             {/* Image Thumbnail */}
@@ -445,6 +498,16 @@ const MultiImageForm = ({
           )}
         </div>
       </div>
+
+      {/* Error Dialog */}
+      <ConfirmDialog
+        isOpen={errorDialog.isOpen}
+        title="Error de validación"
+        message={errorDialog.message}
+        type="danger"
+        confirmText="Aceptar"
+        onConfirm={() => setErrorDialog({ isOpen: false, message: '' })}
+      />
     </div>
   );
 };

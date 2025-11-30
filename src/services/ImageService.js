@@ -9,11 +9,11 @@ export class ImageService {
 
     /**
      * Obtiene el URL de una imagen por su ID
-     * @param {string} imageId - ID de la imagen
+     * @param {string} name - ID de la imagen
      * @returns {string} URL de la imagen
      */
-    static getImageURL(imageId) {
-        return ImageRepository.getImageURL(imageId);
+    static getImageURL(name) {
+        return ImageRepository.getImageURL(name);
     }
 
     /**
@@ -22,9 +22,9 @@ export class ImageService {
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} Imagen subida
      */
-    static async uploadImage(file) {
+    static async uploadImage(name, file) {
         try {
-            const uploadedImage = await ImageRepository.uploadImage(file, AuthService.getToken());
+            const uploadedImage = await ImageRepository.uploadImage(name, file, AuthService.getToken());
             return uploadedImage;
         } catch (error) {
             console.error('ImageService: Error uploading image:', error);

@@ -7,7 +7,7 @@ import MenuLayout from './MenuLayout';
 import CategoryListView from '../../components/menu/views/CategoryListView';
 import SubcategoryListView from '../../components/menu/views/SubcategoryListView';
 import ItemListView from '../../components/menu/views/ItemListView';
-import ConfirmDialog from '../../components/menu/utils/ConfirmDialog';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { useMenuData } from '../../hooks/useMenuData';
 import { MenuEditProvider, useMenuEdit } from '../../contexts/MenuEditContext';
 import styles from './MenuPage.module.css';

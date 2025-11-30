@@ -15,8 +15,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
     </button>
     
     <ul class="nav-desktop">
-        <li><a data-scroll-to="inicio"><Text key="nav.home"/></a></li>
-        <li><a data-scroll-to="historia"><Text key="nav.story"></a></li>
+        <li><a data-scroll-to="inicio" href="inicio"><Text key="nav.home"/></a></li>
+        <li><a data-scroll-to="historia" href="historia"><Text key="nav.story"></a></li>
         <li class="logo-item">
             <a href="#hero" aria-label="Ir a inicio - El Palleter">
                 <img 
@@ -33,8 +33,8 @@ import LanguagePicker from '../i18n/LanguagePicker.astro';
                 />
             </a>
         </li>
-        <li><a data-scroll-to="carta"><Text key="nav.menu"/></a></li>
-        <li><a data-scroll-to="contacto"><Text key="nav.contact"/></a></li>
+        <li><a data-scroll-to="carta" href="carta"><Text key="nav.menu"/></a></li>
+        <li><a data-scroll-to="contacto" href="contacto"><Text key="nav.contact"/></a></li>
         <li class="language-item">
             <LanguagePicker variant="desktop" includeThemeToggle={true} />
         </li>

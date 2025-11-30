@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
+import useImageUploadSettings from '../../hooks/useImageUploadSettings';
+import { validateImageFile } from '../../utils/imageValidationUtils';
+import ConfirmDialog from '../common/ConfirmDialog';
 import styles from './SingleImageForm.module.css';
 
 /**
@@ -16,28 +19,15 @@ const SingleImageForm = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [maxUploadSize, setMaxUploadSize] = useState(null);
-  const [loadingSize, setLoadingSize] = useState(true);
+  const [errorDialog, setErrorDialog] = useState({ isOpen: false, message: '' });
+
+  // Load upload settings using custom hook
+  const { settings: uploadSettings, loading: loadingSettings } = useImageUploadSettings();
 
   // Get the current image URL with cache-busting parameter
   const currentImageUrl = refreshKey
     ? `${ImageService.getImageURL(imageName)}?t=${refreshKey}`
     : ImageService.getImageURL(imageName);
-
-  // Load max upload size on mount
-  useEffect(() => {
-    const loadMaxSize = async () => {
-      try {
-        const sizeInfo = await ImageService.getMaxUploadSize();
-        setMaxUploadSize(sizeInfo);
-      } catch (error) {
-        console.error('Error loading max upload size:', error);
-      } finally {
-        setLoadingSize(false);
-      }
-    };
-    loadMaxSize();
-  }, []);
 
   // Clean up preview URL when component unmounts or file changes
   useEffect(() => {
@@ -73,9 +63,15 @@ const SingleImageForm = ({
       return;
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona un archivo de imagen válido');
+    // Validate file using upload settings
+    const validation = validateImageFile(file, uploadSettings);
+    if (!validation.isValid) {
+      setErrorDialog({
+        isOpen: true,
+        message: validation.errorMessage
+      });
+      // Reset file input
+      e.target.value = '';
       return;
     }
 
@@ -142,9 +138,9 @@ const SingleImageForm = ({
             <ImageIcon size={20} className={styles.cardIcon} />
             <div className={styles.titleSection}>
               <h3 className={styles.cardTitle}>{title}</h3>
-              {!loadingSize && maxUploadSize && (
+              {!loadingSettings && uploadSettings && (
                 <span className={styles.sizeLimit}>
-                  Máx: {maxUploadSize.maxFileSize}
+                  Máx: {uploadSettings.maxFileSize}
                 </span>
               )}
             </div>
@@ -215,6 +211,16 @@ const SingleImageForm = ({
           </div>
         </div>
       </div>
+
+      {/* Error Dialog */}
+      <ConfirmDialog
+        isOpen={errorDialog.isOpen}
+        title="Error de validación"
+        message={errorDialog.message}
+        type="danger"
+        confirmText="Aceptar"
+        onConfirm={() => setErrorDialog({ isOpen: false, message: '' })}
+      />
     </div>
   );
 };
