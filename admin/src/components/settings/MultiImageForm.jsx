@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { Image as ImageIcon, Upload, ChevronUp, ChevronDown, Trash2, Undo2 } from 'lucide-react';
 import { ImageService } from '@services/ImageService';
@@ -11,14 +11,18 @@ import styles from './MultiImageForm.module.css';
  * Form component for viewing and editing a gallery of images
  * Similar to SingleImageForm but manages multiple images
  * Uses ItemView-like interaction for organizing images
+ *
+ * Exposes methods via ref:
+ * - save(): Saves all changes (upload new images, update gallery)
+ * - cancel(): Discards all changes and reloads original data
+ * - hasChanges(): Returns true if there are pending changes
  */
-const MultiImageForm = ({
+const MultiImageForm = forwardRef(({
   galleryName,
   title = 'Galería',
-  onChange,
-  isEditing = false,
-  refreshKey = null
-}) => {
+  onHasChangesChange,
+  isEditing = false
+}, ref) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImageId, setExpandedImageId] = useState(null);
@@ -33,10 +37,8 @@ const MultiImageForm = ({
 
   // Load images from gallery
   useEffect(() => {
-    if (!isEditing) {
-      loadGalleryImages();
-    }
-  }, [galleryName, refreshKey, isEditing]);
+    loadGalleryImages();
+  }, [galleryName, isEditing]);
 
   // Save original image state when entering edit mode
   useEffect(() => {
@@ -73,23 +75,79 @@ const MultiImageForm = ({
     }
   };
 
-  // Notify parent of changes
-  const notifyChange = (updatedImages) => {
-    if (onChange) {
-      // Only send images that need to be uploaded or modified
-      const changes = {
-        newImages: updatedImages.filter(img => img._isNew && img._file),
-        deletedImages: updatedImages.filter(img => img._state === 'deleted'),
-        reorderedImages: updatedImages
-          .filter(img => img._state !== 'deleted')
-          .map((img, index) => ({
-            name: img.name,
-            order: index
-          }))
-      };
-      onChange(changes);
+  // Check if there are any pending changes
+  const checkHasChanges = (currentImages) => {
+    // Check for new images
+    const hasNewImages = currentImages.some(img => img._isNew);
+    // Check for deleted images
+    const hasDeletedImages = currentImages.some(img => img._state === 'deleted');
+    // Check for reordered images
+    const hasReorderedImages = currentImages.some(img => {
+      if (img._isNew || img._state === 'deleted') return false;
+      const originalImage = originalImagesRef.current.find(i => i.id === img.id);
+      return originalImage && originalImage.order !== img.order;
+    });
+
+    return hasNewImages || hasDeletedImages || hasReorderedImages;
+  };
+
+  // Notify parent when hasChanges state changes
+  const notifyHasChangesChange = (updatedImages) => {
+    if (onHasChangesChange) {
+      const hasChanges = checkHasChanges(updatedImages);
+      onHasChangesChange(hasChanges);
     }
   };
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      // 1. Upload new images first
+      const newImages = images.filter(img => img._isNew && img._file);
+      if (newImages.length > 0) {
+        for (const newImage of newImages) {
+          await ImageService.uploadImage(newImage.name, newImage._file);
+        }
+      }
+
+      // 2. Load current gallery and build updated content
+      const currentGallery = await ImageService.getGallery(galleryName);
+
+      // Build new images array with all changes applied
+      const deletedImageNames = new Set(
+        images.filter(img => img._state === 'deleted').map(img => img.name)
+      );
+
+      const updatedImages = images
+        .filter(img => img._state !== 'deleted')
+        .map((img, index) => ({
+          image: {
+            name: img.name
+          },
+          imageOrder: index
+        }));
+
+      const updatedGallery = {
+        ...currentGallery,
+        images: updatedImages
+      };
+
+      // 3. Update the gallery
+      await ImageService.updateGallery(galleryName, updatedGallery);
+
+      // 4. Reload gallery to get fresh data
+      await loadGalleryImages();
+    },
+
+    cancel: () => {
+      // Reload gallery to discard all changes
+      loadGalleryImages();
+    },
+
+    hasChanges: () => {
+      return checkHasChanges(images);
+    }
+  }), [images, galleryName]);
 
   const handleAddImage = () => {
     // Trigger file input
@@ -137,7 +195,7 @@ const MultiImageForm = ({
 
     const updatedImages = [...images, ...newImages];
     setImages(updatedImages);
-    notifyChange(updatedImages);
+    notifyHasChangesChange(updatedImages);
 
     // Reset file input
     e.target.value = '';
@@ -192,7 +250,7 @@ const MultiImageForm = ({
     });
 
     setImages(finalImages);
-    notifyChange(finalImages);
+    notifyHasChangesChange(finalImages);
   };
 
   const handleDeleteImage = (imageId) => {
@@ -202,7 +260,7 @@ const MultiImageForm = ({
         : img
     );
     setImages(updatedImages);
-    notifyChange(updatedImages);
+    notifyHasChangesChange(updatedImages);
   };
 
   const handleUndoDelete = (imageId) => {
@@ -229,7 +287,7 @@ const MultiImageForm = ({
       return img;
     });
     setImages(updatedImages);
-    notifyChange(updatedImages);
+    notifyHasChangesChange(updatedImages);
   };
 
   const handleToggleExpand = (imageId) => {
@@ -240,8 +298,7 @@ const MultiImageForm = ({
     if (image._previewUrl) {
       return image._previewUrl;
     }
-    const url = ImageService.getImageURL(image.name);
-    return refreshKey ? `${url}?t=${refreshKey}` : url;
+    return ImageService.getImageURL(image.name);
   };
 
   // Clean up preview URLs on unmount
@@ -259,7 +316,6 @@ const MultiImageForm = ({
   useEffect(() => {
     if (!isEditing) {
       setExpandedImageId(null);
-      loadGalleryImages();
     }
   }, [isEditing]);
 
@@ -515,9 +571,8 @@ const MultiImageForm = ({
 MultiImageForm.propTypes = {
   galleryName: PropTypes.string.isRequired,
   title: PropTypes.string,
-  onChange: PropTypes.func,
-  isEditing: PropTypes.bool,
-  refreshKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  onHasChangesChange: PropTypes.func,
+  isEditing: PropTypes.bool
 };
 
 export default MultiImageForm;

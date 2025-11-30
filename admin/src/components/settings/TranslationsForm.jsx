@@ -1,20 +1,91 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Search, Languages } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
+import { I18nService } from '@services/I18nService';
 import styles from './TranslationsForm.module.css';
 
 /**
  * Form component for editing translations
+ *
+ * Exposes methods via ref:
+ * - save(): Saves all changed translations
+ * - cancel(): Discards changes and reloads original data
+ * - hasChanges(): Returns true if there are pending changes
  */
-const TranslationsForm = ({
-  translations,
-  onChange,
+const TranslationsForm = forwardRef(({
+  language = 'es',
+  onHasChangesChange,
   errors = {},
-  isEditing = false,
-  language = 'es'
-}) => {
+  isEditing = false
+}, ref) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [translations, setTranslations] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Store original translations for comparison
+  const originalTranslationsRef = useRef(null);
+
+  // Load translations from service
+  useEffect(() => {
+    loadTranslations();
+  }, [language]);
+
+  const loadTranslations = () => {
+    setLoading(true);
+    try {
+      const flatTranslations = I18nService.getAllTranslations(language);
+      setTranslations(flatTranslations);
+      originalTranslationsRef.current = flatTranslations;
+    } catch (error) {
+      console.error('Error loading translations:', error);
+      setTranslations({});
+      originalTranslationsRef.current = {};
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check if there are any pending changes
+  const checkHasChanges = () => {
+    if (!translations || !originalTranslationsRef.current) return false;
+    return JSON.stringify(translations) !== JSON.stringify(originalTranslationsRef.current);
+  };
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (!translations || !originalTranslationsRef.current) return;
+
+      // Get changed translations
+      const changedTranslations = [];
+      for (const [key, value] of Object.entries(translations)) {
+        if (originalTranslationsRef.current[key] !== value) {
+          changedTranslations.push({ key, newValue: value });
+        }
+      }
+
+      // Update all changed translations
+      if (changedTranslations.length > 0) {
+        const updatePromises = changedTranslations.map(({ key, newValue }) =>
+          I18nService.updateTranslation(language, key, newValue)
+        );
+        await Promise.all(updatePromises);
+      }
+
+      // Reload translations
+      loadTranslations();
+    },
+
+    cancel: () => {
+      // Reload translations to discard changes
+      loadTranslations();
+    },
+
+    hasChanges: () => {
+      return checkHasChanges();
+    }
+  }), [translations, language]);
 
   // Filter and sort translations based on search term
   const filteredTranslations = useMemo(() => {
@@ -73,15 +144,35 @@ const TranslationsForm = ({
   }, [translations, searchTerm]);
 
   const handleTranslationChange = (key, newValue) => {
-    if (!onChange) return;
-
     const updatedTranslations = {
       ...translations,
       [key]: newValue
     };
 
-    onChange(updatedTranslations);
+    setTranslations(updatedTranslations);
+
+    // Notify parent of changes
+    if (onHasChangesChange) {
+      const hasChanges = JSON.stringify(updatedTranslations) !== JSON.stringify(originalTranslationsRef.current);
+      onHasChangesChange(hasChanges);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.section}>
+        <div className={styles.translationsCard}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
+            <Languages size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>Traducciones</h3>
+          </div>
+          <div className={styles.cardContent}>
+            <div className={styles.emptyState}>Cargando traducciones...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isEditing) {
     // Read-only display
@@ -211,11 +302,10 @@ const TranslationsForm = ({
 };
 
 TranslationsForm.propTypes = {
-  translations: PropTypes.object,
-  onChange: PropTypes.func,
+  language: PropTypes.string,
+  onHasChangesChange: PropTypes.func,
   errors: PropTypes.object,
-  isEditing: PropTypes.bool,
-  language: PropTypes.string
+  isEditing: PropTypes.bool
 };
 
 export default TranslationsForm;
