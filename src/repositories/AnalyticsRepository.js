@@ -14,6 +14,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<void>}
      */
     static async trackVisitStart(visitData) {
+        if (!visitData) {
+            throw new Error('Visit data is required');
+        }
+
         try {
             await this.post('/analytics/visit/start', visitData);
         } catch (error) {
@@ -29,6 +33,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<void>}
      */
     static async trackEvent(eventData) {
+        if (!eventData) {
+            throw new Error('Event data is required');
+        }
+
         try {
             await this.post('/analytics/event/track', eventData);
         } catch (error) {
@@ -44,6 +52,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<void>}
      */
     static async trackVisitEnd(endData) {
+        if (!endData) {
+            throw new Error('End data is required');
+        }
+
         try {
             await this.post('/analytics/visit/end', endData);
         } catch (error) {
@@ -59,6 +71,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<Object>} Estadísticas semanales
      */
     static async getWeeklyStats(token) {
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
             return await this.get('/analytics/stats/weekly', {
                 headers: this.getAuthHeaders(token)
@@ -76,6 +92,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<Object>} Estadísticas semanales
      */
     static async getLastWeekStats(token) {
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
             return await this.get('/analytics/stats/last-week', {
                 headers: this.getAuthHeaders(token)
@@ -95,6 +115,18 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<Object>} Estadísticas del período
      */
     static async getCustomPeriodStats(token, startDate, endDate) {
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
+        if (!startDate) {
+            throw new Error('Start date is required');
+        }
+        
+        if (!endDate) {
+            throw new Error('End date is required');
+        }
+
         try {
             return await this.get('/analytics/stats/custom', {
                 headers: this.getAuthHeaders(token),
@@ -115,6 +147,10 @@ export class AnalyticsRepository extends BaseRepository {
      * @returns {Promise<void>}
      */
     static async trackEventsBatch(events) {
+        if (!events || !Array.isArray(events)) {
+            throw new Error('Events must be an array');
+        }
+
         try {
             // Enviar eventos secuencialmente para evitar sobrecargar el servidor
             for (const event of events) {

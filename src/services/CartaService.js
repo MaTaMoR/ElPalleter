@@ -71,10 +71,21 @@ export class CartaService {
      */
     static async getCategoriesWithFallback(language = 'es') {
         try {
-            const categories = await CartaRepository.getCategoriesWithFallback(language);
+            const categories = await CartaRepository.getTranslatedCategories(language);
             return this.sortByOrderIndex(categories);
         } catch (error) {
-            console.error('CartaService: Error getting categories with fallback:', error);
+            console.warn(`Failed to get categories for language ${language}, falling back to Spanish:`, error);
+
+            if (language !== 'es') {
+                try {
+                    const categories = await CartaRepository.getTranslatedCategories('es');
+                    return this.sortByOrderIndex(categories);
+                } catch (fallbackError) {
+                    console.error('CartaService: Even Spanish fallback failed:', fallbackError);
+                    throw fallbackError;
+                }
+            }
+
             throw error;
         }
     }
@@ -82,12 +93,32 @@ export class CartaService {
     /**
      * Obtiene solo las categorías y items disponibles
      * @param {string} language - Código de idioma
+     * @param {boolean} onlyAvailable - Si true, solo devuelve categorías con items disponibles
      * @returns {Promise<Array>} Array de categorías filtradas por disponibilidad y ordenadas por orderIndex
      */
-    static async getAvailableCategories(language = 'es') {
+    static async getAvailableCategories(language = 'es', onlyAvailable = true) {
         try {
-            const categories = await CartaRepository.getAvailableCategories(language, true);
-            return this.sortByOrderIndex(categories);
+            const categories = await CartaRepository.getTranslatedCategories(language);
+
+            if (!onlyAvailable) {
+                return this.sortByOrderIndex(categories);
+            }
+
+            const filteredCategories = categories.filter(category => {
+                return category.subcategories && category.subcategories.some(subcategory => {
+                    return subcategory.items && subcategory.items.some(item => item.available === true);
+                });
+            }).map(category => ({
+                ...category,
+                subcategories: category.subcategories.filter(subcategory => {
+                    return subcategory.items && subcategory.items.some(item => item.available === true);
+                }).map(subcategory => ({
+                    ...subcategory,
+                    items: subcategory.items.filter(item => item.available === true)
+                }))
+            }));
+
+            return this.sortByOrderIndex(filteredCategories);
         } catch (error) {
             console.error('CartaService: Error getting available categories:', error);
             throw error;
@@ -102,7 +133,35 @@ export class CartaService {
      */
     static async searchItems(language = 'es', searchTerm = '') {
         try {
-            return await CartaRepository.searchItems(language, searchTerm);
+            const categories = await CartaRepository.getTranslatedCategories(language);
+            const searchResults = [];
+
+            if (!searchTerm.trim()) {
+                return searchResults;
+            }
+
+            const searchLower = searchTerm.toLowerCase();
+
+            categories.forEach(category => {
+                category.subcategories?.forEach(subcategory => {
+                    subcategory.items?.forEach(item => {
+                        const nameMatch = item.nameKey?.toLowerCase().includes(searchLower);
+                        const descMatch = item.descriptionKey?.toLowerCase().includes(searchLower);
+
+                        if (nameMatch || descMatch) {
+                            searchResults.push({
+                                ...item,
+                                categoryName: category.nameKey,
+                                subcategoryName: subcategory.nameKey,
+                                categoryId: category.id,
+                                subcategoryId: subcategory.id
+                            });
+                        }
+                    });
+                });
+            });
+
+            return searchResults;
         } catch (error) {
             console.error('CartaService: Error searching items:', error);
             throw error;
@@ -117,7 +176,24 @@ export class CartaService {
      */
     static async getItemById(language = 'es', itemId) {
         try {
-            return await CartaRepository.getItemById(language, itemId);
+            const categories = await CartaRepository.getTranslatedCategories(language);
+
+            for (const category of categories) {
+                for (const subcategory of category.subcategories || []) {
+                    const item = subcategory.items?.find(item => item.id === itemId);
+                    if (item) {
+                        return {
+                            ...item,
+                            categoryName: category.nameKey,
+                            subcategoryName: subcategory.nameKey,
+                            categoryId: category.id,
+                            subcategoryId: subcategory.id
+                        };
+                    }
+                }
+            }
+
+            return null;
         } catch (error) {
             console.error('CartaService: Error getting item by ID:', error);
             throw error;
@@ -131,7 +207,38 @@ export class CartaService {
      */
     static async getMenuStats(language = 'es') {
         try {
-            return await CartaRepository.getMenuStats(language);
+            const categories = await CartaRepository.getTranslatedCategories(language);
+
+            let totalCategories = categories.length;
+            let totalSubcategories = 0;
+            let totalItems = 0;
+            let availableItems = 0;
+            let unavailableItems = 0;
+
+            categories.forEach(category => {
+                totalSubcategories += category.subcategories?.length || 0;
+
+                category.subcategories?.forEach(subcategory => {
+                    totalItems += subcategory.items?.length || 0;
+
+                    subcategory.items?.forEach(item => {
+                        if (item.available) {
+                            availableItems++;
+                        } else {
+                            unavailableItems++;
+                        }
+                    });
+                });
+            });
+
+            return {
+                totalCategories,
+                totalSubcategories,
+                totalItems,
+                availableItems,
+                unavailableItems,
+                availabilityPercentage: totalItems > 0 ? Math.round((availableItems / totalItems) * 100) : 0
+            };
         } catch (error) {
             console.error('CartaService: Error getting menu stats:', error);
             throw error;

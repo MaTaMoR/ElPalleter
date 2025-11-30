@@ -16,8 +16,7 @@ export class I18nRepository extends BaseRepository {
      */
     static async getAvailableLanguageCodes() {
         try {
-            const response = await this.get('/i18n/languages/codes');
-            return response || [];
+            return (await this.get('/i18n/languages/codes')) || [];
         } catch (error) {
             console.error('I18nRepository: Error getting language codes:', error);
             throw error;
@@ -31,8 +30,7 @@ export class I18nRepository extends BaseRepository {
      */
     static async getLanguages() {
         try {
-            const response = await this.get('/i18n/languages');
-            return response || [];
+            return (await this.get('/i18n/languages')) || [];
         } catch (error) {
             console.error('I18nRepository: Error getting languages:', error);
             throw error;
@@ -51,8 +49,7 @@ export class I18nRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.get(`/i18n/languages/${code}`);
-            return response || null;
+            return (await this.get(`/i18n/languages/${code}`)) || null;
         } catch (error) {
             console.error(`I18nRepository: Error getting language ${code}:`, error);
             throw error;
@@ -86,8 +83,7 @@ export class I18nRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.get(`/i18n/translations/${language}`);
-            return response || [];
+            return (await this.get(`/i18n/translations/${language}`)) || [];
         } catch (error) {
             console.error(`I18nRepository: Error getting translations for language ${language}:`, error);
             throw error;
@@ -193,10 +189,9 @@ export class I18nRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.put('/i18n/translations', request, {
+            return await this.put('/i18n/translations', request, {
                 headers: this.getAuthHeaders(token)
             });
-            return response;
         } catch (error) {
             console.error('I18nRepository: Error updating translation:', error);
             throw error;

@@ -20,8 +20,7 @@ export class AuthRepository extends BaseRepository {
         };
 
         try {
-            const response = await this.post('/auth/login', loginData);
-            return response;
+            return await this.post('/auth/login', loginData);
         } catch (error) {
             console.error('AuthRepository: Login failed:', error);
             throw error;
@@ -64,8 +63,7 @@ export class AuthRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.post('/auth/register', registerData);
-            return response;
+            return await this.post('/auth/register', registerData);
         } catch (error) {
             console.error('AuthRepository: Registration failed:', error);
             throw error;
@@ -87,12 +85,11 @@ export class AuthRepository extends BaseRepository {
         const cleanToken = token.replace('Bearer ', '').trim();
 
         try {
-            const response = await this.post('/auth/validate', cleanToken, {
+            return await this.post('/auth/validate', cleanToken, {
                 headers: {
                     'Content-Type': 'text/plain'
                 }
             });
-            return response;
         } catch (error) {
             console.error('AuthRepository: Token validation failed:', error);
             throw error;
@@ -138,10 +135,9 @@ export class AuthRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.post('/auth/update', updateData, {
+            return await this.post('/auth/update', updateData, {
                 headers: this.getAuthHeaders(cleanToken)
             });
-            return response;
         } catch (error) {
             console.error('AuthRepository: User update failed:', error);
             throw error;

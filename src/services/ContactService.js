@@ -197,7 +197,7 @@ export class ContactService {
      */
     static async getContactInfo(language = 'es') {
         try {
-            return await ContactRepository.getContactInfo(language);
+            return await ContactRepository.getTranslatedRestaurantInfo(language);
         } catch (error) {
             console.error('ContactService: Error getting contact info:', error);
             throw error;
@@ -211,7 +211,7 @@ export class ContactService {
      */
     static async getSchedules(language = 'es') {
         try {
-            return await ContactRepository.getSchedules(language);
+            return await ContactRepository.getTranslatedRestaurantInfo(language);
         } catch (error) {
             console.error('ContactService: Error getting schedules:', error);
             throw error;
@@ -225,7 +225,9 @@ export class ContactService {
      */
     static async getEnabledSocials(language = 'es') {
         try {
-            return await ContactRepository.getActiveSocialMedias(language);
+            const restaurantInfo = await ContactRepository.getTranslatedRestaurantInfo(language);
+            const socialMedias = restaurantInfo.socialMedias || [];
+            return socialMedias.filter(social => social.enabled === true);
         } catch (error) {
             console.error('ContactService: Error getting enabled socials:', error);
             throw error;
@@ -254,7 +256,23 @@ export class ContactService {
      */
     static async getActionLinks(language = 'es') {
         try {
-            return await ContactRepository.getActionLinks(language);
+            const restaurantInfo = await ContactRepository.getTranslatedRestaurantInfo(language);
+            const contactInfo = restaurantInfo.contactInfo;
+
+            if (!contactInfo) {
+                throw new Error('No contact info available');
+            }
+
+            const fullAddress = `${contactInfo.street}, ${contactInfo.postalCode} ${contactInfo.city}, ${contactInfo.province}`;
+
+            return {
+                call: contactInfo.phoneMain ? `tel:${contactInfo.phoneMain}` : null,
+                email: contactInfo.emailMain ? `mailto:${contactInfo.emailMain}` : null,
+                website: contactInfo.website || null,
+                maps: fullAddress ? `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}` : null,
+                directions: fullAddress ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}` : null,
+                fullAddress
+            };
         } catch (error) {
             console.error('ContactService: Error getting action links:', error);
             throw error;
