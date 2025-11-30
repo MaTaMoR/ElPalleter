@@ -1,0 +1,21 @@
+# robots.txt para El Palleter
+# https://www.elpalleter.com
+
+User-agent: *
+Allow: /
+
+# Permitir acceso a todos los idiomas
+Allow: /en/
+Allow: /val/
+
+# Bloquear directorios administrativos y de desarrollo
+Disallow: /admin/
+Disallow: /_astro/
+Disallow: /api/
+
+# Archivos y recursos que no necesitan ser indexados
+Disallow: /*.json$
+Disallow: /*.xml$
+
+# Sitemap
+Sitemap: https://www.elpalleter.com/sitemap-index.xml
