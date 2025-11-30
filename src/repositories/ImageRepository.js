@@ -11,21 +11,26 @@ export class ImageRepository extends BaseRepository {
 
     /**
      * Obtiene el URL a una imagen
-     * @param {string} imageId - ID de la imagen
+     * @param {string} name - Nombre de la imagen
      * @returns {string} URL de imagen
      */
-    static getImageURL(imageId) {
-        return this.getBaseUrl() + '/image/get/' + imageId;
+    static getImageURL(name) {
+        return this.getBaseUrl() + '/image/get/' + name;
     }
 
     /**
      * Sube una nueva imagen
-     * POST /image/upload
+     * PUT /image/upload
+     * @param {string} name - Nombre de la imagen a subir
      * @param {File} file - Archivo de imagen a subir
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} Imagen subida
      */
-    static async uploadImage(file, token) {
+    static async uploadImage(name, file, token) {
+        if (!name) {
+            throw new Error('Image name is required');
+        }
+
         if (!file) {
             throw new Error('Image file is required');
         }
@@ -34,21 +39,11 @@ export class ImageRepository extends BaseRepository {
             const formData = new FormData();
             formData.append('image', file);
 
-            // Crear headers manualmente para FormData
-            const headers = {};
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            // NO incluir Content-Type - el navegador lo agregará con el boundary correcto
-
-            const response = await fetch(`${this.getBaseUrl()}/image/upload`, {
-                method: 'POST',
-                headers: headers,
-                body: formData,
-                // Sin timeout explícito para permitir archivos grandes
+            const response = await this.putFormData(`/image/upload/${name}`, formData, {
+                headers: this.getAuthHeaders(token)
             });
 
-            return this.handleResponse(response);
+            return response;
         } catch (error) {
             console.error('ImageRepository: Error uploading image:', error);
             throw error;
@@ -87,7 +82,7 @@ export class ImageRepository extends BaseRepository {
         }
 
         try {
-            const response = await fetch(`${this.getBaseUrl()}/image/get/${name}`);
+            const response = await this.get(`/image/get/${name}`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }

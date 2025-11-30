@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-11-24T22:23:11.078Z",
+  "generatedAt": "2025-11-30T18:32:06.957Z",
   "apiUrl": "http://localhost:8080",
   "images": [
     "hero-main.jpg"
@@ -22,23 +22,18 @@
         "success": true,
         "images": [
           {
-            "name": "historia-1.jpg",
-            "imageName": "historia-1.jpg",
+            "name": "historia-1764035087249-3vt9jqx2.png",
+            "imageName": "historia-1764035087249-3vt9jqx2.png",
             "success": true
           },
           {
-            "name": "historia-2.jpg",
-            "imageName": "historia-2.jpg",
+            "name": "historia-1764035444974-6to7oztf.png",
+            "imageName": "historia-1764035444974-6to7oztf.png",
             "success": true
           },
           {
-            "name": "historia-3.jpg",
-            "imageName": "historia-3.jpg",
-            "success": true
-          },
-          {
-            "name": "historia-4.jpg",
-            "imageName": "historia-4.jpg",
+            "name": "historia-1764035447523-k5vtqinj.png",
+            "imageName": "historia-1764035447523-k5vtqinj.png",
             "success": true
           }
         ]
@@ -84,7 +79,7 @@
         ]
       }
     },
-    "totalDownloaded": 11,
+    "totalDownloaded": 10,
     "totalFailed": 0
   }
 }

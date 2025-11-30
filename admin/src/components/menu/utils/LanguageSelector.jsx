@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from 'lucide-react';
+import Icon from '../common/Icon';
 import I18nService from '@services/I18nService.js';
 import styles from './LanguageSelector.module.css';
 
@@ -44,16 +45,12 @@ const LanguageSelector = ({ selectedLanguage, onChange, disabled = false }) => {
 
   // Render flag image from backend SVG
   const renderFlag = (lang) => {
-    if (!lang?.flag?.value) {
+    if (!lang?.flag?.name) {
       return null;
     }
+
     return (
-      <img
-        src={lang.flag.value}
-        alt={lang.name}
-        className={styles.flagImage}
-        aria-hidden="true"
-      />
+      <Icon name={lang.flag.name} className={styles.flagImage} />
     );
   };
 

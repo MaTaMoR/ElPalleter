@@ -109,11 +109,9 @@ export class GalleryRepository extends BaseRepository {
         }
 
         try {
-            await this.patch(
-                `/gallery/${galleryName}/image/${imageName}/order`,
-                { order },
-                { headers: this.getAuthHeaders(token) }
-            );
+            await this.patch(`/gallery/${galleryName}/image/${imageName}/order`, { order }, { 
+                headers: this.getAuthHeaders(token) 
+            });
         } catch (error) {
             console.error(`GalleryRepository: Error updating image ${imageName} order in gallery ${galleryName}:`, error);
             throw error;
