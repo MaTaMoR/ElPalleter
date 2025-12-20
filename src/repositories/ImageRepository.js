@@ -40,11 +40,9 @@ export class ImageRepository extends BaseRepository {
             const formData = new FormData();
             formData.append('image', file);
 
-            const response = await this.putFormData(`/image/upload/${name}`, formData, {
+            return await this.putFormData(`/image/upload/${name}`, formData, {
                 headers: this.getAuthHeaders(token)
             });
-
-            return response;
         } catch (error) {
             console.error('ImageRepository: Error uploading image:', error);
             throw error;
@@ -82,10 +80,16 @@ export class ImageRepository extends BaseRepository {
         }
 
         try {
-            const response = await this.get(`/image/get/${name}`);
+            // Para obtener blob, necesitamos hacer fetch directo sin procesar la respuesta
+            const response = await fetch(this.getBuiltUrl(`/image/get/${name}`, {}), {
+                method: 'GET',
+                headers: this.getBaseHeaders()
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
+
             return await response.blob();
         } catch (error) {
             console.error(`ImageRepository: Error getting image ${name}:`, error);
@@ -100,8 +104,7 @@ export class ImageRepository extends BaseRepository {
      */
     static async getImageUploadSettings() {
         try {
-            const response = await this.get('/image/image-upload-settings');
-            return response;
+            return await this.get('/image/image-upload-settings');
         } catch (error) {
             console.error('ImageRepository: Error getting image upload settings:', error);
             throw error;
@@ -133,10 +136,9 @@ export class ImageRepository extends BaseRepository {
             const formData = new FormData();
             formData.append('image', file);
 
-            const response = await this.putFormData(`/image/update/${name}`, formData, {
+            return await this.putFormData(`/image/update/${name}`, formData, {
                 headers: this.getAuthHeaders(token)
             });
-            return response;
         } catch (error) {
             console.error(`ImageRepository: Error updating image ${name}:`, error);
             throw error;

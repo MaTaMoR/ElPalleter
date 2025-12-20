@@ -35,6 +35,18 @@ export class GalleryRepository extends BaseRepository {
      * @returns {Promise<Object>} Respuesta del backend
      */
     static async updateGallery(name, gallery, token) {
+        if (!name) {
+            throw new Error('Gallery name is required');
+        }
+        
+        if (!gallery) {
+            throw new Error('Gallery data is required');
+        }
+
+        if (!token) {
+            throw new Error('Token is required');
+        }
+
         try {
             const endpoint = `/gallery/update/${name}`;
 
