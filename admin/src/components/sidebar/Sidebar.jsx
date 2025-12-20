@@ -5,7 +5,8 @@ import {
   FileText,
   Phone,
   Users,
-  Settings
+  Settings,
+  Type
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -18,6 +19,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, isMobile }) =
     { path: '/admin/menu', label: 'Carta', icon: FileText },
     { path: '/admin/contact', label: 'Contacto', icon: Phone },
     { path: '/admin/users', label: 'Usuarios', icon: Users },
+    { path: '/admin/content', label: 'Contenido', icon: Type },
     { path: '/admin/settings', label: 'Configuración', icon: Settings },
   ];
 
