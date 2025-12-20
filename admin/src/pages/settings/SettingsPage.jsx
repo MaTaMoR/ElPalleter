@@ -308,6 +308,7 @@ const SettingsContent = () => {
                 id="richContent"
                 contentKey="historia_content"
                 title="Contenido de Historia"
+                language={selectedLanguage}
                 ref={richContentRef}
                 onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}

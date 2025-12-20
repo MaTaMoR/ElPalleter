@@ -1,192 +1,190 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import RichTextEditor from '../common/RichTextEditor';
-import LanguageSelector from '../menu/utils/LanguageSelector';
+import PropTypes from 'prop-types';
 import { FileText } from 'lucide-react';
+import RichTextEditor from '../common/RichTextEditor';
 import { RichContentService } from '../../../../src/services/RichContentService';
 import styles from './RichContentForm.module.css';
 
 /**
- * Formulario para editar contenido de texto rico
- * Soporta múltiples idiomas
+ * Form component for editing rich text content
+ * Supports single language editing (language selected in parent)
+ *
+ * Exposes methods via ref:
+ * - save(): Saves the rich content for the current language
+ * - cancel(): Discards changes and reloads original data
+ * - hasChanges(): Returns true if there are pending changes
  */
 const RichContentForm = forwardRef(({
   id,
   contentKey,
-  title,
+  title = 'Contenido Rico',
+  language = 'es',
   onHasChangesChange,
-  isEditing
+  isEditing = false
 }, ref) => {
-  const [selectedLanguage, setSelectedLanguage] = useState('es');
-  const [content, setContent] = useState({
-    es: { html: '' },
-    en: { html: '' },
-    val: { html: '' }
-  });
-  const [originalContent, setOriginalContent] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [content, setContent] = useState('');
+  const [originalContent, setOriginalContent] = useState('');
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Cargar contenido al montar el componente
+  // Load content when component mounts or language changes
   useEffect(() => {
     loadContent();
-  }, [contentKey]);
+  }, [contentKey, language]);
 
   const loadContent = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       setError(null);
 
-      // Cargar contenido desde el backend usando el servicio
-      const contentData = await RichContentService.getContentKeyAllLanguages(contentKey);
+      // Load content from backend for current language
+      const contentData = await RichContentService.getContentByLanguageAndKey(language, contentKey);
 
-      if (contentData) {
-        setContent(contentData);
-        setOriginalContent(JSON.parse(JSON.stringify(contentData)));
-      } else {
-        // Si no existe, crear estructura vacía
-        const emptyContent = {
-          es: { html: '' },
-          en: { html: '' },
-          val: { html: '' }
-        };
-        setContent(emptyContent);
-        setOriginalContent(JSON.parse(JSON.stringify(emptyContent)));
-      }
+      const html = contentData?.contentValue || '';
+      setContent(html);
+      setOriginalContent(html);
     } catch (err) {
-      console.error('Error loading content:', err);
-      setError(err.message || 'Error al cargar el contenido');
+      // If content doesn't exist (404), start with empty content
+      if (err.status === 404) {
+        setContent('');
+        setOriginalContent('');
+      } else {
+        console.error('Error loading rich content:', err);
+        setError(err.message || 'Error al cargar el contenido');
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Verificar si hay cambios
-  const hasChanges = () => {
-    if (!originalContent) return false;
-
-    return Object.keys(content).some(lang => {
-      return content[lang].html !== originalContent[lang].html;
-    });
+  // Check if there are any pending changes
+  const checkHasChanges = () => {
+    return content !== originalContent;
   };
 
-  // Notificar al padre cuando hay cambios
+  // Notify parent of changes whenever content changes
   useEffect(() => {
     if (onHasChangesChange) {
-      onHasChangesChange(id, hasChanges());
+      onHasChangesChange(id, checkHasChanges());
     }
   }, [content, originalContent, id, onHasChangesChange]);
 
-  // Manejar cambio de contenido en el editor
-  const handleContentChange = ({ html }) => {
-    setContent(prev => ({
-      ...prev,
-      [selectedLanguage]: { html }
-    }));
-  };
-
-  // Exponer métodos al componente padre a través de ref
+  // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
     save: async () => {
       try {
-        console.log('Saving rich content:', contentKey, content);
+        console.log('Saving rich content:', contentKey, language, content);
 
-        // Guardar contenido en el backend usando el servicio
-        await RichContentService.saveContentAllLanguages(contentKey, content);
+        // Save content to backend using upsert (create or update)
+        await RichContentService.upsertContent(language, contentKey, content);
 
-        // Actualizar el contenido original después de guardar exitosamente
-        setOriginalContent(JSON.parse(JSON.stringify(content)));
+        // Update original content after successful save
+        setOriginalContent(content);
       } catch (err) {
         console.error('Error saving rich content:', err);
         throw new Error(`Error al guardar el contenido: ${err.message || 'Error desconocido'}`);
       }
     },
-    cancel: () => {
-      // Restaurar contenido original
-      if (originalContent) {
-        setContent(JSON.parse(JSON.stringify(originalContent)));
-      }
-    }
-  }));
 
-  const handleLanguageChange = (lang) => {
-    if (!isEditing) {
-      setSelectedLanguage(lang);
+    cancel: () => {
+      // Reload content to discard changes
+      loadContent();
+    },
+
+    hasChanges: () => {
+      return checkHasChanges();
     }
+  }), [content, contentKey, language]);
+
+  const handleContentChange = ({ html }) => {
+    setContent(html);
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className={styles.formSection}>
-        <div className={styles.sectionHeader}>
-          <FileText size={20} />
-          <h2 className={styles.sectionTitle}>{title}</h2>
+      <div className={styles.section}>
+        <div className={styles.richContentCard}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
+            <FileText size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>{title}</h3>
+          </div>
+          <div className={styles.cardContent}>
+            <div className={styles.emptyState}>Cargando contenido...</div>
+          </div>
         </div>
-        <div className={styles.loading}>Cargando contenido...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.formSection}>
-        <div className={styles.sectionHeader}>
-          <FileText size={20} />
-          <h2 className={styles.sectionTitle}>{title}</h2>
+      <div className={styles.section}>
+        <div className={styles.richContentCard}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
+            <FileText size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>{title}</h3>
+          </div>
+          <div className={styles.cardContent}>
+            <div className={styles.errorState}>Error: {error}</div>
+          </div>
         </div>
-        <div className={styles.error}>Error: {error}</div>
       </div>
     );
   }
 
+  if (!isEditing) {
+    // Read-only display
+    return (
+      <div className={styles.section}>
+        <div className={styles.richContentCard}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderReadOnly}`}>
+            <FileText size={20} className={styles.cardIcon} />
+            <h3 className={styles.cardTitle}>{title}</h3>
+          </div>
+          <div className={styles.cardContent}>
+            {content ? (
+              <div
+                className={styles.richContentDisplay}
+                dangerouslySetInnerHTML={{ __html: content }}
+              />
+            ) : (
+              <div className={styles.emptyState}>No hay contenido disponible</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Edit mode
   return (
-    <div className={styles.formSection}>
-      <div className={styles.sectionHeader}>
-        <div className={styles.titleGroup}>
-          <FileText size={20} />
-          <h2 className={styles.sectionTitle}>{title}</h2>
+    <div className={styles.section}>
+      <div className={styles.richContentCard}>
+        <div className={styles.cardHeader}>
+          <FileText size={20} className={styles.cardIcon} />
+          <h3 className={styles.cardTitle}>{title}</h3>
         </div>
-
-        {!isEditing && (
-          <LanguageSelector
-            selectedLanguage={selectedLanguage}
-            onChange={handleLanguageChange}
-            disabled={isEditing}
+        <div className={styles.cardContent}>
+          <RichTextEditor
+            value={content}
+            onChange={handleContentChange}
+            placeholder={`Escribe el contenido en ${language}...`}
           />
-        )}
-      </div>
-
-      {isEditing && (
-        <div className={styles.languageTabs}>
-          {Object.keys(content).map(lang => (
-            <button
-              key={lang}
-              className={`${styles.languageTab} ${selectedLanguage === lang ? styles.active : ''}`}
-              onClick={() => setSelectedLanguage(lang)}
-            >
-              {lang.toUpperCase()}
-            </button>
-          ))}
         </div>
-      )}
-
-      <div className={styles.editorContainer}>
-        <RichTextEditor
-          value={content[selectedLanguage]?.html || ''}
-          onChange={handleContentChange}
-          disabled={!isEditing}
-          placeholder={`Escribe el contenido en ${selectedLanguage}...`}
-        />
       </div>
-
-      {hasChanges() && isEditing && (
-        <div className={styles.changesIndicator}>
-          Hay cambios sin guardar en este contenido
-        </div>
-      )}
     </div>
   );
 });
 
 RichContentForm.displayName = 'RichContentForm';
+
+RichContentForm.propTypes = {
+  id: PropTypes.string.isRequired,
+  contentKey: PropTypes.string.isRequired,
+  title: PropTypes.string,
+  language: PropTypes.string,
+  onHasChangesChange: PropTypes.func,
+  isEditing: PropTypes.bool
+};
 
 export default RichContentForm;
