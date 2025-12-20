@@ -4,7 +4,8 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
-import { useEffect } from 'react';
+import Highlight from '@tiptap/extension-highlight';
+import { useEffect, useState } from 'react';
 import {
   Bold,
   Italic,
@@ -20,29 +21,144 @@ import {
   Heading1,
   Heading2,
   Heading3,
-  Type
+  Type,
+  Palette,
+  Highlighter
 } from 'lucide-react';
 import styles from './RichTextEditor.module.css';
+
+const ColorPicker = ({ editor, type = 'text' }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [customColor, setCustomColor] = useState('#000000');
+
+  const colorPresets = [
+    '#000000', // Negro
+    '#374151', // Gris oscuro
+    '#6B7280', // Gris
+    '#EF4444', // Rojo
+    '#F59E0B', // Naranja
+    '#10B981', // Verde
+    '#3B82F6', // Azul
+    '#8B5CF6', // Púrpura
+    '#EC4899', // Rosa
+    '#FFFFFF', // Blanco
+  ];
+
+  const applyColor = (color) => {
+    if (type === 'text') {
+      editor.chain().focus().setColor(color).run();
+    } else {
+      editor.chain().focus().toggleHighlight({ color }).run();
+    }
+  };
+
+  const handleCustomColorChange = (e) => {
+    const color = e.target.value;
+    setCustomColor(color);
+    applyColor(color);
+  };
+
+  const handleHexInputChange = (e) => {
+    let hex = e.target.value;
+    // Ensure it starts with #
+    if (!hex.startsWith('#')) {
+      hex = '#' + hex;
+    }
+    setCustomColor(hex);
+
+    // Only apply if it's a valid hex color
+    if (/^#[0-9A-F]{6}$/i.test(hex)) {
+      applyColor(hex);
+    }
+  };
+
+  const removeColor = () => {
+    if (type === 'text') {
+      editor.chain().focus().unsetColor().run();
+    } else {
+      editor.chain().focus().unsetHighlight().run();
+    }
+    setIsOpen(false);
+  };
+
+  return (
+    <div className={styles.colorPickerWrapper}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={styles.menuButton}
+        title={type === 'text' ? 'Color de texto' : 'Color de fondo'}
+      >
+        {type === 'text' ? <Palette size={18} /> : <Highlighter size={18} />}
+      </button>
+
+      {isOpen && (
+        <div className={styles.colorPickerDropdown}>
+          <div className={styles.colorPickerHeader}>
+            <span className={styles.colorPickerTitle}>
+              {type === 'text' ? 'Color de texto' : 'Color de fondo'}
+            </span>
+            <button
+              onClick={() => setIsOpen(false)}
+              className={styles.colorPickerClose}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className={styles.colorPickerContent}>
+            {/* Color presets */}
+            <div className={styles.colorPresetsLabel}>Colores predeterminados:</div>
+            <div className={styles.colorGrid}>
+              {colorPresets.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => applyColor(color)}
+                  className={styles.colorButton}
+                  style={{ backgroundColor: color }}
+                  title={color}
+                />
+              ))}
+            </div>
+
+            {/* Custom color picker */}
+            <div className={styles.customColorSection}>
+              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
+              <div className={styles.customColorInputs}>
+                <input
+                  type="color"
+                  value={customColor}
+                  onChange={handleCustomColorChange}
+                  className={styles.colorInput}
+                />
+                <input
+                  type="text"
+                  value={customColor}
+                  onChange={handleHexInputChange}
+                  placeholder="#000000"
+                  className={styles.hexInput}
+                  maxLength={7}
+                />
+              </div>
+            </div>
+
+            {/* Remove color button */}
+            <button
+              onClick={removeColor}
+              className={styles.removeColorButton}
+            >
+              Quitar color
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null;
   }
-
-  const colorPresets = [
-    '#000000', // Negro
-    '#FF0000', // Rojo
-    '#00FF00', // Verde
-    '#0000FF', // Azul
-    '#FFFF00', // Amarillo
-    '#FF00FF', // Magenta
-    '#00FFFF', // Cyan
-    '#FFA500', // Naranja
-    '#800080', // Púrpura
-    '#A52A2A', // Marrón
-    '#808080', // Gris
-    '#FFFFFF', // Blanco
-  ];
 
   const fontSizes = [
     { label: 'Normal', value: null },
@@ -175,24 +291,10 @@ const MenuBar = ({ editor }) => {
         </button>
       </div>
 
-      {/* Selector de color */}
+      {/* Selectores de color */}
       <div className={styles.buttonGroup}>
-        <div className={styles.colorPicker}>
-          <label className={styles.colorLabel}>Color:</label>
-          <div className={styles.colorGrid}>
-            {colorPresets.map((color) => (
-              <button
-                key={color}
-                onClick={() => editor.chain().focus().setColor(color).run()}
-                className={`${styles.colorButton} ${
-                  editor.isActive('textStyle', { color }) ? styles.isActive : ''
-                }`}
-                style={{ backgroundColor: color }}
-                title={color}
-              />
-            ))}
-          </div>
-        </div>
+        <ColorPicker editor={editor} type="text" />
+        <ColorPicker editor={editor} type="background" />
       </div>
     </div>
   );
@@ -212,6 +314,9 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
       }),
       TextStyle,
       Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
     ],
     content: value || '',
     editable: !disabled,

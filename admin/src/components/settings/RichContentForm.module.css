@@ -66,16 +66,23 @@
 /* Rich Content Display (read-only mode) */
 .richContentDisplay {
   line-height: 1.6;
-  color: var(--text-primary);
+  color: var(--text-primary, #1f2937);
 }
 
 .richContentDisplay p {
   margin: 0 0 1em 0;
   line-height: 1.6;
+  color: var(--text-primary, #1f2937);
 }
 
 .richContentDisplay p:last-child {
   margin-bottom: 0;
+}
+
+.richContentDisplay h1,
+.richContentDisplay h2,
+.richContentDisplay h3 {
+  color: var(--text-primary, #1f2937);
 }
 
 .richContentDisplay h1 {
@@ -97,6 +104,11 @@
   font-weight: bold;
   margin: 0.5em 0;
   line-height: 1.4;
+}
+
+.richContentDisplay mark {
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
 }
 
 .richContentDisplay strong {

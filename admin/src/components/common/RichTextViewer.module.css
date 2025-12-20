@@ -17,15 +17,23 @@
 /* Estilos del contenido visualizado */
 .richTextViewer :global(.ProseMirror) {
   outline: none;
+  color: var(--text-primary, #1f2937);
 }
 
 .richTextViewer :global(.ProseMirror p) {
   margin: 0 0 1em 0;
   line-height: 1.6;
+  color: var(--text-primary, #1f2937);
 }
 
 .richTextViewer :global(.ProseMirror p:last-child) {
   margin-bottom: 0;
+}
+
+.richTextViewer :global(.ProseMirror h1),
+.richTextViewer :global(.ProseMirror h2),
+.richTextViewer :global(.ProseMirror h3) {
+  color: var(--text-primary, #1f2937);
 }
 
 .richTextViewer :global(.ProseMirror h1) {
@@ -47,6 +55,11 @@
   font-weight: bold;
   margin: 0.5em 0;
   line-height: 1.4;
+}
+
+.richTextViewer :global(.ProseMirror mark) {
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
 }
 
 .richTextViewer :global(.ProseMirror strong) {

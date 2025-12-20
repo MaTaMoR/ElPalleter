@@ -72,14 +72,22 @@
 .editorContent :global(.ProseMirror) {
   outline: none;
   min-height: 268px;
+  color: var(--text-primary, #1f2937);
 }
 
 .editorContent :global(.ProseMirror p) {
   margin: 0 0 1em 0;
+  color: var(--text-primary, #1f2937);
 }
 
 .editorContent :global(.ProseMirror p:last-child) {
   margin-bottom: 0;
+}
+
+.editorContent :global(.ProseMirror h1),
+.editorContent :global(.ProseMirror h2),
+.editorContent :global(.ProseMirror h3) {
+  color: var(--text-primary, #1f2937);
 }
 
 .editorContent :global(.ProseMirror h1) {
@@ -141,43 +149,176 @@
   pointer-events: none;
 }
 
-/* Color Picker */
-.colorPicker {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Highlight (background color) styles */
+.editorContent :global(.ProseMirror mark) {
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
 }
 
-.colorLabel {
+/* Color Picker Wrapper */
+.colorPickerWrapper {
+  position: relative;
+}
+
+/* Color Picker Dropdown */
+.colorPickerDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  min-width: 280px;
+}
+
+.colorPickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background: var(--bg-secondary, #f9fafb);
+}
+
+.colorPickerTitle {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.colorPickerClose {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 20px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.colorPickerClose:hover {
+  background: var(--hover-bg, #e5e7eb);
+  color: var(--text-primary, #1f2937);
+}
+
+.colorPickerContent {
+  padding: 16px;
+}
+
+.colorPresetsLabel {
+  font-size: 12px;
   font-weight: 500;
-  color: var(--text-primary, #374151);
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .colorGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .colorButton {
-  width: 24px;
-  height: 24px;
-  border: 2px solid transparent;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  position: relative;
+}
+
+.colorButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color, #3b82f6);
+}
+
+.colorButton:active {
+  transform: scale(0.95);
+}
+
+/* Custom Color Section */
+.customColorSection {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  margin-top: 8px;
+}
+
+.customColorInputs {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.colorInput {
+  width: 60px;
+  height: 40px;
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
 }
 
-.colorButton:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.colorInput:hover {
+  border-color: var(--primary-color, #3b82f6);
 }
 
-.colorButton.isActive {
+.hexInput {
+  flex: 1;
+  height: 40px;
+  padding: 8px 12px;
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: monospace;
+  color: var(--text-primary, #1f2937);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.hexInput:focus {
+  outline: none;
   border-color: var(--primary-color, #3b82f6);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.hexInput::placeholder {
+  color: var(--text-tertiary, #9ca3af);
+  text-transform: none;
+}
+
+.removeColorButton {
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  background: white;
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeColorButton:hover {
+  background: var(--danger-bg, #fef2f2);
+  border-color: var(--danger, #ef4444);
+  color: var(--danger, #ef4444);
 }
 
 /* Scrollbar personalizado */
@@ -223,5 +364,9 @@
   .editorContent {
     padding: 12px;
     min-height: 200px;
+  }
+
+  .colorPickerDropdown {
+    min-width: 240px;
   }
 }

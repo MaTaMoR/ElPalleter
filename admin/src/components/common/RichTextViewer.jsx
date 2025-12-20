@@ -4,6 +4,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
+import Highlight from '@tiptap/extension-highlight';
 import { useEffect } from 'react';
 import styles from './RichTextViewer.module.css';
 
@@ -28,6 +29,9 @@ const RichTextViewer = ({ content, className = '' }) => {
       }),
       TextStyle,
       Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
     ],
     content: content || '',
     editable: false,
