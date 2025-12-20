@@ -112,17 +112,44 @@ Formulario completo para editar contenido rico con soporte multiidioma:
 - `save()`: Guarda los cambios (retorna una Promise)
 - `cancel()`: Cancela los cambios y restaura el contenido original
 
-### 5. ContentPage (Admin)
-**Ubicación:** `/admin/src/pages/content/ContentPage.jsx`
+### 5. SettingsPage con RichContentForm (Admin)
+**Ubicación:** `/admin/src/pages/settings/SettingsPage.jsx`
 
-Página completa de administración que integra el RichContentForm con:
+El RichContentForm está integrado en la página de Settings, debajo de las secciones de gestión de imágenes.
+La página de Settings maneja:
 - Modo edición/visualización
 - Botones Guardar/Cancelar
 - Confirmación de cambios
 - Toasts de notificación
 - Overlay de guardado
 
-**Acceso:** `/admin/content`
+**Acceso:** `/admin/settings`
+
+### 6. RichContentRepository
+**Ubicación:** `/src/repositories/RichContentRepository.js`
+
+Repository que maneja las llamadas HTTP a la API para contenido rico.
+
+**Métodos principales:**
+- `getContentByLanguage(languageCode)`: Obtiene todo el contenido de un idioma
+- `getContentByLanguageAndKey(languageCode, contentKey)`: Obtiene contenido específico
+- `getAllStructuredContent(languageCodes)`: Obtiene todo el contenido estructurado
+- `createContent(richContentDTO, token)`: Crea nuevo contenido (requiere auth)
+- `updateContent(richContentDTO, token)`: Actualiza contenido existente (requiere auth)
+- `upsertContent(richContentDTO, token)`: Crea o actualiza contenido (requiere auth)
+- `deleteContent(languageCode, contentKey, token)`: Elimina contenido (requiere auth)
+
+### 7. RichContentService
+**Ubicación:** `/src/services/RichContentService.js`
+
+Servicio que proporciona una capa de abstracción sobre RichContentRepository.
+
+**Métodos principales:**
+- `getContentKeyAllLanguages(contentKey)`: Obtiene un contentKey en todos los idiomas
+- `getAllStructuredContent(languageCodes)`: Obtiene todo el contenido estructurado
+- `saveContentAllLanguages(contentKey, contentByLanguage)`: Guarda contenido en múltiples idiomas
+- `upsertContent(languageCode, contentKey, contentValue)`: Crea o actualiza contenido
+- `deleteContent(languageCode, contentKey)`: Elimina contenido
 
 ## Estructura de Datos
 
@@ -175,63 +202,59 @@ Editor de texto rico basado en ProseMirror.
 
 ## Integración con el Backend
 
-### Guardar contenido
-El método `save()` del RichContentForm debe ser actualizado para enviar los datos al backend.
+La integración con el backend está completamente implementada usando RichContentService y RichContentRepository.
 
-**Implementación sugerida:**
-```jsx
-save: async () => {
-  // Construir el payload
-  const payload = {
-    key: contentKey,
-    content: content
-  };
+### API Endpoints
 
-  // Llamar al servicio/API
-  const response = await fetch('/api/rich-content', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(payload)
-  });
+Los siguientes endpoints están disponibles en el backend:
 
-  if (!response.ok) {
-    throw new Error('Error al guardar el contenido');
-  }
+**Endpoints Públicos:**
+- `GET /i18n/rich-content/{languageCode}` - Obtiene todo el contenido de un idioma
+- `GET /i18n/rich-content/{languageCode}/{contentKey}` - Obtiene contenido específico
+- `GET /i18n/rich-content/search?keyPart=texto` - Busca contenido en todos los idiomas
+- `GET /i18n/rich-content/{languageCode}/search?keyPart=texto` - Busca en un idioma específico
 
-  // Actualizar el contenido original
-  setOriginalContent(JSON.parse(JSON.stringify(content)));
+**Endpoints Protegidos (requieren autenticación con CAN_EDIT_CONTENT):**
+- `POST /i18n/rich-content` - Crea nuevo contenido
+- `PUT /i18n/rich-content` - Actualiza contenido existente
+- `DELETE /i18n/rich-content/{languageCode}/{contentKey}` - Elimina contenido
+
+### Estructura de DTO
+
+```typescript
+{
+  language: string,      // Código del idioma (es, en, val)
+  contentKey: string,    // Clave del contenido (e.g., "historia_content")
+  contentValue: string   // Valor HTML del contenido
 }
 ```
 
 ### Cargar contenido
-Actualmente el componente carga el contenido desde `/data/rich-content.json`. Para cargar desde el backend:
+
+El RichContentForm carga automáticamente el contenido usando RichContentService:
 
 ```jsx
+// En RichContentForm.jsx
 const loadContent = async () => {
-  try {
-    setIsLoading(true);
-    setError(null);
-
-    // Llamar al backend
-    const response = await fetch(`/api/rich-content/${contentKey}`);
-    if (!response.ok) {
-      throw new Error('Error al cargar el contenido');
-    }
-
-    const data = await response.json();
-    setContent(data);
-    setOriginalContent(JSON.parse(JSON.stringify(data)));
-  } catch (err) {
-    console.error('Error loading content:', err);
-    setError(err.message);
-  } finally {
-    setIsLoading(false);
-  }
+  const contentData = await RichContentService.getContentKeyAllLanguages(contentKey);
+  setContent(contentData);
+  setOriginalContent(JSON.parse(JSON.stringify(contentData)));
 };
 ```
+
+### Guardar contenido
+
+El RichContentForm guarda el contenido usando RichContentService:
+
+```jsx
+// En RichContentForm.jsx
+save: async () => {
+  await RichContentService.saveContentAllLanguages(contentKey, content);
+  setOriginalContent(JSON.parse(JSON.stringify(content)));
+}
+```
+
+El método `saveContentAllLanguages` internamente usa `upsertContent` para cada idioma, lo que significa que creará el contenido si no existe, o lo actualizará si ya existe.
 
 ## Uso en el Frontend Público
 

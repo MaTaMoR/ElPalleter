@@ -2,6 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import RichTextEditor from '../common/RichTextEditor';
 import LanguageSelector from '../menu/utils/LanguageSelector';
 import { FileText } from 'lucide-react';
+import { RichContentService } from '../../../../src/services/RichContentService';
 import styles from './RichContentForm.module.css';
 
 /**
@@ -35,14 +36,8 @@ const RichContentForm = forwardRef(({
       setIsLoading(true);
       setError(null);
 
-      // Cargar el archivo rich-content.json
-      const response = await fetch('/data/rich-content.json');
-      if (!response.ok) {
-        throw new Error('Error al cargar el contenido');
-      }
-
-      const data = await response.json();
-      const contentData = data[contentKey];
+      // Cargar contenido desde el backend usando el servicio
+      const contentData = await RichContentService.getContentKeyAllLanguages(contentKey);
 
       if (contentData) {
         setContent(contentData);
@@ -59,7 +54,7 @@ const RichContentForm = forwardRef(({
       }
     } catch (err) {
       console.error('Error loading content:', err);
-      setError(err.message);
+      setError(err.message || 'Error al cargar el contenido');
     } finally {
       setIsLoading(false);
     }
@@ -92,17 +87,18 @@ const RichContentForm = forwardRef(({
   // Exponer métodos al componente padre a través de ref
   useImperativeHandle(ref, () => ({
     save: async () => {
-      // Aquí deberías implementar la lógica para guardar en el backend
-      // Por ahora solo simularemos el guardado
-      console.log('Saving rich content:', contentKey, content);
+      try {
+        console.log('Saving rich content:', contentKey, content);
 
-      // Simulación de guardado (reemplazar con llamada real al backend)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setOriginalContent(JSON.parse(JSON.stringify(content)));
-          resolve();
-        }, 1000);
-      });
+        // Guardar contenido en el backend usando el servicio
+        await RichContentService.saveContentAllLanguages(contentKey, content);
+
+        // Actualizar el contenido original después de guardar exitosamente
+        setOriginalContent(JSON.parse(JSON.stringify(content)));
+      } catch (err) {
+        console.error('Error saving rich content:', err);
+        throw new Error(`Error al guardar el contenido: ${err.message || 'Error desconocido'}`);
+      }
     },
     cancel: () => {
       // Restaurar contenido original

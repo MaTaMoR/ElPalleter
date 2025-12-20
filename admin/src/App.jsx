@@ -16,7 +16,6 @@ import MenuPage from './pages/menu/MenuPage';
 import ContactPage from './pages/contact/ContactPage';
 import UsersPage from './pages/users/UsersPage';
 import SettingsPage from './pages/settings/SettingsPage';
-import ContentPage from './pages/content/ContentPage';
 
 export default function App() {
   return (
@@ -34,7 +33,6 @@ export default function App() {
             <Route path="menu/*" element={<MenuPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="users" element={<UsersPage />} />
-            <Route path="content" element={<ContentPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
           <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
