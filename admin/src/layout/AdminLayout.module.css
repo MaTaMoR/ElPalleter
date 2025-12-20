@@ -10,13 +10,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  margin-left: calc(280px + 4rem);
+  margin-left: calc(var(--sidebar-size-expanded) + 4rem);
   margin-top: 86px;
   transition: margin-left 0s;
 }
 
 .mainContentCollapsed {
-  margin-left: calc(72px + 4rem);
+  margin-left: calc(var(--sidebar-size-collapsed) + 4rem);
 }
 
 .pageContainer {

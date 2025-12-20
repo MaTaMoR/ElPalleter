@@ -4,6 +4,7 @@ import { Share2 } from 'lucide-react';
 import MenuTextField from '../menu/fields/MenuTextField';
 import BadgeToggle from '../common/BadgeToggle';
 import styles from './SocialMediaForm.module.css';
+import Icon from '../common/Icon';
 
 /**
  * Form component for editing social media links
@@ -68,7 +69,7 @@ const SocialMediaForm = ({
             <div className={styles.socialGrid}>
               {enabledSocials.map((social, index) => (
                 <div key={index} className={styles.socialCard}>
-                  <div className={styles.socialIcon}>{getPlatformIcon(social.platform)}</div>
+                  <div className={styles.socialIcon}><Icon name={social.icon.name} /></div>
                   <div className={styles.socialInfo}>
                     <div className={styles.platform}>{social.platform}</div>
                     <div className={styles.handle}>{social.handle}</div>
@@ -157,7 +158,7 @@ SocialMediaForm.propTypes = {
     enabled: PropTypes.bool.isRequired,
     url: PropTypes.string,
     handle: PropTypes.string,
-    icon: PropTypes.string
+    icon: PropTypes.object
   })).isRequired,
   onChange: PropTypes.func,
   errors: PropTypes.object,

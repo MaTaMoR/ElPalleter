@@ -30,14 +30,14 @@ export const getLanguageName = (languageCode) => {
  * @param {string} languageCode - Código del idioma
  * @returns {string|null} URL de la imagen de la bandera
  */
-export const getLanguageFlagUrl = (languageCode) => {
+export const getLanguageFlag = (languageCode) => {
   if (!languageCode) return null;
   
   // Obtener el idioma desde I18nService
   const language = I18nService.getLanguage(languageCode);
   
-  if (language && language.flag && language.flag.value) {
-    return language.flag.value;
+  if (language && language.flag && language.flag.name) {
+    return language.flag;
   }
   
   return null;
@@ -67,19 +67,6 @@ export const formatNumber = (number) => {
     return (number / 1000).toFixed(1) + 'k';
   }
   return number.toString();
-};
-
-export const getDeviceIcon = (deviceType) => {
-  switch (deviceType?.toLowerCase()) {
-    case 'mobile':
-      return '📱';
-    case 'tablet':
-      return '📟';
-    case 'desktop':
-      return '🖥️';
-    default:
-      return '❓';
-  }
 };
 
 /**
@@ -139,6 +126,13 @@ export const formatTimeAgo = (dateString) => {
   return `Hace ${diffDays} días`;
 };
 
+export const CHANGE_TYPE = {
+  POSITIVE: 'positive',
+  NEGATIVE: 'negative',
+  AVERAGE: 'average',
+  NEUTRAL: 'neutral'
+}
+
 /**
  * Calcula el porcentaje de cambio entre dos valores
  * @param {number} current - Valor actual
@@ -146,60 +140,90 @@ export const formatTimeAgo = (dateString) => {
  * @returns {Object} { percentage: number, isPositive: boolean, changeType: string, displayText: string, showChange: boolean }
  */
 export const calculatePercentageChange = (current, previous) => {
-  if (!previous || previous === 0) {
+  // Comprobar si previous no existe (null o undefined), no si es 0
+  if (previous === null || previous === undefined) {
     return {
       percentage: 0,
       isPositive: false,
-      changeType: 'neutral',
+      changeType: CHANGE_TYPE.NEUTRAL,
       displayText: '',
       showChange: false // No mostrar change si no hay datos anteriores
     };
   }
 
-  const change = ((current - previous) / previous) * 100;
+  // Si previous es 0, cualquier valor actual es un incremento infinito
+  // En este caso mostramos el cambio como un valor muy alto o simplemente como "nuevo"
+  let change;
+  if (previous === 0) {
+    // Si current también es 0, no hay cambio
+    if (current === 0) {
+      change = 0;
+    } else {
+      // Si pasamos de 0 a algo, es un incremento del 100% (o podríamos usar un valor alto)
+      change = 100;
+    }
+  } else {
+    change = ((current - previous) / previous) * 100;
+  }
+
   const roundedChange = Math.round(change * 10) / 10; // Redondear a 1 decimal
-  
+
   const isPositive = change > 0;
   const isNegative = change < 0;
-  
-  let changeType = 'neutral';
-  if (Math.abs(change) > 0.1) { // Solo mostrar cambio si es mayor a 0.1%
-    changeType = isPositive ? 'positive' : 'negative';
+
+  let changeType = CHANGE_TYPE.NEUTRAL;
+  if (Math.abs(change) > 5) {
+    if (Math.abs(change) > 15) {
+      changeType = isPositive ? CHANGE_TYPE.POSITIVE : CHANGE_TYPE.NEGATIVE;
+    } else {
+      changeType = CHANGE_TYPE.AVERAGE;
+    }
   }
 
   const sign = isPositive ? '+' : '';
-  const displayText = Math.abs(roundedChange) < 0.1 
-    ? 'Sin cambios' 
-    : `${sign}${roundedChange}% vs anterior`;
+  const changeText = Math.abs(change) > 1 ? `${sign}${roundedChange}%` : 'N/A';
 
   return {
     percentage: roundedChange,
     isPositive,
     isNegative,
     changeType,
-    displayText,
+    displayText: changeText,
     showChange: true
   };
 };
 
 /**
  * Calcula cambios para todas las métricas principales
- * @param {Object} currentData - Datos de la semana actual
- * @param {Object} previousData - Datos de la semana anterior
+ * @param {Object} currentData - Datos del periodo actual
+ * @param {Object} previousData - Datos del periodo anterior
  * @returns {Object} Objeto con todos los cambios calculados
  */
 export const calculateAllMetricChanges = (currentData, previousData) => {
+  const defaultChange = { displayText: '', changeType: 'neutral', showChange: false };
+
   if (!currentData || !previousData) {
-    // Devolver objetos que indican no mostrar change
     return {
-      uniqueVisitors: { displayText: '', changeType: 'neutral', showChange: false },
-      totalVisits: { displayText: '', changeType: 'neutral', showChange: false },
-      averageDuration: { displayText: '', changeType: 'neutral', showChange: false },
-      mobilePercentage: { displayText: '', changeType: 'neutral', showChange: false },
-      engagementRate: { displayText: '', changeType: 'neutral', showChange: false },
-      topSection: { displayText: '', changeType: 'neutral', showChange: false }
+      uniqueVisitors: defaultChange,
+      totalVisits: defaultChange,
+      averageDuration: defaultChange,
+      mobilePercentage: defaultChange,
+      engagementRate: defaultChange,
+      topSection: defaultChange
     };
   }
+
+  console.log('P: ' + JSON.stringify(previousData));
+  console.log('C: ' + JSON.stringify(currentData));
+
+  const currentMobile = calculateMobilePercentage(currentData.deviceStats, currentData.totalVisits);
+  const previousMobile = calculateMobilePercentage(previousData.deviceStats, previousData.totalVisits);
+
+  const currentEngagement = calculateEngagementRate(currentData.bounceRate);
+  const previousEngagement = calculateEngagementRate(previousData.bounceRate);
+
+  const currentTopSection = getMostViewedSection(currentData.sectionStats);
+  const previousTopSection = getMostViewedSection(previousData.sectionStats);
 
   return {
     uniqueVisitors: calculatePercentageChange(
@@ -214,73 +238,8 @@ export const calculateAllMetricChanges = (currentData, previousData) => {
       currentData.averageDuration || 0,
       previousData.averageDuration || 0
     ),
-    // Para métricas calculadas, necesitamos calcular los valores para ambas semanas
-    mobilePercentage: calculateMobilePercentageChange(currentData, previousData),
-    engagementRate: calculateEngagementRateChange(currentData, previousData),
-    topSection: calculateTopSectionChange(currentData, previousData)
+    mobilePercentage: calculatePercentageChange(currentMobile, previousMobile),
+    engagementRate: calculatePercentageChange(currentEngagement, previousEngagement),
+    topSection: calculatePercentageChange(currentTopSection.percentage, previousTopSection.percentage)
   };
-};
-
-/**
- * Calcula el cambio en porcentaje móvil
- */
-const calculateMobilePercentageChange = (currentData, previousData) => {
-  const currentMobile = calculateMobilePercentage(currentData.deviceStats, currentData.totalVisits);
-  const previousMobile = calculateMobilePercentage(previousData.deviceStats, previousData.totalVisits);
-  
-  // Para porcentajes, mostramos la diferencia en puntos porcentuales
-  const change = currentMobile - previousMobile;
-  const roundedChange = Math.round(change * 10) / 10;
-  
-  let changeType = 'neutral';
-  if (Math.abs(change) > 0.5) { // Cambio significativo en puntos porcentuales
-    changeType = change > 0 ? 'positive' : 'negative';
-  }
-  
-  const sign = change > 0 ? '+' : '';
-  const displayText = Math.abs(roundedChange) < 0.1 
-    ? 'Sin cambios' 
-    : `${sign}${roundedChange}pp vs anterior`;
-
-  return { displayText, changeType, showChange: true };
-};
-
-/**
- * Calcula el cambio en tasa de engagement
- */
-const calculateEngagementRateChange = (currentData, previousData) => {
-  const currentRate = calculateEngagementRate(currentData.bounceRate);
-  const previousRate = calculateEngagementRate(previousData.bounceRate);
-  
-  return calculatePercentageChange(currentRate, previousRate);
-};
-
-/**
- * Calcula el cambio en la sección más vista
- */
-const calculateTopSectionChange = (currentData, previousData) => {
-  const currentTop = getMostViewedSection(currentData.sectionStats);
-  const previousTop = getMostViewedSection(previousData.sectionStats);
-  
-  if (currentTop.name === previousTop.name) {
-    // Misma sección, mostrar cambio en porcentaje de tráfico
-    const change = currentTop.percentage - previousTop.percentage;
-    const roundedChange = Math.round(change * 10) / 10;
-    
-    const sign = change > 0 ? '+' : '';
-    const displayText = Math.abs(roundedChange) < 0.1 
-      ? `${currentTop.percentage.toFixed(1)}% del tráfico` 
-      : `${currentTop.percentage.toFixed(1)}% (${sign}${roundedChange}pp)`;
-    
-    const changeType = Math.abs(change) > 0.5 ? (change > 0 ? 'positive' : 'negative') : 'neutral';
-    
-    return { displayText, changeType, showChange: true };
-  } else {
-    // Sección diferente
-    return {
-      displayText: `${currentTop.percentage.toFixed(1)}% (Nueva líder)`,
-      changeType: 'positive',
-      showChange: true
-    };
-  }
 };

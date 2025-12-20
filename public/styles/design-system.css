@@ -334,7 +334,6 @@ img {
   right: 0;
   bottom: 0;
   background: var(--bg-overlay);
-  backdrop-filter: var(--backdrop-blur);
   z-index: var(--z-modal);
   display: flex;
   align-items: center;
@@ -359,7 +358,6 @@ body[data-debug-breakpoints="true"]:before {
   top: var(--space-3);
   right: var(--space-3);
   background: var(--glass-bg);
-  backdrop-filter: var(--backdrop-blur);
   color: var(--text-primary);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);

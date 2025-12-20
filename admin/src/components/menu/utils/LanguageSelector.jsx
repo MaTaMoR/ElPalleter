@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from 'lucide-react';
-import Icon from '../common/Icon';
+import Icon from '../../common/Icon';
 import I18nService from '@services/I18nService.js';
 import styles from './LanguageSelector.module.css';
 
