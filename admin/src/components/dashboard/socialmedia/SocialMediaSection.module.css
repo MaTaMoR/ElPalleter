@@ -1,0 +1,151 @@
+/* Sección */
+.section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Container con background y border */
+.sectionContainer {
+  background: var(--container-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: var(--section-padding);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Header */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: var(--section-header-padding-bottom);
+  border-bottom: 2px solid var(--border-color);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sectionHeader > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.sectionHeader h2 {
+  color: var(--text-primary);
+  font-size: var(--section-title-size);
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* Marketing Digital */
+.socialGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.cardSkeleton {
+  min-height: 180px;
+}
+
+.starIcon {
+  flex-shrink: 0;
+}
+
+/* Error State */
+.errorState {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.errorIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.errorState h3 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.errorState p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.retryButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.retryButton:hover {
+  background: var(--primary-dark);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sectionContainer {
+    padding: 1.25rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .sectionHeader > div:first-child {
+    width: 100%;
+  }
+
+  .socialGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .starIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Solo para pantallas muy pequeñas 1 columna */
+@media (max-width: 480px) {
+  .socialGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}

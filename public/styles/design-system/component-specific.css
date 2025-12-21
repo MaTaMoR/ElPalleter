@@ -374,7 +374,6 @@ body[data-debug-breakpoints="true"]::before {
   z-index: var(--z-toast);
   pointer-events: none;
   border: var(--border-1) solid var(--accent-primary);
-  backdrop-filter: var(--backdrop-blur);
 }
 
 @media print {

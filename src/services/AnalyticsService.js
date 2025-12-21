@@ -7,116 +7,129 @@ import { AuthService } from './AuthService.js';
  */
 function detectDeviceType() {
     if (typeof window === 'undefined') return 'UNKNOWN';
-    
+
     const ua = navigator.userAgent.toLowerCase();
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;
     const maxScreenDimension = Math.max(screenWidth, screenHeight);
     const minScreenDimension = Math.min(screenWidth, screenHeight);
-    
+
     // Patrones de móviles
     const mobilePatterns = [
         /android.*mobile/i, /iphone/i, /ipod/i, /blackberry/i,
         /windows phone/i, /opera mini/i, /iemobile/i
     ];
-    
+
     // Patrones de tablets
     const tabletPatterns = [
         /ipad/i, /android(?!.*mobile)/i, /tablet/i, /kindle/i, /silk/i
     ];
-    
+
     // Detectar por UA primero
     if (mobilePatterns.some(pattern => pattern.test(ua))) {
         return 'MOBILE';
     }
-    
+
     if (tabletPatterns.some(pattern => pattern.test(ua))) {
         return 'TABLET';
     }
-    
+
     // Si tiene touch, usar tamaño de pantalla física
     if (hasTouch) {
         if (maxScreenDimension <= 768) return 'MOBILE';
         if (maxScreenDimension <= 1366 && minScreenDimension >= 600) return 'TABLET';
     }
-    
+
     // Por defecto, desktop
     return 'DESKTOP';
 }
+
+/**
+ * Estado del servicio (a nivel de módulo)
+ */
+const state = {
+    sessionId: null,
+    visitStartTime: null,
+    isTrackingEnabled: true,
+    eventQueue: [],
+    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    hasStartedVisit: false,
+    deviceType: typeof window !== 'undefined' ? detectDeviceType() : 'UNKNOWN',
+    MIN_SESSION_DURATION: 5000, // 5 segundos mínimo
+    visibilityTimeout: null,
+    initialized: false
+};
 
 /**
  * Servicio de Analytics compartido
  * Maneja el tracking automático y envío de datos
  */
 export class AnalyticsService {
-    constructor() {
-        this.sessionId = this.generateSessionId();
-        this.visitStartTime = Date.now();
-        this.isTrackingEnabled = true;
-        this.eventQueue = [];
-        this.isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-        this.hasStartedVisit = false;
-        this.deviceType = typeof window !== 'undefined' ? detectDeviceType() : 'UNKNOWN';
-        
-        this.MIN_SESSION_DURATION = 5000; // 5 segundos mínimo
-        this.visibilityTimeout = null;
-        
+
+    static initialize() {
+        if (state.initialized) return;
+
+        state.sessionId = this.generateSessionId();
+        state.visitStartTime = Date.now();
+
         if (typeof window !== 'undefined') {
             this.setupEventListeners();
         }
+
+        state.initialized = true;
     }
 
-    generateSessionId() {
+    static generateSessionId() {
         return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    setupEventListeners() {
+    static setupEventListeners() {
         // ← MODIFICAR: Agregar delay antes de reportar fin
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 // Esperar 3 segundos antes de considerar que se fue
-                this.visibilityTimeout = setTimeout(() => {
-                    this.endVisitTracking();
+                state.visibilityTimeout = setTimeout(() => {
+                    AnalyticsService.endVisitTracking();
                 }, 3000);
             } else {
                 // Si vuelve, cancelar el timeout
-                if (this.visibilityTimeout) {
-                    clearTimeout(this.visibilityTimeout);
-                    this.visibilityTimeout = null;
+                if (state.visibilityTimeout) {
+                    clearTimeout(state.visibilityTimeout);
+                    state.visibilityTimeout = null;
                 }
             }
         });
 
         window.addEventListener('beforeunload', () => {
             // Cancelar timeout si existe
-            if (this.visibilityTimeout) {
-                clearTimeout(this.visibilityTimeout);
+            if (state.visibilityTimeout) {
+                clearTimeout(state.visibilityTimeout);
             }
-            this.endVisitTracking();
+            AnalyticsService.endVisitTracking();
         });
 
         window.addEventListener('online', () => {
-            this.isOnline = true;
-            this.processEventQueue();
+            state.isOnline = true;
+            AnalyticsService.processEventQueue();
         });
 
         window.addEventListener('offline', () => {
-            this.isOnline = false;
+            state.isOnline = false;
         });
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                this.startVisitTracking();
+                AnalyticsService.startVisitTracking();
             });
         } else {
-            setTimeout(() => this.startVisitTracking(), 100);
+            setTimeout(() => AnalyticsService.startVisitTracking(), 100);
         }
     }
 
-    getLanguageFromUrl() {
+    static getLanguageFromUrl() {
         if (typeof window === 'undefined') return 'es';
-        
+
         const path = window.location.pathname;
         if (path.startsWith('/en')) return 'en';
         if (path.startsWith('/val')) return 'val';
@@ -128,27 +141,27 @@ export class AnalyticsService {
      * Inicia el tracking de la visita
      * IMPORTANTE: Ahora incluye el deviceType detectado correctamente
      */
-    async startVisitTracking() {
-        if (!this.isTrackingEnabled || this.hasStartedVisit) return;
-        
-        this.hasStartedVisit = true;
+    static async startVisitTracking() {
+        if (!state.isTrackingEnabled || state.hasStartedVisit) return;
+
+        state.hasStartedVisit = true;
 
         const visitData = {
-            sessionId: this.sessionId,
+            sessionId: state.sessionId,
             userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
             languageCode: this.getLanguageFromUrl(),
             referrer: typeof document !== 'undefined' ? document.referrer || null : null,
             screenWidth: typeof window !== 'undefined' ? window.screen?.width : null,
             screenHeight: typeof window !== 'undefined' ? window.screen?.height : null,
-            deviceType: this.deviceType  // ← Añadido: tipo de dispositivo real
+            deviceType: state.deviceType  // ← Añadido: tipo de dispositivo real
         };
 
         await this.sendToRepository('trackVisitStart', visitData);
-        
+
         // Track initial page load event
         this.trackEvent('PAGE_LOAD', null, {
             url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-            deviceType: this.deviceType,
+            deviceType: state.deviceType,
             viewport: typeof window !== 'undefined' ? {
                 width: window.innerWidth,
                 height: window.innerHeight
@@ -156,78 +169,78 @@ export class AnalyticsService {
         });
     }
 
-    async trackEvent(eventType, sectionName = null, eventData = {}) {
-        if (!this.isTrackingEnabled) return;
+    static async trackEvent(eventType, sectionName = null, eventData = {}) {
+        if (!state.isTrackingEnabled) return;
 
         const event = {
-            sessionId: this.sessionId,
+            sessionId: state.sessionId,
             eventType: eventType,
             sectionName: sectionName,
             timestamp: new Date().toISOString(),
             eventData: {
                 ...eventData,
                 url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-                deviceType: this.deviceType  // Incluir en todos los eventos
+                deviceType: state.deviceType  // Incluir en todos los eventos
             }
         };
 
         await this.sendToRepository('trackEvent', event);
     }
 
-    async trackSectionView(sectionName) {
+    static async trackSectionView(sectionName) {
         await this.trackEvent('SECTION_VIEW', sectionName, {
             scrollPosition: typeof window !== 'undefined' ? window.scrollY : 0,
             sectionVisible: this.isSectionVisible(sectionName)
         });
     }
 
-    async trackFormSubmit(formType, sectionName) {
+    static async trackFormSubmit(formType, sectionName) {
         await this.trackEvent('FORM_SUBMIT', sectionName, {
             formType: formType
         });
     }
 
-    async trackContactClick(contactType, sectionName) {
+    static async trackContactClick(contactType, sectionName) {
         await this.trackEvent('CONTACT_CLICK', sectionName, {
             contactType: contactType
         });
     }
 
-    async trackMenuView(menuSection) {
+    static async trackMenuView(menuSection) {
         await this.trackEvent('MENU_VIEW', 'carta', {
             menuSection: menuSection
         });
     }
 
-    isSectionVisible(sectionName) {
+    static isSectionVisible(sectionName) {
         if (typeof window === 'undefined') return false;
-        
-        const element = document.getElementById(sectionName) || 
+
+        const element = document.getElementById(sectionName) ||
                        document.querySelector(`[data-section="${sectionName}"]`);
-        
+
         if (!element) return false;
 
         const rect = element.getBoundingClientRect();
         const windowHeight = window.innerHeight;
-        
+
         const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
         const sectionHeight = rect.height;
-        
+
         return visibleHeight / sectionHeight > 0.5;
     }
 
-    async endVisitTracking() {
-        if (!this.isTrackingEnabled || !this.hasStartedVisit) return;
+    static async endVisitTracking() {
+        if (!state.isTrackingEnabled || !state.hasStartedVisit) return;
 
-        const duration = Math.floor((Date.now() - this.visitStartTime) / 1000);
-        
-        if (duration * 1000 < this.MIN_SESSION_DURATION) {
+        const duration = Math.floor((Date.now() - state.visitStartTime) / 1000);
+
+        if (duration * 1000 < state.MIN_SESSION_DURATION) {
             console.debug('Session too short, not tracking end', { duration });
             return;
         }
-        
+
         const endData = {
-            sessionId: this.sessionId,
+            sessionId: state.sessionId,
             durationSeconds: duration
         };
 
@@ -245,9 +258,9 @@ export class AnalyticsService {
         await this.sendToRepository('trackVisitEnd', endData);
     }
 
-    async sendToRepository(method, data) {
-        if (!this.isOnline) {
-            this.eventQueue.push({ method, data });
+    static async sendToRepository(method, data) {
+        if (!state.isOnline) {
+            state.eventQueue.push({ method, data });
             return;
         }
 
@@ -255,30 +268,60 @@ export class AnalyticsService {
             await AnalyticsRepository[method](data, AuthService.getToken());
         } catch (error) {
             console.warn('Analytics tracking failed:', error);
-            this.eventQueue.push({ method, data });
+            state.eventQueue.push({ method, data });
         }
     }
 
-    async processEventQueue() {
-        if (!this.isOnline || this.eventQueue.length === 0) return;
+    static async processEventQueue() {
+        if (!state.isOnline || state.eventQueue.length === 0) return;
 
-        const queue = [...this.eventQueue];
-        this.eventQueue = [];
+        const queue = [...state.eventQueue];
+        state.eventQueue = [];
 
         for (const { method, data } of queue) {
             await this.sendToRepository(method, data);
         }
     }
 
-    disableTracking() {
-        this.isTrackingEnabled = false;
+    static disableTracking() {
+        state.isTrackingEnabled = false;
     }
 
-    enableTracking() {
-        this.isTrackingEnabled = true;
+    static enableTracking() {
+        state.isTrackingEnabled = true;
     }
 
-    async getWeeklyStats() {
+    static async getMonthlyStats(year = null, month = null) {
+        try {
+            return await AnalyticsRepository.getMonthlyStats(AuthService.getToken(), year, month);
+        } catch (error) {
+            console.error('AnalyticsService: Error getting monthly stats:', error);
+            throw error;
+        }
+    }
+
+    static async getStartDate() {
+        try {
+            return await AnalyticsRepository.getStartDate(AuthService.getToken());
+        } catch (error) {
+            console.error('AnalyticsService: Error getting start date:', error);
+            throw error;
+        }
+    }
+
+    static async getYearlyStats() {
+        try {
+            return await AnalyticsRepository.getYearlyStats(AuthService.getToken());
+        } catch (error) {
+            console.error('AnalyticsService: Error getting yearly stats:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * @deprecated - Usar getMonthlyStats en su lugar
+     */
+    static async getWeeklyStats() {
         try {
             return await AnalyticsRepository.getWeeklyStats(AuthService.getToken());
         } catch (error) {
@@ -287,7 +330,10 @@ export class AnalyticsService {
         }
     }
 
-    async getPreviousWeekStats() {
+    /**
+     * @deprecated - Usar getMonthlyStats en su lugar
+     */
+    static async getPreviousWeekStats() {
         try {
             return await AnalyticsRepository.getLastWeekStats(AuthService.getToken());
         } catch (error) {
@@ -296,7 +342,10 @@ export class AnalyticsService {
         }
     }
 
-    async getCustomPeriodStats(startDate, endDate) {
+    /**
+     * @deprecated - Usar getMonthlyStats en su lugar
+     */
+    static async getCustomPeriodStats(startDate, endDate) {
         try {
             return await AnalyticsRepository.getCustomPeriodStats(AuthService.getToken(), startDate, endDate);
         } catch (error) {
@@ -305,18 +354,18 @@ export class AnalyticsService {
         }
     }
 
-    async healthCheck() {
+    static async healthCheck() {
         try {
             const repoHealth = await AnalyticsRepository.healthCheck();
-            
+
             return {
                 ...repoHealth,
                 service: 'AnalyticsService',
-                sessionId: this.sessionId,
-                trackingEnabled: this.isTrackingEnabled,
-                hasStartedVisit: this.hasStartedVisit,
-                deviceType: this.deviceType,
-                queueLength: this.eventQueue.length,
+                sessionId: state.sessionId,
+                trackingEnabled: state.isTrackingEnabled,
+                hasStartedVisit: state.hasStartedVisit,
+                deviceType: state.deviceType,
+                queueLength: state.eventQueue.length,
                 lastCheck: new Date().toISOString()
             };
         } catch (error) {
@@ -329,7 +378,7 @@ export class AnalyticsService {
         }
     }
 
-    setupSectionTracking(sectionIds = []) {
+    static setupSectionTracking(sectionIds = []) {
         if (typeof window === 'undefined' || !window.IntersectionObserver) return;
 
         // Set para trackear secciones ya vistas
@@ -339,13 +388,13 @@ export class AnalyticsService {
             (entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-                        const sectionName = entry.target.id || 
+                        const sectionName = entry.target.id ||
                                            entry.target.getAttribute('data-section');
-                        
+
                         // Solo trackear si NO fue vista antes
                         if (sectionName && !viewedSections.has(sectionName)) {
                             viewedSections.add(sectionName);
-                            this.trackSectionView(sectionName);
+                            AnalyticsService.trackSectionView(sectionName);
                             console.debug('Section viewed (first time):', sectionName);
                         }
                     }
@@ -357,7 +406,7 @@ export class AnalyticsService {
             }
         );
 
-        const sectionsToObserve = sectionIds.length > 0 
+        const sectionsToObserve = sectionIds.length > 0
             ? sectionIds.map(id => document.getElementById(id)).filter(Boolean)
             : Array.from(document.querySelectorAll('[id], [data-section]'));
 
@@ -368,19 +417,21 @@ export class AnalyticsService {
         return observer;
     }
 
-    getConfig() {
+    static getConfig() {
         return {
             repository: AnalyticsRepository.getConfig(),
-            sessionId: this.sessionId,
-            trackingEnabled: this.isTrackingEnabled,
-            deviceType: this.deviceType,
+            sessionId: state.sessionId,
+            trackingEnabled: state.isTrackingEnabled,
+            deviceType: state.deviceType,
             supportedLanguages: ['es', 'en', 'val'],
             defaultLanguage: 'es'
         };
     }
 }
 
-// Crear instancia singleton
-const analyticsService = new AnalyticsService();
+// Inicializar el servicio automáticamente cuando se carga el módulo
+if (typeof window !== 'undefined') {
+    AnalyticsService.initialize();
+}
 
-export default analyticsService;
+export default AnalyticsService;

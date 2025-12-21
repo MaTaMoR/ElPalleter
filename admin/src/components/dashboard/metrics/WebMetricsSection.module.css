@@ -15,30 +15,54 @@
 
 /* Container con background y border */
 .sectionContainer {
-  background: rgba(26, 26, 26, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--container-color);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 2rem;
+  padding: var(--section-padding);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
 }
 
 /* Header */
 .sectionHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  padding-bottom: var(--section-header-padding-bottom);
   border-bottom: 2px solid var(--border-color);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sectionHeader > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionIcon {
+  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .sectionHeader h2 {
   color: var(--text-primary);
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--section-title-size);
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
 .lastUpdated {
@@ -88,9 +112,7 @@
   padding: 4rem 2rem;
   text-align: center;
   min-height: 400px;
-  background: rgba(26, 26, 26, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--container-color);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
@@ -155,12 +177,11 @@
 /* Responsive */
 @media (max-width: 768px) {
   .sectionContainer {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .sectionHeader {
-    flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .statsGrid {
@@ -169,8 +190,10 @@
   }
 }
 
+/* Solo para pantallas muy pequeñas 1 columna */
 @media (max-width: 480px) {
-  .sectionContainer {
-    padding: 1rem;
+  .socialGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 }

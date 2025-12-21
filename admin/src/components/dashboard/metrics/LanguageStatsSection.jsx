@@ -1,5 +1,7 @@
 import React from 'react';
-import { getLanguageFlagUrl, getLanguageName, formatNumber, formatPercentage } from '@utils/analyticsUtils';
+import { getLanguageFlag, getLanguageName, formatNumber, formatPercentage } from '@utils/analyticsUtils';
+import DashboardCard from '../common/DashboardCard';
+import Icon from '../../common/Icon.jsx';
 import styles from './LanguageStatsSection.module.css';
 
 const LanguageStatsSection = ({ analyticsData }) => {
@@ -11,9 +13,9 @@ const LanguageStatsSection = ({ analyticsData }) => {
     name: getLanguageName(code),
     count: count,
     percentage: totalVisits > 0 ? (count / totalVisits) * 100 : 0,
-    flagUrl: getLanguageFlagUrl(code)
+    flag: getLanguageFlag(code)
   })).sort((a, b) => b.count - a.count);
-
+  
   if (languages.length === 0) {
     return (
       <div className={styles.languageStats}>
@@ -30,14 +32,10 @@ const LanguageStatsSection = ({ analyticsData }) => {
       <h4>Idiomas</h4>
       <div className={styles.languageList}>
         {languages.map((language) => (
-          <div key={language.code} className={styles.languageItem}>
+          <DashboardCard key={language.code} className={styles.languageItem}>
             <div className={styles.languageLeft}>
-              {language.flagUrl && (
-                <img 
-                  src={language.flagUrl} 
-                  alt={`${language.name} flag`}
-                  className={styles.languageFlag}
-                />
+              {language.flag && (
+                <Icon name={language.flag.name} />
               )}
               <span className={styles.languageName}>{language.name}</span>
             </div>
@@ -45,7 +43,7 @@ const LanguageStatsSection = ({ analyticsData }) => {
               <span className={styles.languageCount}>{formatNumber(language.count)}</span>
               <span className={styles.languagePercentage}>{formatPercentage(language.percentage)}</span>
             </div>
-          </div>
+          </DashboardCard>
         ))}
       </div>
     </div>

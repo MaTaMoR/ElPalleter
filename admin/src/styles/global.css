@@ -9,7 +9,7 @@
   --bg-primary: #0a0a0a;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #2a2a2a;
-  --bg-card: #1f1f1f;
+  --bg-card: rgba(26, 26, 26, 0.5);
   
   /* Colores de texto */
   --text-primary: #ffffff;
@@ -21,9 +21,10 @@
   --error: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --neutral: #666666;
   
   /* Bordes */
-  --border-color: #333333;
+  --border-color: var(--neutral);
   --border-radius: 0.5rem;
   
   /* Sombras */
@@ -39,6 +40,17 @@
   --z-overlay: 999;
   --z-dropdown: 1001;
   --z-topbar: 500;
+
+  /* Dashboard Sections */
+  --section-padding: 2rem;
+  --section-title-size: 1.4rem;
+  --section-header-padding-bottom: 0.9375rem;
+  --sidebar-size-expanded: 14rem;
+  --sidebar-size-collapsed: 5rem;
+  --section-background: rgba(26, 26, 26, 1);
+
+  --container-color: rgba(26, 26, 26, 0.65);
+  --container-color-secondary: rgba(107, 114, 128, 0.15);
 }
 
 * {

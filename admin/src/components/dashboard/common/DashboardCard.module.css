@@ -1,0 +1,41 @@
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Variables de color según el tipo de cambio */
+.card.positive {
+  --change-color: var(--success);
+}
+
+.card.negative {
+  --change-color: var(--error);
+}
+
+.card.average {
+  --change-color: var(--warning);
+}
+
+.card.neutral {
+  --change-color: var(--neutral);
+}
+
+/* Aplicar color dinámico al borde */
+.card.positive,
+.card.negative,
+.card.average,
+.card.neutral {
+  border-color: var(--change-color);
+}
