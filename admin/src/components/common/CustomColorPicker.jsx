@@ -64,12 +64,13 @@ const rgbToHex = (r, g, b) => {
   }).join('');
 };
 
-const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) => {
+const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onRemove }) => {
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(1);
   const [value, setValue] = useState(1);
   const [alpha, setAlpha] = useState(1);
   const [mode, setMode] = useState('hex'); // 'hex' or 'rgb'
+  const [isAdvanced, setIsAdvanced] = useState(false);
 
   const canvasRef = useRef(null);
   const isDraggingCanvas = useRef(false);
@@ -229,126 +230,10 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
 
   return (
     <div className={styles.colorPicker}>
-      {/* Saturation/Value Canvas */}
-      <div className={styles.canvasWrapper}>
-        <canvas
-          ref={canvasRef}
-          width={240}
-          height={150}
-          className={styles.canvas}
-          onMouseDown={(e) => {
-            isDraggingCanvas.current = true;
-            handleCanvasInteraction(e);
-          }}
-        />
-        <div
-          className={styles.canvasCursor}
-          style={{
-            left: `${saturation * 100}%`,
-            top: `${(1 - value) * 100}%`,
-            backgroundColor: currentHex
-          }}
-        />
-      </div>
-
-      {/* Hue Slider */}
-      <div className={styles.sliderWrapper}>
-        <div
-          className={styles.hueSlider}
-          onMouseDown={(e) => {
-            isDraggingHue.current = true;
-            handleHueChange(e);
-          }}
-        >
-          <div
-            className={styles.sliderThumb}
-            style={{ left: `${(hue / 360) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Alpha Slider */}
-      <div className={styles.sliderWrapper}>
-        <div
-          className={styles.alphaSlider}
-          onMouseDown={(e) => {
-            isDraggingAlpha.current = true;
-            handleAlphaChange(e);
-          }}
-        >
-          <div
-            className={styles.alphaSliderFill}
-            style={{
-              background: `linear-gradient(to right, transparent, ${currentHex})`
-            }}
-          />
-          <div
-            className={styles.sliderThumb}
-            style={{ left: `${alpha * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Input Section */}
-      <div className={styles.inputSection}>
-        <button
-          className={styles.modeToggle}
-          onClick={() => setMode(mode === 'hex' ? 'rgb' : 'hex')}
-        >
-          {mode === 'hex' ? 'Hex' : 'RGB'} ▼
-        </button>
-
-        {mode === 'hex' ? (
-          <input
-            type="text"
-            value={currentHex}
-            onChange={handleHexInput}
-            className={styles.hexInput}
-            maxLength={7}
-          />
-        ) : (
-          <div className={styles.rgbInputs}>
-            <input
-              type="number"
-              value={currentRgb.r}
-              onChange={(e) => handleRgbInput('r', e.target.value)}
-              className={styles.rgbInput}
-              min="0"
-              max="255"
-            />
-            <input
-              type="number"
-              value={currentRgb.g}
-              onChange={(e) => handleRgbInput('g', e.target.value)}
-              className={styles.rgbInput}
-              min="0"
-              max="255"
-            />
-            <input
-              type="number"
-              value={currentRgb.b}
-              onChange={(e) => handleRgbInput('b', e.target.value)}
-              className={styles.rgbInput}
-              min="0"
-              max="255"
-            />
-          </div>
-        )}
-
-        <input
-          type="number"
-          value={Math.round(alpha * 100)}
-          onChange={handleAlphaInput}
-          className={styles.alphaInput}
-          min="0"
-          max="100"
-        />
-      </div>
-
-      {/* Preset Colors */}
+      {/* Preset Colors - Always at top */}
       {presetColors.length > 0 && (
         <div className={styles.presetsSection}>
-          <div className={styles.presetsLabel}>Colores predeterminados:</div>
+          <div className={styles.presetsLabel}>Colores predeterminados</div>
           <div className={styles.presetsGrid}>
             {presetColors.map((presetColor, index) => (
               <button
@@ -362,6 +247,146 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
           </div>
         </div>
       )}
+
+      {/* Advanced Editor - Conditionally shown */}
+      {isAdvanced && (
+        <div className={styles.advancedSection}>
+          {/* Saturation/Value Canvas */}
+          <div className={styles.canvasWrapper}>
+            <canvas
+              ref={canvasRef}
+              width={240}
+              height={150}
+              className={styles.canvas}
+              onMouseDown={(e) => {
+                isDraggingCanvas.current = true;
+                handleCanvasInteraction(e);
+              }}
+            />
+            <div
+              className={styles.canvasCursor}
+              style={{
+                left: `${saturation * 100}%`,
+                top: `${(1 - value) * 100}%`,
+                backgroundColor: currentHex
+              }}
+            />
+          </div>
+
+          {/* Hue Slider */}
+          <div className={styles.sliderWrapper}>
+            <div
+              className={styles.hueSlider}
+              onMouseDown={(e) => {
+                isDraggingHue.current = true;
+                handleHueChange(e);
+              }}
+            >
+              <div
+                className={styles.sliderThumb}
+                style={{ left: `${(hue / 360) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Alpha Slider */}
+          <div className={styles.sliderWrapper}>
+            <div
+              className={styles.alphaSlider}
+              onMouseDown={(e) => {
+                isDraggingAlpha.current = true;
+                handleAlphaChange(e);
+              }}
+            >
+              <div
+                className={styles.alphaSliderFill}
+                style={{
+                  background: `linear-gradient(to right, transparent, ${currentHex})`
+                }}
+              />
+              <div
+                className={styles.sliderThumb}
+                style={{ left: `${alpha * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Input Section */}
+          <div className={styles.inputSection}>
+            <button
+              className={styles.modeToggle}
+              onClick={() => setMode(mode === 'hex' ? 'rgb' : 'hex')}
+            >
+              {mode === 'hex' ? 'Hex' : 'RGB'} ▼
+            </button>
+
+            {mode === 'hex' ? (
+              <input
+                type="text"
+                value={currentHex}
+                onChange={handleHexInput}
+                className={styles.hexInput}
+                maxLength={7}
+              />
+            ) : (
+              <div className={styles.rgbInputs}>
+                <input
+                  type="number"
+                  value={currentRgb.r}
+                  onChange={(e) => handleRgbInput('r', e.target.value)}
+                  className={styles.rgbInput}
+                  min="0"
+                  max="255"
+                />
+                <input
+                  type="number"
+                  value={currentRgb.g}
+                  onChange={(e) => handleRgbInput('g', e.target.value)}
+                  className={styles.rgbInput}
+                  min="0"
+                  max="255"
+                />
+                <input
+                  type="number"
+                  value={currentRgb.b}
+                  onChange={(e) => handleRgbInput('b', e.target.value)}
+                  className={styles.rgbInput}
+                  min="0"
+                  max="255"
+                />
+              </div>
+            )}
+
+            <input
+              type="number"
+              value={Math.round(alpha * 100)}
+              onChange={handleAlphaInput}
+              className={styles.alphaInput}
+              min="0"
+              max="100"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons - Always at bottom */}
+      <div className={styles.actionButtons}>
+        <button
+          className={styles.toggleButton}
+          onClick={() => setIsAdvanced(!isAdvanced)}
+          title={isAdvanced ? 'Modo simple' : 'Modo avanzado'}
+        >
+          {isAdvanced ? '−' : '+'}
+        </button>
+        {onRemove && (
+          <button
+            className={styles.removeButton}
+            onClick={onRemove}
+          >
+            Quitar color
+          </button>
+        )}
+      </div>
     </div>
   );
 };

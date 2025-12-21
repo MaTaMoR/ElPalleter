@@ -74,6 +74,12 @@
   color: var(--text-primary, #1f2937);
 }
 
+/* Subtle selection highlight to better see text colors */
+.editorContent :global(.ProseMirror)::selection,
+.editorContent :global(.ProseMirror) *::selection {
+  background: rgba(217, 119, 6, 0.2);
+}
+
 .editorContent :global(.ProseMirror p) {
   margin: 0 0 1em 0;
   color: var(--text-primary, #1f2937);
@@ -279,6 +285,7 @@
 
   .buttonGroup {
     padding: 0 4px;
+    min-width: fit-content;
   }
 
   .menuButton {
@@ -290,5 +297,24 @@
   .editorContent {
     padding: 12px;
     min-height: 200px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .menuBar {
+    gap: 2px;
+    padding: 6px;
+  }
+
+  .buttonGroup {
+    padding: 0 2px;
+    gap: 2px;
+  }
+
+  .menuButton {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
   }
 }

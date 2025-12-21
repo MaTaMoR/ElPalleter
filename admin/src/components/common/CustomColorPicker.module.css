@@ -128,6 +128,7 @@
 
 .hexInput {
   flex: 1;
+  max-width: 90px;
   height: 28px;
   padding: 0 8px;
   border: 1px solid var(--border-color);
@@ -209,11 +210,9 @@
   -moz-appearance: textfield;
 }
 
-/* Presets Section */
+/* Presets Section - Now at top */
 .presetsSection {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
+  padding-bottom: 12px;
 }
 
 .presetsLabel {
@@ -250,4 +249,62 @@
 
 .presetColor:active {
   transform: scale(0.95);
+}
+
+/* Advanced Section */
+.advancedSection {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.toggleButton {
+  width: 40px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggleButton:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.removeButton {
+  flex: 1;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeButton:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--error);
+  color: var(--error);
 }

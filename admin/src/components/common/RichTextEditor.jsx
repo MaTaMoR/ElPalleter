@@ -141,12 +141,8 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
                 color={customColor}
                 onChange={handleColorChange}
                 presetColors={colorPresets}
+                onRemove={removeColor}
               />
-
-              <div className={styles.colorPickerFooter}>
-                <button onClick={removeColor} className={styles.removeColorButton}>
-                  Quitar color
-                </button>
               </div>
             </div>
           </div>
