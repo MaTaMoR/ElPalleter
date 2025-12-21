@@ -109,12 +109,14 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
               <button onClick={onClose} className={styles.colorPickerClose}>×</button>
             </div>
 
-            <ChromePicker
-              color={customColor}
-              onChange={handleColorChange}
-              onChangeComplete={handleColorChange}
-              disableAlpha={true}
-            />
+            <div className={styles.colorPickerContent}>
+              <ChromePicker
+                color={customColor}
+                onChange={handleColorChange}
+                onChangeComplete={handleColorChange}
+                disableAlpha={false}
+              />
+            </div>
 
             <div className={styles.colorPickerFooter}>
               <button onClick={removeColor} className={styles.removeColorButton}>
@@ -192,12 +194,14 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
               <button onClick={onClose} className={styles.colorPickerClose}>×</button>
             </div>
 
-            <ChromePicker
-              color={customColor}
-              onChange={handleColorChange}
-              onChangeComplete={handleColorChange}
-              disableAlpha={true}
-            />
+            <div className={styles.colorPickerContent}>
+              <ChromePicker
+                color={customColor}
+                onChange={handleColorChange}
+                onChangeComplete={handleColorChange}
+                disableAlpha={false}
+              />
+            </div>
 
             <div className={styles.colorPickerFooter}>
               <button onClick={resetBackground} className={styles.removeColorButton}>
@@ -213,6 +217,24 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
 
 const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundChange }) => {
   const [openPicker, setOpenPicker] = useState(null);
+  const [, forceUpdate] = useState({});
+
+  // Force re-render when editor selection changes
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateHandler = () => {
+      forceUpdate({});
+    };
+
+    editor.on('selectionUpdate', updateHandler);
+    editor.on('transaction', updateHandler);
+
+    return () => {
+      editor.off('selectionUpdate', updateHandler);
+      editor.off('transaction', updateHandler);
+    };
+  }, [editor]);
 
   if (!editor) {
     return null;
@@ -266,29 +288,31 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
 
       {/* Tamaño de texto */}
       <div className={styles.buttonGroup}>
-        {fontSizes.map((size) => (
-          <button
-            key={size.label}
-            onClick={() => {
-              if (size.value === null) {
-                editor.chain().focus().setParagraph().run();
-              } else {
-                editor.chain().focus().toggleHeading({ level: size.value }).run();
-              }
-            }}
-            className={`${styles.menuButton} ${
-              size.value === null
-                ? editor.isActive('paragraph') ? styles.isActive : ''
-                : editor.isActive('heading', { level: size.value }) ? styles.isActive : ''
-            }`}
-            title={size.label}
-          >
-            {size.label === 'H1' && <Heading1 size={18} />}
-            {size.label === 'H2' && <Heading2 size={18} />}
-            {size.label === 'H3' && <Heading3 size={18} />}
-            {size.label === 'Normal' && <Type size={18} />}
-          </button>
-        ))}
+        {fontSizes.map((size) => {
+          const isActive = size.value === null
+            ? !editor.isActive('heading')
+            : editor.isActive('heading', { level: size.value });
+
+          return (
+            <button
+              key={size.label}
+              onClick={() => {
+                if (size.value === null) {
+                  editor.chain().focus().setParagraph().run();
+                } else {
+                  editor.chain().focus().toggleHeading({ level: size.value }).run();
+                }
+              }}
+              className={`${styles.menuButton} ${isActive ? styles.isActive : ''}`}
+              title={size.label}
+            >
+              {size.label === 'H1' && <Heading1 size={18} />}
+              {size.label === 'H2' && <Heading2 size={18} />}
+              {size.label === 'H3' && <Heading3 size={18} />}
+              {size.label === 'Normal' && <Type size={18} />}
+            </button>
+          );
+        })}
       </div>
 
       {/* Formato de texto */}
