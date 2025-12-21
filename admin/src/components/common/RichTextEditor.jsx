@@ -5,8 +5,8 @@ import TextAlign from '@tiptap/extension-text-align';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
-import { useEffect, useState } from 'react';
-import { CirclePicker } from 'react-color';
+import { useEffect, useState, useRef } from 'react';
+import { SketchPicker } from 'react-color';
 import {
   Bold,
   Italic,
@@ -32,43 +32,34 @@ import styles from './RichTextEditor.module.css';
 
 const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   const [customColor, setCustomColor] = useState('#000000');
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef(null);
 
   const colorPresets = [
-    '#000000', // Negro
-    '#374151', // Gris oscuro
-    '#6B7280', // Gris
-    '#EF4444', // Rojo
-    '#F59E0B', // Naranja
-    '#10B981', // Verde
-    '#3B82F6', // Azul
-    '#8B5CF6', // Púrpura
-    '#EC4899', // Rosa
-    '#FFFFFF', // Blanco
-    '#FFEB3B', // Amarillo
-    '#FF5722', // Naranja oscuro
+    '#000000', '#374151', '#6B7280', '#EF4444',
+    '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
+    '#EC4899', '#FFFFFF', '#FFEB3B', '#FF5722',
   ];
 
-  const applyColor = (color) => {
+  // Calculate picker position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPickerPosition({
+        top: rect.bottom + 8,
+        left: rect.left
+      });
+    }
+  }, [isOpen]);
+
+  const handleColorChange = (color) => {
+    const hexColor = color.hex;
+    setCustomColor(hexColor);
+
     if (type === 'text') {
-      editor.chain().focus().setColor(color).run();
+      editor.chain().focus().setColor(hexColor).run();
     } else {
-      // Use setHighlight instead of toggleHighlight to always set the color
-      editor.chain().focus().setHighlight({ color }).run();
-    }
-    setCustomColor(color);
-  };
-
-  const handleHexInputChange = (e) => {
-    let hex = e.target.value;
-    // Ensure it starts with #
-    if (!hex.startsWith('#')) {
-      hex = '#' + hex;
-    }
-    setCustomColor(hex);
-
-    // Only apply if it's a valid hex color
-    if (/^#[0-9A-F]{6}$/i.test(hex)) {
-      applyColor(hex);
+      editor.chain().focus().setHighlight({ color: hexColor }).run();
     }
   };
 
@@ -89,6 +80,7 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   return (
     <div className={styles.colorPickerWrapper}>
       <button
+        ref={buttonRef}
         onClick={onToggle}
         className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
         title={getTitle()}
@@ -97,75 +89,38 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
       </button>
 
       {isOpen && (
-        <div className={styles.colorPickerDropdown}>
-          <div className={styles.colorPickerHeader}>
-            <span className={styles.colorPickerTitle}>
-              {getTitle()}
-            </span>
-            <button
-              onClick={onClose}
-              className={styles.colorPickerClose}
-            >
-              ×
-            </button>
+        <>
+          {/* Backdrop to close picker when clicking outside */}
+          <div className={styles.colorPickerBackdrop} onClick={onClose} />
+
+          {/* Picker with fixed position */}
+          <div
+            className={styles.colorPickerDropdownFixed}
+            style={{
+              top: `${pickerPosition.top}px`,
+              left: `${pickerPosition.left}px`
+            }}
+          >
+            <div className={styles.colorPickerHeader}>
+              <span className={styles.colorPickerTitle}>{getTitle()}</span>
+              <button onClick={onClose} className={styles.colorPickerClose}>×</button>
+            </div>
+
+            <SketchPicker
+              color={customColor}
+              onChange={handleColorChange}
+              onChangeComplete={handleColorChange}
+              presetColors={colorPresets}
+              disableAlpha={false}
+            />
+
+            <div className={styles.colorPickerFooter}>
+              <button onClick={removeColor} className={styles.removeColorButton}>
+                Quitar color
+              </button>
+            </div>
           </div>
-
-          <div className={styles.colorPickerContent}>
-            {/* Color presets */}
-            <div className={styles.colorPresetsLabel}>Colores predeterminados:</div>
-            <div className={styles.colorPresetsGrid}>
-              {colorPresets.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => applyColor(color)}
-                  className={styles.colorButton}
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
-            </div>
-
-            {/* Circle Picker */}
-            <div className={styles.customColorSection}>
-              <div className={styles.colorPresetsLabel}>Selector de color:</div>
-              <div className={styles.circlePickerWrapper}>
-                <CirclePicker
-                  color={customColor}
-                  onChange={(color) => applyColor(color.hex)}
-                  colors={[
-                    '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-                    '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-                    '#009688', '#4caf50', '#8bc34a', '#cddc39',
-                    '#ffeb3b', '#ffc107', '#ff9800', '#ff5722',
-                    '#795548', '#607d8b', '#000000', '#ffffff'
-                  ]}
-                  width="100%"
-                />
-              </div>
-            </div>
-
-            {/* Hex Input */}
-            <div className={styles.hexInputSection}>
-              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
-              <input
-                type="text"
-                value={customColor}
-                onChange={handleHexInputChange}
-                placeholder="#000000"
-                className={styles.hexInput}
-                maxLength={7}
-              />
-            </div>
-
-            {/* Remove color button */}
-            <button
-              onClick={removeColor}
-              className={styles.removeColorButton}
-            >
-              Quitar color
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -174,51 +129,46 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
 // Background Color Picker for editor container (visual only, not saved)
 const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => {
   const [customColor, setCustomColor] = useState('#FFFFFF');
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef(null);
 
   const backgroundPresets = [
-    '#FFFFFF', // Blanco
-    '#F9FAFB', // Gris muy claro
-    '#F3F4F6', // Gris claro
-    '#FEF3C7', // Amarillo claro
-    '#FEE2E2', // Rojo claro
-    '#DBEAFE', // Azul claro
-    '#D1FAE5', // Verde claro
-    '#E0E7FF', // Índigo claro
-    '#FCE7F3', // Rosa claro
-    '#F5F3FF', // Púrpura claro
-    '#FED7AA', // Naranja claro
-    '#E5E7EB', // Gris
+    '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7',
+    '#FEE2E2', '#DBEAFE', '#D1FAE5', '#E0E7FF',
+    '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB',
   ];
 
-  const applyBackgroundColor = (color) => {
-    setCustomColor(color);
+  // Calculate picker position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPickerPosition({
+        top: rect.bottom + 8,
+        left: rect.left
+      });
+    }
+  }, [isOpen]);
+
+  const handleColorChange = (color) => {
+    const hexColor = color.hex;
+    setCustomColor(hexColor);
     if (onColorChange) {
-      onColorChange(color);
-    }
-  };
-
-  const handleHexInputChange = (e) => {
-    let hex = e.target.value;
-    // Ensure it starts with #
-    if (!hex.startsWith('#')) {
-      hex = '#' + hex;
-    }
-    setCustomColor(hex);
-
-    // Only apply if it's a valid hex color
-    if (/^#[0-9A-F]{6}$/i.test(hex)) {
-      applyBackgroundColor(hex);
+      onColorChange(hexColor);
     }
   };
 
   const resetBackground = () => {
-    applyBackgroundColor('#FFFFFF');
+    setCustomColor('#FFFFFF');
+    if (onColorChange) {
+      onColorChange('#FFFFFF');
+    }
     onClose();
   };
 
   return (
     <div className={styles.colorPickerWrapper}>
       <button
+        ref={buttonRef}
         onClick={onToggle}
         className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
         title="Color de fondo del editor"
@@ -227,75 +177,38 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
       </button>
 
       {isOpen && (
-        <div className={styles.colorPickerDropdown}>
-          <div className={styles.colorPickerHeader}>
-            <span className={styles.colorPickerTitle}>
-              Fondo del editor
-            </span>
-            <button
-              onClick={onClose}
-              className={styles.colorPickerClose}
-            >
-              ×
-            </button>
+        <>
+          {/* Backdrop to close picker when clicking outside */}
+          <div className={styles.colorPickerBackdrop} onClick={onClose} />
+
+          {/* Picker with fixed position */}
+          <div
+            className={styles.colorPickerDropdownFixed}
+            style={{
+              top: `${pickerPosition.top}px`,
+              left: `${pickerPosition.left}px`
+            }}
+          >
+            <div className={styles.colorPickerHeader}>
+              <span className={styles.colorPickerTitle}>Fondo del editor</span>
+              <button onClick={onClose} className={styles.colorPickerClose}>×</button>
+            </div>
+
+            <SketchPicker
+              color={customColor}
+              onChange={handleColorChange}
+              onChangeComplete={handleColorChange}
+              presetColors={backgroundPresets}
+              disableAlpha={false}
+            />
+
+            <div className={styles.colorPickerFooter}>
+              <button onClick={resetBackground} className={styles.removeColorButton}>
+                Restablecer fondo
+              </button>
+            </div>
           </div>
-
-          <div className={styles.colorPickerContent}>
-            {/* Color presets */}
-            <div className={styles.colorPresetsLabel}>Colores predeterminados:</div>
-            <div className={styles.colorPresetsGrid}>
-              {backgroundPresets.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => applyBackgroundColor(color)}
-                  className={styles.colorButton}
-                  style={{ backgroundColor: color, border: '2px solid #d1d5db' }}
-                  title={color}
-                />
-              ))}
-            </div>
-
-            {/* Circle Picker */}
-            <div className={styles.customColorSection}>
-              <div className={styles.colorPresetsLabel}>Selector de color:</div>
-              <div className={styles.circlePickerWrapper}>
-                <CirclePicker
-                  color={customColor}
-                  onChange={(color) => applyBackgroundColor(color.hex)}
-                  colors={[
-                    '#ffffff', '#f9fafb', '#f3f4f6', '#e5e7eb',
-                    '#fef3c7', '#fde68a', '#fcd34d', '#fbbf24',
-                    '#fee2e2', '#fecaca', '#fca5a5', '#f87171',
-                    '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa',
-                    '#d1fae5', '#a7f3d0', '#6ee7b7', '#34d399'
-                  ]}
-                  width="100%"
-                />
-              </div>
-            </div>
-
-            {/* Hex Input */}
-            <div className={styles.hexInputSection}>
-              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
-              <input
-                type="text"
-                value={customColor}
-                onChange={handleHexInputChange}
-                placeholder="#FFFFFF"
-                className={styles.hexInput}
-                maxLength={7}
-              />
-            </div>
-
-            {/* Reset background button */}
-            <button
-              onClick={resetBackground}
-              className={styles.removeColorButton}
-            >
-              Restablecer fondo
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
