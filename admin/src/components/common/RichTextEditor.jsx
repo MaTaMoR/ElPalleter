@@ -6,7 +6,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { useEffect, useState, useRef } from 'react';
-import { ChromePicker } from 'react-color';
+import CustomColorPicker from './CustomColorPicker';
 import {
   Bold,
   Italic,
@@ -36,10 +36,8 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   const buttonRef = useRef(null);
 
   const colorPresets = [
-    '#D0021B', '#F5A623', '#F8E71C', '#8B572A',
-    '#7ED321', '#417505', '#BD10E0', '#9013FE',
-    '#4A90E2', '#50E3C2', '#B8E986', '#000000',
-    '#4A4A4A', '#9B9B9B', '#FFFFFF'
+    '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+    '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
   ];
 
   // Calculate picker position when opened
@@ -110,18 +108,17 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
             </div>
 
             <div className={styles.colorPickerContent}>
-              <ChromePicker
+              <CustomColorPicker
                 color={customColor}
                 onChange={handleColorChange}
-                onChangeComplete={handleColorChange}
-                disableAlpha={false}
+                presetColors={colorPresets}
               />
-            </div>
 
-            <div className={styles.colorPickerFooter}>
-              <button onClick={removeColor} className={styles.removeColorButton}>
-                Quitar color
-              </button>
+              <div className={styles.colorPickerFooter}>
+                <button onClick={removeColor} className={styles.removeColorButton}>
+                  Quitar color
+                </button>
+              </div>
             </div>
           </div>
         </>
@@ -135,6 +132,11 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
   const [customColor, setCustomColor] = useState('#FFFFFF');
   const [pickerPosition, setPickerPosition] = useState(null);
   const buttonRef = useRef(null);
+
+  const backgroundPresets = [
+    '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
+    '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
+  ];
 
   // Calculate picker position when opened
   useEffect(() => {
@@ -195,18 +197,17 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
             </div>
 
             <div className={styles.colorPickerContent}>
-              <ChromePicker
+              <CustomColorPicker
                 color={customColor}
                 onChange={handleColorChange}
-                onChangeComplete={handleColorChange}
-                disableAlpha={false}
+                presetColors={backgroundPresets}
               />
-            </div>
 
-            <div className={styles.colorPickerFooter}>
-              <button onClick={resetBackground} className={styles.removeColorButton}>
-                Restablecer fondo
-              </button>
+              <div className={styles.colorPickerFooter}>
+                <button onClick={resetBackground} className={styles.removeColorButton}>
+                  Restablecer fondo
+                </button>
+              </div>
             </div>
           </div>
         </>

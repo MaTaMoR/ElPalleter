@@ -218,27 +218,27 @@
   color: var(--primary);
 }
 
-/* Color Picker Content - wrapper for ChromePicker */
+/* Color Picker Content - wrapper for CustomColorPicker */
 .colorPickerContent {
-  padding: 12px;
+  padding: 16px;
   user-select: none;
 }
 
 /* Color Picker Footer */
 .colorPickerFooter {
-  padding: 12px 16px;
+  padding-top: 16px;
+  margin-top: 16px;
   border-top: 1px solid var(--border-color);
-  background: var(--bg-secondary);
   user-select: none;
 }
 
 .removeColorButton {
   width: 100%;
   padding: 8px 16px;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: white;
-  color: var(--text-secondary, #6b7280);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -246,9 +246,9 @@
 }
 
 .removeColorButton:hover {
-  background: var(--danger-bg, #fef2f2);
-  border-color: var(--danger, #ef4444);
-  color: var(--danger, #ef4444);
+  background: var(--bg-tertiary);
+  border-color: var(--error);
+  color: var(--error);
 }
 
 /* Scrollbar personalizado */
