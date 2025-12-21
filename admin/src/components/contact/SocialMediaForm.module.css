@@ -80,8 +80,11 @@
 }
 
 .socialIcon {
+  width: 1.5rem;
+  height: 1.5rem;
   font-size: 2rem;
   flex-shrink: 0;
+  color: var(--primary);
 }
 
 .socialInfo {
@@ -92,7 +95,6 @@
 .platform {
   font-weight: 600;
   color: var(--text-primary);
-  text-transform: capitalize;
   margin-bottom: 0.25rem;
 }
 
@@ -153,7 +155,6 @@
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
-  text-transform: capitalize;
 }
 
 .socialFields {

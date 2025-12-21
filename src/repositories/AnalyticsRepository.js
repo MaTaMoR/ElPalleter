@@ -65,6 +65,67 @@ export class AnalyticsRepository extends BaseRepository {
     }
 
     /**
+     * Obtiene estadísticas mensuales
+     * GET /analytics/stats/monthly
+     * @param {string} token - Valid token for request
+     * @param {number} year - Año (opcional, si no se pasa devuelve mes actual)
+     * @param {number} month - Mes 1-12 (opcional, si no se pasa devuelve mes actual)
+     * @returns {Promise<Object>} Estadísticas mensuales
+     */
+    static async getMonthlyStats(token, year = null, month = null) {
+        try {
+            const params = {};
+            if (year !== null && month !== null) {
+                params.year = year;
+                params.month = month;
+            }
+
+            return await this.get('/analytics/stats/monthly', {
+                headers: this.getAuthHeaders(token),
+                params
+            });
+        } catch (error) {
+            console.error('AnalyticsRepository: Error getting monthly stats:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene la fecha de inicio de las analíticas (primer registro)
+     * GET /analytics/stats/start-date
+     * @param {string} token - Valid token for request
+     * @returns {Promise<string>} Fecha en formato "YYYY-MM"
+     */
+    static async getStartDate(token) {
+        try {
+            return await this.get('/analytics/stats/start-date', {
+                headers: this.getAuthHeaders(token)
+            });
+        } catch (error) {
+            console.error('AnalyticsRepository: Error getting start date:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene visitas por mes del último año
+     * GET /analytics/stats/yearly
+     * @param {string} token - Valid token for request
+     * @returns {Promise<Object>} Estadísticas anuales con monthlyBreakdown
+     */
+    static async getYearlyStats(token) {
+        try {
+            return await this.get('/analytics/stats/yearly', {
+                headers: this.getAuthHeaders(token)
+            });
+        } catch (error) {
+            console.error('AnalyticsRepository: Error getting yearly stats:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * @deprecated - Usar getMonthlyStats en su lugar
      * Obtiene estadísticas de la semana actual
      * GET /analytics/stats/weekly
      * @param {string} token - Valid token for request
@@ -84,8 +145,9 @@ export class AnalyticsRepository extends BaseRepository {
             throw error;
         }
     }
-    
+
     /**
+     * @deprecated - Usar getMonthlyStats en su lugar
      * Obtiene estadísticas de la semana pasada
      * GET /analytics/stats/last-week
      * @param {string} token - Valid token for request
@@ -107,6 +169,7 @@ export class AnalyticsRepository extends BaseRepository {
     }
 
     /**
+     * @deprecated - Usar getMonthlyStats en su lugar
      * Obtiene estadísticas para un período personalizado
      * GET /analytics/stats/
      * @param {string} token - Valid token for request
