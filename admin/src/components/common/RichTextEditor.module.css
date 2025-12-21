@@ -169,7 +169,7 @@
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 1000;
+  z-index: 10000;
   min-width: 280px;
 }
 
@@ -257,28 +257,22 @@
   margin-top: 8px;
 }
 
-.customColorInputs {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
+/* Circle Picker Wrapper */
+.circlePickerWrapper {
+  margin-bottom: 16px;
 }
 
-.colorInput {
-  width: 60px;
-  height: 40px;
-  border: 2px solid var(--border-color, #e5e7eb);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+.circlePickerWrapper :global(.circle-picker) {
+  width: 100% !important;
 }
 
-.colorInput:hover {
-  border-color: var(--primary-color, #3b82f6);
+/* Hex Input Section */
+.hexInputSection {
+  margin-top: 16px;
 }
 
 .hexInput {
-  flex: 1;
+  width: 100%;
   height: 40px;
   padding: 8px 12px;
   border: 2px solid var(--border-color, #e5e7eb);

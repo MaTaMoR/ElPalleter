@@ -6,6 +6,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { useEffect, useState } from 'react';
+import { CirclePicker } from 'react-color';
 import {
   Bold,
   Italic,
@@ -27,8 +28,7 @@ import {
 } from 'lucide-react';
 import styles from './RichTextEditor.module.css';
 
-const ColorPicker = ({ editor, type = 'text' }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   const [customColor, setCustomColor] = useState('#000000');
 
   const colorPresets = [
@@ -42,20 +42,18 @@ const ColorPicker = ({ editor, type = 'text' }) => {
     '#8B5CF6', // Púrpura
     '#EC4899', // Rosa
     '#FFFFFF', // Blanco
+    '#FFEB3B', // Amarillo
+    '#FF5722', // Naranja oscuro
   ];
 
   const applyColor = (color) => {
     if (type === 'text') {
       editor.chain().focus().setColor(color).run();
     } else {
-      editor.chain().focus().toggleHighlight({ color }).run();
+      // Use setHighlight instead of toggleHighlight to always set the color
+      editor.chain().focus().setHighlight({ color }).run();
     }
-  };
-
-  const handleCustomColorChange = (e) => {
-    const color = e.target.value;
     setCustomColor(color);
-    applyColor(color);
   };
 
   const handleHexInputChange = (e) => {
@@ -78,14 +76,14 @@ const ColorPicker = ({ editor, type = 'text' }) => {
     } else {
       editor.chain().focus().unsetHighlight().run();
     }
-    setIsOpen(false);
+    onClose();
   };
 
   return (
     <div className={styles.colorPickerWrapper}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={styles.menuButton}
+        onClick={onToggle}
+        className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
         title={type === 'text' ? 'Color de texto' : 'Color de fondo'}
       >
         {type === 'text' ? <Palette size={18} /> : <Highlighter size={18} />}
@@ -98,7 +96,7 @@ const ColorPicker = ({ editor, type = 'text' }) => {
               {type === 'text' ? 'Color de texto' : 'Color de fondo'}
             </span>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               className={styles.colorPickerClose}
             >
               ×
@@ -108,7 +106,7 @@ const ColorPicker = ({ editor, type = 'text' }) => {
           <div className={styles.colorPickerContent}>
             {/* Color presets */}
             <div className={styles.colorPresetsLabel}>Colores predeterminados:</div>
-            <div className={styles.colorGrid}>
+            <div className={styles.colorPresetsGrid}>
               {colorPresets.map((color) => (
                 <button
                   key={color}
@@ -120,25 +118,36 @@ const ColorPicker = ({ editor, type = 'text' }) => {
               ))}
             </div>
 
-            {/* Custom color picker */}
+            {/* Circle Picker */}
             <div className={styles.customColorSection}>
-              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
-              <div className={styles.customColorInputs}>
-                <input
-                  type="color"
-                  value={customColor}
-                  onChange={handleCustomColorChange}
-                  className={styles.colorInput}
-                />
-                <input
-                  type="text"
-                  value={customColor}
-                  onChange={handleHexInputChange}
-                  placeholder="#000000"
-                  className={styles.hexInput}
-                  maxLength={7}
+              <div className={styles.colorPresetsLabel}>Selector de color:</div>
+              <div className={styles.circlePickerWrapper}>
+                <CirclePicker
+                  color={customColor}
+                  onChange={(color) => applyColor(color.hex)}
+                  colors={[
+                    '#f44336', '#e91e63', '#9c27b0', '#673ab7',
+                    '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
+                    '#009688', '#4caf50', '#8bc34a', '#cddc39',
+                    '#ffeb3b', '#ffc107', '#ff9800', '#ff5722',
+                    '#795548', '#607d8b', '#000000', '#ffffff'
+                  ]}
+                  width="100%"
                 />
               </div>
+            </div>
+
+            {/* Hex Input */}
+            <div className={styles.hexInputSection}>
+              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
+              <input
+                type="text"
+                value={customColor}
+                onChange={handleHexInputChange}
+                placeholder="#000000"
+                className={styles.hexInput}
+                maxLength={7}
+              />
             </div>
 
             {/* Remove color button */}
@@ -156,6 +165,8 @@ const ColorPicker = ({ editor, type = 'text' }) => {
 };
 
 const MenuBar = ({ editor }) => {
+  const [openPicker, setOpenPicker] = useState(null);
+
   if (!editor) {
     return null;
   }
@@ -166,6 +177,14 @@ const MenuBar = ({ editor }) => {
     { label: 'H2', value: 2 },
     { label: 'H3', value: 3 },
   ];
+
+  const handleTogglePicker = (pickerType) => {
+    setOpenPicker(openPicker === pickerType ? null : pickerType);
+  };
+
+  const handleClosePicker = () => {
+    setOpenPicker(null);
+  };
 
   return (
     <div className={styles.menuBar}>
@@ -293,8 +312,20 @@ const MenuBar = ({ editor }) => {
 
       {/* Selectores de color */}
       <div className={styles.buttonGroup}>
-        <ColorPicker editor={editor} type="text" />
-        <ColorPicker editor={editor} type="background" />
+        <ColorPicker
+          editor={editor}
+          type="text"
+          isOpen={openPicker === 'text'}
+          onToggle={() => handleTogglePicker('text')}
+          onClose={handleClosePicker}
+        />
+        <ColorPicker
+          editor={editor}
+          type="background"
+          isOpen={openPicker === 'background'}
+          onToggle={() => handleTogglePicker('background')}
+          onClose={handleClosePicker}
+        />
       </div>
     </div>
   );
