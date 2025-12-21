@@ -143,7 +143,6 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
                 presetColors={colorPresets}
                 onRemove={removeColor}
               />
-              </div>
             </div>
           </div>
         </>

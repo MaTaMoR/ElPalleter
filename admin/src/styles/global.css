@@ -4,6 +4,7 @@
   --primary: #d97706;
   --primary-dark: #b45309;
   --primary-light: #fbbf24;
+  --primary-highlight: rgba(217, 119, 6, 0.1);
   
   /* Colores de fondo */
   --bg-primary: #0a0a0a;
