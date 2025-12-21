@@ -64,7 +64,7 @@ const rgbToHex = (r, g, b) => {
   }).join('');
 };
 
-const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onRemove }) => {
+const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onRemove, removeButtonText = 'Quitar color' }) => {
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(1);
   const [value, setValue] = useState(1);
@@ -114,7 +114,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     valueGradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
     ctx.fillStyle = valueGradient;
     ctx.fillRect(0, 0, width, height);
-  }, [hue]);
+  }, [hue, isAdvanced]);
 
   // Notify parent of color changes
   useEffect(() => {
@@ -383,7 +383,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
             className={styles.removeButton}
             onClick={onRemove}
           >
-            Quitar color
+            {removeButtonText}
           </button>
         )}
       </div>

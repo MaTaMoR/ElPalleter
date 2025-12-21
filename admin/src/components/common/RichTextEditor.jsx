@@ -226,13 +226,9 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
                 color={customColor}
                 onChange={handleColorChange}
                 presetColors={backgroundPresets}
+                onRemove={resetBackground}
+                removeButtonText="Restablecer fondo"
               />
-
-              <div className={styles.colorPickerFooter}>
-                <button onClick={resetBackground} className={styles.removeColorButton}>
-                  Restablecer fondo
-                </button>
-              </div>
             </div>
           </div>
         </>
