@@ -6,7 +6,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { useEffect, useState, useRef } from 'react';
-import { SketchPicker } from 'react-color';
+import { ChromePicker } from 'react-color';
 import {
   Bold,
   Italic,
@@ -32,13 +32,14 @@ import styles from './RichTextEditor.module.css';
 
 const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   const [customColor, setCustomColor] = useState('#000000');
-  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const [pickerPosition, setPickerPosition] = useState(null);
   const buttonRef = useRef(null);
 
   const colorPresets = [
-    '#000000', '#374151', '#6B7280', '#EF4444',
-    '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
-    '#EC4899', '#FFFFFF', '#FFEB3B', '#FF5722',
+    '#D0021B', '#F5A623', '#F8E71C', '#8B572A',
+    '#7ED321', '#417505', '#BD10E0', '#9013FE',
+    '#4A90E2', '#50E3C2', '#B8E986', '#000000',
+    '#4A4A4A', '#9B9B9B', '#FFFFFF'
   ];
 
   // Calculate picker position when opened
@@ -49,6 +50,8 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
         top: rect.bottom + 8,
         left: rect.left
       });
+    } else {
+      setPickerPosition(null);
     }
   }, [isOpen]);
 
@@ -88,7 +91,7 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
         {type === 'text' ? <Palette size={18} /> : <Highlighter size={18} />}
       </button>
 
-      {isOpen && (
+      {isOpen && pickerPosition && (
         <>
           {/* Backdrop to close picker when clicking outside */}
           <div className={styles.colorPickerBackdrop} onClick={onClose} />
@@ -106,12 +109,11 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
               <button onClick={onClose} className={styles.colorPickerClose}>×</button>
             </div>
 
-            <SketchPicker
+            <ChromePicker
               color={customColor}
               onChange={handleColorChange}
               onChangeComplete={handleColorChange}
-              presetColors={colorPresets}
-              disableAlpha={false}
+              disableAlpha={true}
             />
 
             <div className={styles.colorPickerFooter}>
@@ -129,14 +131,8 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
 // Background Color Picker for editor container (visual only, not saved)
 const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => {
   const [customColor, setCustomColor] = useState('#FFFFFF');
-  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const [pickerPosition, setPickerPosition] = useState(null);
   const buttonRef = useRef(null);
-
-  const backgroundPresets = [
-    '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7',
-    '#FEE2E2', '#DBEAFE', '#D1FAE5', '#E0E7FF',
-    '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB',
-  ];
 
   // Calculate picker position when opened
   useEffect(() => {
@@ -146,6 +142,8 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
         top: rect.bottom + 8,
         left: rect.left
       });
+    } else {
+      setPickerPosition(null);
     }
   }, [isOpen]);
 
@@ -176,7 +174,7 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
         <PaintBucket size={18} />
       </button>
 
-      {isOpen && (
+      {isOpen && pickerPosition && (
         <>
           {/* Backdrop to close picker when clicking outside */}
           <div className={styles.colorPickerBackdrop} onClick={onClose} />
@@ -194,12 +192,11 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
               <button onClick={onClose} className={styles.colorPickerClose}>×</button>
             </div>
 
-            <SketchPicker
+            <ChromePicker
               color={customColor}
               onChange={handleColorChange}
               onChangeComplete={handleColorChange}
-              presetColors={backgroundPresets}
-              disableAlpha={false}
+              disableAlpha={true}
             />
 
             <div className={styles.colorPickerFooter}>

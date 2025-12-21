@@ -174,7 +174,7 @@
 /* Color Picker Dropdown with fixed position */
 .colorPickerDropdownFixed {
   position: fixed;
-  background: white;
+  background: var(--bg-primary, #ffffff);
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
