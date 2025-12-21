@@ -33,6 +33,9 @@ import styles from './RichTextEditor.module.css';
 const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   const [customColor, setCustomColor] = useState('#000000');
   const [pickerPosition, setPickerPosition] = useState(null);
+  const [savedSelection, setSavedSelection] = useState(null);
+  const [initialColor, setInitialColor] = useState('#000000');
+  const hasAppliedRef = useRef(false);
   const buttonRef = useRef(null);
 
   const colorPresets = [
@@ -40,7 +43,7 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
     '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
   ];
 
-  // Calculate picker position when opened
+  // Calculate picker position and save selection when opened
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -48,6 +51,19 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
         top: rect.bottom + 8,
         left: rect.left
       });
+
+      // Save current selection
+      const { from, to } = editor.state.selection;
+      setSavedSelection({ from, to });
+      hasAppliedRef.current = false;
+
+      // Get current color from selection
+      const currentColor = type === 'text'
+        ? editor.getAttributes('textStyle').color
+        : editor.getAttributes('highlight').color;
+
+      setCustomColor(currentColor || '#000000');
+      setInitialColor(currentColor || '#000000');
     } else {
       setPickerPosition(null);
     }
@@ -57,10 +73,23 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
     const hexColor = color.hex;
     setCustomColor(hexColor);
 
-    if (type === 'text') {
-      editor.chain().focus().setColor(hexColor).run();
-    } else {
-      editor.chain().focus().setHighlight({ color: hexColor }).run();
+    // Only apply if user has interacted
+    if (!hasAppliedRef.current) {
+      hasAppliedRef.current = true;
+    }
+
+    // Restore selection and apply color
+    if (savedSelection && savedSelection.from !== savedSelection.to) {
+      editor.chain()
+        .focus()
+        .setTextSelection(savedSelection)
+        .run();
+
+      if (type === 'text') {
+        editor.chain().setColor(hexColor).run();
+      } else {
+        editor.chain().setHighlight({ color: hexColor }).run();
+      }
     }
   };
 
