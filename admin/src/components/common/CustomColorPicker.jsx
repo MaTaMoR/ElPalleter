@@ -173,14 +173,17 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
   };
 
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    const moveHandler = (e) => handleMouseMove(e);
+    const upHandler = () => handleMouseUp();
+
+    document.addEventListener('mousemove', moveHandler);
+    document.addEventListener('mouseup', upHandler);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', moveHandler);
+      document.removeEventListener('mouseup', upHandler);
     };
-  }, []);
+  }, [hue, saturation, value, alpha]);
 
   const currentRgb = hsvToRgb(hue, saturation, value);
   const currentHex = rgbToHex(currentRgb.r, currentRgb.g, currentRgb.b);
@@ -209,6 +212,11 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
     setValue(hsv.v);
   };
 
+  const handleAlphaInput = (e) => {
+    const num = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+    setAlpha(num / 100);
+  };
+
   const handlePresetClick = (presetHex) => {
     const rgb = hexToRgb(presetHex);
     if (rgb) {
@@ -225,8 +233,8 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
       <div className={styles.canvasWrapper}>
         <canvas
           ref={canvasRef}
-          width={280}
-          height={180}
+          width={240}
+          height={150}
           className={styles.canvas}
           onMouseDown={(e) => {
             isDraggingCanvas.current = true;
@@ -327,9 +335,14 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [] }) =
           </div>
         )}
 
-        <div className={styles.alphaInput}>
-          {Math.round(alpha * 100)}%
-        </div>
+        <input
+          type="number"
+          value={Math.round(alpha * 100)}
+          onChange={handleAlphaInput}
+          className={styles.alphaInput}
+          min="0"
+          max="100"
+        />
       </div>
 
       {/* Preset Colors */}

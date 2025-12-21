@@ -1,5 +1,5 @@
 .colorPicker {
-  width: 280px;
+  width: 240px;
   background: var(--bg-primary);
   padding: 0;
   user-select: none;
@@ -9,7 +9,7 @@
 .canvasWrapper {
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 150px;
   border-radius: 6px;
   overflow: hidden;
   cursor: crosshair;
@@ -79,6 +79,7 @@
   right: 0;
   bottom: 0;
   border-radius: 6px;
+  z-index: 1;
 }
 
 .sliderThumb {
@@ -92,6 +93,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   background: white;
+  z-index: 2;
 }
 
 /* Input Section */
@@ -103,19 +105,20 @@
 }
 
 .modeToggle {
-  min-width: 70px;
-  height: 32px;
-  padding: 0 12px;
+  min-width: 55px;
+  height: 28px;
+  padding: 0 8px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 4px;
 }
 
 .modeToggle:hover {
@@ -125,13 +128,13 @@
 
 .hexInput {
   flex: 1;
-  height: 32px;
-  padding: 0 12px;
+  height: 28px;
+  padding: 0 8px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 11px;
   font-family: monospace;
   text-transform: uppercase;
 }
@@ -145,18 +148,18 @@
 .rgbInputs {
   flex: 1;
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .rgbInput {
   flex: 1;
-  height: 32px;
-  padding: 0 8px;
+  height: 28px;
+  padding: 0 4px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -178,17 +181,32 @@
 }
 
 .alphaInput {
-  min-width: 50px;
-  height: 32px;
-  padding: 0 12px;
+  min-width: 48px;
+  height: 28px;
+  padding: 0 6px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 11px;
+  text-align: center;
+}
+
+.alphaInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.1);
+}
+
+/* Remove spinner arrows from alpha input */
+.alphaInput::-webkit-inner-spin-button,
+.alphaInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.alphaInput[type=number] {
+  -moz-appearance: textfield;
 }
 
 /* Presets Section */
