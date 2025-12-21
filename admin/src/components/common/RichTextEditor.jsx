@@ -24,7 +24,9 @@ import {
   Heading3,
   Type,
   Palette,
-  Highlighter
+  Highlighter,
+  PaintBucket,
+  RotateCcw
 } from 'lucide-react';
 import styles from './RichTextEditor.module.css';
 
@@ -79,12 +81,17 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
     onClose();
   };
 
+  const getTitle = () => {
+    if (type === 'text') return 'Color de texto';
+    return 'Resaltar texto';
+  };
+
   return (
     <div className={styles.colorPickerWrapper}>
       <button
         onClick={onToggle}
         className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
-        title={type === 'text' ? 'Color de texto' : 'Color de fondo'}
+        title={getTitle()}
       >
         {type === 'text' ? <Palette size={18} /> : <Highlighter size={18} />}
       </button>
@@ -93,7 +100,7 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
         <div className={styles.colorPickerDropdown}>
           <div className={styles.colorPickerHeader}>
             <span className={styles.colorPickerTitle}>
-              {type === 'text' ? 'Color de texto' : 'Color de fondo'}
+              {getTitle()}
             </span>
             <button
               onClick={onClose}
@@ -164,7 +171,137 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
   );
 };
 
-const MenuBar = ({ editor }) => {
+// Background Color Picker for editor container (visual only, not saved)
+const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => {
+  const [customColor, setCustomColor] = useState('#FFFFFF');
+
+  const backgroundPresets = [
+    '#FFFFFF', // Blanco
+    '#F9FAFB', // Gris muy claro
+    '#F3F4F6', // Gris claro
+    '#FEF3C7', // Amarillo claro
+    '#FEE2E2', // Rojo claro
+    '#DBEAFE', // Azul claro
+    '#D1FAE5', // Verde claro
+    '#E0E7FF', // Índigo claro
+    '#FCE7F3', // Rosa claro
+    '#F5F3FF', // Púrpura claro
+    '#FED7AA', // Naranja claro
+    '#E5E7EB', // Gris
+  ];
+
+  const applyBackgroundColor = (color) => {
+    setCustomColor(color);
+    if (onColorChange) {
+      onColorChange(color);
+    }
+  };
+
+  const handleHexInputChange = (e) => {
+    let hex = e.target.value;
+    // Ensure it starts with #
+    if (!hex.startsWith('#')) {
+      hex = '#' + hex;
+    }
+    setCustomColor(hex);
+
+    // Only apply if it's a valid hex color
+    if (/^#[0-9A-F]{6}$/i.test(hex)) {
+      applyBackgroundColor(hex);
+    }
+  };
+
+  const resetBackground = () => {
+    applyBackgroundColor('#FFFFFF');
+    onClose();
+  };
+
+  return (
+    <div className={styles.colorPickerWrapper}>
+      <button
+        onClick={onToggle}
+        className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
+        title="Color de fondo del editor"
+      >
+        <PaintBucket size={18} />
+      </button>
+
+      {isOpen && (
+        <div className={styles.colorPickerDropdown}>
+          <div className={styles.colorPickerHeader}>
+            <span className={styles.colorPickerTitle}>
+              Fondo del editor
+            </span>
+            <button
+              onClick={onClose}
+              className={styles.colorPickerClose}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className={styles.colorPickerContent}>
+            {/* Color presets */}
+            <div className={styles.colorPresetsLabel}>Colores predeterminados:</div>
+            <div className={styles.colorPresetsGrid}>
+              {backgroundPresets.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => applyBackgroundColor(color)}
+                  className={styles.colorButton}
+                  style={{ backgroundColor: color, border: '2px solid #d1d5db' }}
+                  title={color}
+                />
+              ))}
+            </div>
+
+            {/* Circle Picker */}
+            <div className={styles.customColorSection}>
+              <div className={styles.colorPresetsLabel}>Selector de color:</div>
+              <div className={styles.circlePickerWrapper}>
+                <CirclePicker
+                  color={customColor}
+                  onChange={(color) => applyBackgroundColor(color.hex)}
+                  colors={[
+                    '#ffffff', '#f9fafb', '#f3f4f6', '#e5e7eb',
+                    '#fef3c7', '#fde68a', '#fcd34d', '#fbbf24',
+                    '#fee2e2', '#fecaca', '#fca5a5', '#f87171',
+                    '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa',
+                    '#d1fae5', '#a7f3d0', '#6ee7b7', '#34d399'
+                  ]}
+                  width="100%"
+                />
+              </div>
+            </div>
+
+            {/* Hex Input */}
+            <div className={styles.hexInputSection}>
+              <div className={styles.colorPresetsLabel}>Color personalizado:</div>
+              <input
+                type="text"
+                value={customColor}
+                onChange={handleHexInputChange}
+                placeholder="#FFFFFF"
+                className={styles.hexInput}
+                maxLength={7}
+              />
+            </div>
+
+            {/* Reset background button */}
+            <button
+              onClick={resetBackground}
+              className={styles.removeColorButton}
+            >
+              Restablecer fondo
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundChange }) => {
   const [openPicker, setOpenPicker] = useState(null);
 
   if (!editor) {
@@ -188,7 +325,7 @@ const MenuBar = ({ editor }) => {
 
   return (
     <div className={styles.menuBar}>
-      {/* Undo/Redo */}
+      {/* Undo/Redo/Reset */}
       <div className={styles.buttonGroup}>
         <button
           onClick={() => editor.chain().focus().undo().run()}
@@ -206,6 +343,15 @@ const MenuBar = ({ editor }) => {
         >
           <Redo size={18} />
         </button>
+        {onReset && (
+          <button
+            onClick={onReset}
+            className={styles.menuButton}
+            title="Deshacer todos los cambios"
+          >
+            <RotateCcw size={18} />
+          </button>
+        )}
       </div>
 
       {/* Tamaño de texto */}
@@ -322,16 +468,24 @@ const MenuBar = ({ editor }) => {
         <ColorPicker
           editor={editor}
           type="background"
-          isOpen={openPicker === 'background'}
-          onToggle={() => handleTogglePicker('background')}
+          isOpen={openPicker === 'highlight'}
+          onToggle={() => handleTogglePicker('highlight')}
           onClose={handleClosePicker}
+        />
+        <BackgroundColorPicker
+          isOpen={openPicker === 'editorBackground'}
+          onToggle={() => handleTogglePicker('editorBackground')}
+          onClose={handleClosePicker}
+          onColorChange={onEditorBackgroundChange}
         />
       </div>
     </div>
   );
 };
 
-const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', disabled = false }) => {
+const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', disabled = false, onReset }) => {
+  const [editorBackgroundColor, setEditorBackgroundColor] = useState('#FFFFFF');
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -374,10 +528,23 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
     }
   }, [disabled, editor]);
 
+  const handleEditorBackgroundChange = (color) => {
+    setEditorBackgroundColor(color);
+  };
+
   return (
     <div className={`${styles.richTextEditor} ${disabled ? styles.disabled : ''}`}>
-      <MenuBar editor={editor} />
-      <EditorContent editor={editor} className={styles.editorContent} />
+      <MenuBar
+        editor={editor}
+        onReset={onReset}
+        editorBackgroundColor={editorBackgroundColor}
+        onEditorBackgroundChange={handleEditorBackgroundChange}
+      />
+      <EditorContent
+        editor={editor}
+        className={styles.editorContent}
+        style={{ backgroundColor: editorBackgroundColor }}
+      />
     </div>
   );
 };

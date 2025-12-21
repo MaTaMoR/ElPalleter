@@ -100,6 +100,10 @@ const RichContentForm = forwardRef(({
     setContent(html);
   };
 
+  const handleReset = () => {
+    setContent(originalContent);
+  };
+
   if (loading) {
     return (
       <div className={styles.section}>
@@ -169,6 +173,7 @@ const RichContentForm = forwardRef(({
             value={content}
             onChange={handleContentChange}
             placeholder={`Escribe el contenido en ${language}...`}
+            onReset={handleReset}
           />
         </div>
       </div>
