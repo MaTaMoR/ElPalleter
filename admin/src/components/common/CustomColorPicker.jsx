@@ -146,15 +146,27 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     notifyColorChange(hue, newSaturation, newValue, alpha);
   };
 
-  const handleHueSliderChange = (e) => {
+  // Update local state during drag without notifying parent
+  const handleHueSliderInput = (e) => {
     const newHue = parseFloat(e.target.value);
     setHue(newHue);
+  };
+
+  // Notify parent only when user releases the slider
+  const handleHueSliderChange = (e) => {
+    const newHue = parseFloat(e.target.value);
     notifyColorChange(newHue, saturation, value, alpha);
   };
 
-  const handleAlphaSliderChange = (e) => {
+  // Update local state during drag without notifying parent
+  const handleAlphaSliderInput = (e) => {
     const newAlpha = parseFloat(e.target.value);
     setAlpha(newAlpha);
+  };
+
+  // Notify parent only when user releases the slider
+  const handleAlphaSliderChange = (e) => {
+    const newAlpha = parseFloat(e.target.value);
     notifyColorChange(hue, saturation, value, newAlpha);
   };
 
@@ -282,6 +294,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
                 max="360"
                 step="1"
                 value={hue}
+                onInput={handleHueSliderInput}
                 onChange={handleHueSliderChange}
                 className={styles.rangeInput}
                 style={{
@@ -313,6 +326,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
                 max="1"
                 step="0.01"
                 value={alpha}
+                onInput={handleAlphaSliderInput}
                 onChange={handleAlphaSliderChange}
                 className={styles.rangeInput}
               />
