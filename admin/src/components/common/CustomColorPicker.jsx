@@ -86,6 +86,8 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const [isAdvanced, setIsAdvanced] = useState(false);
 
   const canvasRef = useRef(null);
+  const hueThumbRef = useRef(null);
+  const alphaThumbRef = useRef(null);
   const isDraggingCanvas = useRef(false);
   const isDraggingHue = useRef(false);
   const isDraggingAlpha = useRef(false);
@@ -294,8 +296,8 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
             <div
               className={styles.hueSlider}
               onMouseDown={(e) => {
-                // Only handle if not clicking on thumb
-                if (e.target.classList.contains(styles.sliderThumb)) {
+                // Don't handle if clicking on thumb
+                if (e.target === hueThumbRef.current) {
                   return;
                 }
                 isDraggingHue.current = true;
@@ -303,10 +305,11 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
               }}
             >
               <div
+                ref={hueThumbRef}
                 className={styles.sliderThumb}
                 style={{ left: `${(hue / 360) * 100}%` }}
                 onMouseDown={(e) => {
-                  e.stopPropagation();
+                  e.preventDefault();
                   isDraggingHue.current = true;
                 }}
               />
@@ -318,8 +321,8 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
             <div
               className={styles.alphaSlider}
               onMouseDown={(e) => {
-                // Only handle if not clicking on thumb
-                if (e.target.classList.contains(styles.sliderThumb)) {
+                // Don't handle if clicking on thumb
+                if (e.target === alphaThumbRef.current) {
                   return;
                 }
                 isDraggingAlpha.current = true;
@@ -333,10 +336,11 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
                 }}
               />
               <div
+                ref={alphaThumbRef}
                 className={styles.sliderThumb}
                 style={{ left: `${alpha * 100}%` }}
                 onMouseDown={(e) => {
-                  e.stopPropagation();
+                  e.preventDefault();
                   isDraggingAlpha.current = true;
                 }}
               />
