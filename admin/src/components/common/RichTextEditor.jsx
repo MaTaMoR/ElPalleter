@@ -80,25 +80,32 @@ import {
 } from 'lucide-react';
 import styles from './RichTextEditor.module.css';
 
+// Color presets constants
+const TEXT_COLOR_PRESETS = [
+  '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+  '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
+];
+
+const BACKGROUND_COLOR_PRESETS = [
+  '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
+  '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
+];
+
 // Unified Color Picker Component
 const ColorPickerButton = ({
   title,
   icon,
   presetColors,
   defaultColor = '#000000',
+  currentColor,
   isOpen,
   onToggle,
   onClose,
   onColorChange,
   onRemove,
   removeButtonText = 'Quitar color',
-  editor = null,
-  type = null, // 'text' | 'highlight' | null (for custom handlers)
 }) => {
-  const [customColor, setCustomColor] = useState(defaultColor);
   const [pickerPosition, setPickerPosition] = useState(null);
-  const [savedSelection, setSavedSelection] = useState(null);
-  const hasAppliedRef = useRef(false);
   const buttonRef = useRef(null);
 
   // Calculate picker position when opened
@@ -109,20 +116,6 @@ const ColorPickerButton = ({
         top: rect.bottom + 8,
         left: rect.left
       });
-
-      // Save current selection (only for editor-based pickers)
-      if (editor && type) {
-        const { from, to } = editor.state.selection;
-        setSavedSelection({ from, to });
-        hasAppliedRef.current = false;
-
-        // Get current color from selection
-        const currentColor = type === 'text'
-          ? editor.getAttributes('textStyle').color
-          : editor.getAttributes('highlight').color;
-
-        setCustomColor(currentColor || defaultColor);
-      }
 
       // Close picker on scroll
       const handleScroll = () => {
@@ -136,52 +129,18 @@ const ColorPickerButton = ({
     } else {
       setPickerPosition(null);
     }
-  }, [isOpen, onClose, editor, type, defaultColor]);
+  }, [isOpen, onClose]);
 
   const handleColorChange = (color) => {
-    const hexColor = color.hex;
-    setCustomColor(hexColor);
-
-    // Handle editor-based color changes
-    if (editor && type && savedSelection) {
-      if (!hasAppliedRef.current) {
-        hasAppliedRef.current = true;
-      }
-
-      // Restore selection and apply color
-      if (savedSelection.from !== savedSelection.to) {
-        editor.chain()
-          .focus()
-          .setTextSelection(savedSelection)
-          .run();
-
-        if (type === 'text') {
-          editor.chain().setColor(hexColor).run();
-        } else if (type === 'highlight') {
-          editor.chain().setHighlight({ color: hexColor }).run();
-        }
-      }
-    }
-
-    // Handle custom color change callback
     if (onColorChange) {
-      onColorChange(hexColor);
+      onColorChange(color.hex);
     }
   };
 
   const handleRemove = () => {
-    if (editor && type) {
-      if (type === 'text') {
-        editor.chain().focus().unsetColor().run();
-      } else if (type === 'highlight') {
-        editor.chain().focus().unsetHighlight().run();
-      }
-    }
-
     if (onRemove) {
       onRemove();
     }
-
     onClose();
   };
 
@@ -216,7 +175,7 @@ const ColorPickerButton = ({
 
             <div className={styles.colorPickerContent}>
               <CustomColorPicker
-                color={customColor}
+                color={currentColor || defaultColor}
                 onChange={handleColorChange}
                 presetColors={presetColors}
                 onRemove={handleRemove}
@@ -233,6 +192,8 @@ const ColorPickerButton = ({
 const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundChange }) => {
   const [openPicker, setOpenPicker] = useState(null);
   const [, forceUpdate] = useState({});
+  const savedTextColorSelection = useRef(null);
+  const savedHighlightSelection = useRef(null);
 
   // Force re-render when editor selection changes
   useEffect(() => {
@@ -262,12 +223,120 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
     { label: 'Pequeño', value: '0.875em' },
   ];
 
+  // Picker handlers
   const handleTogglePicker = (pickerType) => {
-    setOpenPicker(openPicker === pickerType ? null : pickerType);
+    const newState = openPicker === pickerType ? null : pickerType;
+
+    // Save selection when opening text color picker
+    if (newState === 'text') {
+      const { from, to } = editor.state.selection;
+      savedTextColorSelection.current = { from, to };
+    }
+
+    // Save selection when opening highlight picker
+    if (newState === 'highlight') {
+      const { from, to } = editor.state.selection;
+      savedHighlightSelection.current = { from, to };
+    }
+
+    setOpenPicker(newState);
   };
 
   const handleClosePicker = () => {
     setOpenPicker(null);
+  };
+
+  // Undo/Redo handlers
+  const handleUndo = () => {
+    editor.chain().focus().undo().run();
+  };
+
+  const handleRedo = () => {
+    editor.chain().focus().redo().run();
+  };
+
+  // Font size handlers
+  const handleFontSizeChange = (value) => {
+    if (value === null) {
+      editor.chain().focus().unsetFontSize().run();
+    } else {
+      editor.chain().focus().setFontSize(value).run();
+    }
+  };
+
+  // Text formatting handlers
+  const handleToggleBold = () => {
+    editor.chain().focus().toggleBold().run();
+  };
+
+  const handleToggleItalic = () => {
+    editor.chain().focus().toggleItalic().run();
+  };
+
+  const handleToggleUnderline = () => {
+    editor.chain().focus().toggleUnderline().run();
+  };
+
+  // List handlers
+  const handleToggleBulletList = () => {
+    editor.chain().focus().toggleBulletList().run();
+  };
+
+  const handleToggleOrderedList = () => {
+    editor.chain().focus().toggleOrderedList().run();
+  };
+
+  // Alignment handlers
+  const handleSetTextAlign = (alignment) => {
+    editor.chain().focus().setTextAlign(alignment).run();
+  };
+
+  // Color handlers
+  const handleTextColorChange = (hexColor) => {
+    if (savedTextColorSelection.current) {
+      const { from, to } = savedTextColorSelection.current;
+      if (from !== to) {
+        editor.chain()
+          .focus()
+          .setTextSelection({ from, to })
+          .setColor(hexColor)
+          .run();
+      }
+    }
+  };
+
+  const handleTextColorRemove = () => {
+    editor.chain().focus().unsetColor().run();
+  };
+
+  const handleHighlightColorChange = (hexColor) => {
+    if (savedHighlightSelection.current) {
+      const { from, to } = savedHighlightSelection.current;
+      if (from !== to) {
+        editor.chain()
+          .focus()
+          .setTextSelection({ from, to })
+          .setHighlight({ color: hexColor })
+          .run();
+      }
+    }
+  };
+
+  const handleHighlightRemove = () => {
+    editor.chain().focus().unsetHighlight().run();
+  };
+
+  const handleEditorBackgroundReset = () => {
+    onEditorBackgroundChange('#FFFFFF');
+  };
+
+  // Get current colors
+  const getCurrentTextColor = () => {
+    return editor.getAttributes('textStyle').color || null;
+  };
+
+  const getCurrentHighlightColor = () => {
+    return editor.getAttributes('highlight').color || null;
   };
 
   return (
@@ -275,7 +344,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
       {/* Undo/Redo/Reset */}
       <div className={styles.buttonGroup}>
         <button
-          onClick={() => editor.chain().focus().undo().run()}
+          onClick={handleUndo}
           disabled={!editor.can().undo()}
           className={styles.menuButton}
           title="Deshacer"
@@ -283,7 +352,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           <Undo size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().redo().run()}
+          onClick={handleRedo}
           disabled={!editor.can().redo()}
           className={styles.menuButton}
           title="Rehacer"
@@ -312,13 +381,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           return (
             <button
               key={size.label}
-              onClick={() => {
-                if (size.value === null) {
-                  editor.chain().focus().unsetFontSize().run();
-                } else {
-                  editor.chain().focus().setFontSize(size.value).run();
-                }
-              }}
+              onClick={() => handleFontSizeChange(size.value)}
               className={`${styles.menuButton} ${isActive ? styles.isActive : ''}`}
               title={size.label}
             >
@@ -334,21 +397,21 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
       {/* Formato de texto */}
       <div className={styles.buttonGroup}>
         <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={handleToggleBold}
           className={`${styles.menuButton} ${editor.isActive('bold') ? styles.isActive : ''}`}
           title="Negrita"
         >
           <Bold size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={handleToggleItalic}
           className={`${styles.menuButton} ${editor.isActive('italic') ? styles.isActive : ''}`}
           title="Cursiva"
         >
           <Italic size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          onClick={handleToggleUnderline}
           className={`${styles.menuButton} ${editor.isActive('underline') ? styles.isActive : ''}`}
           title="Subrayado"
         >
@@ -359,14 +422,14 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
       {/* Listas */}
       <div className={styles.buttonGroup}>
         <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={handleToggleBulletList}
           className={`${styles.menuButton} ${editor.isActive('bulletList') ? styles.isActive : ''}`}
           title="Lista con viñetas"
         >
           <List size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onClick={handleToggleOrderedList}
           className={`${styles.menuButton} ${editor.isActive('orderedList') ? styles.isActive : ''}`}
           title="Lista numerada"
         >
@@ -377,28 +440,28 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
       {/* Alineación */}
       <div className={styles.buttonGroup}>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          onClick={() => handleSetTextAlign('left')}
           className={`${styles.menuButton} ${editor.isActive({ textAlign: 'left' }) ? styles.isActive : ''}`}
           title="Alinear a la izquierda"
         >
           <AlignLeft size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          onClick={() => handleSetTextAlign('center')}
           className={`${styles.menuButton} ${editor.isActive({ textAlign: 'center' }) ? styles.isActive : ''}`}
           title="Centrar"
         >
           <AlignCenter size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          onClick={() => handleSetTextAlign('right')}
           className={`${styles.menuButton} ${editor.isActive({ textAlign: 'right' }) ? styles.isActive : ''}`}
           title="Alinear a la derecha"
         >
           <AlignRight size={18} />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+          onClick={() => handleSetTextAlign('justify')}
           className={`${styles.menuButton} ${editor.isActive({ textAlign: 'justify' }) ? styles.isActive : ''}`}
           title="Justificar"
         >
@@ -411,46 +474,40 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
         <ColorPickerButton
           title="Color de texto"
           icon={<Palette size={18} />}
-          presetColors={[
-            '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
-            '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
-          ]}
+          presetColors={TEXT_COLOR_PRESETS}
           defaultColor="#000000"
-          editor={editor}
-          type="text"
+          currentColor={getCurrentTextColor()}
           isOpen={openPicker === 'text'}
           onToggle={() => handleTogglePicker('text')}
           onClose={handleClosePicker}
+          onColorChange={handleTextColorChange}
+          onRemove={handleTextColorRemove}
           removeButtonText="Quitar color"
         />
         <ColorPickerButton
           title="Resaltar texto"
           icon={<Highlighter size={18} />}
-          presetColors={[
-            '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
-            '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
-          ]}
+          presetColors={TEXT_COLOR_PRESETS}
           defaultColor="#FFFF00"
-          editor={editor}
-          type="highlight"
+          currentColor={getCurrentHighlightColor()}
           isOpen={openPicker === 'highlight'}
           onToggle={() => handleTogglePicker('highlight')}
           onClose={handleClosePicker}
+          onColorChange={handleHighlightColorChange}
+          onRemove={handleHighlightRemove}
           removeButtonText="Quitar resaltado"
         />
         <ColorPickerButton
           title="Fondo del editor"
           icon={<PaintBucket size={18} />}
-          presetColors={[
-            '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
-            '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
-          ]}
+          presetColors={BACKGROUND_COLOR_PRESETS}
           defaultColor="#FFFFFF"
+          currentColor={editorBackgroundColor}
           isOpen={openPicker === 'editorBackground'}
           onToggle={() => handleTogglePicker('editorBackground')}
           onClose={handleClosePicker}
           onColorChange={onEditorBackgroundChange}
-          onRemove={() => onEditorBackgroundChange('#FFFFFF')}
+          onRemove={handleEditorBackgroundReset}
           removeButtonText="Restablecer fondo"
         />
       </div>
