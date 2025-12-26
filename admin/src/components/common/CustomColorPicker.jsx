@@ -84,12 +84,25 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const [alpha, setAlpha] = useState(1);
   const [mode, setMode] = useState('hex'); // 'hex' or 'rgb'
   const [isAdvanced, setIsAdvanced] = useState(false);
-  const isInitialMount = useRef(true);
 
   const canvasRef = useRef(null);
   const isDraggingCanvas = useRef(false);
   const isDraggingHue = useRef(false);
   const isDraggingAlpha = useRef(false);
+
+  // Helper function to notify parent of color changes
+  const notifyColorChange = (h, s, v, a) => {
+    if (onChange) {
+      const rgb = hsvToRgb(h, s, v);
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      onChange({
+        hex,
+        rgb,
+        hsv: { h, s, v },
+        alpha: a
+      });
+    }
+  };
 
   // Draw saturation/value canvas
   useEffect(() => {
@@ -119,28 +132,6 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     ctx.fillRect(0, 0, width, height);
   }, [hue, isAdvanced]);
 
-  // Notify parent of color changes
-  useEffect(() => {
-    // Skip onChange on initial mount
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    const rgb = hsvToRgb(hue, saturation, value);
-    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-
-    if (onChange) {
-      onChange({
-        hex,
-        rgb,
-        hsv: { h: hue, s: saturation, v: value },
-        alpha
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hue, saturation, value, alpha]);
-
   const handleCanvasInteraction = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -149,22 +140,32 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
 
-    setSaturation(x / rect.width);
-    setValue(1 - (y / rect.height));
+    const newSaturation = x / rect.width;
+    const newValue = 1 - (y / rect.height);
+
+    setSaturation(newSaturation);
+    setValue(newValue);
+    notifyColorChange(hue, newSaturation, newValue, alpha);
   };
 
   const handleHueChange = (e) => {
     const slider = e.currentTarget;
     const rect = slider.getBoundingClientRect();
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    setHue((x / rect.width) * 360);
+    const newHue = (x / rect.width) * 360;
+
+    setHue(newHue);
+    notifyColorChange(newHue, saturation, value, alpha);
   };
 
   const handleAlphaChange = (e) => {
     const slider = e.currentTarget;
     const rect = slider.getBoundingClientRect();
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    setAlpha(x / rect.width);
+    const newAlpha = x / rect.width;
+
+    setAlpha(newAlpha);
+    notifyColorChange(hue, saturation, value, newAlpha);
   };
 
   const handleMouseMove = (e) => {
@@ -210,6 +211,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
         setHue(hsv.h);
         setSaturation(hsv.s);
         setValue(hsv.v);
+        notifyColorChange(hsv.h, hsv.s, hsv.v, alpha);
       }
     }
   };
@@ -221,11 +223,14 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     setHue(hsv.h);
     setSaturation(hsv.s);
     setValue(hsv.v);
+    notifyColorChange(hsv.h, hsv.s, hsv.v, alpha);
   };
 
   const handleAlphaInput = (e) => {
     const num = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-    setAlpha(num / 100);
+    const newAlpha = num / 100;
+    setAlpha(newAlpha);
+    notifyColorChange(hue, saturation, value, newAlpha);
   };
 
   const handlePresetClick = (presetHex) => {
@@ -235,6 +240,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
       setHue(hsv.h);
       setSaturation(hsv.s);
       setValue(hsv.v);
+      notifyColorChange(hsv.h, hsv.s, hsv.v, alpha);
     }
   };
 
