@@ -65,9 +65,22 @@ const rgbToHex = (r, g, b) => {
 };
 
 const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onRemove, removeButtonText = 'Quitar color' }) => {
-  const [hue, setHue] = useState(0);
-  const [saturation, setSaturation] = useState(1);
-  const [value, setValue] = useState(1);
+  // Initialize HSV from color prop using lazy initialization
+  const [hue, setHue] = useState(() => {
+    const rgb = hexToRgb(color);
+    return rgb ? rgbToHsv(rgb.r, rgb.g, rgb.b).h : 0;
+  });
+
+  const [saturation, setSaturation] = useState(() => {
+    const rgb = hexToRgb(color);
+    return rgb ? rgbToHsv(rgb.r, rgb.g, rgb.b).s : 1;
+  });
+
+  const [value, setValue] = useState(() => {
+    const rgb = hexToRgb(color);
+    return rgb ? rgbToHsv(rgb.r, rgb.g, rgb.b).v : 1;
+  });
+
   const [alpha, setAlpha] = useState(1);
   const [mode, setMode] = useState('hex'); // 'hex' or 'rgb'
   const [isAdvanced, setIsAdvanced] = useState(false);
@@ -77,17 +90,6 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const isDraggingCanvas = useRef(false);
   const isDraggingHue = useRef(false);
   const isDraggingAlpha = useRef(false);
-
-  // Initialize from color prop
-  useEffect(() => {
-    const rgb = hexToRgb(color);
-    if (rgb) {
-      const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-      setHue(hsv.h);
-      setSaturation(hsv.s);
-      setValue(hsv.v);
-    }
-  }, []);
 
   // Draw saturation/value canvas
   useEffect(() => {
