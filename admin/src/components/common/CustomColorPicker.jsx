@@ -263,6 +263,16 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
       {/* Advanced Editor - Conditionally shown */}
       {isAdvanced && (
         <div className={styles.advancedSection}>
+          {/* Color Preview */}
+          <div className={styles.colorPreview}>
+            <div
+              className={styles.colorPreviewSwatch}
+              style={{
+                backgroundColor: `rgba(${currentRgb.r}, ${currentRgb.g}, ${currentRgb.b}, ${alpha})`
+              }}
+            />
+          </div>
+
           {/* Saturation/Value Canvas */}
           <div className={styles.canvasWrapper}>
             <canvas
@@ -288,6 +298,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
           {/* Hue Slider */}
           <div className={styles.sliderWrapper}>
             <div className={styles.hueSlider}>
+              <div className={styles.hueSliderFill} />
               <input
                 type="range"
                 min="0"
@@ -297,16 +308,6 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
                 onInput={handleHueSliderInput}
                 onChange={handleHueSliderChange}
                 className={styles.rangeInput}
-                style={{
-                  background: `linear-gradient(to right,
-                    hsl(0, 100%, 50%),
-                    hsl(60, 100%, 50%),
-                    hsl(120, 100%, 50%),
-                    hsl(180, 100%, 50%),
-                    hsl(240, 100%, 50%),
-                    hsl(300, 100%, 50%),
-                    hsl(360, 100%, 50%))`
-                }}
               />
             </div>
           </div>
