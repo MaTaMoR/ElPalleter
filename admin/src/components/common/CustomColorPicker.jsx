@@ -294,6 +294,10 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
             <div
               className={styles.hueSlider}
               onMouseDown={(e) => {
+                // Only handle if not clicking on thumb
+                if (e.target.classList.contains(styles.sliderThumb)) {
+                  return;
+                }
                 isDraggingHue.current = true;
                 handleHueChange(e);
               }}
@@ -301,6 +305,10 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
               <div
                 className={styles.sliderThumb}
                 style={{ left: `${(hue / 360) * 100}%` }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  isDraggingHue.current = true;
+                }}
               />
             </div>
           </div>
@@ -310,6 +318,10 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
             <div
               className={styles.alphaSlider}
               onMouseDown={(e) => {
+                // Only handle if not clicking on thumb
+                if (e.target.classList.contains(styles.sliderThumb)) {
+                  return;
+                }
                 isDraggingAlpha.current = true;
                 handleAlphaChange(e);
               }}
@@ -323,6 +335,10 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
               <div
                 className={styles.sliderThumb}
                 style={{ left: `${alpha * 100}%` }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  isDraggingAlpha.current = true;
+                }}
               />
             </div>
           </div>
