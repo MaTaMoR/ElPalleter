@@ -41,14 +41,49 @@
 /* Hue Slider */
 .hueSlider {
   position: relative;
-  height: 32px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.hueSliderFill {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  height: 8px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to right,
+    hsl(0, 100%, 50%),
+    hsl(60, 100%, 50%),
+    hsl(120, 100%, 50%),
+    hsl(180, 100%, 50%),
+    hsl(240, 100%, 50%),
+    hsl(300, 100%, 50%),
+    hsl(360, 100%, 50%));
 }
 
 /* Alpha Slider */
 .alphaSlider {
   position: relative;
-  height: 32px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.alphaSliderBackground {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  height: 8px;
   border-radius: 6px;
+  pointer-events: none;
+  z-index: 0;
   background-image:
     linear-gradient(45deg, #ccc 25%, transparent 25%),
     linear-gradient(-45deg, #ccc 25%, transparent 25%),
@@ -60,19 +95,20 @@
 
 .alphaSliderFill {
   position: absolute;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   left: 0;
   right: 0;
-  bottom: 0;
+  height: 8px;
   border-radius: 6px;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 /* Range Input Styles */
 .rangeInput {
   width: 100%;
-  height: 32px;
+  height: 24px;
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -84,14 +120,16 @@
 /* Range Track */
 .rangeInput::-webkit-slider-runnable-track {
   width: 100%;
-  height: 32px;
+  height: 8px;
   border-radius: 6px;
+  background: transparent;
 }
 
 .rangeInput::-moz-range-track {
   width: 100%;
-  height: 32px;
+  height: 8px;
   border-radius: 6px;
+  background: transparent;
 }
 
 /* Range Thumb */

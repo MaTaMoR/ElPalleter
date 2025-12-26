@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import styles from './CustomColorPicker.module.css';
 
 // Convert HSV to RGB
@@ -280,7 +280,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
               style={{
                 left: `${saturation * 100}%`,
                 top: `${(1 - value) * 100}%`,
-                backgroundColor: currentHex
+                backgroundColor: `rgba(${currentRgb.r}, ${currentRgb.g}, ${currentRgb.b}, ${alpha})`
               }}
             />
           </div>
@@ -314,6 +314,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
           {/* Alpha Slider */}
           <div className={styles.sliderWrapper}>
             <div className={styles.alphaSlider}>
+              <div className={styles.alphaSliderBackground} />
               <div
                 className={styles.alphaSliderFill}
                 style={{
@@ -413,4 +414,15 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   );
 };
 
-export default CustomColorPicker;
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if color or preset colors change
+const arePropsEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.color === nextProps.color &&
+    prevProps.presetColors === nextProps.presetColors &&
+    prevProps.removeButtonText === nextProps.removeButtonText &&
+    prevProps.onRemove === nextProps.onRemove
+  );
+};
+
+export default memo(CustomColorPicker, arePropsEqual);
