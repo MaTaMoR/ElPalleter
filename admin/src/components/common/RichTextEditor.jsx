@@ -524,7 +524,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
 };
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', disabled = false, onReset }) => {
-  const [editorBackgroundColor, setEditorBackgroundColor] = useState('#FFFFFF');
+  const [editorBackgroundColor, setEditorBackgroundColor] = useState(BACKGROUND_DEFAULT_COLOR);
 
   const editor = useEditor({
     extensions: [
