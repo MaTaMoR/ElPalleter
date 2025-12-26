@@ -385,19 +385,6 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
             ? !fontSize
             : fontSize === size.value;
 
-          const getSizeIcon = () => {
-            switch (size.label) {
-              case 'Grande':
-                return <span style={{ fontSize: '20px', fontWeight: '600' }}>T</span>;
-              case 'Mediano':
-                return <span style={{ fontSize: '16px', fontWeight: '600' }}>T</span>;
-              case 'Pequeño':
-                return <span style={{ fontSize: '12px', fontWeight: '600' }}>T</span>;
-              default:
-                return <span style={{ fontSize: '14px', fontWeight: '600' }}>T</span>;
-            }
-          };
-
           return (
             <button
               key={size.label}
@@ -411,7 +398,10 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
               className={`${styles.menuButton} ${isActive ? styles.isActive : ''}`}
               title={size.label}
             >
-              {getSizeIcon()}
+              {size.label === 'Normal' && <Type size={18} />}
+              {size.label === 'Grande' && <Heading1 size={18} />}
+              {size.label === 'Mediano' && <Heading2 size={18} />}
+              {size.label === 'Pequeño' && <Heading3 size={18} />}
             </button>
           );
         })}
