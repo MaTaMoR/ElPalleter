@@ -71,6 +71,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const [alpha, setAlpha] = useState(1);
   const [mode, setMode] = useState('hex'); // 'hex' or 'rgb'
   const [isAdvanced, setIsAdvanced] = useState(false);
+  const isInitialMount = useRef(true);
 
   const canvasRef = useRef(null);
   const isDraggingCanvas = useRef(false);
@@ -118,6 +119,12 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 
   // Notify parent of color changes
   useEffect(() => {
+    // Skip onChange on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     const rgb = hsvToRgb(hue, saturation, value);
     const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
 

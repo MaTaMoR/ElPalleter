@@ -5,8 +5,58 @@ import TextAlign from '@tiptap/extension-text-align';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
+import { Extension } from '@tiptap/core';
 import { useEffect, useState, useRef } from 'react';
 import CustomColorPicker from './CustomColorPicker';
+
+// FontSize extension for inline font size control
+const FontSize = Extension.create({
+  name: 'fontSize',
+
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize || null,
+            renderHTML: attributes => {
+              if (!attributes.fontSize) {
+                return {};
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      setFontSize: fontSize => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontSize })
+          .run();
+      },
+      unsetFontSize: () => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontSize: null })
+          .removeEmptyTextStyle()
+          .run();
+      },
+    };
+  },
+});
 import {
   Bold,
   Italic,
@@ -64,10 +114,20 @@ const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
 
       setCustomColor(currentColor || '#000000');
       setInitialColor(currentColor || '#000000');
+
+      // Close picker on scroll
+      const handleScroll = () => {
+        onClose();
+      };
+
+      window.addEventListener('scroll', handleScroll, true);
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+      };
     } else {
       setPickerPosition(null);
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const handleColorChange = (color) => {
     const hexColor = color.hex;
@@ -170,10 +230,20 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
         top: rect.bottom + 8,
         left: rect.left
       });
+
+      // Close picker on scroll
+      const handleScroll = () => {
+        onClose();
+      };
+
+      window.addEventListener('scroll', handleScroll, true);
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+      };
     } else {
       setPickerPosition(null);
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const handleColorChange = (color) => {
     const hexColor = color.hex;
@@ -263,9 +333,9 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
 
   const fontSizes = [
     { label: 'Normal', value: null },
-    { label: 'H1', value: 1 },
-    { label: 'H2', value: 2 },
-    { label: 'H3', value: 3 },
+    { label: 'Grande', value: '1.5em' },
+    { label: 'Mediano', value: '1.25em' },
+    { label: 'Pequeño', value: '0.875em' },
   ];
 
   const handleTogglePicker = (pickerType) => {
@@ -310,27 +380,25 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
       {/* Tamaño de texto */}
       <div className={styles.buttonGroup}>
         {fontSizes.map((size) => {
+          const fontSize = editor.getAttributes('textStyle').fontSize;
           const isActive = size.value === null
-            ? !editor.isActive('heading')
-            : editor.isActive('heading', { level: size.value });
+            ? !fontSize
+            : fontSize === size.value;
 
           return (
             <button
               key={size.label}
               onClick={() => {
                 if (size.value === null) {
-                  editor.chain().focus().setParagraph().run();
+                  editor.chain().focus().unsetFontSize().run();
                 } else {
-                  editor.chain().focus().toggleHeading({ level: size.value }).run();
+                  editor.chain().focus().setFontSize(size.value).run();
                 }
               }}
               className={`${styles.menuButton} ${isActive ? styles.isActive : ''}`}
               title={size.label}
             >
-              {size.label === 'H1' && <Heading1 size={18} />}
-              {size.label === 'H2' && <Heading2 size={18} />}
-              {size.label === 'H3' && <Heading3 size={18} />}
-              {size.label === 'Normal' && <Type size={18} />}
+              <Type size={size.label === 'Grande' ? 20 : size.label === 'Mediano' ? 18 : size.label === 'Pequeño' ? 16 : 18} />
             </button>
           );
         })}
@@ -453,6 +521,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
         types: ['heading', 'paragraph'],
       }),
       TextStyle,
+      FontSize,
       Color,
       Highlight.configure({
         multicolor: true,

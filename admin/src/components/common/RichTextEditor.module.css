@@ -297,6 +297,11 @@
   .editorContent {
     padding: 12px;
     min-height: 200px;
+    max-height: 400px;
+  }
+
+  .editorContent :global(.ProseMirror) {
+    min-height: 180px;
   }
 }
 
@@ -316,5 +321,14 @@
     width: 28px;
     height: 28px;
     padding: 4px;
+  }
+
+  .editorContent {
+    max-height: 300px;
+    min-height: 150px;
+  }
+
+  .editorContent :global(.ProseMirror) {
+    min-height: 130px;
   }
 }
