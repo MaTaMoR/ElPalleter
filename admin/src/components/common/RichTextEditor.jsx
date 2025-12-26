@@ -80,147 +80,26 @@ import {
 } from 'lucide-react';
 import styles from './RichTextEditor.module.css';
 
-const ColorPicker = ({ editor, type = 'text', isOpen, onToggle, onClose }) => {
-  const [customColor, setCustomColor] = useState('#000000');
+// Unified Color Picker Component
+const ColorPickerButton = ({
+  title,
+  icon,
+  presetColors,
+  defaultColor = '#000000',
+  isOpen,
+  onToggle,
+  onClose,
+  onColorChange,
+  onRemove,
+  removeButtonText = 'Quitar color',
+  editor = null,
+  type = null, // 'text' | 'highlight' | null (for custom handlers)
+}) => {
+  const [customColor, setCustomColor] = useState(defaultColor);
   const [pickerPosition, setPickerPosition] = useState(null);
   const [savedSelection, setSavedSelection] = useState(null);
-  const [initialColor, setInitialColor] = useState('#000000');
   const hasAppliedRef = useRef(false);
   const buttonRef = useRef(null);
-
-  const colorPresets = [
-    '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
-    '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
-  ];
-
-  // Calculate picker position and save selection when opened
-  useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPickerPosition({
-        top: rect.bottom + 8,
-        left: rect.left
-      });
-
-      // Save current selection
-      const { from, to } = editor.state.selection;
-      setSavedSelection({ from, to });
-      hasAppliedRef.current = false;
-
-      // Get current color from selection
-      const currentColor = type === 'text'
-        ? editor.getAttributes('textStyle').color
-        : editor.getAttributes('highlight').color;
-
-      setCustomColor(currentColor || '#000000');
-      setInitialColor(currentColor || '#000000');
-
-      // Close picker on scroll
-      const handleScroll = () => {
-        onClose();
-      };
-
-      window.addEventListener('scroll', handleScroll, true);
-      return () => {
-        window.removeEventListener('scroll', handleScroll, true);
-      };
-    } else {
-      setPickerPosition(null);
-    }
-  }, [isOpen, onClose]);
-
-  const handleColorChange = (color) => {
-    const hexColor = color.hex;
-    setCustomColor(hexColor);
-
-    // Only apply if user has interacted
-    if (!hasAppliedRef.current) {
-      hasAppliedRef.current = true;
-    }
-
-    // Restore selection and apply color
-    if (savedSelection && savedSelection.from !== savedSelection.to) {
-      editor.chain()
-        .focus()
-        .setTextSelection(savedSelection)
-        .run();
-
-      if (type === 'text') {
-        editor.chain().setColor(hexColor).run();
-      } else {
-        editor.chain().setHighlight({ color: hexColor }).run();
-      }
-    }
-  };
-
-  const removeColor = () => {
-    if (type === 'text') {
-      editor.chain().focus().unsetColor().run();
-    } else {
-      editor.chain().focus().unsetHighlight().run();
-    }
-    onClose();
-  };
-
-  const getTitle = () => {
-    if (type === 'text') return 'Color de texto';
-    return 'Resaltar texto';
-  };
-
-  return (
-    <div className={styles.colorPickerWrapper}>
-      <button
-        ref={buttonRef}
-        onClick={onToggle}
-        className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
-        title={getTitle()}
-      >
-        {type === 'text' ? <Palette size={18} /> : <Highlighter size={18} />}
-      </button>
-
-      {isOpen && pickerPosition && (
-        <>
-          {/* Backdrop to close picker when clicking outside */}
-          <div className={styles.colorPickerBackdrop} onClick={onClose} />
-
-          {/* Picker with fixed position */}
-          <div
-            className={styles.colorPickerDropdownFixed}
-            style={{
-              top: `${pickerPosition.top}px`,
-              left: `${pickerPosition.left}px`
-            }}
-          >
-            <div className={styles.colorPickerHeader}>
-              <span className={styles.colorPickerTitle}>{getTitle()}</span>
-              <button onClick={onClose} className={styles.colorPickerClose}>×</button>
-            </div>
-
-            <div className={styles.colorPickerContent}>
-              <CustomColorPicker
-                color={customColor}
-                onChange={handleColorChange}
-                presetColors={colorPresets}
-                onRemove={removeColor}
-              />
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
-// Background Color Picker for editor container (visual only, not saved)
-const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => {
-  const [customColor, setCustomColor] = useState('#FFFFFF');
-  const [pickerPosition, setPickerPosition] = useState(null);
-  const buttonRef = useRef(null);
-
-  const backgroundPresets = [
-    '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
-    '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
-  ];
 
   // Calculate picker position when opened
   useEffect(() => {
@@ -231,6 +110,20 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
         left: rect.left
       });
 
+      // Save current selection (only for editor-based pickers)
+      if (editor && type) {
+        const { from, to } = editor.state.selection;
+        setSavedSelection({ from, to });
+        hasAppliedRef.current = false;
+
+        // Get current color from selection
+        const currentColor = type === 'text'
+          ? editor.getAttributes('textStyle').color
+          : editor.getAttributes('highlight').color;
+
+        setCustomColor(currentColor || defaultColor);
+      }
+
       // Close picker on scroll
       const handleScroll = () => {
         onClose();
@@ -243,21 +136,52 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
     } else {
       setPickerPosition(null);
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, editor, type, defaultColor]);
 
   const handleColorChange = (color) => {
     const hexColor = color.hex;
     setCustomColor(hexColor);
+
+    // Handle editor-based color changes
+    if (editor && type && savedSelection) {
+      if (!hasAppliedRef.current) {
+        hasAppliedRef.current = true;
+      }
+
+      // Restore selection and apply color
+      if (savedSelection.from !== savedSelection.to) {
+        editor.chain()
+          .focus()
+          .setTextSelection(savedSelection)
+          .run();
+
+        if (type === 'text') {
+          editor.chain().setColor(hexColor).run();
+        } else if (type === 'highlight') {
+          editor.chain().setHighlight({ color: hexColor }).run();
+        }
+      }
+    }
+
+    // Handle custom color change callback
     if (onColorChange) {
       onColorChange(hexColor);
     }
   };
 
-  const resetBackground = () => {
-    setCustomColor('#FFFFFF');
-    if (onColorChange) {
-      onColorChange('#FFFFFF');
+  const handleRemove = () => {
+    if (editor && type) {
+      if (type === 'text') {
+        editor.chain().focus().unsetColor().run();
+      } else if (type === 'highlight') {
+        editor.chain().focus().unsetHighlight().run();
+      }
     }
+
+    if (onRemove) {
+      onRemove();
+    }
+
     onClose();
   };
 
@@ -267,9 +191,9 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
         ref={buttonRef}
         onClick={onToggle}
         className={`${styles.menuButton} ${isOpen ? styles.isActive : ''}`}
-        title="Color de fondo del editor"
+        title={title}
       >
-        <PaintBucket size={18} />
+        {icon}
       </button>
 
       {isOpen && pickerPosition && (
@@ -286,7 +210,7 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
             }}
           >
             <div className={styles.colorPickerHeader}>
-              <span className={styles.colorPickerTitle}>Fondo del editor</span>
+              <span className={styles.colorPickerTitle}>{title}</span>
               <button onClick={onClose} className={styles.colorPickerClose}>×</button>
             </div>
 
@@ -294,9 +218,9 @@ const BackgroundColorPicker = ({ isOpen, onToggle, onClose, onColorChange }) => 
               <CustomColorPicker
                 color={customColor}
                 onChange={handleColorChange}
-                presetColors={backgroundPresets}
-                onRemove={resetBackground}
-                removeButtonText="Restablecer fondo"
+                presetColors={presetColors}
+                onRemove={handleRemove}
+                removeButtonText={removeButtonText}
               />
             </div>
           </div>
@@ -484,25 +408,50 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
 
       {/* Selectores de color */}
       <div className={styles.buttonGroup}>
-        <ColorPicker
+        <ColorPickerButton
+          title="Color de texto"
+          icon={<Palette size={18} />}
+          presetColors={[
+            '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+            '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
+          ]}
+          defaultColor="#000000"
           editor={editor}
           type="text"
           isOpen={openPicker === 'text'}
           onToggle={() => handleTogglePicker('text')}
           onClose={handleClosePicker}
+          removeButtonText="Quitar color"
         />
-        <ColorPicker
+        <ColorPickerButton
+          title="Resaltar texto"
+          icon={<Highlighter size={18} />}
+          presetColors={[
+            '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+            '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
+          ]}
+          defaultColor="#FFFF00"
           editor={editor}
-          type="background"
+          type="highlight"
           isOpen={openPicker === 'highlight'}
           onToggle={() => handleTogglePicker('highlight')}
           onClose={handleClosePicker}
+          removeButtonText="Quitar resaltado"
         />
-        <BackgroundColorPicker
+        <ColorPickerButton
+          title="Fondo del editor"
+          icon={<PaintBucket size={18} />}
+          presetColors={[
+            '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
+            '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
+          ]}
+          defaultColor="#FFFFFF"
           isOpen={openPicker === 'editorBackground'}
           onToggle={() => handleTogglePicker('editorBackground')}
           onClose={handleClosePicker}
           onColorChange={onEditorBackgroundChange}
+          onRemove={() => onEditorBackgroundChange('#FFFFFF')}
+          removeButtonText="Restablecer fondo"
         />
       </div>
     </div>
