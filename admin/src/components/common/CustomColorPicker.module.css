@@ -41,25 +41,13 @@
 /* Hue Slider */
 .hueSlider {
   position: relative;
-  height: 12px;
-  border-radius: 6px;
-  background: linear-gradient(
-    to right,
-    #ff0000 0%,
-    #ffff00 17%,
-    #00ff00 33%,
-    #00ffff 50%,
-    #0000ff 67%,
-    #ff00ff 83%,
-    #ff0000 100%
-  );
-  cursor: pointer;
+  height: 32px;
 }
 
 /* Alpha Slider */
 .alphaSlider {
   position: relative;
-  height: 12px;
+  height: 32px;
   border-radius: 6px;
   background-image:
     linear-gradient(45deg, #ccc 25%, transparent 25%),
@@ -68,8 +56,6 @@
     linear-gradient(-45deg, transparent 75%, #ccc 75%);
   background-size: 8px 8px;
   background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
-  cursor: pointer;
-  overflow: hidden;
 }
 
 .alphaSliderFill {
@@ -79,21 +65,64 @@
   right: 0;
   bottom: 0;
   border-radius: 6px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Range Input Styles */
+.rangeInput {
+  width: 100%;
+  height: 32px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
   z-index: 1;
 }
 
-.sliderThumb {
-  position: absolute;
-  top: 50%;
+/* Range Track */
+.rangeInput::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.rangeInput::-moz-range-track {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+}
+
+/* Range Thumb */
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
   width: 18px;
   height: 18px;
   border: 2px solid white;
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
   background: white;
-  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+}
+
+.rangeInput::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.rangeInput::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+}
+
+.rangeInput::-moz-range-thumb:active {
+  cursor: grabbing;
 }
 
 /* Input Section */

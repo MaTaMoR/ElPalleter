@@ -86,11 +86,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const [isAdvanced, setIsAdvanced] = useState(false);
 
   const canvasRef = useRef(null);
-  const hueThumbRef = useRef(null);
-  const alphaThumbRef = useRef(null);
   const isDraggingCanvas = useRef(false);
-  const isDraggingHue = useRef(false);
-  const isDraggingAlpha = useRef(false);
 
   // Helper function to notify parent of color changes
   const notifyColorChange = (h, s, v, a) => {
@@ -150,22 +146,14 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     notifyColorChange(hue, newSaturation, newValue, alpha);
   };
 
-  const handleHueChange = (e) => {
-    const slider = e.currentTarget;
-    const rect = slider.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    const newHue = (x / rect.width) * 360;
-
+  const handleHueSliderChange = (e) => {
+    const newHue = parseFloat(e.target.value);
     setHue(newHue);
     notifyColorChange(newHue, saturation, value, alpha);
   };
 
-  const handleAlphaChange = (e) => {
-    const slider = e.currentTarget;
-    const rect = slider.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    const newAlpha = x / rect.width;
-
+  const handleAlphaSliderChange = (e) => {
+    const newAlpha = parseFloat(e.target.value);
     setAlpha(newAlpha);
     notifyColorChange(hue, saturation, value, newAlpha);
   };
@@ -173,17 +161,11 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   const handleMouseMove = (e) => {
     if (isDraggingCanvas.current) {
       handleCanvasInteraction(e);
-    } else if (isDraggingHue.current) {
-      handleHueChange(e);
-    } else if (isDraggingAlpha.current) {
-      handleAlphaChange(e);
     }
   };
 
   const handleMouseUp = () => {
     isDraggingCanvas.current = false;
-    isDraggingHue.current = false;
-    isDraggingAlpha.current = false;
   };
 
   useEffect(() => {
@@ -293,24 +275,24 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 
           {/* Hue Slider */}
           <div className={styles.sliderWrapper}>
-            <div
-              className={styles.hueSlider}
-              onMouseDown={(e) => {
-                // Don't handle if clicking on thumb
-                if (e.target === hueThumbRef.current) {
-                  return;
-                }
-                isDraggingHue.current = true;
-                handleHueChange(e);
-              }}
-            >
-              <div
-                ref={hueThumbRef}
-                className={styles.sliderThumb}
-                style={{ left: `${(hue / 360) * 100}%` }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  isDraggingHue.current = true;
+            <div className={styles.hueSlider}>
+              <input
+                type="range"
+                min="0"
+                max="360"
+                step="1"
+                value={hue}
+                onChange={handleHueSliderChange}
+                className={styles.rangeInput}
+                style={{
+                  background: `linear-gradient(to right,
+                    hsl(0, 100%, 50%),
+                    hsl(60, 100%, 50%),
+                    hsl(120, 100%, 50%),
+                    hsl(180, 100%, 50%),
+                    hsl(240, 100%, 50%),
+                    hsl(300, 100%, 50%),
+                    hsl(360, 100%, 50%))`
                 }}
               />
             </div>
@@ -318,31 +300,21 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 
           {/* Alpha Slider */}
           <div className={styles.sliderWrapper}>
-            <div
-              className={styles.alphaSlider}
-              onMouseDown={(e) => {
-                // Don't handle if clicking on thumb
-                if (e.target === alphaThumbRef.current) {
-                  return;
-                }
-                isDraggingAlpha.current = true;
-                handleAlphaChange(e);
-              }}
-            >
+            <div className={styles.alphaSlider}>
               <div
                 className={styles.alphaSliderFill}
                 style={{
                   background: `linear-gradient(to right, transparent, ${currentHex})`
                 }}
               />
-              <div
-                ref={alphaThumbRef}
-                className={styles.sliderThumb}
-                style={{ left: `${alpha * 100}%` }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  isDraggingAlpha.current = true;
-                }}
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={alpha}
+                onChange={handleAlphaSliderChange}
+                className={styles.rangeInput}
               />
             </div>
           </div>
