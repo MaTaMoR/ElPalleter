@@ -136,7 +136,8 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
         alpha
       });
     }
-  }, [hue, saturation, value, alpha, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hue, saturation, value, alpha]);
 
   const handleCanvasInteraction = (e) => {
     const canvas = canvasRef.current;
