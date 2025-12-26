@@ -85,11 +85,19 @@ const TEXT_COLOR_PRESETS = [
   '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
   '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
 ];
+const HIGHLIGHT_COLOR_PRESETS = [
+  '#D0021B', '#F5A623', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+  '#9013FE', '#4A90E2', '#50E3C2', '#B8E986', '#000000', '#4A4A4A', '#9B9B9B'
+];
 
 const BACKGROUND_COLOR_PRESETS = [
   '#FFFFFF', '#F9FAFB', '#F3F4F6', '#FEF3C7', '#FEE2E2', '#DBEAFE', '#D1FAE5',
   '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
 ];
+
+const TEXT_COLOR_DEFAULT_COLOR = '#000000';
+const HIGHLIGHT_COLOR_DEFAULT_COLOR = '#FFFF00';
+const BACKGROUND_DEFAULT_COLOR = '#000000';
 
 // Unified Color Picker Component
 const ColorPickerButton = ({
@@ -475,7 +483,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           title="Color de texto"
           icon={<Palette size={18} />}
           presetColors={TEXT_COLOR_PRESETS}
-          defaultColor="#000000"
+          defaultColor={TEXT_COLOR_DEFAULT_COLOR}
           currentColor={getCurrentTextColor()}
           isOpen={openPicker === 'text'}
           onToggle={() => handleTogglePicker('text')}
@@ -487,8 +495,8 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
         <ColorPickerButton
           title="Resaltar texto"
           icon={<Highlighter size={18} />}
-          presetColors={TEXT_COLOR_PRESETS}
-          defaultColor="#FFFF00"
+          presetColors={HIGHLIGHT_COLOR_PRESETS}
+          defaultColor={HIGHLIGHT_COLOR_DEFAULT_COLOR}
           currentColor={getCurrentHighlightColor()}
           isOpen={openPicker === 'highlight'}
           onToggle={() => handleTogglePicker('highlight')}
@@ -501,7 +509,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           title="Fondo del editor"
           icon={<PaintBucket size={18} />}
           presetColors={BACKGROUND_COLOR_PRESETS}
-          defaultColor="#FFFFFF"
+          defaultColor={BACKGROUND_DEFAULT_COLOR}
           currentColor={editorBackgroundColor}
           isOpen={openPicker === 'editorBackground'}
           onToggle={() => handleTogglePicker('editorBackground')}
