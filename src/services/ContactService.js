@@ -675,13 +675,15 @@ export class ContactStatusManager {
     updateStatusElements(statusData, translateFn = null) {
         const statusElement = document.getElementById('restaurantStatus');
         const statusText = document.getElementById('statusText');
-        
+
         if (statusElement) {
             statusElement.className = `status status-${statusData.status}`;
         }
-        
+
         if (statusText) {
-            statusText.textContent = statusData.message || statusData.fullMessage || 'Estado desconocido';
+            const message = statusData.message || statusData.fullMessage || 'Estado desconocido';
+            // Mantener el formato HTML con <strong>
+            statusText.innerHTML = `<strong>${message}</strong>`;
         }
     }
 }

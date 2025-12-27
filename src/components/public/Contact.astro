@@ -298,14 +298,38 @@ const {
         background: var(--error);
     }
 
-    .status.status-closingSoon {
+    .status.status-open {
+        background: var(--success-light);
+        color: var(--success);
+        border-color: var(--success);
+    }
+
+    .status.status-open .status-dot {
+        background: var(--success);
+    }
+
+    .status.status-closingSoon,
+    .status.status-closing_soon {
         background: var(--warning-light);
         color: var(--warning);
         border-color: var(--warning);
     }
 
-    .status.status-closingSoon .status-dot {
+    .status.status-closingSoon .status-dot,
+    .status.status-closing_soon .status-dot {
         background: var(--warning);
+    }
+
+    .status.status-openingSoon,
+    .status.status-opening_soon {
+        background: var(--info-light);
+        color: var(--info);
+        border-color: var(--info);
+    }
+
+    .status.status-openingSoon .status-dot,
+    .status.status-opening_soon .status-dot {
+        background: var(--info);
     }
 
     .contact-content {
@@ -804,6 +828,7 @@ const {
         useBreakpoints,
         disableTransitionsDuringResize,
     } from "../../utils/breakpoints.js";
+    import { ContactStatusManager } from "../../services/ContactService.js";
 
     document.addEventListener("DOMContentLoaded", () => {
         const contactSection = document.querySelector(".contact-section");
@@ -828,6 +853,31 @@ const {
 
         window.addEventListener("beforeunload", () => {
             breakpoints.unsubscribe();
+        });
+
+        // Inicializar monitoreo del estado del restaurante
+        const locale = document.documentElement.lang || 'es';
+        const statusManager = new ContactStatusManager(locale);
+
+        // Actualizar estado inmediatamente al cargar la página
+        statusManager.updateStatus().then(() => {
+            const statusData = statusManager.lastStatus;
+            if (statusData) {
+                statusManager.updateStatusElements(statusData);
+            }
+        });
+
+        // Monitorear cambios cada minuto
+        statusManager.onStatusChange((newStatus, oldStatus) => {
+            console.debug('Restaurant status changed:', oldStatus?.status, '→', newStatus.status);
+            statusManager.updateStatusElements(newStatus);
+        });
+
+        statusManager.startMonitoring(60000); // Actualizar cada minuto
+
+        // Limpiar al descargar la página
+        window.addEventListener("beforeunload", () => {
+            statusManager.stopMonitoring();
         });
     });
 </script>
