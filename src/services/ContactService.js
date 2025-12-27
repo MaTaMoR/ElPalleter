@@ -308,14 +308,13 @@ export class ContactService {
     static async getGroupedSchedule(language = 'es') {
         try {
             const { schedules } = await ContactRepository.getTranslatedRestaurantInfo(language);
-            const legacySchedule = this.convertSchedulesToLegacyFormat(schedules);
-            
+
             const scheduleGroups = new Map();
 
             schedules.forEach((schedule, index) => {
                 const dayName = schedule.dayOfWeek.toLowerCase();
                 if (DAY_NAMES.indexOf(dayName) !== -1) {
-                    const daySchedule = legacySchedule[dayName];
+                    const daySchedule = schedules[dayName];
                 
                     let scheduleKey;
                     if (!daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0) {
