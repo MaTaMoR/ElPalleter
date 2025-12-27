@@ -6,7 +6,6 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { Extension } from '@tiptap/core';
-import BoldExtension from '@tiptap/extension-bold';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import CustomColorPicker from './CustomColorPicker';
 
