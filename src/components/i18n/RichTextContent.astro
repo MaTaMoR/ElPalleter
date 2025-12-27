@@ -1,0 +1,99 @@
+---
+/**
+ * Componente para mostrar contenido de texto rico en Astro
+ *
+ * @param {string} content - Contenido HTML generado por TipTap
+ * @param {string} className - Clase CSS adicional
+ */
+interface Props {
+  content: string;
+  className?: string;
+}
+
+const { content, className = '' } = Astro.props;
+---
+
+<div class={`rich-text-content ${className}`} set:html={content} />
+
+<style>
+  .rich-text-content {
+    line-height: 1.6;
+  }
+
+  .rich-text-content :global(p) {
+    margin: 0 0 1em 0;
+    line-height: 1.6;
+  }
+
+  .rich-text-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .rich-text-content :global(h1) {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.5em 0;
+    line-height: 1.2;
+  }
+
+  .rich-text-content :global(h2) {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.5em 0;
+    line-height: 1.3;
+  }
+
+  .rich-text-content :global(h3) {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0.5em 0;
+    line-height: 1.4;
+  }
+
+  .rich-text-content :global(strong) {
+    font-weight: bold;
+  }
+
+  .rich-text-content :global(em) {
+    font-style: italic;
+  }
+
+  .rich-text-content :global(u) {
+    text-decoration: underline;
+  }
+
+  .rich-text-content :global(ul),
+  .rich-text-content :global(ol) {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+  }
+
+  .rich-text-content :global(ul) {
+    list-style-type: disc;
+  }
+
+  .rich-text-content :global(ol) {
+    list-style-type: decimal;
+  }
+
+  .rich-text-content :global(li) {
+    margin: 0.25em 0;
+    line-height: 1.6;
+  }
+
+  .rich-text-content :global([style*="text-align: left"]) {
+    text-align: left;
+  }
+
+  .rich-text-content :global([style*="text-align: center"]) {
+    text-align: center;
+  }
+
+  .rich-text-content :global([style*="text-align: right"]) {
+    text-align: right;
+  }
+
+  .rich-text-content :global([style*="text-align: justify"]) {
+    text-align: justify;
+  }
+</style>

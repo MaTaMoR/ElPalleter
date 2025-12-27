@@ -1,0 +1,155 @@
+/* RichContentForm.module.css */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* Rich Content Card - similar to other Settings components */
+.richContentCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeaderReadOnly {
+  justify-content: flex-start;
+}
+
+.cardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardContent {
+  padding: 1.25rem;
+}
+
+/* Empty and Error States */
+.emptyState {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem 1rem;
+  font-style: italic;
+}
+
+.errorState {
+  text-align: center;
+  color: var(--danger);
+  padding: 2rem 1rem;
+  background: var(--danger-bg, #fee);
+  border-radius: 6px;
+}
+
+/* Rich Content Display (read-only mode) */
+.richContentDisplay {
+  line-height: 1.6;
+  color: var(--text-primary, #1f2937);
+}
+
+.richContentDisplay p {
+  margin: 0 0 1em 0;
+  line-height: 1.6;
+  color: var(--text-primary, #1f2937);
+}
+
+.richContentDisplay p:last-child {
+  margin-bottom: 0;
+}
+
+.richContentDisplay h1,
+.richContentDisplay h2,
+.richContentDisplay h3 {
+  color: var(--text-primary, #1f2937);
+}
+
+.richContentDisplay h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.5em 0;
+  line-height: 1.2;
+}
+
+.richContentDisplay h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.5em 0;
+  line-height: 1.3;
+}
+
+.richContentDisplay h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0.5em 0;
+  line-height: 1.4;
+}
+
+.richContentDisplay mark {
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
+}
+
+.richContentDisplay strong {
+  font-weight: bold;
+}
+
+.richContentDisplay em {
+  font-style: italic;
+}
+
+.richContentDisplay u {
+  text-decoration: underline;
+}
+
+.richContentDisplay ul,
+.richContentDisplay ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.richContentDisplay ul {
+  list-style-type: disc;
+}
+
+.richContentDisplay ol {
+  list-style-type: decimal;
+}
+
+.richContentDisplay li {
+  margin: 0.25em 0;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cardContent {
+    padding: 1rem;
+  }
+
+  .emptyState,
+  .errorState {
+    padding: 1.5rem 1rem;
+  }
+}

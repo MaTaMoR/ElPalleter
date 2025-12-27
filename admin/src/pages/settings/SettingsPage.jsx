@@ -9,6 +9,7 @@ import SavingOverlay from '../../components/common/SavingOverlay';
 import TranslationsForm from '../../components/settings/TranslationsForm';
 import SingleImageForm from '../../components/settings/SingleImageForm';
 import MultiImageForm from '../../components/settings/MultiImageForm';
+import RichContentForm from '../../components/settings/RichContentForm';
 import styles from './SettingsPage.module.css';
 
 // ============================================================================
@@ -23,12 +24,14 @@ const SettingsContent = () => {
   // Refs to child components
   const singleImageRef = useRef(null);
   const galleryRef = useRef(null);
+  const richContentRef = useRef(null);
   const translationsRef = useRef(null);
 
   // Track which children have changes
   const [childrenHasChanges, setChildrenHasChanges] = useState({
     singleImage: false,
     gallery: false,
+    richContent: false,
     translations: false
   });
 
@@ -83,6 +86,7 @@ const SettingsContent = () => {
     const messageParts = [];
     if (childrenHasChanges.singleImage) messageParts.push('imagen');
     if (childrenHasChanges.gallery) messageParts.push('galería');
+    if (childrenHasChanges.richContent) messageParts.push('contenido rico');
     if (childrenHasChanges.translations) messageParts.push('traducciones');
 
     const message = `¿Estás seguro de que quieres guardar los cambios en ${messageParts.join(', ')}?`;
@@ -110,6 +114,10 @@ const SettingsContent = () => {
             savePromises.push(galleryRef.current.save());
           }
 
+          if (childrenHasChanges.richContent && richContentRef.current) {
+            savePromises.push(richContentRef.current.save());
+          }
+
           if (childrenHasChanges.translations && translationsRef.current) {
             savePromises.push(translationsRef.current.save());
           }
@@ -120,6 +128,7 @@ const SettingsContent = () => {
           setChildrenHasChanges({
             singleImage: false,
             gallery: false,
+            richContent: false,
             translations: false
           });
 
@@ -159,6 +168,7 @@ const SettingsContent = () => {
       setChildrenHasChanges({
         singleImage: false,
         gallery: false,
+        richContent: false,
         translations: false
       });
       return;
@@ -182,6 +192,9 @@ const SettingsContent = () => {
         if (galleryRef.current) {
           galleryRef.current.cancel();
         }
+        if (richContentRef.current) {
+          richContentRef.current.cancel();
+        }
         if (translationsRef.current) {
           translationsRef.current.cancel();
         }
@@ -190,6 +203,7 @@ const SettingsContent = () => {
         setChildrenHasChanges({
           singleImage: false,
           gallery: false,
+          richContent: false,
           translations: false
         });
       }
@@ -286,6 +300,16 @@ const SettingsContent = () => {
                 galleryName="historia"
                 title="Galería de Historia"
                 ref={galleryRef}
+                onHasChangesChange={handleChildHasChangesChange}
+                isEditing={isEditing}
+              />
+              {/* Rich Content Section */}
+              <RichContentForm
+                id="richContent"
+                contentKey="historia_content"
+                title="Contenido de Historia"
+                language={selectedLanguage}
+                ref={richContentRef}
                 onHasChangesChange={handleChildHasChangesChange}
                 isEditing={isEditing}
               />
