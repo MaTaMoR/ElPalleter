@@ -46,7 +46,7 @@
   align-items: center;
 }
 
-.hueSliderFill {
+.hueSliderBackground {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -114,10 +114,10 @@
   background: transparent;
   cursor: pointer;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-/* Range Track */
+/* Range Track - transparent to show background divs */
 .rangeInput::-webkit-slider-runnable-track {
   width: 100%;
   height: 8px;
@@ -138,6 +138,7 @@
   appearance: none;
   width: 18px;
   height: 18px;
+  margin-top: -5px;
   border: 2px solid white;
   border-radius: 50%;
   background: white;

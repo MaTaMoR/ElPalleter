@@ -6,7 +6,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { Extension } from '@tiptap/core';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import CustomColorPicker from './CustomColorPicker';
 
 // FontSize extension for inline font size control
@@ -96,7 +96,7 @@ const BACKGROUND_COLOR_PRESETS = [
   '#E0E7FF', '#FCE7F3', '#F5F3FF', '#FED7AA', '#E5E7EB', '#1F2937', '#0A0A0A'
 ];
 
-const TEXT_COLOR_DEFAULT_COLOR = '#000000';
+const TEXT_COLOR_DEFAULT_COLOR = '#FFFFFF';
 const HIGHLIGHT_COLOR_DEFAULT_COLOR = '#FFFF00';
 const BACKGROUND_DEFAULT_COLOR = '#000000';
 
@@ -140,18 +140,18 @@ const ColorPickerButton = ({
     }
   }, [isOpen, onClose]);
 
-  const handleColorChange = (color) => {
+  const handleColorChange = useCallback((color) => {
     if (onColorChange) {
       onColorChange(color.hex);
     }
-  };
+  }, [onColorChange]);
 
-  const handleRemove = () => {
+  const handleRemove = useCallback(() => {
     if (onRemove) {
       onRemove();
     }
     onClose();
-  };
+  }, [onRemove, onClose]);
 
   return (
     <div className={styles.colorPickerWrapper}>
@@ -203,13 +203,21 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
   const [, forceUpdate] = useState({});
   const savedTextColorSelection = useRef(null);
   const savedHighlightSelection = useRef(null);
+  const isColorPickerActive = useRef(false);
+  
+  // Store the color when picker opens (to handle multi-color selections)
+  const [activeTextColor, setActiveTextColor] = useState(null);
+  const [activeHighlightColor, setActiveHighlightColor] = useState(null);
 
-  // Force re-render when editor selection changes
+  // Force re-render when editor selection changes (but not when color picker is active)
   useEffect(() => {
     if (!editor) return;
 
     const updateHandler = () => {
-      forceUpdate({});
+      // Don't force update while color picker is active to prevent drag interruption
+      if (!isColorPickerActive.current) {
+        forceUpdate({});
+      }
     };
 
     editor.on('selectionUpdate', updateHandler);
@@ -232,6 +240,62 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
     { label: 'Pequeño', value: '0.875em' },
   ];
 
+  // Helper function to check if selection has consistent color
+  const getSelectionColor = (attributeType) => {
+    const { from, to } = editor.state.selection;
+    
+    // If no selection (cursor only), return current mark color
+    if (from === to) {
+      if (attributeType === 'color') {
+        return editor.getAttributes('textStyle').color || null;
+      } else {
+        return editor.getAttributes('highlight').color || null;
+      }
+    }
+    
+    let foundColor = undefined; // undefined = not found yet
+    let isConsistent = true;
+    
+    editor.state.doc.nodesBetween(from, to, (node, pos) => {
+      // Stop if already inconsistent
+      if (!isConsistent) return false;
+      
+      // Only process text nodes
+      if (!node.isText) return;
+      
+      // Calculate overlap between this text node and our selection
+      const nodeStart = pos;
+      const nodeEnd = pos + node.nodeSize;
+      const overlapStart = Math.max(from, nodeStart);
+      const overlapEnd = Math.min(to, nodeEnd);
+      
+      // Skip if no actual overlap
+      if (overlapStart >= overlapEnd) return;
+      
+      // Get color from this text node's marks
+      let colorInNode = null;
+      for (const mark of node.marks) {
+        if (attributeType === 'color' && mark.type.name === 'textStyle' && mark.attrs.color) {
+          colorInNode = mark.attrs.color;
+          break;
+        } else if (attributeType === 'highlight' && mark.type.name === 'highlight' && mark.attrs.color) {
+          colorInNode = mark.attrs.color;
+          break;
+        }
+      }
+      
+      // Check consistency
+      if (foundColor === undefined) {
+        foundColor = colorInNode;
+      } else if (foundColor !== colorInNode) {
+        isConsistent = false;
+      }
+    });
+    
+    // Return color only if consistent, otherwise null (will use default)
+    return isConsistent ? (foundColor ?? null) : null;
+  };
+
   // Picker handlers
   const handleTogglePicker = (pickerType) => {
     const newState = openPicker === pickerType ? null : pickerType;
@@ -240,18 +304,36 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
     if (newState === 'text') {
       const { from, to } = editor.state.selection;
       savedTextColorSelection.current = { from, to };
+      isColorPickerActive.current = true;
+      // Get current color of selection (or null if multiple colors)
+      setActiveTextColor(TEXT_COLOR_DEFAULT_COLOR);
     }
 
     // Save selection when opening highlight picker
     if (newState === 'highlight') {
       const { from, to } = editor.state.selection;
       savedHighlightSelection.current = { from, to };
+      isColorPickerActive.current = true;
+      // Get current highlight color of selection (or null if multiple colors)
+      setActiveHighlightColor(HIGHLIGHT_COLOR_DEFAULT_COLOR);
+    }
+
+    if (newState === 'editorBackground') {
+      isColorPickerActive.current = true;
+    }
+
+    // If closing picker, mark as inactive and clear active colors
+    if (newState === null) {
+      isColorPickerActive.current = false;
+      setActiveTextColor(null);
+      setActiveHighlightColor(null);
     }
 
     setOpenPicker(newState);
   };
 
   const handleClosePicker = () => {
+    isColorPickerActive.current = false;
     setOpenPicker(null);
   };
 
@@ -300,53 +382,46 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
     editor.chain().focus().setTextAlign(alignment).run();
   };
 
-  // Color handlers
-  const handleTextColorChange = (hexColor) => {
+  // Color handlers - DON'T use focus() to avoid stealing focus from slider
+  const handleTextColorChange = useCallback((hexColor) => {
     if (savedTextColorSelection.current) {
       const { from, to } = savedTextColorSelection.current;
       if (from !== to) {
-        editor.chain()
-          .focus()
+        // Use withoutFocus pattern: set selection and color without stealing focus
+        editor
+          .chain()
           .setTextSelection({ from, to })
           .setColor(hexColor)
           .run();
       }
     }
-  };
+  }, [editor]);
 
-  const handleTextColorRemove = () => {
+  const handleTextColorRemove = useCallback(() => {
     editor.chain().focus().unsetColor().run();
-  };
+  }, [editor]);
 
-  const handleHighlightColorChange = (hexColor) => {
+  const handleHighlightColorChange = useCallback((hexColor) => {
     if (savedHighlightSelection.current) {
       const { from, to } = savedHighlightSelection.current;
       if (from !== to) {
-        editor.chain()
-          .focus()
+        // Use withoutFocus pattern: set selection and highlight without stealing focus
+        editor
+          .chain()
           .setTextSelection({ from, to })
           .setHighlight({ color: hexColor })
           .run();
       }
     }
-  };
+  }, [editor]);
 
-  const handleHighlightRemove = () => {
+  const handleHighlightRemove = useCallback(() => {
     editor.chain().focus().unsetHighlight().run();
-  };
+  }, [editor]);
 
-  const handleEditorBackgroundReset = () => {
+  const handleEditorBackgroundReset = useCallback(() => {
     onEditorBackgroundChange(BACKGROUND_DEFAULT_COLOR);
-  };
-
-  // Get current colors
-  const getCurrentTextColor = () => {
-    return editor.getAttributes('textStyle').color || null;
-  };
-
-  const getCurrentHighlightColor = () => {
-    return editor.getAttributes('highlight').color || null;
-  };
+  }, [onEditorBackgroundChange]);
 
   return (
     <div className={styles.menuBar}>
@@ -485,7 +560,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           icon={<Palette size={18} />}
           presetColors={TEXT_COLOR_PRESETS}
           defaultColor={TEXT_COLOR_DEFAULT_COLOR}
-          currentColor={getCurrentTextColor()}
+          currentColor={activeTextColor}
           isOpen={openPicker === 'text'}
           onToggle={() => handleTogglePicker('text')}
           onClose={handleClosePicker}
@@ -498,7 +573,7 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
           icon={<Highlighter size={18} />}
           presetColors={HIGHLIGHT_COLOR_PRESETS}
           defaultColor={HIGHLIGHT_COLOR_DEFAULT_COLOR}
-          currentColor={getCurrentHighlightColor()}
+          currentColor={activeHighlightColor}
           isOpen={openPicker === 'highlight'}
           onToggle={() => handleTogglePicker('highlight')}
           onClose={handleClosePicker}
@@ -570,9 +645,9 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
     }
   }, [disabled, editor]);
 
-  const handleEditorBackgroundChange = (color) => {
+  const handleEditorBackgroundChange = useCallback((color) => {
     setEditorBackgroundColor(color);
-  };
+  }, []);
 
   return (
     <div className={`${styles.richTextEditor} ${disabled ? styles.disabled : ''}`}>

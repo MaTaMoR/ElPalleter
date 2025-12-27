@@ -87,6 +87,24 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 
   const canvasRef = useRef(null);
   const isDraggingCanvas = useRef(false);
+  const isDraggingSlider = useRef(false);
+  
+  // Track the last color prop to detect external changes
+  const lastColorProp = useRef(color);
+
+  // Sync internal state when color prop changes from outside
+  useEffect(() => {
+    if (color !== lastColorProp.current) {
+      lastColorProp.current = color;
+      const rgb = hexToRgb(color);
+      if (rgb) {
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        setHue(hsv.h);
+        setSaturation(hsv.s);
+        setValue(hsv.v);
+      }
+    }
+  }, [color]);
 
   // Helper function to notify parent of color changes
   const notifyColorChange = (h, s, v, a) => {
@@ -146,6 +164,15 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
     notifyColorChange(hue, newSaturation, newValue, alpha);
   };
 
+  // Slider handlers - mark as dragging to prevent external interference
+  const handleSliderMouseDown = () => {
+    isDraggingSlider.current = true;
+  };
+
+  const handleSliderMouseUp = () => {
+    isDraggingSlider.current = false;
+  };
+
   // Update local state during drag without notifying parent
   const handleHueSliderInput = (e) => {
     const newHue = parseFloat(e.target.value);
@@ -155,6 +182,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   // Notify parent only when user releases the slider
   const handleHueSliderChange = (e) => {
     const newHue = parseFloat(e.target.value);
+    setHue(newHue);
     notifyColorChange(newHue, saturation, value, alpha);
   };
 
@@ -167,6 +195,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
   // Notify parent only when user releases the slider
   const handleAlphaSliderChange = (e) => {
     const newAlpha = parseFloat(e.target.value);
+    setAlpha(newAlpha);
     notifyColorChange(hue, saturation, value, newAlpha);
   };
 
@@ -178,6 +207,7 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 
   const handleMouseUp = () => {
     isDraggingCanvas.current = false;
+    isDraggingSlider.current = false;
   };
 
   useEffect(() => {
@@ -288,47 +318,17 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
           {/* Hue Slider */}
           <div className={styles.sliderWrapper}>
             <div className={styles.hueSlider}>
+              <div className={styles.hueSliderBackground} />
               <input
                 type="range"
                 min="0"
                 max="360"
                 step="1"
                 value={hue}
+                onMouseDown={handleSliderMouseDown}
+                onMouseUp={handleSliderMouseUp}
                 onInput={handleHueSliderInput}
                 onChange={handleHueSliderChange}
-                className={styles.rangeInput}
-                style={{
-                  background: `linear-gradient(to right,
-                    hsl(0, 100%, 50%),
-                    hsl(60, 100%, 50%),
-                    hsl(120, 100%, 50%),
-                    hsl(180, 100%, 50%),
-                    hsl(240, 100%, 50%),
-                    hsl(300, 100%, 50%),
-                    hsl(360, 100%, 50%))`
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Alpha Slider */}
-          <div className={styles.sliderWrapper}>
-            <div className={styles.alphaSlider}>
-              <div className={styles.alphaSliderBackground} />
-              <div
-                className={styles.alphaSliderFill}
-                style={{
-                  background: `linear-gradient(to right, transparent, ${currentHex})`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={alpha}
-                onInput={handleAlphaSliderInput}
-                onChange={handleAlphaSliderChange}
                 className={styles.rangeInput}
               />
             </div>
@@ -415,7 +415,6 @@ const CustomColorPicker = ({ color = '#4F46E5', onChange, presetColors = [], onR
 };
 
 // Custom comparison function to prevent unnecessary re-renders
-// Only re-render if color or preset colors change
 const arePropsEqual = (prevProps, nextProps) => {
   return (
     prevProps.color === nextProps.color &&
