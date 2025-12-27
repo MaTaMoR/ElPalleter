@@ -6,6 +6,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { Extension } from '@tiptap/core';
+import BoldExtension from '@tiptap/extension-bold';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import CustomColorPicker from './CustomColorPicker';
 
@@ -55,6 +56,35 @@ const FontSize = Extension.create({
           .run();
       },
     };
+  },
+});
+
+// Custom Color extension that preserves inline colors from any element
+const CustomColor = Color.extend({
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          color: {
+            default: null,
+            parseHTML: (element) => {
+              // Extract color from style attribute of ANY element
+              // This includes <strong>, <em>, <span>, etc.
+              return element.style.color || null;
+            },
+            renderHTML: (attributes) => {
+              if (!attributes.color) {
+                return {};
+              }
+              return {
+                style: `color: ${attributes.color}`,
+              };
+            },
+          },
+        },
+      },
+    ];
   },
 });
 import {
@@ -615,7 +645,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
       }),
       TextStyle,
       FontSize,
-      Color,
+      CustomColor, // Use custom color that preserves inline styles from any element
       Highlight.configure({
         multicolor: true,
       }),
