@@ -829,8 +829,9 @@ const {
         disableTransitionsDuringResize,
     } from "../../utils/breakpoints.js";
     import { ContactStatusManager } from "../../services/ContactService.js";
+    import { I18nService } from "../../services/I18nService.js";
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         const contactSection = document.querySelector(".contact-section");
         const contactSections = document.querySelectorAll(
             ".contact-info-section",
@@ -854,6 +855,13 @@ const {
         window.addEventListener("beforeunload", () => {
             breakpoints.unsubscribe();
         });
+
+        // Inicializar I18nService antes de usar el status manager
+        try {
+            await I18nService.init();
+        } catch (error) {
+            console.warn('Failed to initialize I18nService:', error);
+        }
 
         // Inicializar monitoreo del estado del restaurante
         const locale = document.documentElement.lang || 'es';
