@@ -10,7 +10,7 @@
   --bg-primary: #0a0a0a;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #2a2a2a;
-  --bg-card: rgba(26, 26, 26, 0.5);
+  --bg-card: rgba(26, 26, 26);
   
   /* Colores de texto */
   --text-primary: #ffffff;

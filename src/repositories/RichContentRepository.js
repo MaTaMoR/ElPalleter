@@ -11,7 +11,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Obtiene todo el contenido rico de un idioma
-     * GET /i18n/rich-content/{languageCode}
+     * GET /rich-content/{languageCode}
      * @param {string} languageCode - Código del idioma (es, en, val)
      * @returns {Promise<Array<Object>>} Array de objetos RichContentDTO
      */
@@ -21,7 +21,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return (await this.get(`/i18n/rich-content/${languageCode}`)) || [];
+            return (await this.get(`/rich-content/${languageCode}`)) || [];
         } catch (error) {
             console.error(`RichContentRepository: Error getting content for language ${languageCode}:`, error);
             throw error;
@@ -30,7 +30,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Obtiene un contenido específico por idioma y clave
-     * GET /i18n/rich-content/{languageCode}/{contentKey}
+     * GET /rich-content/{languageCode}/{contentKey}
      * @param {string} languageCode - Código del idioma (es, en, val)
      * @param {string} contentKey - Clave del contenido (e.g., "historia_content")
      * @returns {Promise<Object>} RichContentDTO específico
@@ -41,7 +41,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return await this.get(`/i18n/rich-content/${languageCode}/${contentKey}`);
+            return await this.get(`/rich-content/${languageCode}/${contentKey}`);
         } catch (error) {
             console.error(`RichContentRepository: Error getting content ${contentKey} for language ${languageCode}:`, error);
             throw error;
@@ -50,7 +50,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Busca contenido en todos los idiomas
-     * GET /i18n/rich-content/search?keyPart=texto
+     * GET /rich-content/search?keyPart=texto
      * @param {string} keyPart - Parte de la clave a buscar
      * @returns {Promise<Array<Object>>} Array de objetos RichContentDTO que coinciden
      */
@@ -60,7 +60,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return (await this.get('/i18n/rich-content/search', {
+            return (await this.get('/rich-content/search', {
                 params: { keyPart }
             })) || [];
         } catch (error) {
@@ -71,7 +71,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Busca contenido en un idioma específico
-     * GET /i18n/rich-content/{languageCode}/search?keyPart=texto
+     * GET /rich-content/{languageCode}/search?keyPart=texto
      * @param {string} languageCode - Código del idioma (es, en, val)
      * @param {string} keyPart - Parte de la clave a buscar
      * @returns {Promise<Array<Object>>} Array de objetos RichContentDTO que coinciden
@@ -82,7 +82,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return (await this.get(`/i18n/rich-content/${languageCode}/search`, {
+            return (await this.get(`/rich-content/${languageCode}/search`, {
                 params: { keyPart }
             })) || [];
         } catch (error) {
@@ -129,7 +129,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Crea un nuevo contenido rico
-     * POST /i18n/rich-content
+     * POST /rich-content
      * @param {Object} richContentDTO - Objeto { language, contentKey, contentValue }
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} RichContentDTO creado
@@ -144,7 +144,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return await this.post('/i18n/rich-content', richContentDTO, {
+            return await this.post('/rich-content', richContentDTO, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
@@ -155,7 +155,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Actualiza un contenido rico existente
-     * PUT /i18n/rich-content
+     * PUT /rich-content
      * @param {Object} richContentDTO - Objeto { language, contentKey, contentValue }
      * @param {string} token - Token de autenticación
      * @returns {Promise<Object>} RichContentDTO actualizado
@@ -170,7 +170,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return await this.put('/i18n/rich-content', richContentDTO, {
+            return await this.put('/rich-content', richContentDTO, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
@@ -181,7 +181,7 @@ export class RichContentRepository extends BaseRepository {
 
     /**
      * Elimina un contenido rico
-     * DELETE /i18n/rich-content/{languageCode}/{contentKey}
+     * DELETE /rich-content/{languageCode}/{contentKey}
      * @param {string} languageCode - Código del idioma
      * @param {string} contentKey - Clave del contenido
      * @param {string} token - Token de autenticación
@@ -197,7 +197,7 @@ export class RichContentRepository extends BaseRepository {
         }
 
         try {
-            return await this.delete(`/i18n/rich-content/${languageCode}/${contentKey}`, {
+            return await this.delete(`/rich-content/${languageCode}/${contentKey}`, {
                 headers: this.getAuthHeaders(token)
             });
         } catch (error) {
@@ -313,13 +313,13 @@ export class RichContentRepository extends BaseRepository {
                 service: 'RichContentRepository',
                 backend: this.getBaseUrl(),
                 endpoints: {
-                    byLanguage: '/i18n/rich-content/{languageCode}',
-                    byLanguageAndKey: '/i18n/rich-content/{languageCode}/{contentKey}',
-                    search: '/i18n/rich-content/search',
-                    searchByLanguage: '/i18n/rich-content/{languageCode}/search',
-                    create: 'POST /i18n/rich-content',
-                    update: 'PUT /i18n/rich-content',
-                    delete: 'DELETE /i18n/rich-content/{languageCode}/{contentKey}'
+                    byLanguage: '/rich-content/{languageCode}',
+                    byLanguageAndKey: '/rich-content/{languageCode}/{contentKey}',
+                    search: '/rich-content/search',
+                    searchByLanguage: '/rich-content/{languageCode}/search',
+                    create: 'POST /rich-content',
+                    update: 'PUT /rich-content',
+                    delete: 'DELETE /rich-content/{languageCode}/{contentKey}'
                 },
                 contentCount: content.length,
                 lastCheck: new Date().toISOString()
@@ -342,13 +342,13 @@ export class RichContentRepository extends BaseRepository {
         return {
             baseUrl: this.getBaseUrl(),
             endpoints: {
-                byLanguage: '/i18n/rich-content/{languageCode}',
-                byLanguageAndKey: '/i18n/rich-content/{languageCode}/{contentKey}',
-                search: '/i18n/rich-content/search',
-                searchByLanguage: '/i18n/rich-content/{languageCode}/search',
-                create: 'POST /i18n/rich-content',
-                update: 'PUT /i18n/rich-content',
-                delete: 'DELETE /i18n/rich-content/{languageCode}/{contentKey}'
+                byLanguage: '/rich-content/{languageCode}',
+                byLanguageAndKey: '/rich-content/{languageCode}/{contentKey}',
+                search: '/rich-content/search',
+                searchByLanguage: '/rich-content/{languageCode}/search',
+                create: 'POST /rich-content',
+                update: 'PUT /rich-content',
+                delete: 'DELETE /rich-content/{languageCode}/{contentKey}'
             }
         };
     }
