@@ -82,7 +82,7 @@
 
 .editorContent :global(.ProseMirror p) {
   margin: 0 0 1em 0;
-  color: var(--text-primary, #1f2937);
+  /* Removed fixed color to allow inline styles */
 }
 
 .editorContent :global(.ProseMirror p:last-child) {
@@ -92,7 +92,7 @@
 .editorContent :global(.ProseMirror h1),
 .editorContent :global(.ProseMirror h2),
 .editorContent :global(.ProseMirror h3) {
-  color: var(--text-primary, #1f2937);
+  /* Removed fixed color to allow inline styles */
 }
 
 .editorContent :global(.ProseMirror h1) {

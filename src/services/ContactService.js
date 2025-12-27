@@ -2,6 +2,8 @@ import { ContactRepository } from '../repositories/ContactRepository.js';
 import { I18nService } from './I18nService.js';
 import { AuthService } from './AuthService.js';
 
+const DAY_NAMES = [ 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday' ];
+
 /**
  * Servicio de contacto actualizado para usar el backend Spring Boot
  * Reemplaza los datos estáticos con llamadas a la API
@@ -29,7 +31,7 @@ export class ContactService {
      */
     static async getRestaurantStatus(language = 'es') {
         try {
-            const schedules = await ContactRepository.getSchedules(language);
+            const { schedules } = await ContactRepository.getTranslatedRestaurantInfo(language);
             
             const now = new Date();
             const currentDay = now.getDay(); // 0 = domingo, 1 = lunes, etc.
@@ -205,36 +207,6 @@ export class ContactService {
     }
 
     /**
-     * Obtiene horarios del restaurante
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de horarios por día
-     */
-    static async getSchedules(language = 'es') {
-        try {
-            return await ContactRepository.getTranslatedRestaurantInfo(language);
-        } catch (error) {
-            console.error('ContactService: Error getting schedules:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene redes sociales activas
-     * @param {string} language - Código de idioma
-     * @returns {Promise<Array>} Array de redes sociales habilitadas
-     */
-    static async getEnabledSocials(language = 'es') {
-        try {
-            const restaurantInfo = await ContactRepository.getTranslatedRestaurantInfo(language);
-            const socialMedias = restaurantInfo.socialMedias || [];
-            return socialMedias.filter(social => social.enabled === true);
-        } catch (error) {
-            console.error('ContactService: Error getting enabled socials:', error);
-            throw error;
-        }
-    }
-
-    /**
      * Actualiza la información completa del restaurante
      * @param {Object} restaurantData - Datos del restaurante a actualizar
      * @param {string} language - Código de idioma
@@ -286,20 +258,11 @@ export class ContactService {
      */
     static convertSchedulesToLegacyFormat(schedulesFromBackend) {
         const legacySchedule = {};
-        const dayMapping = {
-            'sunday': 'sunday',
-            'monday': 'monday', 
-            'tuesday': 'tuesday',
-            'wednesday': 'wednesday',
-            'thursday': 'thursday',
-            'friday': 'friday',
-            'saturday': 'saturday'
-        };
 
         schedulesFromBackend.forEach(schedule => {
-            const dayKey = dayMapping[schedule.dayOfWeek.toLowerCase()];
-            if (dayKey) {
-                legacySchedule[dayKey] = {
+            const dayName = schedule.dayOfWeek.toLowerCase();
+            if (DAY_NAMES.indexOf(dayName) !== -1) {
+                legacySchedule[dayName] = {
                     open: schedule.isOpen,
                     ranges: schedule.scheduleRanges?.map(range => ({
                         nameKey: range.nameKey,
@@ -344,46 +307,45 @@ export class ContactService {
      */
     static async getGroupedSchedule(language = 'es') {
         try {
-            const schedules = await this.getSchedules(language);
-            const legacySchedule = this.convertSchedulesToLegacyFormat(schedules);
-            
+            const { schedules } = await ContactRepository.getTranslatedRestaurantInfo(language);
+
             const scheduleGroups = new Map();
-            const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            
-            dayNames.forEach((dayName, index) => {
-                const daySchedule = legacySchedule[dayName];
-                
-                let scheduleKey;
-                if (!daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0) {
-                    scheduleKey = 'CLOSED';
-                } else {
-                    const sortedRanges = [...daySchedule.ranges].sort((a, b) => 
-                        this.timeToMinutes(a.start) - this.timeToMinutes(b.start)
-                    );
-                    scheduleKey = sortedRanges.map(range => 
-                        `${range.nameKey || range.name || 'Sin nombre'}:${range.start}-${range.end}`
-                    ).join('|');
-                }
-                
-                if (!scheduleGroups.has(scheduleKey)) {
-                    scheduleGroups.set(scheduleKey, {
-                        days: [],
-                        dayIndexes: [],
-                        ranges: daySchedule && daySchedule.open ? daySchedule.ranges || [] : [],
-                        closed: !daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0
-                    });
-                }
 
-                // Obtener nombre traducido del día
-                const dayTranslationKey = `contact.days.${dayName}`;
-                const translatedDay = I18nService.getTranslation ? 
-                    I18nService.getTranslation(dayTranslationKey, language, dayName) : 
-                    dayName;
+            schedules.forEach((schedule, index) => {
+                const dayName = schedule.dayOfWeek.toLowerCase();
+                if (DAY_NAMES.indexOf(dayName) !== -1) {
+                    const daySchedule = schedules[dayName];
+                
+                    let scheduleKey;
+                    if (!daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0) {
+                        scheduleKey = 'CLOSED';
+                    } else {
+                        const sortedRanges = [...daySchedule.ranges].sort((a, b) => 
+                            this.timeToMinutes(a.start) - this.timeToMinutes(b.start)
+                        );
+                        scheduleKey = sortedRanges.map(range => 
+                            `${range.nameKey || range.name || 'Sin nombre'}:${range.start}-${range.end}`
+                        ).join('|');
+                    }
+                    
+                    if (!scheduleGroups.has(scheduleKey)) {
+                        scheduleGroups.set(scheduleKey, {
+                            days: [],
+                            dayIndexes: [],
+                            ranges: daySchedule && daySchedule.open ? daySchedule.ranges || [] : [],
+                            closed: !daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0
+                        });
+                    }
 
-                scheduleGroups.get(scheduleKey).days.push(translatedDay);
-                scheduleGroups.get(scheduleKey).dayIndexes.push(index);
-            });
-            
+                    // Obtener nombre traducido del día
+                    const dayTranslationKey = `contact.days.${dayName}`;
+                    const translatedDay = I18nService.getTranslation(dayTranslationKey, language, dayName);
+
+                    scheduleGroups.get(scheduleKey).days.push(translatedDay);
+                    scheduleGroups.get(scheduleKey).dayIndexes.push(index);
+                }
+            })
+
             const result = Array.from(scheduleGroups.values()).map(group => ({
                 ...group,
                 daysDisplay: this.formatDaysRange(group.days, group.dayIndexes, language),
@@ -454,35 +416,18 @@ export class ContactService {
     }
 
     /**
-     * Obtiene la dirección completa formateada
-     * @param {string} language - Código de idioma
-     * @returns {Promise<string>} Dirección completa
-     */
-    static async getFullAddress(language = 'es') {
-        try {
-            const contactInfo = await this.getContactInfo(language);
-            if (!contactInfo) return '';
-            
-            return `${contactInfo.street}, ${contactInfo.postalCode} ${contactInfo.city}, ${contactInfo.province}`;
-        } catch (error) {
-            console.error('ContactService: Error getting full address:', error);
-            return '';
-        }
-    }
-
-    /**
      * Genera datos estructurados para JSON-LD
      * @param {string} language - Código de idioma
      * @returns {Promise<Object>} Datos estructurados del restaurante
      */
     static async getStructuredData(language = 'es') {
         try {
-            const [restaurantInfo, contactInfo, schedules, socials] = await Promise.all([
-                this.getContactData(language),
-                this.getContactInfo(language),
-                this.getSchedules(language),
-                this.getEnabledSocials(language)
-            ]);
+            const {
+                name,
+                contactInfo,
+                schedules,
+                socialMedias
+            } =  await ContactRepository.getTranslatedRestaurantInfo(language);
 
             // Generar especificación de horarios para schema.org
             const openingHours = [];
@@ -502,7 +447,7 @@ export class ContactService {
             return {
                 "@context": "https://schema.org",
                 "@type": "Restaurant",
-                "name": restaurantInfo.name,
+                "name": name,
                 "address": {
                     "@type": "PostalAddress",
                     "streetAddress": contactInfo.street,
@@ -515,7 +460,7 @@ export class ContactService {
                 "email": contactInfo.emailMain,
                 "url": contactInfo.website,
                 "openingHours": openingHours,
-                "sameAs": socials.map(social => social.url).filter(Boolean),
+                "sameAs": socialMedias.map(social => social.url).filter(Boolean),
                 "servesCuisine": "Mediterranean",
                 "acceptsReservations": true,
                 "priceRange": "$$"
