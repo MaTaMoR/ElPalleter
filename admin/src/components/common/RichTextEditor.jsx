@@ -57,6 +57,49 @@ const FontSize = Extension.create({
     };
   },
 });
+
+// Custom Color extension that preserves inline colors from any element
+const CustomColor = Color.extend({
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          color: {
+            default: null,
+            parseHTML: (element) => {
+              // Extract color from style attribute of ANY element
+              // This includes <strong>, <em>, <span>, etc.
+              const color = element.style.color;
+              if (color) {
+                return color;
+              }
+
+              // Also check if parent has color (for nested elements)
+              let parent = element.parentElement;
+              while (parent && parent.tagName !== 'DIV') {
+                if (parent.style && parent.style.color) {
+                  return parent.style.color;
+                }
+                parent = parent.parentElement;
+              }
+
+              return null;
+            },
+            renderHTML: (attributes) => {
+              if (!attributes.color) {
+                return {};
+              }
+              return {
+                style: `color: ${attributes.color}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+});
 import {
   Bold,
   Italic,
@@ -602,6 +645,72 @@ const MenuBar = ({ editor, onReset, editorBackgroundColor, onEditorBackgroundCha
 const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', disabled = false, onReset }) => {
   const [editorBackgroundColor, setEditorBackgroundColor] = useState(BACKGROUND_DEFAULT_COLOR);
 
+  // Preprocess HTML to wrap colored text in spans
+  const preprocessHTML = (html) => {
+    if (!html) return html;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Find all elements with style.color
+    const elementsWithColor = doc.querySelectorAll('[style*="color"]');
+
+    elementsWithColor.forEach((element) => {
+      const color = element.style.color;
+      if (color && element.tagName !== 'SPAN') {
+        // Don't wrap if already a span
+        // Create a span with the color
+        const span = doc.createElement('span');
+        span.style.color = color;
+
+        // Move all children to the span
+        while (element.firstChild) {
+          span.appendChild(element.firstChild);
+        }
+
+        // Append span to the element and remove color from element
+        element.appendChild(span);
+        element.style.color = '';
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
+  // Postprocess HTML to unwrap spans and move color to parent
+  const postprocessHTML = (html) => {
+    if (!html) return html;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Find strong/em/u elements that contain only a span with color
+    const inlineElements = doc.querySelectorAll('strong, em, u, b, i');
+
+    inlineElements.forEach((element) => {
+      // Check if this element contains exactly one child and it's a span with color
+      if (element.children.length === 1 && element.children[0].tagName === 'SPAN') {
+        const span = element.children[0];
+        const color = span.style.color;
+
+        if (color) {
+          // Move color to parent element
+          element.style.color = color;
+
+          // Move span's content to parent
+          while (span.firstChild) {
+            element.insertBefore(span.firstChild, span);
+          }
+
+          // Remove the span
+          span.remove();
+        }
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -615,16 +724,17 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
       }),
       TextStyle,
       FontSize,
-      Color,
+      CustomColor, // Use custom color that preserves inline styles from any element
       Highlight.configure({
         multicolor: true,
       }),
     ],
-    content: value || '',
+    content: preprocessHTML(value) || '',
     editable: !disabled,
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
-      const html = editor.getHTML();
+      const rawHtml = editor.getHTML();
+      const html = postprocessHTML(rawHtml);
       if (onChange) {
         onChange({ json, html });
       }
@@ -633,8 +743,11 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Escribe aquí...', dis
 
   // Actualizar el contenido del editor cuando cambie el valor externo
   useEffect(() => {
-    if (editor && value && value !== editor.getHTML()) {
-      editor.commands.setContent(value);
+    if (editor && value) {
+      const currentHtml = postprocessHTML(editor.getHTML());
+      if (value !== currentHtml) {
+        editor.commands.setContent(preprocessHTML(value));
+      }
     }
   }, [value, editor]);
 
