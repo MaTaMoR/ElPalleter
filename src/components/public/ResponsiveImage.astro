@@ -90,10 +90,10 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
 ---
 
 {imageData ? (
-    <div class="responsive-image-wrapper">
+    <div class={`responsive-image-wrapper ${className}`}>
         <div class="image-skeleton"></div>
         <Image
-            class={`responsive-image ${objectFitClass} ${objectPositionClass} ${className}`}
+            class={`responsive-image ${objectFitClass} ${objectPositionClass}`}
             src={imageData}
             alt={altText}
             loading={finalLoading}
@@ -166,7 +166,6 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
     }
 
     .responsive-image {
-        position: relative;
         width: 100%;
         height: 100%;
         display: block;
