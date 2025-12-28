@@ -45,8 +45,9 @@ export class ContactService {
             const todaySchedule = schedules.find(schedule => 
                 schedule.dayOfWeek.toLowerCase() === currentDayName.toLowerCase()
             );
-            
-            if (!todaySchedule || !todaySchedule.isOpen || !todaySchedule.scheduleRanges?.length) {
+
+            const validSchedule = todaySchedule && todaySchedule.isOpen && todaySchedule.scheduleRanges?.length;
+            if (!validSchedule) {
                 return {
                     status: 'closed',
                     isOpen: false,
@@ -250,33 +251,7 @@ export class ContactService {
             throw error;
         }
     }
-
-    /**
-     * MÉTODO LEGACY: Convierte formato del backend al formato legacy para compatibilidad
-     * @param {Array} schedulesFromBackend - Horarios del backend
-     * @returns {Object} Horarios en formato legacy
-     */
-    static convertSchedulesToLegacyFormat(schedulesFromBackend) {
-        const legacySchedule = {};
-
-        schedulesFromBackend.forEach(schedule => {
-            const dayName = schedule.dayOfWeek.toLowerCase();
-            if (DAY_NAMES.indexOf(dayName) !== -1) {
-                legacySchedule[dayName] = {
-                    open: schedule.isOpen,
-                    ranges: schedule.scheduleRanges?.map(range => ({
-                        nameKey: range.nameKey,
-                        name: range.nameKey, // Backend debería manejar las traducciones
-                        start: this.formatTimeFromBackend(range.startTime),
-                        end: this.formatTimeFromBackend(range.endTime)
-                    })) || []
-                };
-            }
-        });
-
-        return legacySchedule;
-    }
-
+    
     /**
      * Formatea tiempo del backend al formato esperado por el frontend
      * @param {string} backendTime - Tiempo en formato del backend (posiblemente ISO)
@@ -311,52 +286,55 @@ export class ContactService {
 
             const scheduleGroups = new Map();
 
-            schedules.forEach((schedule, index) => {
-                const dayName = schedule.dayOfWeek.toLowerCase();
-                if (DAY_NAMES.indexOf(dayName) !== -1) {
-                    const daySchedule = schedules[dayName];
+            DAY_NAMES.forEach((dayName, index) => { 
+                const daySchedule = schedules
+                    .find(schedule => schedule.dayOfWeek.toLowerCase() === dayName.toLowerCase());
+
+                const validSchedule = daySchedule && daySchedule.isOpen && daySchedule.scheduleRanges?.length;
+                let scheduleKey;
                 
-                    let scheduleKey;
-                    if (!daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0) {
-                        scheduleKey = 'CLOSED';
-                    } else {
-                        const sortedRanges = [...daySchedule.ranges].sort((a, b) => 
-                            this.timeToMinutes(a.start) - this.timeToMinutes(b.start)
-                        );
-                        scheduleKey = sortedRanges.map(range => 
-                            `${range.nameKey || range.name || 'Sin nombre'}:${range.start}-${range.end}`
-                        ).join('|');
-                    }
-                    
-                    if (!scheduleGroups.has(scheduleKey)) {
-                        scheduleGroups.set(scheduleKey, {
-                            days: [],
-                            dayIndexes: [],
-                            ranges: daySchedule && daySchedule.open ? daySchedule.ranges || [] : [],
-                            closed: !daySchedule || !daySchedule.open || !daySchedule.ranges || daySchedule.ranges.length === 0
-                        });
-                    }
-
-                    // Obtener nombre traducido del día
-                    const dayTranslationKey = `contact.days.${dayName}`;
-                    const translatedDay = I18nService.getTranslation(dayTranslationKey, language, dayName);
-
-                    scheduleGroups.get(scheduleKey).days.push(translatedDay);
-                    scheduleGroups.get(scheduleKey).dayIndexes.push(index);
+                if (!validSchedule) {
+                    scheduleKey = 'CLOSED';
+                } else {
+                    const sortedRanges = [...daySchedule.scheduleRanges].sort((a, b) => 
+                        this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startEnd)
+                    );
+                    scheduleKey = sortedRanges.map(range => 
+                        `${range.startTime}-${range.endTime}`
+                    ).join('|');
                 }
+                
+                if (!scheduleGroups.has(scheduleKey)) {
+                    scheduleGroups.set(scheduleKey, {
+                        days: [],
+                        dayIndexes: [],
+                        ranges:  daySchedule?.scheduleRanges || [],
+                        closed: !validSchedule || daySchedule.scheduleRanges.length === 0
+                    });
+                }
+
+                // Obtener nombre traducido del día
+                const dayTranslationKey = `contact.days.${dayName}`;
+                const translatedDay = I18nService.getTranslation(dayTranslationKey, language, dayName);
+
+                scheduleGroups.get(scheduleKey).days.push(translatedDay);
+                scheduleGroups.get(scheduleKey).dayIndexes.push(index);
             })
 
+            const value = Array.from(scheduleGroups.values());
             const result = Array.from(scheduleGroups.values()).map(group => ({
                 ...group,
                 daysDisplay: this.formatDaysRange(group.days, group.dayIndexes, language),
                 firstDayIndex: Math.min(...group.dayIndexes) 
             }));
             
-            return result.sort((a, b) => {
+            const sortedResult = result.sort((a, b) => {
                 const firstDayA = a.firstDayIndex === 0 ? 7 : a.firstDayIndex;
                 const firstDayB = b.firstDayIndex === 0 ? 7 : b.firstDayIndex;
                 return firstDayA - firstDayB;
             });
+
+            return sortedResult;
         } catch (error) {
             console.error('ContactService: Error getting grouped schedule:', error);
             throw error;
