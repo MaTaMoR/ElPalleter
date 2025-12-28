@@ -90,19 +90,22 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
 ---
 
 {imageData ? (
-    <Image
-        class={`responsive-image ${objectFitClass} ${objectPositionClass} ${className}`}
-        src={imageData}
-        alt={altText}
-        loading={finalLoading}
-        decoding={decoding}
-        widths={[400, 800, 1200, 1600, 2000]}
-        sizes={sizes}
-        format="webp"
-        data-image-id={name}
-        width={width}
-        height={height}
-    />
+    <div class="responsive-image-wrapper">
+        <div class="image-skeleton"></div>
+        <Image
+            class={`responsive-image ${objectFitClass} ${objectPositionClass} ${className}`}
+            src={imageData}
+            alt={altText}
+            loading={finalLoading}
+            decoding={decoding}
+            widths={[400, 800, 1200, 1600, 2000]}
+            sizes={sizes}
+            format="webp"
+            data-image-id={name}
+            width={width}
+            height={height}
+        />
+    </div>
 ) : showFallback ? (
     <div class={`responsive-image-fallback ${className}`} data-image-id={name}>
         <div class="fallback-content">
@@ -132,12 +135,44 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
 )}
 
 <style is:inline>
+    .responsive-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .image-skeleton {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s ease-in-out infinite;
+        opacity: 1;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+    }
+
+    .image-skeleton.hidden {
+        opacity: 0;
+    }
+
     .responsive-image {
+        position: relative;
         width: 100%;
         height: 100%;
         display: block;
         opacity: 0;
         transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
     }
 
     .responsive-image.loaded {
@@ -271,18 +306,6 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         color: rgba(255, 255, 255, 0.7);
     }
 
-    /* Shimmer effect mientras se carga */
-    .responsive-image {
-        background: linear-gradient(
-            90deg,
-            rgba(244, 162, 97, 0.05) 0%,
-            rgba(244, 162, 97, 0.1) 50%,
-            rgba(244, 162, 97, 0.05) 100%
-        );
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-    }
-
     @keyframes shimmer {
         0% {
             background-position: -200% 0;
@@ -290,12 +313,6 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
         100% {
             background-position: 200% 0;
         }
-    }
-
-    /* Una vez cargada, quitar el shimmer */
-    .responsive-image.loaded {
-        animation: none;
-        background: none;
     }
 
     @media (max-width: 768px) {
@@ -316,9 +333,41 @@ const objectPositionClass = objectPosition === 'center' ? 'object-center' :
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const images = document.querySelectorAll('.responsive-image');
+        const imageWrappers = document.querySelectorAll('.responsive-image-wrapper');
 
-        images.forEach(img => {
+        imageWrappers.forEach(wrapper => {
+            const img = wrapper.querySelector('.responsive-image');
+            const skeleton = wrapper.querySelector('.image-skeleton');
+
+            if (!img) return;
+
+            const handleImageLoad = () => {
+                img.classList.add('loaded');
+                if (skeleton) {
+                    skeleton.classList.add('hidden');
+                }
+            };
+
+            if (img.complete && img.naturalHeight !== 0) {
+                handleImageLoad();
+            } else {
+                img.addEventListener('load', handleImageLoad);
+
+                img.addEventListener('error', () => {
+                    if (img.dataset.imageId) {
+                        console.warn(`Error cargando imagen: ${img.dataset.imageId}`);
+                    }
+                    // Ocultar skeleton incluso si hay error
+                    if (skeleton) {
+                        skeleton.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // También manejar imágenes que no están en wrappers (fallback compatibility)
+        const standaloneImages = document.querySelectorAll('.responsive-image:not(.responsive-image-wrapper .responsive-image)');
+        standaloneImages.forEach(img => {
             if (img.complete && img.naturalHeight !== 0) {
                 img.classList.add('loaded');
             } else {
