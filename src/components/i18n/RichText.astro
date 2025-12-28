@@ -68,8 +68,8 @@ const Element = tag;
     contain: layout style;
   }
 
-  /* Títulos HTML estándar */
-  .richtext-editor h1 {
+  /* Títulos HTML estándar - usando :global para contenido inyectado con set:html */
+  .richtext-editor :global(h1) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
     font-weight: var(--font-bold);
@@ -80,15 +80,7 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h1 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    letter-spacing: inherit;
-  }
-
-  .richtext-editor h2 {
+  .richtext-editor :global(h2) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-3xl), 3vw, var(--text-4xl));
     font-weight: var(--font-semibold);
@@ -99,15 +91,7 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h2 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    letter-spacing: inherit;
-  }
-
-  .richtext-editor h3 {
+  .richtext-editor :global(h3) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-2xl), 2.5vw, var(--text-3xl));
     font-weight: var(--font-medium);
@@ -117,14 +101,7 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h3 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-
-  .richtext-editor h4 {
+  .richtext-editor :global(h4) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-xl), 2vw, var(--text-2xl));
     font-weight: var(--font-medium);
@@ -134,14 +111,7 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h4 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-
-  .richtext-editor h5 {
+  .richtext-editor :global(h5) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-lg), 1.75vw, var(--text-xl));
     font-weight: var(--font-medium);
@@ -151,14 +121,7 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h5 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-
-  .richtext-editor h6 {
+  .richtext-editor :global(h6) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-base), 1.5vw, var(--text-lg));
     font-weight: var(--font-medium);
@@ -168,15 +131,8 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor h6 > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-
   /* Párrafos HTML estándar */
-  .richtext-editor p {
+  .richtext-editor :global(p) {
     font-family: var(--rt-font-family);
     font-size: clamp(var(--text-base), 1.25vw, var(--text-lg));
     font-weight: var(--font-normal);
@@ -186,34 +142,27 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor p > span {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-
   /* Elementos inline HTML estándar */
-  .richtext-editor strong {
+  .richtext-editor :global(strong) {
     font-weight: var(--font-bold);
     color: inherit; /* Permite que el color se pueda sobrescribir con estilos inline */
     transition: var(--transition-colors);
   }
 
-  .richtext-editor em {
+  .richtext-editor :global(em) {
     font-style: italic;
     color: inherit;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor u {
+  .richtext-editor :global(u) {
     text-decoration: underline;
     text-decoration-color: var(--rt-accent-color);
     text-underline-offset: var(--space-1);
     transition: var(--transition-colors);
   }
 
-  .richtext-editor code {
+  .richtext-editor :global(code) {
     font-family: var(--rt-mono-font);
     font-size: 0.9em;
     background-color: var(--rt-border-color);
@@ -224,7 +173,7 @@ const Element = tag;
   }
 
   /* Enlaces HTML estándar */
-  .richtext-editor a {
+  .richtext-editor :global(a) {
     color: var(--rt-accent-color);
     text-decoration: none;
     font-weight: var(--font-medium);
@@ -232,18 +181,18 @@ const Element = tag;
     transition: var(--transition-colors);
   }
 
-  .richtext-editor a:hover {
+  .richtext-editor :global(a:hover) {
     border-bottom-color: var(--rt-accent-color);
   }
 
   /* Listas HTML estándar */
-  .richtext-editor ul,
-  .richtext-editor ol {
+  .richtext-editor :global(ul),
+  .richtext-editor :global(ol) {
     margin: var(--space-4) 0;
     padding-left: var(--space-6);
   }
 
-  .richtext-editor li {
+  .richtext-editor :global(li) {
     font-family: var(--rt-font-family);
     font-size: clamp(var(--text-base), 1.25vw, var(--text-lg));
     line-height: var(--leading-normal);
@@ -253,7 +202,7 @@ const Element = tag;
   }
 
   /* Blockquotes HTML estándar */
-  .richtext-editor blockquote {
+  .richtext-editor :global(blockquote) {
     font-family: var(--rt-heading-font);
     font-size: clamp(var(--text-lg), 1.5vw, var(--text-xl));
     font-style: italic;
@@ -267,7 +216,7 @@ const Element = tag;
     transition: var(--transition-base);
   }
 
-  .richtext-editor blockquote::before {
+  .richtext-editor :global(blockquote::before) {
     content: '"';
     font-family: var(--rt-heading-font);
     font-size: var(--text-5xl);
@@ -282,12 +231,12 @@ const Element = tag;
 
   /* Responsive para elementos HTML estándar */
   @media (max-width: 768px) {
-    .richtext-editor blockquote {
+    .richtext-editor :global(blockquote) {
       padding: var(--space-4) var(--space-6);
       margin: var(--space-6) 0;
     }
 
-    .richtext-editor blockquote::before {
+    .richtext-editor :global(blockquote::before) {
       font-size: var(--text-4xl);
       left: var(--space-1);
     }
