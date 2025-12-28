@@ -535,6 +535,8 @@ const { images } = Astro.props;
 </style>
 
 <script>
+    import { useBreakpoints } from '../../utils/breakpoints.js';
+
     class ImageSlider {
         constructor(containerId) {
             this.containerId = containerId || 'sliderContainer';
@@ -562,6 +564,18 @@ const { images } = Astro.props;
             this.modalOverlay = this.modal?.querySelector('.slider-fullscreen-overlay');
             this.modalWrapper = this.modal?.querySelector(`[data-slider-target="${this.containerId}"]`);
             this.closeBtn = this.modal?.querySelector('[data-close-slider-modal]');
+
+            // Handlers de fullscreen (guardados para poder añadir/quitar)
+            this.fullscreenHandlers = {
+                slideClick: null,
+                overlayClick: null,
+                closeBtnClick: null,
+                escapeKey: null
+            };
+            this.fullscreenListenersActive = false;
+
+            // Sistema de breakpoints
+            this.breakpoints = null;
 
             if (this.totalSlides > 0 && this.sliderWrapper) {
                 this.init();
@@ -621,40 +635,111 @@ const { images } = Astro.props;
             // Guardar el padre original del slider
             this.originalParent = this.container.parentElement;
 
-            // Event listeners para modo fullscreen (solo en tablet+)
-            if (window.innerWidth >= 768 && this.modal) {
-                this.slides.forEach(slide => {
-                    slide.addEventListener('click', () => {
-                        if (!this.isFullscreen) {
-                            this.openFullscreen();
-                        }
-                    });
-                });
+            // Inicializar sistema de breakpoints
+            this.breakpoints = useBreakpoints(`slider-${this.containerId}`);
 
-                // Click en overlay para cerrar
-                if (this.modalOverlay) {
-                    this.modalOverlay.addEventListener('click', () => {
-                        if (this.isFullscreen) {
-                            this.closeFullscreen();
-                        }
-                    });
+            // Configurar fullscreen según breakpoint inicial
+            this.updateFullscreenListeners();
+
+            // Suscribirse a cambios de breakpoint
+            this.breakpoints.subscribe({
+                onBreakpointChange: (newBreakpoint, oldBreakpoint) => {
+                    console.debug(`ImageSlider: Breakpoint changed ${oldBreakpoint} → ${newBreakpoint}`);
+                    this.updateFullscreenListeners();
                 }
+            });
+        }
 
-                // Click en botón cerrar
-                if (this.closeBtn) {
-                    this.closeBtn.addEventListener('click', () => {
-                        if (this.isFullscreen) {
-                            this.closeFullscreen();
-                        }
-                    });
+        /**
+         * Añade o quita event listeners de fullscreen según el breakpoint actual
+         */
+        updateFullscreenListeners() {
+            const shouldHaveListeners = this.breakpoints.isTabletUp();
+
+            if (shouldHaveListeners && !this.fullscreenListenersActive) {
+                this.addFullscreenListeners();
+            } else if (!shouldHaveListeners && this.fullscreenListenersActive) {
+                this.removeFullscreenListeners();
+            }
+        }
+
+        /**
+         * Añade event listeners para fullscreen
+         */
+        addFullscreenListeners() {
+            if (!this.modal || this.fullscreenListenersActive) return;
+
+            // Crear handlers
+            this.fullscreenHandlers.slideClick = () => {
+                if (!this.isFullscreen) {
+                    this.openFullscreen();
                 }
+            };
 
-                // Tecla ESC para cerrar
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && this.isFullscreen) {
-                        this.closeFullscreen();
-                    }
-                });
+            this.fullscreenHandlers.overlayClick = () => {
+                if (this.isFullscreen) {
+                    this.closeFullscreen();
+                }
+            };
+
+            this.fullscreenHandlers.closeBtnClick = () => {
+                if (this.isFullscreen) {
+                    this.closeFullscreen();
+                }
+            };
+
+            this.fullscreenHandlers.escapeKey = (e) => {
+                if (e.key === 'Escape' && this.isFullscreen) {
+                    this.closeFullscreen();
+                }
+            };
+
+            // Añadir event listeners
+            this.slides.forEach(slide => {
+                slide.addEventListener('click', this.fullscreenHandlers.slideClick);
+            });
+
+            if (this.modalOverlay) {
+                this.modalOverlay.addEventListener('click', this.fullscreenHandlers.overlayClick);
+            }
+
+            if (this.closeBtn) {
+                this.closeBtn.addEventListener('click', this.fullscreenHandlers.closeBtnClick);
+            }
+
+            document.addEventListener('keydown', this.fullscreenHandlers.escapeKey);
+
+            this.fullscreenListenersActive = true;
+            console.debug(`ImageSlider: Fullscreen listeners added`);
+        }
+
+        /**
+         * Quita event listeners de fullscreen
+         */
+        removeFullscreenListeners() {
+            if (!this.fullscreenListenersActive) return;
+
+            // Quitar event listeners
+            this.slides.forEach(slide => {
+                slide.removeEventListener('click', this.fullscreenHandlers.slideClick);
+            });
+
+            if (this.modalOverlay) {
+                this.modalOverlay.removeEventListener('click', this.fullscreenHandlers.overlayClick);
+            }
+
+            if (this.closeBtn) {
+                this.closeBtn.removeEventListener('click', this.fullscreenHandlers.closeBtnClick);
+            }
+
+            document.removeEventListener('keydown', this.fullscreenHandlers.escapeKey);
+
+            this.fullscreenListenersActive = false;
+            console.debug(`ImageSlider: Fullscreen listeners removed`);
+
+            // Si estaba en fullscreen al cambiar a móvil, cerrar
+            if (this.isFullscreen) {
+                this.closeFullscreen();
             }
         }
         
@@ -720,6 +805,12 @@ const { images } = Astro.props;
         
         destroy() {
             this.clearAutoPlay();
+            this.removeFullscreenListeners();
+
+            // Desuscribirse del sistema de breakpoints
+            if (this.breakpoints) {
+                this.breakpoints.unsubscribe();
+            }
         }
 
         async openFullscreen() {
