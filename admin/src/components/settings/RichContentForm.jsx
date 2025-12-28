@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import PropTypes from 'prop-types';
 import { FileText } from 'lucide-react';
 import RichTextEditor from '../common/RichTextEditor';
-import { RichContentService } from '../../../../src/services/RichContentService';
+import { RichContentService } from '@services/RichContentService';
 import styles from './RichContentForm.module.css';
 
 /**
