@@ -463,43 +463,41 @@ const { images } = Astro.props;
         transform: none !important;
     }
 
-    /* View Transitions API - Shared element transition */
-    @supports (view-transition-name: none) {
-        .slider-container {
-            view-transition-name: slider-transition;
-        }
-
-        .slider-fullscreen-wrapper .slider-container {
-            view-transition-name: slider-transition;
-        }
-    }
-
-    /* Animación de escalado para el slider durante la transición */
+    /* Animación para transición a fullscreen */
     .slider-container.transitioning-to-fullscreen {
-        animation: scaleUpToFullscreen 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        animation: expandToFullscreen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        z-index: 999999;
     }
 
     .slider-container.transitioning-from-fullscreen {
-        animation: scaleDownFromFullscreen 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        animation: contractFromFullscreen 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    @keyframes scaleUpToFullscreen {
-        from {
+    @keyframes expandToFullscreen {
+        0% {
             transform: scale(1);
             opacity: 1;
         }
-        to {
-            transform: scale(1.05);
-            opacity: 0.8;
+        50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+        100% {
+            transform: scale(1.15);
+            opacity: 0.7;
         }
     }
 
-    @keyframes scaleDownFromFullscreen {
-        from {
-            transform: scale(1.05);
-            opacity: 0.8;
+    @keyframes contractFromFullscreen {
+        0% {
+            transform: scale(1.15);
+            opacity: 0.7;
         }
-        to {
+        50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+        100% {
             transform: scale(1);
             opacity: 1;
         }
@@ -727,7 +725,7 @@ const { images } = Astro.props;
 
             this.isFullscreen = true;
 
-            // Prevenir scroll del body y html ANTES de hacer cualquier otra cosa
+            // Prevenir scroll del body y html
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
 
@@ -735,32 +733,21 @@ const { images } = Astro.props;
             this.modal.style.visibility = 'visible';
             this.modalOverlay.style.opacity = '0';
 
-            // Usar View Transitions API si está disponible
-            if (document.startViewTransition) {
-                const transition = document.startViewTransition(() => {
-                    // Mover el slider al wrapper del modal
-                    this.modalWrapper.appendChild(this.container);
-                });
+            // Iniciar animación de expansión
+            this.container.classList.add('transitioning-to-fullscreen');
 
-                await transition.finished;
+            // Esperar a que la animación llegue al punto medio
+            await new Promise(resolve => setTimeout(resolve, 300));
 
-                // Ahora sí activar el modal completo (con overlay visible)
+            // Mover el slider al wrapper del modal
+            this.modalWrapper.appendChild(this.container);
+            this.container.classList.remove('transitioning-to-fullscreen');
+
+            // Activar el modal completo con fade-in del overlay
+            requestAnimationFrame(() => {
                 this.modal.classList.add('active');
                 this.modalOverlay.style.opacity = '';
-            } else {
-                // Fallback: animación manual
-                this.container.classList.add('transitioning-to-fullscreen');
-
-                await new Promise(resolve => setTimeout(resolve, 200));
-
-                this.modalWrapper.appendChild(this.container);
-                this.container.classList.remove('transitioning-to-fullscreen');
-
-                requestAnimationFrame(() => {
-                    this.modal.classList.add('active');
-                    this.modalOverlay.style.opacity = '';
-                });
-            }
+            });
 
             // Detener autoplay en fullscreen
             this.clearAutoPlay();
@@ -771,33 +758,30 @@ const { images } = Astro.props;
 
             this.isFullscreen = false;
 
-            // Usar View Transitions API si está disponible
-            if (document.startViewTransition) {
-                const transition = document.startViewTransition(() => {
-                    // Quitar clase active del modal
-                    this.modal.classList.remove('active');
+            // Fade out del overlay primero
+            this.modalOverlay.style.opacity = '0';
 
-                    // Devolver el slider a su posición original
-                    if (this.originalParent && this.container) {
-                        this.originalParent.appendChild(this.container);
-                    }
-                });
+            // Esperar un poco para que el overlay se desvanezca
+            await new Promise(resolve => setTimeout(resolve, 150));
 
-                await transition.finished;
-            } else {
-                // Fallback: animación manual
-                this.modal.classList.remove('active');
-                this.container.classList.add('transitioning-from-fullscreen');
-
-                await new Promise(resolve => setTimeout(resolve, 150));
-
-                // Devolver el slider a su posición original
-                if (this.originalParent && this.container) {
-                    this.originalParent.appendChild(this.container);
-                }
-
-                this.container.classList.remove('transitioning-from-fullscreen');
+            // Devolver el slider a su posición original
+            if (this.originalParent && this.container) {
+                this.originalParent.appendChild(this.container);
             }
+
+            // Iniciar animación de contracción
+            this.container.classList.add('transitioning-from-fullscreen');
+
+            // Esperar a que termine la animación
+            await new Promise(resolve => setTimeout(resolve, 400));
+
+            // Limpiar
+            this.container.classList.remove('transitioning-from-fullscreen');
+            this.modal.classList.remove('active');
+
+            // Limpiar estilos inline del modal para poder volver a abrir
+            this.modal.style.visibility = '';
+            this.modalOverlay.style.opacity = '';
 
             // Restaurar scroll del body y html
             document.documentElement.style.overflow = '';
