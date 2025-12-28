@@ -514,6 +514,7 @@ const { images } = Astro.props;
             this.isTransitioning = false;
             this.isFullscreen = false;
             this.originalParent = null;
+            this.scrollPosition = 0;
 
             // Referencias al modal fullscreen
             this.modal = document.querySelector(`[data-slider-modal="${this.containerId}"]`);
@@ -685,6 +686,9 @@ const { images } = Astro.props;
 
             this.isFullscreen = true;
 
+            // Guardar la posición actual del scroll
+            this.scrollPosition = window.scrollY || window.pageYOffset;
+
             // Mover el slider al wrapper del modal
             this.modalWrapper.appendChild(this.container);
 
@@ -694,10 +698,11 @@ const { images } = Astro.props;
             });
 
             // Prevenir scroll del body de forma más robusta
+            // Aplicar el scroll guardado como top negativo para mantener la posición visual
             document.body.style.overflow = 'hidden';
             document.body.style.position = 'fixed';
+            document.body.style.top = `-${this.scrollPosition}px`;
             document.body.style.width = '100%';
-            document.body.style.height = '100%';
 
             // Detener autoplay en fullscreen
             this.clearAutoPlay();
@@ -721,8 +726,11 @@ const { images } = Astro.props;
                 // Restaurar scroll del body completamente
                 document.body.style.overflow = '';
                 document.body.style.position = '';
+                document.body.style.top = '';
                 document.body.style.width = '';
-                document.body.style.height = '';
+
+                // Restaurar la posición del scroll
+                window.scrollTo(0, this.scrollPosition);
 
                 // Reanudar autoplay
                 this.startAutoPlay();
