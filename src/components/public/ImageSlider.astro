@@ -14,6 +14,7 @@ export interface Props {
 const { images } = Astro.props;
 ---
 
+<div class="slider-overlay" data-slider-overlay="historia-slider"></div>
 <div class="slider-container" data-slider="historia-slider">
     <div class="slider-wrapper">
         {images.map((image, index) => (
@@ -32,13 +33,13 @@ const { images } = Astro.props;
             </div>
         ))}
     </div>
-    
+
     <button class="slider-arrow prev" aria-label="Imagen anterior">‹</button>
     <button class="slider-arrow next" aria-label="Siguiente imagen">›</button>
-    
+
     <div class="slider-nav">
         {images.map((_, index) => (
-            <button 
+            <button
                 class={`nav-dot ${index === 0 ? 'active' : ''}`}
                 data-slide={index}
                 aria-label={`Ir a imagen ${index + 1}`}
@@ -324,8 +325,72 @@ const { images } = Astro.props;
         pointer-events: none;
     }
 
+    /* Overlay para modo fullscreen */
+    .slider-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9998;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--duration-300) var(--ease-in-out),
+                    visibility var(--duration-300) var(--ease-in-out);
+        cursor: pointer;
+    }
+
+    .slider-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Modo fullscreen del slider */
     .slider-container.fullscreen {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        height: 90vh;
+        max-width: 90vw;
+        max-height: 90vh;
+        z-index: 9999;
         border-radius: 0;
+        margin: 0;
+    }
+
+    /* Cursor pointer en las imágenes solo en tablet+ */
+    @media (min-width: 768px) {
+        .slide {
+            cursor: pointer;
+        }
+
+        .slide:hover :global(.slide-background) {
+            transform: scale(1.02);
+            transition: transform var(--duration-300) var(--ease-in-out);
+        }
+
+        .slider-container.fullscreen .slide {
+            cursor: default;
+        }
+
+        .slider-container.fullscreen .slide:hover :global(.slide-background) {
+            transform: scale(1);
+        }
+    }
+
+    /* En modo fullscreen, las imágenes ocupan todo el espacio disponible */
+    .slider-container.fullscreen .slide :global(.slide-background) {
+        object-fit: contain;
+    }
+
+    /* Ocultar overlay en móvil */
+    @media (max-width: 767px) {
+        .slider-overlay {
+            display: none;
+        }
     }
 </style>
 
@@ -334,22 +399,24 @@ const { images } = Astro.props;
         constructor(containerId) {
             this.containerId = containerId || 'sliderContainer';
             this.container = document.querySelector(`[data-slider="${this.containerId}"]`);
-            
+
             if (!this.container) {
                 console.warn(`Slider container with data-slider="${this.containerId}" not found`);
                 return;
             }
-            
+
             this.currentSlide = 0;
             this.sliderWrapper = this.container.querySelector('.slider-wrapper');
             this.dots = this.container.querySelectorAll('.nav-dot');
             this.slides = this.container.querySelectorAll('.slide');
             this.prevBtn = this.container.querySelector('.slider-arrow.prev');
             this.nextBtn = this.container.querySelector('.slider-arrow.next');
+            this.overlay = document.querySelector(`[data-slider-overlay="${this.containerId}"]`);
             this.totalSlides = this.slides.length;
             this.autoPlayInterval = null;
             this.isTransitioning = false;
-            
+            this.isFullscreen = false;
+
             if (this.totalSlides > 0 && this.sliderWrapper) {
                 this.init();
                 this.updateSlider();
@@ -395,10 +462,37 @@ const { images } = Astro.props;
             this.startAutoPlay();
             
             this.container.addEventListener('keydown', (e) => this.handleKeydown(e));
-            
+
             this.container.setAttribute('tabindex', '0');
             this.container.setAttribute('role', 'region');
             this.container.setAttribute('aria-label', 'Galería de imágenes');
+
+            // Event listeners para modo fullscreen (solo en tablet+)
+            if (window.innerWidth >= 768) {
+                this.slides.forEach(slide => {
+                    slide.addEventListener('click', () => {
+                        if (!this.isFullscreen) {
+                            this.openFullscreen();
+                        }
+                    });
+                });
+            }
+
+            // Click en overlay para cerrar fullscreen
+            if (this.overlay) {
+                this.overlay.addEventListener('click', () => {
+                    if (this.isFullscreen) {
+                        this.closeFullscreen();
+                    }
+                });
+            }
+
+            // Tecla ESC para cerrar fullscreen
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.isFullscreen) {
+                    this.closeFullscreen();
+                }
+            });
         }
         
         updateSlider() {
@@ -463,6 +557,34 @@ const { images } = Astro.props;
         
         destroy() {
             this.clearAutoPlay();
+        }
+
+        openFullscreen() {
+            if (!this.container || !this.overlay) return;
+
+            this.isFullscreen = true;
+            this.container.classList.add('fullscreen');
+            this.overlay.classList.add('active');
+
+            // Prevenir scroll del body
+            document.body.style.overflow = 'hidden';
+
+            // Detener autoplay en fullscreen
+            this.clearAutoPlay();
+        }
+
+        closeFullscreen() {
+            if (!this.container || !this.overlay) return;
+
+            this.isFullscreen = false;
+            this.container.classList.remove('fullscreen');
+            this.overlay.classList.remove('active');
+
+            // Restaurar scroll del body
+            document.body.style.overflow = '';
+
+            // Reanudar autoplay
+            this.startAutoPlay();
         }
     }
     
