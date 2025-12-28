@@ -463,6 +463,48 @@ const { images } = Astro.props;
         transform: none !important;
     }
 
+    /* View Transitions API - Shared element transition */
+    @supports (view-transition-name: none) {
+        .slider-container {
+            view-transition-name: slider-transition;
+        }
+
+        .slider-fullscreen-wrapper .slider-container {
+            view-transition-name: slider-transition;
+        }
+    }
+
+    /* Animación de escalado para el slider durante la transición */
+    .slider-container.transitioning-to-fullscreen {
+        animation: scaleUpToFullscreen 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .slider-container.transitioning-from-fullscreen {
+        animation: scaleDownFromFullscreen 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes scaleUpToFullscreen {
+        from {
+            transform: scale(1);
+            opacity: 1;
+        }
+        to {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+    }
+
+    @keyframes scaleDownFromFullscreen {
+        from {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
     /* Ocultar modal en móvil */
     @media (max-width: 767px) {
         .slider-fullscreen-modal {
@@ -680,7 +722,7 @@ const { images } = Astro.props;
             this.clearAutoPlay();
         }
 
-        openFullscreen() {
+        async openFullscreen() {
             if (!this.container || !this.modal || !this.modalWrapper || this.isFullscreen) return;
 
             this.isFullscreen = true;
@@ -689,40 +731,72 @@ const { images } = Astro.props;
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
 
-            // Mover el slider al wrapper del modal
-            this.modalWrapper.appendChild(this.container);
+            // Usar View Transitions API si está disponible
+            if (document.startViewTransition) {
+                const transition = document.startViewTransition(() => {
+                    // Mover el slider al wrapper del modal
+                    this.modalWrapper.appendChild(this.container);
+                    this.modal.classList.add('active');
+                });
 
-            // Activar el modal con un pequeño delay para la transición
-            requestAnimationFrame(() => {
-                this.modal.classList.add('active');
-            });
+                await transition.finished;
+            } else {
+                // Fallback: animación manual
+                this.container.classList.add('transitioning-to-fullscreen');
+
+                await new Promise(resolve => setTimeout(resolve, 150));
+
+                this.modalWrapper.appendChild(this.container);
+                this.container.classList.remove('transitioning-to-fullscreen');
+
+                requestAnimationFrame(() => {
+                    this.modal.classList.add('active');
+                });
+            }
 
             // Detener autoplay en fullscreen
             this.clearAutoPlay();
         }
 
-        closeFullscreen() {
+        async closeFullscreen() {
             if (!this.isFullscreen || !this.modal) return;
 
             this.isFullscreen = false;
 
-            // Quitar clase active del modal
-            this.modal.classList.remove('active');
+            // Usar View Transitions API si está disponible
+            if (document.startViewTransition) {
+                const transition = document.startViewTransition(() => {
+                    // Quitar clase active del modal
+                    this.modal.classList.remove('active');
 
-            // Esperar a que termine la transición antes de mover el slider
-            setTimeout(() => {
+                    // Devolver el slider a su posición original
+                    if (this.originalParent && this.container) {
+                        this.originalParent.appendChild(this.container);
+                    }
+                });
+
+                await transition.finished;
+            } else {
+                // Fallback: animación manual
+                this.modal.classList.remove('active');
+                this.container.classList.add('transitioning-from-fullscreen');
+
+                await new Promise(resolve => setTimeout(resolve, 150));
+
                 // Devolver el slider a su posición original
                 if (this.originalParent && this.container) {
                     this.originalParent.appendChild(this.container);
                 }
 
-                // Restaurar scroll del body y html
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
+                this.container.classList.remove('transitioning-from-fullscreen');
+            }
 
-                // Reanudar autoplay
-                this.startAutoPlay();
-            }, 300); // Duración de la transición
+            // Restaurar scroll del body y html
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+
+            // Reanudar autoplay
+            this.startAutoPlay();
         }
     }
     
