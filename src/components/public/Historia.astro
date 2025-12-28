@@ -75,7 +75,7 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
 
     /* === CONTAINER USANDO SISTEMA GLOBAL === */
     .historia-container {
-        min-height: 660px;
+        min-height: 400px;
         height: auto;
         display: flex;
         flex-direction: row;
@@ -87,7 +87,6 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
 
     /* === CONTENT SECTIONS - USANDO GLASS SYSTEM === */
     .history-content {
-        flex: 1.2;
         padding: var(--padding-mobile);
         display: flex;
         flex-direction: column;
@@ -105,8 +104,6 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
     }
 
     .slider-section {
-        flex: 1.3;
-        min-height: 660px;
         height: auto;
         display: grid;
         place-items: center;
@@ -139,34 +136,6 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
         overflow-wrap: break-word;
     }
 
-    @media (min-width: 768px) {
-        .historia-header {
-            margin-bottom: calc(var(--gap-tablet) * 2);
-        }
-
-        .historia-title {
-            font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
-            margin-bottom: var(--gap-tablet);
-        }
-
-        .historia-subtitle {
-            font-size: var(--text-xl);
-        }
-
-        .historia-container {
-            gap: var(--gap-tablet);
-        }
-        
-        .history-content {
-            padding: var(--padding-tablet);
-        }
-        
-        .slider-section {
-            height: auto;
-            min-height: 500px;
-        }
-    }
-
     @media (min-width: 1024px) {
         .historia-header {
             margin-bottom: calc(var(--gap-desktop) * 1.33);
@@ -178,10 +147,15 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
 
         .historia-container {
             gap: var(--gap-desktop);
+            flex-direction: column-reverse;
         }
         
         .history-content {
             padding: var(--padding-desktop);
+        }
+
+        .slider-section {
+            max-height: 500px;
         }
     }
 
@@ -196,10 +170,20 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
 
         .historia-container {
             gap: var(--gap-desktop-lg);
+            flex-direction: row;
+        }
+
+        .slider-section {
+            max-height: unset;
+            flex: 1;
+        }
+
+        .history-content {
+            flex: 1;
         }
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
         .historia-section {
             min-height: auto;
             max-height: none;
@@ -234,8 +218,9 @@ const imagesToShow = await ImageService.getGalleryImages('historia');
         
         .slider-section {
             order: 1;
+            max-height: 400px;
             height: fit-content;
-            min-height: fit-content;
+            min-height: unset;
             border-radius: var(--radius-xl);
             transform: translate3d(0, 0, 0);
         }
