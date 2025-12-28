@@ -27,6 +27,7 @@ const { images } = Astro.props;
                     showFallback={true}
                     fallbackText="Imagen no disponible"
                     fallbackIcon="image"
+                    objectFit='contain'
                 />
             </div>
         ))}
@@ -81,6 +82,10 @@ const { images } = Astro.props;
         backface-visibility: hidden;
         contain: layout style paint;
         overflow: hidden;
+    }
+
+    .slide :global(img) {
+        object-fit: contain;
     }
     
     .slide :global(.slide-background) {
@@ -206,9 +211,7 @@ const { images } = Astro.props;
         .slider-container {
             border-radius: var(--radius-xl);
         }
-    }
 
-    @media (max-width: 640px) {
         .slider-arrow {
             width: var(--space-10);
             height: var(--space-10);
@@ -447,7 +450,7 @@ const { images } = Astro.props;
                     if (!this.isTransitioning) {
                         this.nextSlide();
                     }
-                }, 3500);
+                }, 8500); // DELAY 8,5S BETWEEN SLIDES
             }
         }
         
