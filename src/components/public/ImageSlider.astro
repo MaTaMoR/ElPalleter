@@ -685,6 +685,10 @@ const { images } = Astro.props;
 
             this.isFullscreen = true;
 
+            // Prevenir scroll del body y html ANTES de hacer cualquier otra cosa
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+
             // Mover el slider al wrapper del modal
             this.modalWrapper.appendChild(this.container);
 
@@ -692,9 +696,6 @@ const { images } = Astro.props;
             requestAnimationFrame(() => {
                 this.modal.classList.add('active');
             });
-
-            // Prevenir scroll del body
-            document.body.style.overflow = 'hidden';
 
             // Detener autoplay en fullscreen
             this.clearAutoPlay();
@@ -715,7 +716,8 @@ const { images } = Astro.props;
                     this.originalParent.appendChild(this.container);
                 }
 
-                // Restaurar scroll del body
+                // Restaurar scroll del body y html
+                document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
 
                 // Reanudar autoplay
