@@ -14,6 +14,19 @@ export interface Props {
 const { images } = Astro.props;
 ---
 
+<!-- Wrapper fullscreen para el slider -->
+<div class="slider-fullscreen-modal" data-slider-modal="historia-slider">
+    <div class="slider-fullscreen-overlay"></div>
+    <div class="slider-fullscreen-content">
+        <button class="slider-close-btn" data-close-slider-modal aria-label="Cerrar vista completa">
+            <span>✕</span>
+        </button>
+        <div class="slider-fullscreen-wrapper" data-slider-target="historia-slider">
+            <!-- El slider se moverá aquí -->
+        </div>
+    </div>
+</div>
+
 <div class="slider-container" data-slider="historia-slider">
     <div class="slider-wrapper">
         {images.map((image, index) => (
@@ -336,67 +349,143 @@ const { images } = Astro.props;
         }
     }
 
-    /* Estilos para fullscreen modal (se crean dinámicamente) */
-    :global(.slider-fullscreen-overlay) {
+    /* Modal fullscreen para el slider */
+    .slider-fullscreen-modal {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 999998;
+        z-index: var(--z-modal);
         opacity: 0;
-        transition: opacity var(--duration-300) var(--ease-in-out);
+        visibility: hidden;
+        transition: opacity var(--duration-300) var(--ease-in-out),
+                    visibility var(--duration-300) var(--ease-in-out);
+        contain: layout style paint;
+    }
+
+    .slider-fullscreen-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .slider-fullscreen-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
         cursor: pointer;
     }
 
-    :global(.slider-fullscreen-overlay.active) {
-        opacity: 1;
-    }
-
-    :global(.slider-fullscreen-wrapper) {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 999999;
+    .slider-fullscreen-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: var(--space-12);
         box-sizing: border-box;
+    }
+
+    .slider-close-btn {
+        position: absolute;
+        top: var(--space-8);
+        right: var(--space-8);
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop-blur);
+        border: var(--border-1) solid var(--glass-border);
+        color: var(--text-primary);
+        font-size: var(--text-2xl);
+        cursor: pointer;
+        padding: var(--space-3);
+        border-radius: var(--radius-full);
+        transition: var(--transition-base);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
         opacity: 0;
-        transition: opacity var(--duration-300) var(--ease-in-out);
-        pointer-events: none;
+        transform: translateX(var(--space-5)) rotate(0deg);
     }
 
-    :global(.slider-fullscreen-wrapper.active) {
+    .slider-fullscreen-modal.active .slider-close-btn {
         opacity: 1;
-        pointer-events: auto;
+        transform: translateX(0) rotate(0deg);
+        transition: all var(--duration-300) var(--ease-out) var(--duration-100);
     }
 
-    :global(.slider-fullscreen-wrapper .slider-container) {
+    .slider-close-btn:hover {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+        color: #ffffff;
+        transform: rotate(90deg) scale(1.1);
+    }
+
+    .slider-fullscreen-modal.active .slider-close-btn:hover {
+        transform: rotate(90deg) scale(1.1);
+    }
+
+    .slider-close-btn:focus-visible {
+        outline: var(--border-2) solid var(--focus-ring);
+        outline-offset: var(--space-1);
+    }
+
+    .slider-fullscreen-wrapper {
         width: 100%;
         height: 100%;
         max-width: 1400px;
         max-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .slider-fullscreen-wrapper .slider-container {
+        width: 100%;
+        height: 100%;
         border-radius: var(--radius-xl);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
-    :global(.slider-fullscreen-wrapper .slide) {
+    .slider-fullscreen-wrapper .slide {
         cursor: default !important;
     }
 
-    :global(.slider-fullscreen-wrapper .slide:hover) :global(.slide-background) {
+    .slider-fullscreen-wrapper .slide:hover :global(.slide-background) {
         transform: none !important;
     }
 
+    /* Ocultar modal en móvil */
     @media (max-width: 767px) {
-        :global(.slider-fullscreen-overlay),
-        :global(.slider-fullscreen-wrapper) {
+        .slider-fullscreen-modal {
             display: none;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .slider-close-btn {
+            width: 40px;
+            height: 40px;
+            top: var(--space-6);
+            right: var(--space-6);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .slider-fullscreen-modal,
+        .slider-close-btn {
+            transition: none;
+        }
+
+        .slider-close-btn:hover,
+        .slider-fullscreen-modal.active .slider-close-btn:hover {
+            transform: none;
         }
     }
 </style>
@@ -422,9 +511,13 @@ const { images } = Astro.props;
             this.autoPlayInterval = null;
             this.isTransitioning = false;
             this.isFullscreen = false;
-            this.fullscreenOverlay = null;
-            this.fullscreenWrapper = null;
             this.originalParent = null;
+
+            // Referencias al modal fullscreen
+            this.modal = document.querySelector(`[data-slider-modal="${this.containerId}"]`);
+            this.modalOverlay = this.modal?.querySelector('.slider-fullscreen-overlay');
+            this.modalWrapper = this.modal?.querySelector(`[data-slider-target="${this.containerId}"]`);
+            this.closeBtn = this.modal?.querySelector('[data-close-slider-modal]');
 
             if (this.totalSlides > 0 && this.sliderWrapper) {
                 this.init();
@@ -476,8 +569,16 @@ const { images } = Astro.props;
             this.container.setAttribute('role', 'region');
             this.container.setAttribute('aria-label', 'Galería de imágenes');
 
+            // Mover el modal al body para que esté fuera del contexto del container
+            if (this.modal && this.modal.parentElement !== document.body) {
+                document.body.appendChild(this.modal);
+            }
+
+            // Guardar el padre original del slider
+            this.originalParent = this.container.parentElement;
+
             // Event listeners para modo fullscreen (solo en tablet+)
-            if (window.innerWidth >= 768) {
+            if (window.innerWidth >= 768 && this.modal) {
                 this.slides.forEach(slide => {
                     slide.addEventListener('click', () => {
                         if (!this.isFullscreen) {
@@ -485,10 +586,32 @@ const { images } = Astro.props;
                         }
                     });
                 });
-            }
 
-            // Guardar el padre original
-            this.originalParent = this.container.parentElement;
+                // Click en overlay para cerrar
+                if (this.modalOverlay) {
+                    this.modalOverlay.addEventListener('click', () => {
+                        if (this.isFullscreen) {
+                            this.closeFullscreen();
+                        }
+                    });
+                }
+
+                // Click en botón cerrar
+                if (this.closeBtn) {
+                    this.closeBtn.addEventListener('click', () => {
+                        if (this.isFullscreen) {
+                            this.closeFullscreen();
+                        }
+                    });
+                }
+
+                // Tecla ESC para cerrar
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isFullscreen) {
+                        this.closeFullscreen();
+                    }
+                });
+            }
         }
         
         updateSlider() {
@@ -556,41 +679,17 @@ const { images } = Astro.props;
         }
 
         openFullscreen() {
-            if (!this.container || this.isFullscreen) return;
+            if (!this.container || !this.modal || !this.modalWrapper || this.isFullscreen) return;
 
             this.isFullscreen = true;
 
-            // Crear overlay
-            this.fullscreenOverlay = document.createElement('div');
-            this.fullscreenOverlay.className = 'slider-fullscreen-overlay';
+            // Mover el slider al wrapper del modal
+            this.modalWrapper.appendChild(this.container);
 
-            // Crear wrapper fullscreen
-            this.fullscreenWrapper = document.createElement('div');
-            this.fullscreenWrapper.className = 'slider-fullscreen-wrapper';
-
-            // Mover el slider al wrapper fullscreen
-            this.fullscreenWrapper.appendChild(this.container);
-
-            // Añadir overlay y wrapper al body
-            document.body.appendChild(this.fullscreenOverlay);
-            document.body.appendChild(this.fullscreenWrapper);
-
-            // Activar con un pequeño delay para la transición
+            // Activar el modal con un pequeño delay para la transición
             requestAnimationFrame(() => {
-                this.fullscreenOverlay.classList.add('active');
-                this.fullscreenWrapper.classList.add('active');
+                this.modal.classList.add('active');
             });
-
-            // Event listeners para cerrar
-            this.fullscreenOverlay.addEventListener('click', () => this.closeFullscreen());
-
-            const escapeHandler = (e) => {
-                if (e.key === 'Escape') {
-                    this.closeFullscreen();
-                    document.removeEventListener('keydown', escapeHandler);
-                }
-            };
-            document.addEventListener('keydown', escapeHandler);
 
             // Prevenir scroll del body
             document.body.style.overflow = 'hidden';
@@ -600,31 +699,19 @@ const { images } = Astro.props;
         }
 
         closeFullscreen() {
-            if (!this.isFullscreen || !this.fullscreenOverlay || !this.fullscreenWrapper) return;
+            if (!this.isFullscreen || !this.modal) return;
 
             this.isFullscreen = false;
 
-            // Quitar clases active para transición
-            this.fullscreenOverlay.classList.remove('active');
-            this.fullscreenWrapper.classList.remove('active');
+            // Quitar clase active del modal
+            this.modal.classList.remove('active');
 
-            // Esperar a que termine la transición antes de limpiar
+            // Esperar a que termine la transición antes de mover el slider
             setTimeout(() => {
                 // Devolver el slider a su posición original
-                if (this.originalParent) {
+                if (this.originalParent && this.container) {
                     this.originalParent.appendChild(this.container);
                 }
-
-                // Eliminar overlay y wrapper del DOM
-                if (this.fullscreenOverlay && this.fullscreenOverlay.parentElement) {
-                    this.fullscreenOverlay.remove();
-                }
-                if (this.fullscreenWrapper && this.fullscreenWrapper.parentElement) {
-                    this.fullscreenWrapper.remove();
-                }
-
-                this.fullscreenOverlay = null;
-                this.fullscreenWrapper = null;
 
                 // Restaurar scroll del body
                 document.body.style.overflow = '';
