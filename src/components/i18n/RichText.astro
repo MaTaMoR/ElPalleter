@@ -1,8 +1,8 @@
 ---
 export const prerender = true;
 
-import richContent from '../../data/rich-content.json';
 import { I18nService } from '../../services/I18nService.js';
+import { RichContentService } from '../../services/RichContentService.js';
 
 export interface Props {
   key: string;
@@ -28,14 +28,6 @@ const {
 
 const { locale } = I18nService.getI18nInfo(Astro);
 
-function getRichContent(contentKey: string, lang: string): string {
-  const content = richContent[contentKey as keyof typeof richContent];
-  if (content && typeof content === 'object') {
-    return content[lang as keyof typeof content] || content['es'] || fallback || '';
-  }
-  return fallback || contentKey;
-}
-
 function sanitizeHtml(html: string): string {
   if (!sanitize) return html;
   
@@ -46,16 +38,17 @@ function sanitizeHtml(html: string): string {
     .replace(/javascript:/gi, '');
 }
 
-let htmlContent = getRichContent(key, locale);
+const richContent = await RichContentService.getContentByLanguageAndKey(locale, "historia_content");
+let html = richContent.contentValue;
 
 if (sanitize) {
-  htmlContent = sanitizeHtml(htmlContent);
+  html = sanitizeHtml(html);
 }
 
-if (maxLength && htmlContent.length > maxLength) {
-  const tempDiv = { textContent: htmlContent.replace(/<[^>]*>/g, '') };
+if (maxLength && html.length > maxLength) {
+  const tempDiv = { textContent: html.replace(/<[^>]*>/g, '') };
   if (tempDiv.textContent && tempDiv.textContent.length > maxLength) {
-    htmlContent = htmlContent.substring(0, maxLength - 3) + '...';
+    html = html.substring(0, maxLength - 3) + '...';
   }
 }
 
@@ -67,398 +60,13 @@ const elementProps = {
 const Element = tag;
 ---
 
-<Element {...elementProps} set:html={htmlContent} />
+<Element {...elementProps} set:html={html} />
 
 <style>
-  /* === RICH TEXT EDITOR - COMPLETAMENTE MIGRADO === */
-
-  /* === SISTEMA DE TEMAS CON TOKENS === */
-  
-  /* Tema Light usando tokens del sistema */
-  .richtext-editor.light-theme {
-    --rt-primary-color: var(--text-primary);
-    --rt-secondary-color: var(--text-secondary);
-    --rt-accent-color: var(--accent-primary);
-    --rt-highlight-color: var(--accent-hover);
-    --rt-background-color: var(--bg-primary);
-    --rt-border-color: var(--border-primary);
-    --rt-font-family: var(--font-primary);
-    --rt-heading-font: var(--font-heading);
-    --rt-mono-font: var(--font-mono);
-  }
-  
-  /* Tema Dark usando tokens del sistema */
-  .richtext-editor.dark-theme {
-    --rt-primary-color: var(--text-primary);
-    --rt-secondary-color: var(--text-secondary);
-    --rt-accent-color: var(--accent-primary);
-    --rt-highlight-color: var(--accent-hover);
-    --rt-background-color: var(--bg-primary);
-    --rt-border-color: var(--border-primary);
-    --rt-font-family: var(--font-primary);
-    --rt-heading-font: var(--font-heading);
-    --rt-mono-font: var(--font-mono);
-  }
-  
-  /* Tema Gold - MANTENIENDO EXACTAMENTE EL DISEÑO ORIGINAL */
-  .richtext-editor.gold-theme {
-    --rt-primary-color: #ffffff;
-    --rt-secondary-color: #f4a261;
-    --rt-accent-color: #f39c12;
-    --rt-highlight-color: #f4a261;
-    --rt-background-color: transparent;
-    --rt-border-color: #f4a261;
-    --rt-font-family: var(--font-primary);
-    --rt-heading-font: var(--font-heading);
-    --rt-mono-font: var(--font-mono);
-  }
-
-  /* Tema Adaptive - SE ADAPTA AL TEMA GLOBAL */
-  .richtext-editor.adaptive-theme {
-    /* Por defecto (tema oscuro) usa colores del tema gold */
-    --rt-primary-color: #ffffff;
-    --rt-secondary-color: #f4a261;
-    --rt-accent-color: #f39c12;
-    --rt-highlight-color: #f4a261;
-    --rt-background-color: transparent;
-    --rt-border-color: #f4a261;
-    --rt-font-family: var(--font-primary);
-    --rt-heading-font: var(--font-heading);
-    --rt-mono-font: var(--font-mono);
-    
-    /* Transiciones suaves usando tokens */
-    transition: var(--transition-colors);
-  }
-
-  /* Tema adaptive en modo claro */
-  :root[data-theme="light"] .richtext-editor.adaptive-theme,
-  html[data-theme="light"] .richtext-editor.adaptive-theme {
-    --rt-primary-color: var(--text-primary);
-    --rt-secondary-color: var(--accent-primary);
-    --rt-accent-color: var(--accent-primary);
-    --rt-highlight-color: var(--accent-primary);
-    --rt-background-color: transparent;
-    --rt-border-color: var(--accent-primary);
-  }
-  
-  /* Tema Custom - permite override completo */
-  .richtext-editor.custom-theme {
-    --rt-primary-color: var(--text-primary);
-    --rt-secondary-color: var(--text-secondary);
-    --rt-accent-color: var(--accent-primary);
-    --rt-highlight-color: var(--accent-hover);
-    --rt-background-color: var(--bg-primary);
-    --rt-border-color: var(--border-primary);
-    --rt-font-family: var(--font-primary);
-    --rt-heading-font: var(--font-heading);
-    --rt-mono-font: var(--font-mono);
-  }
-  
-  /* === BASE CONTAINER === */
-  .richtext-editor {
-    width: 100%;
-    font-family: var(--rt-font-family);
-    color: var(--rt-primary-color);
-    background-color: var(--rt-background-color);
-    line-height: var(--leading-normal);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    contain: layout style;
-  }
-  
-  /* Reset básico para evitar herencia */
-  .richtext-editor * {
-    box-sizing: border-box;
-  }
-  
-  /* === SISTEMA DE TIPOGRAFÍA CON TOKENS === */
-  
-  /* Títulos usando tokens de tamaño responsivo */
-  .richtext-editor :global(.rt-h1) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-4xl), 4vw, var(--text-5xl));
-    font-weight: var(--font-bold);
-    line-height: var(--leading-tight);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-6) 0;
-    letter-spacing: var(--tracking-tight);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-h2) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-3xl), 3vw, var(--text-4xl));
-    font-weight: var(--font-semibold);
-    line-height: var(--leading-tight);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-5) 0;
-    letter-spacing: var(--tracking-tight);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-h3) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-2xl), 2.5vw, var(--text-3xl));
-    font-weight: var(--font-medium);
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-4) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-h4) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-xl), 2vw, var(--text-2xl));
-    font-weight: var(--font-medium);
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-3) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-h5) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-lg), 1.75vw, var(--text-xl));
-    font-weight: var(--font-medium);
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-3) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-h6) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-base), 1.5vw, var(--text-lg));
-    font-weight: var(--font-medium);
-    line-height: var(--leading-normal);
-    color: var(--rt-secondary-color);
-    margin: 0 0 var(--space-3) 0;
-    transition: var(--transition-colors);
-  }
-  
-  /* Textos de Cuerpo usando tokens */
-  .richtext-editor :global(.rt-body-large) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-lg), 1.5vw, var(--text-xl));
-    font-weight: var(--font-normal);
-    line-height: var(--leading-relaxed);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-5) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-body) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-base), 1.25vw, var(--text-lg));
-    font-weight: var(--font-normal);
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-4) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-body-small) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-sm), 1.1vw, var(--text-base));
-    font-weight: var(--font-normal);
-    line-height: var(--leading-normal);
-    color: var(--rt-secondary-color);
-    margin: 0 0 var(--space-3) 0;
-    transition: var(--transition-colors);
-  }
-  
-  /* Subtítulos y elementos especiales */
-  .richtext-editor :global(.rt-subtitle) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-lg), 1.75vw, var(--text-xl));
-    font-weight: var(--font-normal);
-    font-style: italic;
-    line-height: var(--leading-normal);
-    color: var(--rt-secondary-color);
-    margin: 0 0 var(--space-2) 0;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-lead) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-lg), 1.75vw, var(--text-xl));
-    font-weight: var(--font-light);
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin: 0 0 var(--space-6) 0;
-    transition: var(--transition-colors);
-  }
-  
-  /* === ELEMENTOS INLINE === */
-  
-  /* Destacados y énfasis */
-  .richtext-editor :global(.rt-highlight) {
-    color: var(--rt-highlight-color);
-    font-weight: var(--font-semibold);
-    background: none;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-accent) {
-    color: var(--rt-accent-color);
-    font-weight: var(--font-medium);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-strong) {
-    font-weight: var(--font-bold);
-    color: var(--rt-primary-color);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-emphasis) {
-    font-style: italic;
-    color: var(--rt-primary-color);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-underline) {
-    text-decoration: underline;
-    text-decoration-color: var(--rt-accent-color);
-    text-underline-offset: var(--space-1);
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-code) {
-    font-family: var(--rt-mono-font);
-    font-size: 0.9em;
-    background-color: var(--rt-border-color);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-sm);
-    color: var(--rt-primary-color);
-    transition: var(--transition-base);
-  }
-  
-  /* === ELEMENTOS DE BLOQUE === */
-  
-  /* Quotes usando tokens */
-  .richtext-editor :global(.rt-quote) {
-    font-family: var(--rt-heading-font);
-    font-size: clamp(var(--text-lg), 1.5vw, var(--text-xl));
-    font-style: italic;
-    line-height: var(--leading-normal);
-    color: var(--rt-secondary-color);
-    margin: var(--space-8) 0;
-    padding: var(--space-6) var(--space-8);
-    border-left: var(--border-4) solid var(--rt-accent-color);
-    background-color: var(--rt-border-color);
-    position: relative;
-    transition: var(--transition-base);
-  }
-  
-  .richtext-editor :global(.rt-quote::before) {
-    content: '"';
-    font-family: var(--rt-heading-font);
-    font-size: var(--text-5xl);
-    color: var(--rt-accent-color);
-    position: absolute;
-    left: var(--space-2);
-    top: 0;
-    line-height: 1;
-    opacity: 0.3;
-    transition: var(--transition-colors);
-  }
-  
-  /* Listas usando tokens */
-  .richtext-editor :global(.rt-list) {
-    margin: var(--space-4) 0;
-    padding-left: var(--space-6);
-  }
-  
-  .richtext-editor :global(.rt-list-item) {
-    font-family: var(--rt-font-family);
-    font-size: clamp(var(--text-base), 1.25vw, var(--text-lg));
-    line-height: var(--leading-normal);
-    color: var(--rt-primary-color);
-    margin-bottom: var(--space-2);
-    transition: var(--transition-colors);
-  }
-  
-  /* Enlaces */
-  .richtext-editor :global(.rt-link) {
-    color: var(--rt-accent-color);
-    text-decoration: none;
-    font-weight: var(--font-medium);
-    border-bottom: var(--border-1) solid transparent;
-    transition: var(--transition-colors);
-  }
-  
-  .richtext-editor :global(.rt-link:hover) {
-    border-bottom-color: var(--rt-accent-color);
-  }
-  
-  /* === ESPACIADO CON TOKENS === */
-  .richtext-editor :global(.rt-spacer-xs) { height: var(--space-2); }
-  .richtext-editor :global(.rt-spacer-sm) { height: var(--space-4); }
-  .richtext-editor :global(.rt-spacer-md) { height: var(--space-6); }
-  .richtext-editor :global(.rt-spacer-lg) { height: var(--space-8); }
-  .richtext-editor :global(.rt-spacer-xl) { height: var(--space-12); }
-  
-  /* === CONTENEDORES === */
-  .richtext-editor :global(.rt-content) {
-    width: 100%;
-  }
-  
-  .richtext-editor :global(.rt-section) {
-    margin: var(--space-8) 0;
-  }
-  
-  .richtext-editor :global(.rt-block) {
-    margin: var(--space-4) 0;
-  }
-  
-  /* === COLORES PERSONALIZADOS USANDO TOKENS === */
-  .richtext-editor :global(.rt-color-primary) { color: var(--rt-primary-color) !important; }
-  .richtext-editor :global(.rt-color-secondary) { color: var(--rt-secondary-color) !important; }
-  .richtext-editor :global(.rt-color-accent) { color: var(--rt-accent-color) !important; }
-  .richtext-editor :global(.rt-color-highlight) { color: var(--rt-highlight-color) !important; }
-  
-  /* === TAMAÑOS PERSONALIZADOS CON TOKENS === */
-  .richtext-editor :global(.rt-size-xs) { font-size: var(--text-xs) !important; }
-  .richtext-editor :global(.rt-size-sm) { font-size: var(--text-sm) !important; }
-  .richtext-editor :global(.rt-size-md) { font-size: var(--text-base) !important; }
-  .richtext-editor :global(.rt-size-lg) { font-size: var(--text-lg) !important; }
-  .richtext-editor :global(.rt-size-xl) { font-size: var(--text-xl) !important; }
-  .richtext-editor :global(.rt-size-2xl) { font-size: var(--text-2xl) !important; }
-  
-  /* === RESPONSIVE CON TOKENS === */
-  @media (max-width: 768px) {
-    .richtext-editor :global(.rt-quote) {
-      padding: var(--space-4) var(--space-6);
-      margin: var(--space-6) 0;
-    }
-    
-    .richtext-editor :global(.rt-quote::before) {
-      font-size: var(--text-4xl);
-      left: var(--space-1);
-    }
-  }
-
-  /* === ACCESIBILIDAD === */
-  @media (prefers-reduced-motion: reduce) {
-    .richtext-editor :global(*) {
-      transition: none !important;
-    }
-  }
-
-  @media (prefers-contrast: high) {
-    .richtext-editor :global(.rt-code),
-    .richtext-editor :global(.rt-quote) {
-      border: var(--border-2) solid var(--rt-accent-color);
-    }
-  }
-
   /* === MEJORAS DE RENDIMIENTO === */
   .richtext-editor {
     contain: layout style;
   }
-
-  /* === SOPORTE PARA HTML ESTÁNDAR (NUEVO FORMATO) === */
 
   /* Títulos HTML estándar - usando :global para contenido inyectado con set:html */
   .richtext-editor :global(h1) {
@@ -634,18 +242,3 @@ const Element = tag;
     }
   }
 </style>
-
-<script>
-  window.RichTextEditor = {
-    themes: ['light', 'dark', 'gold', 'custom'],
-    elements: [
-      'rt-h1', 'rt-h2', 'rt-h3', 'rt-h4', 'rt-h5', 'rt-h6',
-      'rt-body-large', 'rt-body', 'rt-body-small',
-      'rt-subtitle', 'rt-lead', 'rt-quote',
-      'rt-highlight', 'rt-accent', 'rt-strong', 'rt-emphasis'
-    ],
-    colors: ['primary', 'secondary', 'accent', 'highlight'],
-    sizes: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'],
-    spacers: ['xs', 'sm', 'md', 'lg', 'xl']
-  };
-</script>

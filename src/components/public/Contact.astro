@@ -1,18 +1,18 @@
 ---
 export const prerender = true;
 
-import Text from '../i18n/Text.astro';
-import { I18nService } from '../../services/I18nService.js'
-import { ContactService } from '../../services/ContactService.js';
-import Icon from './Icon.astro';
+import Text from "../i18n/Text.astro";
+import { I18nService } from "../../services/I18nService.js";
+import { ContactService } from "../../services/ContactService.js";
+import Icon from "./Icon.astro";
 
 // Obtener información de i18n
 const { locale } = I18nService.getI18nInfo(Astro);
 
-const {
-    statusInfo,
-    socials,
-    groupedSchedule,
+const { 
+    statusInfo, 
+    socials, 
+    groupedSchedule, 
     contactInfo
 } = await ContactService.getContactDataWithTranslations(I18nService, locale);
 ---
@@ -23,19 +23,13 @@ const {
             <Text key="contact.title" fallback="Contacto" />
         </h2>
         <p class="contact-subtitle">
-            <Text
-                key="contact.subtitle"
-                fallback="Donde estamos y como contactarnos"
-            />
+            <Text key="contact.subtitle" fallback="Donde estamos y como contactarnos" />
         </p>
     </div>
     <div class="contact-container">
         <div class="contact-component">
             <div class="top-bar">
-                <div
-                    class={`status status-${statusInfo.status}`}
-                    id="restaurantStatus"
-                >
+                <div class={`status status-${statusInfo.status}`} id="restaurantStatus">
                     <div class="status-dot"></div>
                     <span id="statusText" class="status-message">
                         <strong>{statusInfo.fullMessage || "No Disponible"}</strong>
@@ -46,62 +40,30 @@ const {
             <div class="contact-content">
                 <div class="contact-grid">
                     <div class="contact-info-section">
-                        <h4>
-                            <Text
-                                key="contact.sections.address"
-                                fallback="Dirección"
-                            />
-                        </h4>
+                        <h4><Text key="contact.sections.address" fallback="Dirección" /></h4>
                         <p>{contactInfo.street}</p>
+                        <p>{contactInfo.postalCode}{contactInfo.city}</p>
+                        <p>{contactInfo.province}, {contactInfo.country}</p>
+                    </div>
+
+                    <div class="contact-info-section">
+                        <h4><Text key="contact.sections.phone" fallback="Contacto" /></h4>
                         <p>
-                            {contactInfo.postalCode}
-                            {contactInfo.city}
+                            <strong><Text key="contact.fields.phone" fallback="Teléfono"/>:</strong>
+                            <a href={`tel:${contactInfo.phoneMain}`}>
+                                {contactInfo.phoneMain}
+                            </a>
                         </p>
                         <p>
-                            {contactInfo.province}, {
-                                contactInfo.country
-                            }
+                            <strong><Text key="contact.fields.email" fallback="Email" />:</strong>
+                            <a href={`mailto:${contactInfo.emailMain}`}>
+                                {contactInfo.emailMain}
+                            </a>
                         </p>
                     </div>
 
                     <div class="contact-info-section">
-                        <h4>
-                            <Text
-                                key="contact.sections.phone"
-                                fallback="Contacto"
-                            />
-                        </h4>
-                        <p>
-                            <strong
-                                ><Text
-                                    key="contact.fields.phone"
-                                    fallback="Teléfono"
-                                />:</strong
-                            >
-                            <a href={`tel:${contactInfo.phoneMain}`}
-                                >{contactInfo.phoneMain}</a
-                            >
-                        </p>
-                        <p>
-                            <strong
-                                ><Text
-                                    key="contact.fields.email"
-                                    fallback="Email"
-                                />:</strong
-                            >
-                            <a href={`mailto:${contactInfo.emailMain}`}
-                                >{contactInfo.emailMain}</a
-                            >
-                        </p>
-                    </div>
-
-                    <div class="contact-info-section">
-                        <h4>
-                            <Text
-                                key="contact.sections.hours"
-                                fallback="Horarios"
-                            />
-                        </h4>
+                        <h4><Text key="contact.sections.hours" fallback="Horarios" /></h4>
                         {
                             groupedSchedule.map((group) => (
                                 <div class="schedule-group">
@@ -110,26 +72,14 @@ const {
                                     </p>
                                     {group.closed ? (
                                         <p class="schedule-closed">
-                                            <Text
-                                                key="contact.status.states.closed"
-                                                fallback="Cerrado"
-                                            />
+                                            <Text key="contact.status.states.closed" fallback="Cerrado" />
                                         </p>
                                     ) : (
                                         <div class="schedule-ranges">
                                             {group.ranges.map((range) => (
                                                 <p class="schedule-range">
-                                                    {range.translatedName && (
-                                                        <span class="range-name">
-                                                            {
-                                                                range.translatedName
-                                                            }
-                                                            :{" "}
-                                                        </span>
-                                                    )}
                                                     <span class="range-time">
-                                                        {range.start} -{" "}
-                                                        {range.end}
+                                                        {range.startTime + " - " + range.endTime}
                                                     </span>
                                                 </p>
                                             ))}
@@ -140,12 +90,7 @@ const {
                         }
                     </div>
                     <div class="contact-info-section social-section">
-                        <h4>
-                            <Text
-                                key="contact.sections.social"
-                                fallback="Síguenos"
-                            />
-                        </h4>
+                        <h4><Text key="contact.sections.social" fallback="Síguenos" /></h4>
                         <div class="social-links">
                             {
                                 socials.map((social) => (
@@ -156,7 +101,7 @@ const {
                                         title={social.handle}
                                         aria-label={social.platform}
                                     >
-                                        <Icon name={social.icon.name}/>
+                                        <Icon name={social.icon.name} />
                                     </a>
                                 ))
                             }
@@ -338,7 +283,7 @@ const {
 
     .contact-grid {
         display: grid;
-        grid-template-columns: repeat(3,1fr);
+        grid-template-columns: repeat(3, 1fr);
         grid-template-rows: auto auto;
         gap: calc(var(--gap-mobile) * 1.5);
     }
@@ -414,7 +359,8 @@ const {
         margin-bottom: calc(var(--gap-mobile) * 0.3) !important;
     }
 
-    .schedule-ranges, .schedule-closed {
+    .schedule-ranges,
+    .schedule-closed {
         margin-left: calc(var(--padding-mobile) * 0.8);
     }
 
@@ -444,7 +390,11 @@ const {
     }
 
     .social-links a {
-        background: linear-gradient(45deg,var(--accent-active),var(--accent-primary));
+        background: linear-gradient(
+            45deg,
+            var(--accent-active),
+            var(--accent-primary)
+        );
         color: var(--accent-primary);
         width: var(--space-8);
         height: var(--space-8);
@@ -497,7 +447,8 @@ const {
             font-size: var(--text-base);
         }
 
-        .schedule-ranges, .schedule-closed  {
+        .schedule-ranges,
+        .schedule-closed {
             margin-left: calc(var(--padding-mobile) * 0.5);
         }
 
@@ -538,7 +489,8 @@ const {
             margin-bottom: calc(var(--gap-mobile) * 1);
         }
 
-        .schedule-ranges, .schedule-closed  {
+        .schedule-ranges,
+        .schedule-closed {
             margin-left: calc(var(--padding-mobile) * 0.75);
         }
     }
@@ -590,7 +542,8 @@ const {
         .contact-info-section:nth-child(4) {
             grid-column: 1 / span 2;
             grid-row: 2;
-            padding: calc(var(--padding-tablet) * 0.6) calc(var(--padding-tablet) * 0.75);
+            padding: calc(var(--padding-tablet) * 0.6)
+                calc(var(--padding-tablet) * 0.75);
             display: flex;
             align-items: center;
             gap: calc(var(--gap-tablet) * 1.5);
@@ -633,7 +586,8 @@ const {
             margin-bottom: calc(var(--gap-tablet) * 0.5);
         }
 
-        .schedule-ranges, .schedule-closed  {
+        .schedule-ranges,
+        .schedule-closed {
             margin-left: calc(var(--padding-tablet) * 0.8);
         }
     }
@@ -685,7 +639,8 @@ const {
         .contact-info-section:nth-child(4) {
             grid-column: 1 / span 2;
             grid-row: 2;
-            padding: calc(var(--padding-desktop) * 0.6) calc(var(--padding-desktop) * 0.75);
+            padding: calc(var(--padding-desktop) * 0.6)
+                calc(var(--padding-desktop) * 0.75);
             display: flex;
             align-items: center;
             gap: calc(var(--gap-desktop) * 1.5);
@@ -728,7 +683,8 @@ const {
             margin-bottom: calc(var(--gap-desktop) * 0.5);
         }
 
-        .schedule-ranges, .schedule-closed  {
+        .schedule-ranges,
+        .schedule-closed {
             margin-left: calc(var(--padding-desktop) * 0.8);
         }
     }
@@ -760,7 +716,8 @@ const {
         }
 
         .contact-info-section:nth-child(4) {
-            padding: calc(var(--padding-desktop) * 0.7) calc(var(--padding-desktop) * 0.875);
+            padding: calc(var(--padding-desktop) * 0.7)
+                calc(var(--padding-desktop) * 0.875);
         }
 
         .social-links {
@@ -860,11 +817,11 @@ const {
         try {
             await I18nService.init();
         } catch (error) {
-            console.warn('Failed to initialize I18nService:', error);
+            console.warn("Failed to initialize I18nService:", error);
         }
 
         // Inicializar monitoreo del estado del restaurante
-        const locale = document.documentElement.lang || 'es';
+        const locale = document.documentElement.lang || "es";
         const statusManager = new ContactStatusManager(locale);
 
         // Actualizar estado inmediatamente al cargar la página
@@ -877,7 +834,12 @@ const {
 
         // Monitorear cambios cada minuto
         statusManager.onStatusChange((newStatus, oldStatus) => {
-            console.debug('Restaurant status changed:', oldStatus?.status, '→', newStatus.status);
+            console.debug(
+                "Restaurant status changed:",
+                oldStatus?.status,
+                "→",
+                newStatus.status,
+            );
             statusManager.updateStatusElements(newStatus);
         });
 
